@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "date": "2024-05-01",
+        "region": "Europe",
+        "sales": 1200,
+        "category": "A"
+    },
+    {
+        "id": 2,
+        "date": "2024-05-02",
+        "region": "Asie",
+        "sales": 900,
+        "category": "B"
+    },
+    {
+        "id": 3,
+        "date": "2024-05-03",
+        "region": "Amérique",
+        "sales": 1500,
+        "category": "A"
+    }
+]
