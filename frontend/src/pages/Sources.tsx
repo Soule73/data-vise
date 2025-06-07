@@ -1,82 +1,17 @@
 import Button from '@/components/Button';
 import Table from '@/components/Table';
 import Modal from '@/components/Modal';
-import Notification, { type NotificationType } from '@/components/Notification';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getSources, deleteSource } from '@/services/datasource';
-import { useNavigate } from 'react-router-dom';
+import { useSourcesPage } from '@/hooks/useSourcesPage';
+import { useSources } from '@/hooks/useSources';
 import { ROUTES } from '@/constants/routes';
-import { useState } from 'react';
 import { EditSourceForm, DeleteSourceForm } from '@/components/source/SourceForms';
 
 export default function SourcesPage() {
-  const { data: sources = [] } = useQuery({
-    queryKey: ['sources'],
-    queryFn: getSources,
-  });
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedSource, setSelectedSource] = useState<any>(null);
-  const [modalType, setModalType] = useState<'delete' | 'edit' | null>(null);
-  const [notif, setNotif] = useState<{
-    open: boolean;
-    type: NotificationType;
-    title: string;
-    description?: string;
-  }>({ open: false, type: 'default', title: '' });
+  const {
+    modalOpen, setModalOpen, selectedSource, setSelectedSource, modalType, setModalType, navigate, deleteMutation, handleEditSuccess, handleEditError
+  } = useSourcesPage();
 
-  const handleEditSuccess = () => {
-    setNotif({
-      open: true,
-      type: 'success',
-      title: 'Source modifiée',
-      description: 'La source a bien été modifiée.',
-    });
-    queryClient.invalidateQueries({ queryKey: ['sources'] });
-  };
-
-  const handleEditError = (message: string) => {
-    setNotif({
-      open: true,
-      type: 'error',
-      title: 'Erreur',
-      description: message,
-    });
-  };
-
-  const handleDeleteSuccess = () => {
-    setNotif({
-      open: true,
-      type: 'success',
-      title: 'Source supprimée',
-      description: 'La source a bien été supprimée.',
-    });
-    queryClient.invalidateQueries({ queryKey: ['sources'] });
-  };
-
-  const handleDeleteError = (message: string) => {
-    setNotif({
-      open: true,
-      type: 'error',
-      title: 'Erreur',
-      description: message,
-    });
-  };
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteSource(id),
-    onSuccess: () => {
-      setModalOpen(false);
-      setSelectedSource(null);
-      handleDeleteSuccess();
-    },
-    onError: (e: any) => {
-      setModalOpen(false);
-      setSelectedSource(null);
-      handleDeleteError(e.response?.data?.message || 'Erreur lors de la suppression');
-    },
-  });
+  const { sources } = useSources();
 
   const columns = [
     {
@@ -121,7 +56,6 @@ export default function SourcesPage() {
                         Sources de données
                 </h1>
             <div className="flex items-center gap-2">
-                        
                 <Button color="indigo" size="lg" onClick={() => navigate(ROUTES.addSource)}>
                     Ajouter une source
                 </Button>
@@ -136,7 +70,6 @@ export default function SourcesPage() {
         onClose={() => { setModalOpen(false); setSelectedSource(null); }}
         title={modalType === 'delete' ? 'Supprimer la source' : 'Modifier la source'}
         size="sm"
-        color={modalType === 'delete' ? 'red' : 'indigo'}
         footer={null}
       >
         {modalType === 'delete' && selectedSource && (
@@ -156,15 +89,6 @@ export default function SourcesPage() {
           />
         )}
       </Modal>
-      <Notification
-        open={notif.open}
-        onClose={() => setNotif(n => ({ ...n, open: false }))}
-        type={notif.type}
-        title={notif.title}
-        description={notif.description}
-        duration={3500}
-        position="bottom-right"
-      />
     </>
   );
 }

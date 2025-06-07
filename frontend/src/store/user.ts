@@ -1,42 +1,25 @@
 import { create } from 'zustand';
-import { jwtDecode } from 'jwt-decode';
 import { persist } from 'zustand/middleware';
 import type { StateCreator } from 'zustand';
 
-interface DecodedToken {
+interface UserRole {
   id: string;
-  email?: string;
-  username?: string;
-  role: string;
-  exp: number;
-}
-
-function getUserFromToken(token: string | null) {
-  if (!token) return null;
-  try {
-    const decoded = jwtDecode<DecodedToken>(token);
-    return {
-      id: decoded.id,
-      username: decoded.username || '',
-      email: decoded.email || '',
-      role: decoded.role,
-    };
-  } catch {
-    return null;
-  }
+  name: string;
+  description?: string;
+  permissions: { id: string; name: string; description?: string }[];
 }
 
 interface UserState {
-  user: { id: string; username: string; email: string; role: string } | null;
+  user: { id: string; username: string; email: string; role: UserRole | null } | null;
   token: string | null;
-  setUser: (user: { id: string; username: string; email: string; role: string }, token: string) => void;
+  setUser: (user: { id: string; username: string; email: string; role: UserRole | null }, token: string) => void;
   logout: () => void;
 }
 
 export const useUserStore = create<UserState>(
   persist(
     (set) => ({
-      user: getUserFromToken(localStorage.getItem('token')),
+      user: null,
       token: localStorage.getItem('token'),
       setUser: (user, token) => {
         localStorage.setItem('token', token);

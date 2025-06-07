@@ -5,4 +5,7 @@ export const ROUTES = {
   sources: '/sources',
   addSource: '/sources/add',
   widgets: '/widgets',
+  roles: '/roles',
+  roleCreate: '/roles/create',
+  users: '/users'
 };

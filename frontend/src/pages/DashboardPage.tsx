@@ -1,9 +1,7 @@
-import DashboardGrid from '@/components/DashboardGrid';
-import Button from '@/components/Button';
-import WidgetSelectModal from '@/components/WidgetSelectModal';
-import Notification from '@/components/Notification';
-import { useDashboard } from '@/hooks/useDashboard';
-
+import DashboardGrid from "@/components/DashboardGrid";
+import Button from "@/components/Button";
+import WidgetSelectModal from "@/components/WidgetSelectModal";
+import { useDashboard } from "@/hooks/useDashboard";
 
 export default function DashboardPage() {
   const {
@@ -13,8 +11,6 @@ export default function DashboardPage() {
     selectOpen,
     setSelectOpen,
     layout,
-    notif,
-    setNotif,
     editMode,
     setEditMode,
     hasUnsavedChanges,
@@ -31,38 +27,61 @@ export default function DashboardPage() {
 
   return (
     <>
-      <WidgetSelectModal open={selectOpen} onClose={() => setSelectOpen(false)} onSelect={handleAddWidget} />
+      <WidgetSelectModal
+        open={selectOpen}
+        onClose={() => setSelectOpen(false)}
+        onSelect={handleAddWidget}
+      />
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold ">Tableau de bord</h1>
-          {editMode ? (
-            <div className="flex items-center gap-2 w-1/2">
-              <Button color="indigo" size="md" onClick={() => setSelectOpen(true)}>
-                Ajouter un widget
-              </Button>
-            <Button color="green" size="md" onClick={
-              handleSave
-            } loading={saving}>
-                Sauvegarder
-              </Button>
-              <Button color="gray" size="md" onClick={() => setEditMode(false)}>
-                Annuler
-              </Button>
-            </div>
+        {editMode ? (
+          <div className="flex items-center gap-2">
+            <Button
+              color="indigo"
+              className=" !min-w-42"
+              size="md"
+              onClick={() => setSelectOpen(true)}
+            >
+              Ajouter un widget
+            </Button>
+            <Button
+              color="green"
+              size="md"
+              onClick={handleSave}
+              loading={saving}
+            >
+              Sauvegarder
+            </Button>
+            <Button
+              color="gray"
+              variant="outline"
+              size="md"
+              onClick={() => setEditMode(false)}
+            >
+              Annuler
+            </Button>
+          </div>
         ) : (
-            <div>
-            <Button color="indigo" size="md" variant="outline"
-              className=' w-max'
-              onClick={() => setEditMode(true)}>
+          <div>
+            <Button
+              color="indigo"
+              size="md"
+              variant="outline"
+              className=" w-max"
+              onClick={() => setEditMode(true)}
+            >
               Modifier
             </Button>
-            </div>
-          )}
+          </div>
+        )}
       </div>
       {isLoading ? (
         <div>Chargement…</div>
       ) : layout.length === 0 ? (
         <div className="text-gray-400 text-center py-12">
-          Aucun widget sur ce dashboard.<br />Cliquez sur "Ajouter un widget" pour commencer.
+          Aucun widget sur ce dashboard.
+          <br />
+          Cliquez sur "Ajouter un widget" pour commencer.
         </div>
       ) : (
         <DashboardGrid
@@ -73,16 +92,11 @@ export default function DashboardPage() {
           hasUnsavedChanges={hasUnsavedChanges}
         />
       )}
-      {saving && <div className="fixed bottom-4 right-4 bg-indigo-600 text-white px-4 py-2 rounded shadow">Sauvegarde…</div>}
-      <Notification
-        open={notif.open}
-        onClose={() => setNotif(n => ({ ...n, open: false }))}
-        type={notif.type}
-        title={notif.type === 'success' ? 'Succès' : 'Erreur'}
-        description={notif.message}
-        duration={3000}
-        position="bottom-right"
-      />
+      {saving && (
+        <div className="fixed bottom-4 right-4 bg-indigo-600 text-white px-4 py-2 rounded shadow">
+          Sauvegarde…
+        </div>
+      )}
     </>
   );
 }

@@ -16,7 +16,9 @@ export default function WidgetSelectModal({ open, onClose, onSelect }: WidgetSel
   });
 
   return (
-    <Modal open={open} onClose={onClose} title="Ajouter une visualisation existante">
+    <Modal
+      size='lg'  
+        open={open} onClose={onClose} title="Ajouter une visualisation existante">
       {isLoading ? (
         <div>Chargement…</div>
       ) : (
@@ -28,7 +30,9 @@ export default function WidgetSelectModal({ open, onClose, onSelect }: WidgetSel
                 <div className="font-semibold text-sm">{w.title}</div>
                 <div className="text-xs text-gray-500">{w.type}</div>
               </div>
-              <Button color="indigo" size="sm" onClick={() => onSelect(w)}>Ajouter</Button>
+              <div>
+                <Button color="indigo" size="sm" onClick={() => onSelect(w)}>Ajouter</Button>
+              </div>
             </div>
           ))}
         </div>

@@ -4,7 +4,6 @@ import Button from '@/components/Button';
 import InputField from '@/components/InputField';
 import ColorField from '@/components/ColorField';
 import SelectField from '@/components/SelectField';
-import Notification from '@/components/Notification';
 import CheckboxField from '@/components/CheckboxField';
 
 export default function WidgetCreatePage() {
@@ -26,8 +25,6 @@ export default function WidgetCreatePage() {
     handleConfigChange,
     createMutation,
     sources,
-    notif,
-    setNotif,
   } = useWidgetCreateForm();
 
   const WidgetComponent = WIDGETS[type].component;
@@ -37,15 +34,6 @@ export default function WidgetCreatePage() {
     <div className="flex items-center justify-between">
       <h1 className="md:text-xl font-bold mb-2">Configurer la visualisation</h1>
     </div>
-    <Notification
-      open={notif.open}
-      onClose={() => setNotif(n => ({ ...n, open: false }))}
-      type={notif.type}
-      title={notif.type === 'success' ? 'Succès' : 'Erreur'}
-      description={notif.message}
-      duration={3000}
-      position="top-right"
-    />
     <div className=" bg-white dark:bg-gray-900 rounded shadow dark:border dark:border-gray-700
     lg:max-h-[80vh] lg:min-h-[80vh] lg:overflow-hidden
     relative flex flex-col h-full min-h-0 overflow-hidden

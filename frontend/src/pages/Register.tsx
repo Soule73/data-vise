@@ -2,10 +2,9 @@ import AuthLayout from '@/components/AuthLayout';
 import InputField from '@/components/InputField';
 import Button from '@/components/Button';
 import { useRegisterForm } from '@/hooks/useRegisterForm';
-import ErrorModal from '@/components/ErrorModal';
 
 export default function Register() {
-  const { register, handleSubmit, formState: { errors }, onSubmit, loading, globalError, setGlobalError } = useRegisterForm();
+  const { register, handleSubmit, formState: { errors }, onSubmit, loading, globalError } = useRegisterForm();
 
   return (
     <AuthLayout
@@ -18,7 +17,13 @@ export default function Register() {
         </>
       }
     >
-      {globalError && <ErrorModal message={globalError} onClose={() => setGlobalError('')} />}
+      {globalError && (
+        <div className="mb-4 p-3 rounded bg-red-100 text-red-700 border border-red-300 text-sm text-center
+        dark:bg-red-900 dark:text-red-300 dark:border-red-700 transition-colors duration-300
+        ">
+          {globalError}
+        </div>
+      )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <InputField label="Nom d'utilisateur" {...register('username')} error={errors.username?.message} />
         <InputField label="Email" type="email" {...register('email')} error={errors.email?.message} />
