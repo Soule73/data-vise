@@ -7,5 +7,7 @@ export const ROUTES = {
   widgets: '/widgets',
   roles: '/roles',
   roleCreate: '/roles/create',
-  users: '/users'
+  users: '/users',
+  dashboards: '/dashboards',
+  dashboardDetail: '/dashboards/:id'
 };

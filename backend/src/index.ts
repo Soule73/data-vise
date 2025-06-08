@@ -7,6 +7,7 @@ import dataSourceRoutes from '@/routes/datasource';
 import widgetRoutes from '@/routes/widget';
 import dashboardRoutes from '@/routes/dashboard';
 import type { Request, Response, NextFunction } from 'express';
+import { initPermissionsAndRoles } from './data/initPermissions';
 
 // Chargement des variables d'environnement
 dotenv.config();
@@ -36,8 +37,9 @@ app.get('/', (req, res) => {
 mongoose.connect(process.env.MONGO_URI || '', {
   // options recommandées
 })
-.then(() => {
+.then(async () => {
   console.log('Connecté à MongoDB');
+  await initPermissionsAndRoles();
   app.listen(PORT, () => {
     console.log(`Serveur backend démarré sur http://localhost:${PORT}`);
   });

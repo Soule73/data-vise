@@ -6,7 +6,7 @@ export interface IUser extends mongoose.Document {
   username: string;
   email: string;
   password: string;
-  role: 'user' | 'admin';
+  roleId: mongoose.Types.ObjectId; // Référence au rôle
   preferences?: Record<string, any>;
 }
 
@@ -14,7 +14,7 @@ const UserSchema = new Schema({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  roleId: { type: Schema.Types.ObjectId, ref: 'Role', required: true }, // Référence à Role
   preferences: { type: Schema.Types.Mixed, default: {} },
 }, { timestamps: true });
 

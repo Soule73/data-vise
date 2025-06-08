@@ -5,6 +5,8 @@ import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Button from "@/components/Button";
 import { useDataSourceForm } from "@/hooks/useDataSourceForm";
 import Table from "@/components/Table";
+import { useDashboardStore } from "@/store/dashboard";
+import { useEffect } from "react";
 
 export default function AddSourcePage() {
   const {
@@ -26,6 +28,13 @@ export default function AddSourcePage() {
     loading,
     setStep,
   } = useDataSourceForm();
+
+  const setDashboardTitle = useDashboardStore((s) => s.setDashboardTitle);
+
+  useEffect(() => {
+    setDashboardTitle("add", "Ajouter une source");
+    setDashboardTitle("sources", "Sources");
+  }, [setDashboardTitle]);
 
   return (
     <>

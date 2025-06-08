@@ -15,8 +15,8 @@ const sidebarGroups = [
     label: "Navigation",
     items: [
       {
-        to: "/dashboard",
-        label: "Tableau de bord",
+        to: "/dashboards",
+        label: "Mes dashboards",
         icon: <HomeIcon className="w-5 h-5" />,
         permission: "dashboard:canView",
       },

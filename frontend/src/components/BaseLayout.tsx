@@ -13,7 +13,7 @@ export default function BaseLayout({ children }: BaseLayoutProps) {
   const notif = useNotificationStore((s) => s.notification);
   const closeNotif = useNotificationStore((s) => s.closeNotification);
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-800 transition-colors duration-300 pl-0 pt-16 dark:text-white text-gray-900">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-800 transition-colors duration-300 pl-0 pt-10 dark:text-white text-gray-900">
       <Notification
         open={notif.open}
         onClose={closeNotif}

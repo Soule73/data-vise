@@ -1,8 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect, useRef, useContext } from 'react';
-import { fetchDashboard, fetchSources, saveDashboardLayout } from '@/services/dashboard';
-import { UNSAFE_NavigationContext } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { fetchDashboard, fetchSources, saveDashboardLayout, createDashboard as apiCreateDashboard } from '@/services/dashboard';
 import { useDashboardStore } from '@/store/dashboard';
+import { useNotificationStore } from '@/store/notification';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface DashboardLayoutItem {
   widgetId: string;
@@ -13,19 +14,25 @@ export interface DashboardLayoutItem {
   widget?: any;
 }
 
-export function useDashboard() {
+export function useDashboard(onSaveCallback?: (success: boolean) => void) {
+  const params = useParams();
+  const location = useLocation();
+  const isCreate = typeof window !== 'undefined' && location.pathname.includes('/dashboards/create');
+  const dashboardId = params.id;
+
+  // Query dashboard uniquement si pas en création
   const { data: dashboard, isLoading } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: fetchDashboard,
+    queryKey: ['dashboard', dashboardId],
+    queryFn: () => dashboardId ? fetchDashboard(dashboardId) : undefined,
+    enabled: !isCreate && !!dashboardId,
   });
   const { data: sources = [] } = useQuery({
     queryKey: ['sources'],
     queryFn: fetchSources,
   });
+  const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
-  const [notif, setNotif] = useState<{ open: boolean; type: 'success'|'error'; message: string }>({ open: false, type: 'success', message: '' });
-  const didInit = useRef(false);
   // Store Zustand pour l'état global du dashboard
   const layout = useDashboardStore(s => s.layout);
   const setLayout = useDashboardStore(s => s.setLayout);
@@ -33,48 +40,113 @@ export function useDashboard() {
   const setEditMode = useDashboardStore(s => s.setEditMode);
   const hasUnsavedChanges = useDashboardStore(s => s.hasUnsavedChanges);
   const setHasUnsavedChanges = useDashboardStore(s => s.setHasUnsavedChanges);
-  const navigator = useContext(UNSAFE_NavigationContext)?.navigator;
+  const showNotification = useNotificationStore((s) => s.showNotification);
+  const navigate = useNavigate();
 
-  // Ajout d'un widget existant au dashboard
+  // Dashboard local temporaire pour la création
+  const [localDashboard, setLocalDashboard] = useState<{ _id?: string; title: string; layout: DashboardLayoutItem[] }>({ title: '', layout: [] });
+
+  // Synchronise le layout Zustand avec le dashboard local uniquement au premier montage en création
+  useEffect(() => {
+    if (isCreate && layout.length === 0 && localDashboard.layout.length > 0) {
+      setLayout(localDashboard.layout);
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  // Restaure le layout depuis le backend uniquement en mode édition (jamais en création)
+  useEffect(() => {
+    if (!isCreate && dashboard && dashboard.layout) {
+      setLayout(dashboard.layout);
+    }
+    // eslint-disable-next-line
+  }, [dashboard, isCreate]);
+
+  // Ajout d'un widget au dashboard (local ou distant)
   const handleAddWidget = (widget: any) => {
-    if (layout.some(item => item.widgetId === widget.widgetId || item.widgetId === widget._id)) return;
-    setLayout([
-      ...layout,
-      {
-        widgetId: widget.widgetId || widget._id,
-        w: 6,
-        h: 8,
-        x: 0,
-        y: layout.length,
-        widget,
-      }
-    ]);
+    const newItem = {
+      widgetId: widget.widgetId || widget._id,
+      w: 6,
+      h: 8,
+      x: 0,
+      y: (isCreate ? localDashboard.layout.length : layout.length),
+      widget,
+    };
+    if (isCreate) {
+      setLocalDashboard(ld => {
+        const updated = { ...ld, layout: [...ld.layout, newItem] };
+        setLayout(updated.layout); // synchronise Zustand pour l'affichage
+        return updated;
+      });
+    } else {
+      setLayout([...layout, newItem]);
+    }
     setSelectOpen(false);
     setHasUnsavedChanges(true);
   };
 
-  // Restauration du layout depuis le backend au chargement
-  useEffect(() => {
-    if (didInit.current) return;
-    if (dashboard && dashboard.layout && dashboard.layout.length > 0) {
-      setLayout(dashboard.layout);
-      didInit.current = true;
-    }
-  }, [dashboard, setLayout]);
+  // Gestion du titre local en création
+  const setLocalTitle = (title: string) => {
+    if (isCreate) setLocalDashboard(ld => ({ ...ld, title }));
+  };
 
   // Sauvegarde du layout côté backend
-  const handleSaveDashboard = async () => {
+  const handleSaveDashboard = async (updates?: Partial<{ title: string }>) => {
     if (!dashboard) return;
     setSaving(true);
     try {
+      if (updates && updates.title !== undefined) {
+        dashboard.title = updates.title;
+      }
       const layoutToSave = layout
         .filter(item => item.widgetId && typeof item.x === 'number' && typeof item.y === 'number' && typeof item.w === 'number' && typeof item.h === 'number')
         .map(({ widgetId, w, h, x, y }) => ({ widgetId, w, h, x, y }));
-      await saveDashboardLayout(dashboard._id, layoutToSave);
-      setNotif({ open: true, type: 'success', message: 'Dashboard sauvegardé avec succès !' });
+      await saveDashboardLayout(dashboard._id, layoutToSave, updates?.title);
       setHasUnsavedChanges(false);
+      showNotification({
+        open: true,
+        type: 'success',
+        title: 'Dashboard sauvegardé',
+        description: 'Les modifications ont bien été enregistrées.'
+      });
+      if (onSaveCallback) onSaveCallback(true);
     } catch (e) {
-      setNotif({ open: true, type: 'error', message: 'Erreur lors de la sauvegarde du dashboard.' });
+      showNotification({
+        open: true,
+        type: 'error',
+        title: 'Erreur',
+        description: "La sauvegarde du dashboard a échoué."
+      });
+      if (onSaveCallback) onSaveCallback(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Création d'un nouveau dashboard (mode création)
+  const handleCreateDashboard = async (title: string) => {
+    setSaving(true);
+    try {
+      const newDashboard = await apiCreateDashboard({ title, layout: localDashboard.layout });
+      // Invalide le cache du dashboard et de la liste
+      await queryClient.invalidateQueries({ queryKey: ['dashboard', newDashboard._id] });
+      await queryClient.invalidateQueries({ queryKey: ['dashboards'] });
+      showNotification({
+        open: true,
+        type: 'success',
+        title: 'Dashboard créé',
+        description: 'Votre dashboard a bien été créé.'
+      });
+      navigate(`/dashboards/${newDashboard._id}`);
+      return newDashboard;
+    } catch (e: any) {
+      showNotification({
+        open: true,
+        type: 'error',
+        title: 'Erreur',
+        description: "La création du dashboard a échoué."
+      });
+      if (onSaveCallback) onSaveCallback(false);
     } finally {
       setSaving(false);
     }
@@ -82,48 +154,37 @@ export function useDashboard() {
 
   // Gestion du swap et du resize (drag & drop)
   const handleSwapLayout = (newLayout: DashboardLayoutItem[]) => {
-    if (!editMode) return;
-    setLayout(newLayout);
+    if (isCreate) {
+      setLocalDashboard(ld => {
+        const updated = { ...ld, layout: newLayout };
+        setLayout(updated.layout);
+        return updated;
+      });
+    } else {
+      setLayout(newLayout);
+    }
     setHasUnsavedChanges(true);
   };
 
-  // Blocage navigation interne si édition non sauvegardée
-  useEffect(() => {
-    if (!editMode || !hasUnsavedChanges || !navigator) return;
-    const push = navigator.push;
-    const replace = navigator.replace;
-    function confirmNav(method: (...args: any[]) => void) {
-      return function(this: any, ...args: any[]) {
-        if (window.confirm('Vous avez des modifications non sauvegardées. Quitter la page ?')) {
-          method.apply(this, args);
-        }
-      };
-    }
-    navigator.push = confirmNav(push);
-    navigator.replace = confirmNav(replace);
-    return () => {
-      navigator.push = push;
-      navigator.replace = replace;
-    };
-  }, [editMode, hasUnsavedChanges, navigator]);
+  // Expose le dashboard à utiliser (local en création, sinon backend)
+  const dashboardToUse = isCreate ? localDashboard : dashboard;
+  const layoutToUse = isCreate ? localDashboard.layout : layout;
 
   return {
-    dashboard,
     isLoading,
     sources,
     saving,
     selectOpen,
     setSelectOpen,
-    layout,
-    setLayout,
-    notif,
-    setNotif,
+    layout: layoutToUse,
     editMode,
     setEditMode,
     hasUnsavedChanges,
-    setHasUnsavedChanges,
     handleAddWidget,
     handleSaveDashboard,
     handleSwapLayout,
+    handleCreateDashboard,
+    dashboard: dashboardToUse,
+    setLocalTitle,
   };
 }

@@ -69,6 +69,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     configSchema: {
       columns: 'ColumnConfig[]', // Modifié pour accepter un tableau d'objets
       pageSize: 'number?',
+      groupBy: 'string?', // Ajout du champ groupBy optionnel
     },
   },
   line: {
