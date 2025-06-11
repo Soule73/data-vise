@@ -8,6 +8,8 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import type { ChartOptions, ChartData } from "chart.js";
+
 ChartJS.register(
   BarElement,
   CategoryScale,
@@ -15,7 +17,19 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend
+  // SUPPRESSION DU PLUGIN DATALABELS GLOBAL POUR TOUS LES CHARTS
+  // ChartJS.register(ChartDataLabels); // LIGNE À SUPPRIMER OU COMMENTER
 );
+
+export interface MetricConfig {
+  agg: string; // sum, avg, min, max, count
+  field: string;
+  label?: string;
+}
+export interface BucketConfig {
+  field: string;
+  type?: string; // x, split, etc.
+}
 
 export interface BarChartConfig {
   xField: string;
@@ -30,157 +44,160 @@ export default function BarChartWidget({
 }: {
   data: any[];
   config: any;
+  editMode?: boolean;
 }) {
-  if (!data || !config.xField || !config.yField) {
+  if (
+    !data ||
+    !config.metrics ||
+    !config.bucket ||
+    !Array.isArray(config.metrics) ||
+    !config.bucket.field
+  ) {
     return (
       <div className="text-xs text-gray-500">
-        Sélectionnez les champs pour afficher le graphique.
+        Sélectionnez les métriques et le champ de groupement.
       </div>
     );
   }
-  // Gestion du groupBy : si défini, on crée un dataset par valeur unique de groupBy
-  let chartData;
-  if (config.groupBy) {
-    // Trouver toutes les valeurs uniques de groupBy
-    const groupValues = Array.from(
-      new Set(data.map((row: any) => row[config.groupBy]))
-    );
-    // Trouver toutes les valeurs uniques de xField (labels)
-    const labels = Array.from(
-      new Set(data.map((row: any) => row[config.xField]))
-    );
-    // Générer un dataset par valeur de groupBy
-    const datasets = groupValues.map((groupVal, idx) => {
-      // Pour chaque label, trouver la valeur correspondante dans le groupe
-      const values = labels.map((label) => {
-        const found = data.find(
-          (row: any) =>
-            row[config.groupBy] === groupVal && row[config.xField] === label
-        );
-        return found ? found[config.yField] : 0;
-      });
-      return {
-        label: groupVal,
-        data: values,
-        backgroundColor: config.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-        datalabels: config.showValues
-          ? {
-              color: config.labelColor || "#222",
-              font: { size: config.labelFontSize || 12 },
-              formatter: (value: number, ctx: any) => {
-                if (config.labelFormat) {
-                  const label = ctx.chart.data.labels[ctx.dataIndex];
-                  return config.labelFormat
-                    .replace("{label}", label)
-                    .replace("{value}", value);
-                }
-                return value;
-              },
-            }
-          : undefined,
-      };
-    });
-    chartData = { labels, datasets };
-  } else {
-    // Cas simple : un seul dataset
-    const labels = data.map((row: any) => row[config.xField]);
-    const values = data.map((row: any) => row[config.yField]);
-    chartData = {
-      labels,
-      datasets: [
-        {
-          label: config.yField,
-          data: values,
-          backgroundColor: config.color || "#6366f1",
-          datalabels: config.showValues
-            ? {
-                color: config.labelColor || "#222",
-                font: { size: config.labelFontSize || 12 },
-                formatter: (value: number, ctx: any) => {
-                  if (config.labelFormat) {
-                    const label = ctx.chart.data.labels[ctx.dataIndex];
-                    return config.labelFormat
-                      .replace("{label}", label)
-                      .replace("{value}", value);
-                  }
-                  return value;
-                },
-              }
-            : undefined,
-        },
-      ],
-    };
+  // Préparer les labels (valeurs uniques du bucket)
+  const labels = Array.from(
+    new Set(data.map((row: any) => row[config.bucket.field]))
+  );
+  // Pour chaque métrique, calculer les valeurs agrégées par bucket
+  function aggregate(rows: any[], agg: string, field: string) {
+    if (agg === "none") {
+      if (rows.length === 1) return rows[0][field];
+      // Si plusieurs lignes, retourne la première valeur non undefined
+      const found = rows.find(
+        (r) => r[field] !== undefined && r[field] !== null
+      );
+      return found ? found[field] : "";
+    }
+    const nums = rows.map((r) => Number(r[field])).filter((v) => !isNaN(v));
+    if (agg === "sum") return nums.reduce((a, b) => a + b, 0);
+    if (agg === "avg")
+      return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
+    if (agg === "min") return nums.length ? Math.min(...nums) : 0;
+    if (agg === "max") return nums.length ? Math.max(...nums) : 0;
+    if (agg === "count") return rows.length;
+    return "";
   }
+  const showValues =
+    config.widgetParams?.showValues ?? config.showValues ?? false;
+  const stacked = config.widgetParams?.stacked ?? config.stacked ?? false;
+  const labelFormat =
+    config.widgetParams?.labelFormat ||
+    config.labelFormat ||
+    "{label}: {value}";
+  const datasets = config.metrics.map((metric: any, idx: number) => {
+    const values = labels.map((labelVal) => {
+      const rows = data.filter(
+        (row: any) => row[config.bucket.field] === labelVal
+      );
+      return aggregate(rows, metric.agg, metric.field);
+    });
+    const style = (config.metricStyles && config.metricStyles[idx]) || {};
+    return {
+      label: metric.label || metric.field,
+      data: values,
+      backgroundColor: style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
+      borderWidth: style.borderWidth || 1,
+      borderColor: style.borderColor || undefined,
+      barThickness: style.barThickness || undefined,
+      borderRadius: style.borderRadius || 0,
+    };
+  });
+  // Désactivation stricte de datalabels si un dataset est vide
+  const chartData: ChartData<"bar"> = { labels, datasets };
   // Helpers pour valider les valeurs autorisées
-  const allowedLegendPositions = ["top", "left", "right", "bottom"] as const;
-  const legendPosition: "top" | "left" | "right" | "bottom" =
-    allowedLegendPositions.includes(config.legendPosition)
-      ? config.legendPosition
-      : "top";
-  const allowedTitleAlign = ["start", "center", "end"] as const;
-  const titleAlign: "start" | "center" | "end" = allowedTitleAlign.includes(
-    config.titleAlign
-  )
-    ? config.titleAlign
-    : "center";
+  const legendPosition =
+    config.widgetParams?.legendPosition || config.legendPosition || "top";
+  const title = config.widgetParams?.title || config.title;
+  const titleAlign =
+    config.widgetParams?.titleAlign || config.titleAlign || "center";
+  const xLabel = config.widgetParams?.xLabel;
+  const yLabel = config.widgetParams?.yLabel;
+  const showGrid = config.widgetParams?.showGrid ?? config.showGrid ?? true;
+  const isHorizontal =
+    config.widgetParams?.horizontal ?? config.horizontal ?? false;
+  const indexAxis: "x" | "y" = isHorizontal ? "y" : "x";
 
-  const options = {
+  // Correction : ne pas dupliquer la clé plugins dans l'objet options
+  const pluginsOptions = showValues
+    ? {
+        datalabels: undefined, // On s'assure que rien n'est injecté
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            label: function (context: any) {
+              const label = context.label;
+              const value = context.parsed.y;
+              return labelFormat
+                .replace("{label}", label)
+                .replace("{value}", String(value));
+            },
+          },
+        },
+      }
+    : {};
+
+  const options: ChartOptions<"bar"> = {
     responsive: true,
     plugins: {
       legend: {
-        display: config.legend !== false,
-        position: legendPosition,
+        display:
+          config.widgetParams?.legend !== false && config.legend !== false,
+        position: legendPosition as "top" | "left" | "right" | "bottom",
       },
-      title: config.title
+      title: title
         ? {
             display: true,
-            text: config.title,
-            position: "top" as "top", // typage littéral strict
-            align: titleAlign,
+            text: title,
+            position: "top",
+            align: titleAlign as "start" | "center" | "end",
           }
         : undefined,
       tooltip: {
         enabled: true,
-        callbacks: config.tooltipFormat
-          ? {
-              label: function (context: any) {
-                const label = context.label;
-                const value = context.parsed.y;
-                return config.tooltipFormat
-                  .replace("{label}", label)
-                  .replace("{value}", value);
-              },
+        callbacks: {
+          label: (context: import("chart.js").TooltipItem<"bar">) => {
+            const label = context.label;
+            const value = context.parsed.y;
+            // Si showValues, on affiche la valeur formatée dans le tooltip
+            if (showValues) {
+              return labelFormat
+                .replace("{label}", label)
+                .replace("{value}", String(value));
             }
-          : undefined,
+            // Sinon, fallback natif
+            return `${label}: ${value}`;
+          },
+        },
       },
+      ...pluginsOptions,
     },
-    indexAxis: config.horizontal ? "y" : ("x" as "x" | "y"),
+    indexAxis,
     scales: {
       x: {
-        grid: { display: config.showGrid !== false },
-        title: config.xLabel
-          ? { display: true, text: config.xLabel }
-          : undefined,
+        grid: { display: showGrid },
+        title: xLabel ? { display: true, text: xLabel } : undefined,
       },
       y: {
-        grid: { display: config.showGrid !== false },
-        stacked: !!config.stacked,
-        title: config.yLabel
-          ? { display: true, text: config.yLabel }
-          : undefined,
+        grid: { display: showGrid },
+        stacked: stacked,
+        title: yLabel ? { display: true, text: yLabel } : undefined,
       },
     },
-    barThickness: config.barThickness || undefined,
-    borderRadius: config.borderRadius || 0,
+    animation: false,
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded w-full h-full flex items-center justify-center">
+    <div className="bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
       <Bar
-        className="max-w-full max-h-full p-1 md:p-2"
+        className="w-full max-w-full h-auto p-1 md:p-2"
         data={chartData}
         options={options}
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", maxWidth: "100%", height: "auto", minWidth: 0 }}
       />
     </div>
   );

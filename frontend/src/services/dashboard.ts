@@ -13,6 +13,7 @@ export async function fetchSources() {
 }
 
 export async function saveDashboardLayout(dashboardId: string, layout: DashboardLayoutItem[], title?: string) {
+  // On envoie le layout tel quel (width: string %, height: px)
   return api.put(`/dashboards/${dashboardId}`, title ? { layout, title } : { layout });
 }
 

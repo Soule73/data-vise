@@ -5,13 +5,15 @@ import { useNavigate } from "react-router-dom";
 import Table from "@/components/Table";
 import { useDashboardStore } from "@/store/dashboard";
 import { useEffect } from "react";
+import { EyeIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
+import { ROUTES } from "@/constants/routes";
 
 export default function DashboardListPage() {
-  const setDashboardTitle = useDashboardStore((s) => s.setDashboardTitle);
-
+  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
   useEffect(() => {
-    setDashboardTitle("dashboards", "Tableaux de bord");
-  }, [setDashboardTitle]);
+    setBreadcrumb([{ url: "/dashboards", label: "Tableaux de bord" }]);
+  }, [setBreadcrumb]);
 
   const { data: dashboards = [], isLoading } = useQuery({
     queryKey: ["dashboards"],
@@ -30,17 +32,17 @@ export default function DashboardListPage() {
 
   return (
     <>
-      <div className="max-w-5xl mx-auto py-8 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-6">
+      <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <h1 className="text-2xl font-bold ">Mes tableaux de bord</h1>
           <div>
-            <Button
+            <Link
+              to={ROUTES.createDashboard}
+              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
               color="indigo"
-              className=" sm:px-8"
-              onClick={() => navigate("/dashboards/create")}
             >
-              Nouveau dashboard
-            </Button>
+              Nouveau tableau de bord
+            </Link>
           </div>
         </div>
         {isLoading ? (
@@ -51,9 +53,13 @@ export default function DashboardListPage() {
           </div>
         ) : (
           <Table
+            searchable={true}
+            paginable={true}
+            rowPerPage={5}
             columns={columns}
             data={dashboards}
             emptyMessage="Aucun dashboard."
+            onClickItem={(row) => navigate(`/dashboards/${row._id}`)}
             actionsColumn={{
               label: "",
               render: (row: any) => (
@@ -61,12 +67,15 @@ export default function DashboardListPage() {
                   color="gray"
                   size="sm"
                   variant="outline"
+                  title="Ouvrir le dashboard"
+                  className=" w-max !border-none !bg-transparent hover:!bg-gray-100 dark:hover:!bg-gray-800"
                   onClick={(e) => {
                     e.stopPropagation();
                     navigate(`/dashboards/${row._id}`);
                   }}
                 >
-                  Ouvrir
+                  {/* Ouvrir */}
+                  <EyeIcon className="w-4 h-4 ml-1 inline" />
                 </Button>
               ),
             }}

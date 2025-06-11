@@ -1,79 +1,113 @@
-import { useQuery } from '@tanstack/react-query';
-import { WIDGETS } from '@/components/widgets';
-import Button from '@/components/Button';
-import api from '@/services/api';
-import { useNavigate } from 'react-router-dom';
-import { useSourceData } from '@/hooks/useSourceData';
-
-function WidgetPreview({ w, widgetDef, WidgetComponent, source }: any) {
-  const initialData = Array.isArray(source?.data) ? source.data : undefined;
-  const { data: widgetData, loading, error } = useSourceData(source?.endpoint, initialData);
-  let dataError = '';
-  if (!source) {
-    dataError = "Source de données introuvable.";
-  } else if (error) {
-    dataError = error;
-  } else if (!loading && (!widgetData || !widgetData.length)) {
-    dataError = "Aucune donnée disponible pour cette source.";
-  }
-  if (!WidgetComponent) return null;
-  return (
-    <div className="bg-white dark:bg-gray-900 rounded shadow p-4 flex flex-col gap-2 dark:border dark:border-gray-700 ">
-      <div className="font-semibold mb-1">{w.title}</div>
-      <div className="text-xs text-gray-500 mb-2">{widgetDef.label} | Source : {source?.name || 'inconnue'}</div>
-      {loading ? (
-        <div className="text-sm text-gray-400">Chargement des données…</div>
-      ) : dataError ? (
-        <div className="text-sm text-red-500">{dataError}</div>
-      ) : (
-        <WidgetComponent data={widgetData} config={w.config} />
-      )}
-      <details className="mt-2">
-        <summary className="text-xs text-indigo-500 cursor-pointer">Voir la configuration</summary>
-        <pre className="text-xs bg-gray-100 dark:bg-gray-800 rounded p-2 overflow-x-auto">{JSON.stringify(w.config, null, 2)}</pre>
-      </details>
-    </div>
-  );
-}
+import { useQuery } from "@tanstack/react-query";
+import { WIDGETS } from "@/components/widgets";
+import api from "@/services/api";
+import { Link } from "react-router-dom";
+import { useDashboardStore } from "@/store/dashboard";
+import { useEffect, useState, useMemo } from "react";
+import { ROUTES } from "@/constants/routes";
+import Table from "@/components/Table";
+import Modal from "@/components/Modal";
 
 export default function WidgetListPage() {
+  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
+  useEffect(() => {
+    setBreadcrumb([{ url: "/widgets", label: "Visualisations" }]);
+  }, [setBreadcrumb]);
+
   const { data: widgets = [], isLoading } = useQuery({
-    queryKey: ['widgets'],
-    queryFn: async () => (await api.get('/widgets')).data,
+    queryKey: ["widgets"],
+    queryFn: async () => (await api.get("/widgets")).data,
   });
   const { data: sources = [] } = useQuery({
-    queryKey: ['sources'],
-    queryFn: async () => (await api.get('/sources')).data,
+    queryKey: ["sources"],
+    queryFn: async () => (await api.get("/sources")).data,
   });
-  const navigate = useNavigate();
+
   const widgetsArray = Array.isArray(widgets) ? widgets : [];
 
+  // Utilisation de useMemo pour stabiliser columns et data
+  const columns = useMemo(
+    () => [
+      { key: "title", label: "Titre" },
+      { key: "type", label: "Type" },
+      { key: "dataSourceId", label: "Source" },
+    ],
+    []
+  );
+
+  const tableData = useMemo(
+    () =>
+      widgetsArray.map((w: any) => ({
+        ...w,
+        type: WIDGETS[w.type as keyof typeof WIDGETS]?.label || w.type,
+        dataSourceId:
+          sources.find((s: any) => String(s._id) === String(w.dataSourceId))
+            ?.name || w.dataSourceId,
+      })),
+    [widgetsArray, sources]
+  );
+
+  // Ajout de l'état pour la modal de configuration
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedConfig, setSelectedConfig] = useState<any>(null);
+
   return (
-    <>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold ">Visualisations</h1>
+    <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow mt-2s">
+      <div className="flex items-center justify-end mb-3">
         <div className="flex items-center gap-2">
-          <Button
-            color="indigo"
-            size="lg"
-            onClick={() => navigate('/widgets/create')}
+          <Link
+            to={ROUTES.createWidget}
+            className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
           >
             Ajouter une visualisation
-          </Button>
+          </Link>
         </div>
       </div>
       {isLoading ? (
         <div>Chargement...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {widgetsArray.map((w: any) => {
-            const widgetDef = WIDGETS[w.type as keyof typeof WIDGETS];
-            const WidgetComponent = widgetDef?.component;
-            const source = sources.find((s: any) => String(s._id) === String(w.dataSourceId));
-            return <WidgetPreview key={w._id} w={w} widgetDef={widgetDef} WidgetComponent={WidgetComponent} source={source} />;
-          })}
-        </div>
+        <Table
+          paginable={true}
+          searchable={true}
+          rowPerPage={5}
+          columns={columns}
+          data={tableData}
+          emptyMessage="Aucune visualisation."
+          actionsColumn={{
+            label: "Actions",
+            render: (row: any) => (
+              <div className="flex gap-2">
+                <Link
+                  to={ROUTES.editWidget.replace(":id", row._id)}
+                  className="text-xs text-indigo-600 underline hover:text-indigo-800"
+                >
+                  Modifier
+                </Link>
+                <button
+                  type="button"
+                  className="text-xs text-indigo-500 underline hover:text-indigo-700"
+                  onClick={() => {
+                    setSelectedConfig(row.config);
+                    setModalOpen(true);
+                  }}
+                >
+                  Voir la config
+                </button>
+              </div>
+            ),
+          }}
+        />
       )}
-    </>
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Configuration du widget"
+        size="lg"
+      >
+        <pre className="text-xs bg-gray-100 dark:bg-gray-800 rounded p-2 overflow-x-auto max-h-80">
+          {selectedConfig ? JSON.stringify(selectedConfig, null, 2) : ""}
+        </pre>
+      </Modal>
+    </div>
   );
 }

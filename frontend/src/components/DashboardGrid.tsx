@@ -1,12 +1,13 @@
-import DashboardWidgetPreview from "./DashboardWidgetPreview";
+import DashboardGridItem from "./DashboardGridItem";
 import { useDashboardGrid } from "@/hooks/useDashboardGrid";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/services/api";
+import { useEffect, useState } from "react";
 
 interface DashboardLayoutItem {
   widgetId: string;
-  w: number;
-  h: number;
+  width: string; // ex: "48%"
+  height: number; // px
   x: number;
   y: number;
   widget?: any;
@@ -43,34 +44,47 @@ export default function DashboardGrid({
     return widget ? { ...item, widget } : item;
   });
 
+  // Wrapper pour tracer les appels à onSwapLayout (resize/swap)
+  const handleSwapLayout = (newLayout: DashboardLayoutItem[]) => {
+    onSwapLayout && onSwapLayout(newLayout);
+  };
+
   const {
     draggedIdx,
     hoveredIdx,
     isMobile,
-    gridCols,
     gridWidth,
     slots,
-    getLayoutIdx,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
     handleDrop,
-    handleResizeMouseDown,
   } = useDashboardGrid({
     layout: hydratedLayout,
     editMode,
     hasUnsavedChanges,
-    onSwapLayout,
+    onSwapLayout: handleSwapLayout,
   });
+
+  // Ajout d'un effet pour forcer le recalcul du responsive lors du resize de la fenêtre
+  const [, setDummyState] = useState(0);
+  useEffect(() => {
+    const handleResize = () => {
+      setDummyState((v) => v + 1);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div
-      className="w-full grid min-w-full"
+      className="w-full flex flex-wrap min-w-full"
       style={{
-        gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
         gap: 16,
         maxWidth: gridWidth,
         margin: "0 auto",
+        alignItems: "stretch",
+        minHeight: 320,
       }}
     >
       {slots.map((item, idx) => {
@@ -79,12 +93,8 @@ export default function DashboardGrid({
           return (
             <div
               key="add-slot"
-              className="relative min-h-[160px] border-2 border-dashed rounded-lg flex items-center justify-center text-gray-400 hover:border-indigo-400 hover:text-indigo-600 cursor-pointer select-none"
-              style={{
-                gridColumn: `span ${isMobile ? 1 : 6} / span ${
-                  isMobile ? 1 : 6
-                }`,
-              }}
+              className="relative min-h-[160px] w-full max-w-full border-2 border-dashed rounded-lg flex items-center justify-center text-gray-400 hover:border-indigo-400 hover:text-indigo-600 cursor-pointer select-none overflow-x-auto"
+              style={{ minWidth: "48%", minHeight: 300, flex: "1 1 48%" }}
               onClick={() => editMode && onSwapLayout && onSwapLayout(layout)}
             >
               <svg
@@ -106,77 +116,40 @@ export default function DashboardGrid({
           );
         }
         const widget = item?.widget;
-        const layoutIdx = getLayoutIdx(idx);
         return (
-          <div
+          <DashboardGridItem
             key={item?.widgetId || idx}
-            className={`relative min-h-[160px] 
-              ${editMode ? "border-2 border-dashed" : "border "}
-               rounded-lg transition-colors duration-150 ${
-                 hoveredIdx === idx && draggedIdx !== null
-                   ? "border-indigo-500 bg-indigo-50"
-                   : "border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-800"
-               }`}
-            draggable={editMode && !!widget}
-            onDragStart={editMode ? () => handleDragStart(idx) : undefined}
-            onDragOver={
+            idx={idx}
+            hydratedLayout={hydratedLayout}
+            editMode={editMode}
+            item={item}
+            widget={widget}
+            hoveredIdx={hoveredIdx}
+            draggedIdx={draggedIdx}
+            handleDragStart={handleDragStart}
+            handleDragOver={handleDragOver}
+            handleDrop={handleDrop}
+            handleDragEnd={handleDragEnd}
+            isMobile={isMobile}
+            sources={sources}
+            onRemove={
               editMode
-                ? (e) => {
-                    e.preventDefault();
-                    handleDragOver(idx);
+                ? () => {
+                    const newLayout = hydratedLayout.filter(
+                      (_, lidx) => lidx !== idx
+                    );
+                    onSwapLayout && onSwapLayout(newLayout);
                   }
                 : undefined
             }
-            onDrop={editMode ? () => handleDrop(idx) : undefined}
-            onDragEnd={editMode ? handleDragEnd : undefined}
-            style={{
-              gridColumn: `span ${item?.w ?? (isMobile ? 1 : 6)} / span ${
-                item?.w ?? (isMobile ? 1 : 6)
-              }`,
-              gridRowEnd: `span ${Math.ceil((item?.h ?? 8) / 8)}`,
-            }}
+            onSwapLayout={handleSwapLayout}
           >
-            {widget ? (
-              <div className="h-full w-full flex flex-col relative group">
-                <DashboardWidgetPreview
-                  widget={widget}
-                  sources={sources}
-                  editMode={editMode}
-                  onRemove={
-                    editMode
-                      ? () => {
-                          // Supprime ce widget du layout
-                          const newLayout = hydratedLayout.filter(
-                            (_, lidx) => lidx !== idx
-                          );
-                          onSwapLayout && onSwapLayout(newLayout);
-                        }
-                      : undefined
-                  }
-                />
-                {!isMobile && editMode && (
-                  <div
-                    className="absolute bottom-1 right-1 w-4 h-4 rounded cursor-se-resize bg-gray-200 opacity-70 group-hover:opacity-100 z-10"
-                    onMouseDown={(e) => handleResizeMouseDown(layoutIdx, e)}
-                    title="Redimensionner"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16">
-                      <path
-                        d="M2 14h12M6 10l6 4"
-                        stroke="#555"
-                        strokeWidth="1.5"
-                        fill="none"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            ) : (
+            {widget ? null : (
               <div className="text-gray-300 text-center py-12 select-none">
                 Emplacement vide
               </div>
             )}
-          </div>
+          </DashboardGridItem>
         );
       })}
     </div>

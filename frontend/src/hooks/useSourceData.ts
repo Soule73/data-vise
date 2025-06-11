@@ -3,13 +3,14 @@ import { fetchSourceData } from '@/services/datasource';
 
 // Optimisé : hook qui utilise react-query pour le cache par endpoint
 export function useSourceData(endpoint?: string, initialData?: any[] | null) {
+  // Toujours appeler useQuery, même si endpoint est vide
   const {
     data = null,
     isLoading: loading,
     error,
   } = useQuery({
-    queryKey: endpoint ? ['source-data', endpoint] : ['source-data', 'none'],
-    queryFn: endpoint ? () => fetchSourceData(endpoint) : undefined,
+    queryKey: ['source-data', endpoint],
+    queryFn: () => endpoint ? fetchSourceData(endpoint) : Promise.resolve(initialData ?? null),
     enabled: !!endpoint,
     initialData,
     staleTime: 1000 * 60 * 5, // 5 min de cache

@@ -1,13 +1,16 @@
-import { useUserManagement } from '@/hooks/useUserManagement';
-import { userSchema } from '@/validation/user';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Table from '@/components/Table';
-import Button from '@/components/Button';
-import Modal from '@/components/Modal';
-import InputField from '@/components/InputField';
-import SelectField from '@/components/SelectField';
-import AlertModal from '@/components/AlertModal';
+import { useUserManagement } from "@/hooks/useUserManagement";
+import { userSchema } from "@/validation/user";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Table from "@/components/Table";
+import Button from "@/components/Button";
+import Modal from "@/components/Modal";
+import InputField from "@/components/InputField";
+import SelectField from "@/components/SelectField";
+import AlertModal from "@/components/AlertModal";
+import { useEffect } from "react";
+import { useDashboardStore } from "@/store/dashboard";
+import { Link } from "react-router-dom";
 
 interface User {
   _id: string;
@@ -18,18 +21,36 @@ interface User {
 
 function getErrorMsg(err: any) {
   if (!err) return undefined;
-  if (typeof err === 'string') return err;
-  if (typeof err.message === 'string') return err.message;
+  if (typeof err === "string") return err;
+  if (typeof err.message === "string") return err.message;
   return undefined;
 }
 
 export default function UserManagementPage() {
+  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
+  useEffect(() => {
+    setBreadcrumb([{ url: "/users", label: "Gestion des Utilisateurs" }]);
+  }, [setBreadcrumb]);
+
   const {
-    users, roles, isLoading,
-    modalOpen, setModalOpen, editingUser,
-    form, setForm, isSaving, showPassword,
-    openModal, handleSaveUser,
-    deleteModalOpen, setDeleteModalOpen, userToDelete, setUserToDelete, handleDeleteUser, isDeleting,
+    users,
+    roles,
+    isLoading,
+    modalOpen,
+    setModalOpen,
+    editingUser,
+    form,
+    setForm,
+    isSaving,
+    showPassword,
+    openModal,
+    handleSaveUser,
+    deleteModalOpen,
+    setDeleteModalOpen,
+    userToDelete,
+    setUserToDelete,
+    handleDeleteUser,
+    isDeleting,
     generatePassword,
   } = useUserManagement();
 
@@ -47,56 +68,87 @@ export default function UserManagementPage() {
 
   // Table columns (sans la colonne actions)
   const columns = [
-    { key: 'email', label: 'Email' },
-    { key: 'username', label: 'Nom d’utilisateur' },
-    { key: 'roleId', label: 'Rôle', render: (u: any) => u.roleId?.name },
+    { key: "email", label: "Email" },
+    { key: "username", label: "Nom d’utilisateur" },
+    { key: "roleId", label: "Rôle", render: (u: any) => u.roleId?.name },
   ];
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold">Gestion des utilisateurs</h1>
-              <div>
-                  
-        <Button onClick={() => openModal()} >Ajouter un utilisateur</Button>
-              </div>
+    <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow-sm">
+      <div className="flex items-center justify-end mb-6">
+        <div>
+          <Link
+            className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+            to={"#"}
+            onClick={() => openModal()}
+          >
+            Ajouter un utilisateur
+          </Link>
+        </div>
       </div>
       <Table
+        searchable={true}
+        paginable={true}
+        rowPerPage={5}
         columns={columns}
         data={users}
-        emptyMessage={isLoading ? 'Chargement...' : 'Aucun utilisateur.'}
+        emptyMessage={isLoading ? "Chargement..." : "Aucun utilisateur."}
         actionsColumn={{
-          label: '',
+          label: "",
           render: (u: User) => (
             <div className="flex items-center flex-wrap gap-2 px-4">
               <div>
-                <Button size="sm" variant="outline" onClick={() => openModal(u)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openModal(u)}
+                >
                   Modifier
                 </Button>
               </div>
               <div>
-                <Button size="sm" color="red" variant="outline" onClick={() => { setUserToDelete(u); setDeleteModalOpen(true); }}>
+                <Button
+                  size="sm"
+                  color="red"
+                  variant="outline"
+                  onClick={() => {
+                    setUserToDelete(u);
+                    setDeleteModalOpen(true);
+                  }}
+                >
                   Supprimer
                 </Button>
               </div>
             </div>
           ),
-          className: 'text-right',
+          className: "text-right",
         }}
       />
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title={editingUser ? 'Modifier un utilisateur' : 'Ajouter un utilisateur'}
+        title={
+          editingUser ? "Modifier un utilisateur" : "Ajouter un utilisateur"
+        }
         size="md"
         footer={
           <div className="flex gap-2 justify-end">
-            <Button onClick={() => setModalOpen(false)} variant="outline">Annuler</Button>
-            <Button onClick={handleSaveUser} loading={isSaving} >{editingUser ? 'Enregistrer' : 'Créer'}</Button>
+            <Button onClick={() => setModalOpen(false)} variant="outline">
+              Annuler
+            </Button>
+            <Button onClick={handleSaveUser} loading={isSaving}>
+              {editingUser ? "Enregistrer" : "Créer"}
+            </Button>
           </div>
         }
       >
-        <form className="space-y-4" onSubmit={e => { e.preventDefault(); handleSaveUser(); }}>
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSaveUser();
+          }}
+        >
           <InputField
             label="Email"
             name="email"
@@ -119,8 +171,8 @@ export default function UserManagementPage() {
                 <InputField
                   label="Mot de passe"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={form.password || ''}
+                  type={showPassword ? "text" : "password"}
+                  value={form.password || ""}
                   onChange={handleFormChange}
                   minLength={8}
                   required={!editingUser}
@@ -129,7 +181,12 @@ export default function UserManagementPage() {
                 />
               </div>
               <div>
-                <Button type="button" size='lg' className="text-xs cursor-pointer text-indigo-600 hover:underline whitespace-nowrap" onClick={generatePassword}>
+                <Button
+                  type="button"
+                  size="lg"
+                  className="text-xs cursor-pointer text-indigo-600 hover:underline whitespace-nowrap"
+                  onClick={generatePassword}
+                >
                   Générer
                 </Button>
               </div>
@@ -148,11 +205,20 @@ export default function UserManagementPage() {
       </Modal>
       <AlertModal
         open={deleteModalOpen}
-        onClose={() => { setDeleteModalOpen(false); setUserToDelete(null); }}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setUserToDelete(null);
+        }}
         onConfirm={handleDeleteUser}
         type="error"
         title="Supprimer l’utilisateur ?"
-        description={userToDelete ? `Cette action supprimera l’utilisateur «${userToDelete.username || userToDelete.email}», ses widgets et dashboards privés. Les objets publics resteront mais sans propriétaire.` : ''}
+        description={
+          userToDelete
+            ? `Cette action supprimera l’utilisateur «${
+                userToDelete.username || userToDelete.email
+              }», ses widgets et dashboards privés. Les objets publics resteront mais sans propriétaire.`
+            : ""
+        }
         confirmLabel="Supprimer"
         cancelLabel="Annuler"
         loading={isDeleting}

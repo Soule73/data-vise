@@ -16,6 +16,7 @@ import RoleCreatePage from "@/pages/RoleCreatePage";
 import UserManagementPage from "@/pages/UserManagementPage";
 import DashboardPage from "./pages/DashboardPage";
 import DashboardListPage from "@/pages/DashboardListPage";
+import WidgetEditPage from "./pages/WidgetEditPage";
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const user = useUserStore((s) => s.user);
@@ -119,6 +120,16 @@ const App: React.FC = () => {
             <RequireAuth>
               <BaseLayout>
                 <UserManagementPage />
+              </BaseLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path={ROUTES.editWidget}
+          element={
+            <RequireAuth>
+              <BaseLayout>
+                <WidgetEditPage />
               </BaseLayout>
             </RequireAuth>
           }

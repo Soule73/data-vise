@@ -4,10 +4,11 @@ const { Schema } = mongoose;
 
 export interface DashboardLayoutItem {
   widgetId: string;
-  w: number;
-  h: number;
+  width: string; // ex: "48%"
+  height: number; // px
   x: number;
   y: number;
+  widget?: any;
 }
 
 export interface DashboardHistoryItem {
@@ -30,8 +31,8 @@ export interface IDashboard extends mongoose.Document {
 
 const DashboardLayoutItemSchema = new Schema({
   widgetId: { type: String, required: true },
-  w: { type: Number, required: true },
-  h: { type: Number, required: true },
+  width: { type: String, required: true }, // ex: "48%"
+  height: { type: Number, required: true }, // px
   x: { type: Number, required: true },
   y: { type: Number, required: true },
 }, { _id: false });

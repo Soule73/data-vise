@@ -90,18 +90,19 @@ export default function Sidebar() {
       {showSidebar && (
         <div
           className={
-            isMobile
-              ? "fixed inset-0 z-40 md:hidden"
-              : "hidden md:flex fixed top-0 left-0 flex-col w-64 h-screen z-20"
+            //   isMobile
+            // ?
+            "fixed inset-0 z-10"
+            // : "hidden md:flex fixed top-0 left-0 flex-col w-64 h-screen z-20"
           }
         >
           {/* Overlay mobile */}
-          {isMobile && (
-            <div
-              className="absolute inset-0 bg-black/40 dark:bg-black/60 transition-colors duration-300"
-              onClick={closeSidebar}
-            />
-          )}
+          {/* {isMobile && ( */}
+          <div
+            className="absolute inset-0 bg-black/40 dark:bg-black/60 transition-colors duration-300"
+            onClick={closeSidebar}
+          />
+          {/* )} */}
           <aside
             id="sidebar-panel"
             className={

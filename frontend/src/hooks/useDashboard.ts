@@ -7,11 +7,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface DashboardLayoutItem {
   widgetId: string;
-  w: number;
-  h: number;
+  width: string; // ex: "48%"
+  height: number; // px
   x: number;
   y: number;
   widget?: any;
+  // config?: any; // plus nécessaire ici, tout est à plat
 }
 
 export function useDashboard(onSaveCallback?: (success: boolean) => void) {
@@ -64,24 +65,16 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
 
   // Ajout d'un widget au dashboard (local ou distant)
   const handleAddWidget = (widget: any) => {
+    // Par défaut, 48% de largeur, 300px de hauteur
     const newItem = {
-      widgetId: widget.widgetId || widget._id,
-      w: 6,
-      h: 8,
+      widgetId: widget.widgetId,
+      width: "48%",
+      height: 300,
       x: 0,
-      y: (isCreate ? localDashboard.layout.length : layout.length),
+      y: layout.length,
       widget,
     };
-    if (isCreate) {
-      setLocalDashboard(ld => {
-        const updated = { ...ld, layout: [...ld.layout, newItem] };
-        setLayout(updated.layout); // synchronise Zustand pour l'affichage
-        return updated;
-      });
-    } else {
-      setLayout([...layout, newItem]);
-    }
-    setSelectOpen(false);
+    setLayout([...layout, newItem]);
     setHasUnsavedChanges(true);
   };
 
@@ -92,31 +85,20 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
 
   // Sauvegarde du layout côté backend
   const handleSaveDashboard = async (updates?: Partial<{ title: string }>) => {
-    if (!dashboard) return;
     setSaving(true);
     try {
-      if (updates && updates.title !== undefined) {
-        dashboard.title = updates.title;
-      }
-      const layoutToSave = layout
-        .filter(item => item.widgetId && typeof item.x === 'number' && typeof item.y === 'number' && typeof item.w === 'number' && typeof item.h === 'number')
-        .map(({ widgetId, w, h, x, y }) => ({ widgetId, w, h, x, y }));
-      await saveDashboardLayout(dashboard._id, layoutToSave, updates?.title);
+      // Suppression du log debug
+      const layoutToSave = useDashboardStore.getState().layout;
+      await saveDashboardLayout(
+        (dashboardId || localDashboard._id) ?? "",
+        layoutToSave.map(({ widgetId, width, height, x, y }) => ({ widgetId, width, height, x, y })),
+        updates?.title || localDashboard.title
+      );
       setHasUnsavedChanges(false);
-      showNotification({
-        open: true,
-        type: 'success',
-        title: 'Dashboard sauvegardé',
-        description: 'Les modifications ont bien été enregistrées.'
-      });
-      if (onSaveCallback) onSaveCallback(true);
+      showNotification({open:true, type: "success",title:"Sauvegradé", description: "Les modifications ont bien été  sauvegardé !" });
+      queryClient.invalidateQueries({ queryKey: ["dashboard", dashboardId ?? ""] });
     } catch (e) {
-      showNotification({
-        open: true,
-        type: 'error',
-        title: 'Erreur',
-        description: "La sauvegarde du dashboard a échoué."
-      });
+      showNotification({ open:true,type: "error",title:"Erreur", description: "Erreur lors de la sauvegarde" });
       if (onSaveCallback) onSaveCallback(false);
     } finally {
       setSaving(false);
@@ -154,14 +136,17 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
 
   // Gestion du swap et du resize (drag & drop)
   const handleSwapLayout = (newLayout: DashboardLayoutItem[]) => {
+    // Suppression des logs debug
+    const cleanedLayout = newLayout.map(({ widgetId, width, height, x, y }) => ({
+      widgetId, width, height, x, y
+    }));
     if (isCreate) {
-      setLocalDashboard(ld => {
-        const updated = { ...ld, layout: newLayout };
-        setLayout(updated.layout);
-        return updated;
-      });
+      setLocalDashboard(ld => ({
+        ...ld,
+        layout: cleanedLayout
+      }));
     } else {
-      setLayout(newLayout);
+      setLayout(cleanedLayout);
     }
     setHasUnsavedChanges(true);
   };

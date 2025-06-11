@@ -6,15 +6,50 @@ import api from '@/services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function getDefaultConfig(type: WidgetType, columns: string[]): any {
+  // Génère un config complet selon le schéma du widget
   switch (type) {
     case 'bar':
-      return { xField: columns[0] || '', yField: columns[1] || '', color: '', groupBy: '' };
+      return {
+        metrics: [
+          { agg: 'sum', field: columns[1] || '', label: columns[1] || '' }
+        ],
+        bucket: { field: columns[0] || '', type: 'x' },
+        metricStyles: [{}],
+        widgetParams: {},
+        xField: columns[0] || '',
+        yField: columns[1] || '',
+        color: '',
+        groupBy: '',
+      };
     case 'pie':
-      return { valueField: columns[1] || '', nameField: columns[0] || '', colorScheme: '' };
-    case 'table':
-      return { columns: columns.slice(0, 3), pageSize: 10 };
+      return {
+        metrics: [
+          { agg: 'sum', field: columns[1] || '', label: columns[1] || '' }
+        ],
+        metricStyles: [{}],
+        widgetParams: {},
+        valueField: columns[1] || '',
+        nameField: columns[0] || '',
+        colorScheme: '',
+      };
     case 'line':
-      return { xField: columns[0] || '', yField: columns[1] || '', color: '' };
+      return {
+        metrics: [
+          { agg: 'sum', field: columns[1] || '', label: columns[1] || '' }
+        ],
+        bucket: { field: columns[0] || '', type: 'x' },
+        metricStyles: [{}],
+        widgetParams: {},
+        xField: columns[0] || '',
+        yField: columns[1] || '',
+        color: '',
+      };
+    case 'table':
+      return {
+        columns: columns.slice(0, 3),
+        pageSize: 10,
+        widgetParams: {},
+      };
     default:
       return {};
   }
@@ -94,6 +129,11 @@ export function useWidgetCreateForm() {
       setNotif({ open: true, type: 'error', message: e.response?.data?.message || 'Erreur lors de la création du widget' });
     },
   });
+
+  // Réinitialise le config à chaque changement de type ou de source
+  useEffect(() => {
+    setConfig(getDefaultConfig(type, columns));
+  }, [type, sourceId]);
 
   return {
     step,

@@ -28,7 +28,7 @@ export default function DashboardPage() {
     setLocalTitle,
   } = useDashboard();
 
-  const setDashboardTitle = useDashboardStore((s) => s.setDashboardTitle);
+  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
 
   const location = useLocation();
   const isCreate = location.pathname.includes("/dashboards/create");
@@ -40,33 +40,57 @@ export default function DashboardPage() {
     // Met à jour le titre du breadcrumb uniquement si le dashboard est chargé et a un titre
     if (isCreate) {
       if (dashboard?.title) {
-        setDashboardTitle && setDashboardTitle("create", dashboard.title);
+        setBreadcrumb([
+          { url: "/dashboards", label: "Tableaux de bord" },
+          {
+            url: "/dashboards/create",
+            label: dashboard?.title || "Nouveau dashboard",
+          },
+        ]);
       }
     } else if (dashboard && dashboard._id && dashboard.title) {
-      setDashboardTitle && setDashboardTitle(dashboard._id, dashboard.title);
+      setBreadcrumb([
+        { url: "/dashboards", label: "Tableaux de bord" },
+        { url: `/dashboards/${dashboard._id}`, label: dashboard.title },
+      ]);
     }
-
-    setDashboardTitle("dashboards", "Tableaux de bord");
-  }, [dashboard?._id, dashboard?.title, isCreate, setDashboardTitle]);
+  }, [isCreate, dashboard?._id, dashboard?.title, setBreadcrumb]);
 
   // Met à jour le titre du breadcrumb dès que l'ID change (titre temporaire)
   useEffect(() => {
     if (!isCreate && dashboard && dashboard._id) {
-      setDashboardTitle(dashboard._id, dashboard.title || "Dashboard");
+      setBreadcrumb([
+        { url: "/dashboards", label: "Tableaux de bord" },
+        {
+          url: `/dashboards/${dashboard._id}`,
+          label: dashboard.title || "Dashboard",
+        },
+      ]);
     } else if (isCreate) {
-      setDashboardTitle("create", dashboard?.title || "Nouveau dashboard");
+      setBreadcrumb([
+        { url: "/dashboards", label: "Tableaux de bord" },
+        {
+          url: "/dashboards/create",
+          label: dashboard?.title || "Nouveau dashboard",
+        },
+      ]);
     }
-    setDashboardTitle("dashboards", "Tableaux de bord");
-  }, [dashboard?._id, isCreate, setDashboardTitle]);
+  }, [dashboard?._id, isCreate, setBreadcrumb]);
 
   // Met à jour le titre du breadcrumb dès que le titre réel arrive
   useEffect(() => {
     if (!isCreate && dashboard && dashboard._id && dashboard.title) {
-      setDashboardTitle(dashboard._id, dashboard.title);
+      setBreadcrumb([
+        { url: "/dashboards", label: "Tableaux de bord" },
+        { url: `/dashboards/${dashboard._id}`, label: dashboard.title },
+      ]);
     } else if (isCreate && dashboard?.title) {
-      setDashboardTitle("create", dashboard.title);
+      setBreadcrumb([
+        { url: "/dashboards", label: "Tableaux de bord" },
+        { url: "/dashboards/create", label: dashboard.title },
+      ]);
     }
-  }, [dashboard?.title, dashboard?._id, isCreate, setDashboardTitle]);
+  }, [dashboard?.title, dashboard?._id, isCreate, setBreadcrumb]);
 
   // Gère le champ local de titre indépendamment du breadcrumb
   useEffect(() => {
@@ -113,13 +137,22 @@ export default function DashboardPage() {
             onChange={(e) => {
               setPendingTitle(e.target.value);
               if (isCreate && setLocalTitle) setLocalTitle(e.target.value);
-              if (isCreate && setDashboardTitle) {
-                setDashboardTitle(
-                  "create",
-                  e.target.value || "Nouveau dashboard"
-                );
-              } else if (dashboard && dashboard._id && setDashboardTitle) {
-                setDashboardTitle(dashboard._id, e.target.value || "Dashboard");
+              if (isCreate && setBreadcrumb) {
+                setBreadcrumb([
+                  { url: "/dashboards", label: "Tableaux de bord" },
+                  {
+                    url: "/dashboards/create",
+                    label: e.target.value || "Nouveau dashboard",
+                  },
+                ]);
+              } else if (dashboard && dashboard._id && setBreadcrumb) {
+                setBreadcrumb([
+                  { url: "/dashboards", label: "Tableaux de bord" },
+                  {
+                    url: `/dashboards/${dashboard._id}`,
+                    label: e.target.value || "Dashboard",
+                  },
+                ]);
               }
             }}
             required
@@ -147,9 +180,9 @@ export default function DashboardPage() {
         {editMode || isCreate ? (
           <div className="flex items-center gap-2 md:gap-4">
             <Link
-              about="Ajouter un widget"
-              to={"#"}
               className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+              to={"#"}
+              about="Ajouter un widget"
               onClick={() => setSelectOpen(true)}
             >
               Ajouter un widget

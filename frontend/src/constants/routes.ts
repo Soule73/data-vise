@@ -9,5 +9,9 @@ export const ROUTES = {
   roleCreate: '/roles/create',
   users: '/users',
   dashboards: '/dashboards',
-  dashboardDetail: '/dashboards/:id'
+  dashboardDetail: '/dashboards/:id',
+  editWidget: '/widgets/edit/:id',
+  createWidget: '/widgets/create',
+  dashboardList: '/dashboards',
+  createDashboard: '/dashboards/create',
 };
