@@ -1,9 +1,7 @@
+import { IPermission } from '@/types/authType';
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface IPermission extends Document {
-  name: string; // ex: dashboard:canView
-  description?: string;
-}
+
 
 const PermissionSchema = new Schema<IPermission>({
   name: { type: String, required: true, unique: true },

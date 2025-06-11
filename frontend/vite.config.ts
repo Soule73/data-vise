@@ -30,7 +30,7 @@ export default defineConfig({
       'locales': '/src/locales',
       'theme': '/src/theme',
       'navigation': '/src/navigation',
-      'models': '/src/models',  
+      'models': '/src/models',
     }
   }
 })

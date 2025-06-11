@@ -1,9 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import { AuthRequest } from '@/types/authType';
+import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-
-export interface AuthRequest extends Request {
-  user?: { id: string; role: string };
-}
 
 export function requireAuth(
   req: AuthRequest,
@@ -41,3 +38,5 @@ export function requireRole(role: 'admin' | 'user') {
     next();
   };
 }
+
+export type { AuthRequest } from '../types/authType';

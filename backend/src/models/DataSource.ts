@@ -1,13 +1,5 @@
+import { IDataSource } from '@/types/sourceType';
 import mongoose, { Document, Schema } from 'mongoose';
-
-export interface IDataSource extends Document {
-  name: string;
-  type: string;
-  endpoint: string;
-  config?: Record<string, any>;
-  ownerId: mongoose.Types.ObjectId;
-  visibility: 'public' | 'private';
-}
 
 const DataSourceSchema = new Schema<IDataSource>({
   name: { type: String, required: true },

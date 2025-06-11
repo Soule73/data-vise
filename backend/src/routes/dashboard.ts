@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { requirePermission } from '../middleware/requirePermission';
 import { requireAuth } from '../middleware/auth';
-import type { AuthRequest } from '../middleware/auth';
 import dashboardController from '../controllers/dashboardController';
 
 const router = express.Router();

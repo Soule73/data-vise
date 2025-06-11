@@ -2,26 +2,26 @@
 
 import React, { type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import SourcesPage from "@/pages/Sources";
-import AddSourcePage from "@/pages/AddSource";
-import BaseLayout from "@/components/BaseLayout";
-import { useUserStore } from "@/store/user";
-import { ROUTES } from "@/constants/routes";
-import WidgetListPage from "@/pages/WidgetListPage";
-import WidgetCreatePage from "@/pages/WidgetCreatePage";
-import RoleManagementPage from "@/pages/RoleManagementPage";
-import RoleCreatePage from "@/pages/RoleCreatePage";
-import UserManagementPage from "@/pages/UserManagementPage";
-import DashboardPage from "./pages/DashboardPage";
-import DashboardListPage from "@/pages/DashboardListPage";
-import WidgetEditPage from "./pages/WidgetEditPage";
+import Login from "@/presentation/pages/auth/LoginPage";
+import Register from "@/presentation/pages/auth/RegisterPage";
+import SourcesPage from "@/presentation/pages/SourceListPage";
+import AddSourcePage from "@/presentation/pages/AddSourcePage";
+import BaseLayout from "@/presentation/components/BaseLayout";
+import { useUserStore } from "@/core/store/user";
+import { ROUTES } from "@/core/constants/routes";
+import WidgetListPage from "@/presentation/pages/WidgetListPage";
+import WidgetCreatePage from "@/presentation/pages/WidgetCreatePage";
+import RoleManagementPage from "@/presentation/pages/RoleManagementPage";
+import RoleCreatePage from "@/presentation/pages/RoleCreatePage";
+import UserManagementPage from "@/presentation/pages/UserManagementPage";
+import DashboardPage from "@/presentation/pages/DashboardPage";
+import DashboardListPage from "@/presentation/pages/DashboardListPage";
+import WidgetEditPage from "@/presentation/pages/WidgetEditPage";
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const user = useUserStore((s) => s.user);
   if (!user) return <Navigate to={ROUTES.login} replace />;
-  return <>{children}</>;
+  return <BaseLayout>{children}</BaseLayout>;
 }
 
 const App: React.FC = () => {
@@ -34,9 +34,7 @@ const App: React.FC = () => {
           path={ROUTES.dashboards}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <DashboardListPage />
-              </BaseLayout>
             </RequireAuth>
           }
         />
@@ -44,9 +42,7 @@ const App: React.FC = () => {
           path={ROUTES.dashboardDetail}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <DashboardPage />
-              </BaseLayout>
             </RequireAuth>
           }
         />
@@ -58,9 +54,7 @@ const App: React.FC = () => {
           path={ROUTES.sources}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <SourcesPage />
-              </BaseLayout>
             </RequireAuth>
           }
         />
@@ -68,9 +62,7 @@ const App: React.FC = () => {
           path={ROUTES.addSource}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <AddSourcePage />
-              </BaseLayout>
             </RequireAuth>
           }
         />
@@ -78,19 +70,15 @@ const App: React.FC = () => {
           path={ROUTES.widgets}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <WidgetListPage />
-              </BaseLayout>
             </RequireAuth>
           }
         />
         <Route
-          path={ROUTES.widgets + "/create"}
+          path={ROUTES.createWidget}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <WidgetCreatePage />
-              </BaseLayout>
             </RequireAuth>
           }
         />
@@ -98,19 +86,15 @@ const App: React.FC = () => {
           path={ROUTES.roles}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <RoleManagementPage />
-              </BaseLayout>
             </RequireAuth>
           }
         />
         <Route
-          path={ROUTES.roles + "/create"}
+          path={ROUTES.createRole}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <RoleCreatePage />
-              </BaseLayout>
             </RequireAuth>
           }
         />
@@ -118,9 +102,7 @@ const App: React.FC = () => {
           path={ROUTES.users}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <UserManagementPage />
-              </BaseLayout>
             </RequireAuth>
           }
         />
@@ -128,9 +110,7 @@ const App: React.FC = () => {
           path={ROUTES.editWidget}
           element={
             <RequireAuth>
-              <BaseLayout>
                 <WidgetEditPage />
-              </BaseLayout>
             </RequireAuth>
           }
         />

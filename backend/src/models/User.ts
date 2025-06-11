@@ -1,14 +1,8 @@
+import { IUser } from '@/types/authType';
 import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
-export interface IUser extends mongoose.Document {
-  username: string;
-  email: string;
-  password: string;
-  roleId: mongoose.Types.ObjectId; // Référence au rôle
-  preferences?: Record<string, any>;
-}
 
 const UserSchema = new Schema({
   username: { type: String, required: true },
