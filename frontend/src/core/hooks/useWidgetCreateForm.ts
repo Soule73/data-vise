@@ -1,9 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { type WidgetType } from '@/data/adapters/visualizations';
 import { v4 as uuidv4 } from 'uuid';
 import api from '@/data/services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
+import type { WidgetType } from '../types/widget-types';
+import { useSources } from './useSources';
 
 function getDefaultConfig(type: WidgetType, columns: string[]): any {
   // Génère un config complet selon le schéma du widget
@@ -77,7 +78,9 @@ export function useWidgetCreateForm() {
     if (state?.sourceId) setSourceId(state.sourceId);
   }, [location.state]);
 
-  const { data: sources = [] } = useQuery({ queryKey: ['sources'], queryFn: async () => (await api.get('/sources')).data });
+  const { data: sources = [],
+    // refetchWidgets
+  } = useSources();
 
   // Étape 1 : charger les colonnes et preview
   const loadSourceColumns = async () => {

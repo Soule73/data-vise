@@ -8,7 +8,7 @@ import {
   PlusCircleIcon,
 } from "@heroicons/react/24/solid";
 import { useMetricUICollapseStore } from "@/core/store/metricUI";
-import type { WidgetDataConfigSectionProps } from "@/core/types/ui";
+import type { WidgetDataConfigSectionProps } from "@/core/types/widget-types";
 
 export default function WidgetDataConfigSection({
   dataConfig,

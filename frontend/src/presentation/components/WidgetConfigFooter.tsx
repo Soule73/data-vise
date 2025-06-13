@@ -1,4 +1,4 @@
-import type { WidgetConfigFooterProps } from "@/core/types/ui";
+import type { WidgetConfigFooterProps } from "@/core/types/widget-types";
 import Button from "@/presentation/components/Button";
 
 export default function WidgetConfigFooter({

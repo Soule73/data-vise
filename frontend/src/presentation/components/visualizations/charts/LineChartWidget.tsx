@@ -1,4 +1,5 @@
 import { useLineChartLogic } from "@/core/hooks/visualizations/useLineChartVM";
+import { PresentationChartLineIcon } from "@heroicons/react/24/outline";
 import {
   Chart as ChartJS,
   LineElement,
@@ -11,6 +12,8 @@ import {
   Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import InvalideConfigWidget from "./InvalideConfigWidget";
+import NoDataWidget from "./NoDataWidget";
 
 ChartJS.register(
   LineElement,
@@ -39,10 +42,16 @@ export default function LineChartWidget({
     !config.bucket.field
   ) {
     return (
-      <div className="text-xs text-gray-500">
-        Sélectionnez les métriques et le champ de groupement.
-      </div>
-    );
+      <InvalideConfigWidget />
+    )
+  }
+
+  if (data.length === 0) {
+    return (
+      <NoDataWidget
+        icon={<PresentationChartLineIcon className="w-12 h-12 stroke-gray-300 dark:stroke-gray-700" />}
+      />
+    )
   }
   const { chartData, options, showNativeValues, valueLabelsPlugin } =
     useLineChartLogic(data, config);
@@ -57,4 +66,5 @@ export default function LineChartWidget({
       />
     </div>
   );
-}
+};
+

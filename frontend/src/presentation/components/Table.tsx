@@ -2,7 +2,7 @@ import React from "react";
 import { useTableSearchStore } from "../../core/store/tableSearch";
 import Pagination from "./Pagination";
 import TableSearch from "./TableSearch";
-import type { TableProps } from "@/core/types/ui";
+import type { TableProps } from "@/core/types/table-types";
 
 export default function Table<T extends { [key: string]: any }>({
   columns,

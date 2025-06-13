@@ -1,7 +1,11 @@
 import { useWidgetCreateForm } from "@/core/hooks/useWidgetCreateForm";
-import { WIDGETS, WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
+import {
+  WIDGETS,
+  WIDGET_DATA_CONFIG,
+  WIDGET_CONFIG_FIELDS,
+} from "@/data/adapters/visualizations";
 import { useDashboardStore } from "@/core/store/dashboard";
-import { useMetricLabelStore } from '@/core/store/metricLabels';
+import { useMetricLabelStore } from "@/core/store/metricLabels";
 import { useState, useEffect, useRef } from "react";
 
 export function useWidgetCreateLogic() {
@@ -121,14 +125,45 @@ export function useWidgetCreateLogic() {
   }
 
   // Synchronisation metrics/metricStyles
-  const prevMetricsRef = useRef<any[]>(config.metrics ? [...config.metrics] : []);
+  const prevMetricsRef = useRef<any[]>(
+    config.metrics ? [...config.metrics] : []
+  );
   useEffect(() => {
     const metrics = config.metrics || [];
     let metricStyles = config.metricStyles || [];
+    // Correction : générer un style par défaut selon le schéma du widget
+    // const widgetDef = WIDGETS[type];
+    // const metricStyleSchema = widgetDef?.configSchema?.metricStyles || {}; // supprimé car inutilisé
+    // Correction : générer dynamiquement les styles par défaut pour chaque metric selon les champs de style attendus pour le widget
+    function getDefaultMetricStyle() {
+      // Champs de style typiques pour chaque type de widget
+      const styleFields = Object.keys(WIDGET_CONFIG_FIELDS).filter((key) =>
+        [
+          "color",
+          "borderColor",
+          "borderWidth",
+          "labelColor",
+          "labelFontSize",
+          "pointStyle",
+          "barThickness",
+          "borderRadius",
+          // Ajoute ici d'autres champs de style spécifiques si besoin
+        ].includes(key)
+      );
+      const style: Record<string, any> = {};
+      styleFields.forEach((field) => {
+        style[field] =
+          WIDGET_CONFIG_FIELDS[field]?.default ??
+          (WIDGET_CONFIG_FIELDS[field]?.inputType === "color" ? "#2563eb" : "");
+      });
+      return style;
+    }
     if (metricStyles.length < metrics.length) {
       metricStyles = [
         ...metricStyles,
-        ...Array(metrics.length - metricStyles.length).fill({}),
+        ...Array(metrics.length - metricStyles.length)
+          .fill(0)
+          .map(() => getDefaultMetricStyle()),
       ];
       handleConfigChange("metricStyles", metricStyles);
     }
@@ -144,34 +179,67 @@ export function useWidgetCreateLogic() {
       const oldMetrics = prevMetricsRef.current;
       const newMetricStyles = metrics.map((m: any) => {
         const oldIdx = oldMetrics.findIndex(
-          (om: any) => om.field === m.field && om.agg === m.agg && om.label === m.label
+          (om: any) =>
+            om.field === m.field && om.agg === m.agg && om.label === m.label
         );
-        return oldIdx !== -1 ? metricStyles[oldIdx] : {};
+        return oldIdx !== -1 ? metricStyles[oldIdx] : getDefaultMetricStyle();
       });
       handleConfigChange("metricStyles", newMetricStyles);
     }
     prevMetricsRef.current = [...metrics];
     // eslint-disable-next-line
-  }, [config.metrics]);
+  }, [config.metrics, type]);
 
   // Synchronisation initiale des labels (données -> store)
   useEffect(() => {
     if (Array.isArray(config.metrics)) {
-      const labels = config.metrics.map((m: any, idx: number) => m.label || `Métrique ${idx + 1}`);
+      const labels = config.metrics.map(
+        (m: any, idx: number) => m.label || `Métrique ${idx + 1}`
+      );
       metricLabelStore.setAllMetricLabels(labels);
+      // Synchronise le label dans metricStyles uniquement si non personnalisé
+      if (Array.isArray(config.metricStyles)) {
+        const newMetricStyles = config.metricStyles.map(
+          (style: any, idx: number) => {
+            // Génère le label auto selon agg et field
+            const metric = config.metrics[idx];
+            const aggLabel = metric?.agg || "";
+            const fieldLabel = metric?.field || "";
+            const autoLabel = `${aggLabel}${
+              fieldLabel ? " · " + fieldLabel : ""
+            }`;
+            // Si customLabel est défini, on ne touche pas au label
+            if (style && style.customLabel) {
+              return style;
+            }
+            return {
+              ...style,
+              label: autoLabel,
+            };
+          }
+        );
+        handleConfigChange("metricStyles", newMetricStyles);
+      }
     }
     // eslint-disable-next-line
   }, [config.metrics]);
 
   // Wrapper pour synchroniser label lors du changement d'agg ou de field
-  function handleMetricAggOrFieldChange(idx: number, field: 'agg' | 'field', value: any) {
+  function handleMetricAggOrFieldChange(
+    idx: number,
+    field: "agg" | "field",
+    value: any
+  ) {
     const newMetrics = [...config.metrics];
     newMetrics[idx] = { ...newMetrics[idx], [field]: value };
-    const aggLabel = dataConfig.metrics.allowedAggs.find((a: any) => a.value === (field === 'agg' ? value : newMetrics[idx].agg))?.label || (field === 'agg' ? value : newMetrics[idx].agg);
-    const fieldLabel = field === 'field' ? value : newMetrics[idx].field;
-    const autoLabel = `${aggLabel}${fieldLabel ? ' · ' + fieldLabel : ''}`;
+    const aggLabel =
+      dataConfig.metrics.allowedAggs.find(
+        (a: any) => a.value === (field === "agg" ? value : newMetrics[idx].agg)
+      )?.label || (field === "agg" ? value : newMetrics[idx].agg);
+    const fieldLabel = field === "field" ? value : newMetrics[idx].field;
+    const autoLabel = `${aggLabel}${fieldLabel ? " · " + fieldLabel : ""}`;
     newMetrics[idx].label = autoLabel;
-    handleConfigChange('metrics', newMetrics);
+    handleConfigChange("metrics", newMetrics);
     metricLabelStore.setMetricLabel(idx, autoLabel);
   }
 
@@ -210,6 +278,6 @@ export function useWidgetCreateLogic() {
     handleDragOver,
     handleDrop,
     handleMetricAggOrFieldChange,
-    metricLabelStore
+    metricLabelStore,
   };
 }

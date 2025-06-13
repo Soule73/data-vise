@@ -1,23 +1,23 @@
 import DashboardGridItem from "./DashboardGridItem";
 import { useDashboardGrid } from "@/core/hooks/useDashboardGrid";
-import { useQuery } from "@tanstack/react-query";
-import api from "@/data/services/api";
+import { useWidgets } from "@/core/hooks/useWidgets";
 import { useEffect, useState } from "react";
-import type { DashboardGridProps, DashboardLayoutItem } from "@/core/types/ui";
+import type { DashboardGridProps, DashboardLayoutItem } from "@/core/types/dashboard-types";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 export default function DashboardGrid({
   layout,
   onSwapLayout,
   sources,
   editMode = false,
+  isLoading = false,
   hasUnsavedChanges = false,
 }: DashboardGridProps) {
-  // Charge tous les widgets (pour hydratation du layout)
-  const { data: widgets = [] } = useQuery({
-    queryKey: ["widgets"],
-    queryFn: async () => (await api.get("/widgets")).data,
-    staleTime: 1000 * 60 * 2,
-  });
+
+  const { data: widgets = [],
+    // isLoading
+
+  } = useWidgets();
 
   // Hydrate le layout avec le widget complet si absent
   const hydratedLayout = layout.map((item) => {
@@ -43,6 +43,7 @@ export default function DashboardGrid({
     handleDragOver,
     handleDragEnd,
     handleDrop,
+    handleRemove,
   } = useDashboardGrid({
     layout: hydratedLayout,
     editMode,
@@ -81,33 +82,21 @@ export default function DashboardGrid({
               style={{ minWidth: "48%", minHeight: 300, flex: "1 1 48%" }}
               onClick={() => editMode && onSwapLayout && onSwapLayout(layout)}
             >
-              <svg
-                width="32"
-                height="32"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
+              <PlusIcon className="w-6 h-6 text-gray-400" />
               <span className="ml-2">Ajouter un widget</span>
             </div>
           );
         }
         const widget = item?.widget;
         return (
-          <DashboardGridItem
-            key={item?.widgetId || idx}
+          widget ? <DashboardGridItem
+            key={widget.widgetId || idx}
             idx={idx}
             hydratedLayout={hydratedLayout}
             editMode={editMode}
             item={item}
             widget={widget}
+            isLoading={isLoading}
             hoveredIdx={hoveredIdx}
             draggedIdx={draggedIdx}
             handleDragStart={handleDragStart}
@@ -116,24 +105,11 @@ export default function DashboardGrid({
             handleDragEnd={handleDragEnd}
             isMobile={isMobile}
             sources={sources}
-            onRemove={
-              editMode
-                ? () => {
-                    const newLayout = hydratedLayout.filter(
-                      (_, lidx) => lidx !== idx
-                    );
-                    onSwapLayout && onSwapLayout(newLayout);
-                  }
-                : undefined
-            }
+            onRemove={editMode ? () => handleRemove(idx) : undefined}
             onSwapLayout={handleSwapLayout}
-          >
-            {widget ? null : (
-              <div className="text-gray-300 text-center py-12 select-none">
-                Emplacement vide
-              </div>
-            )}
-          </DashboardGridItem>
+          /> : <div className="text-gray-300 text-center py-12 select-none">
+            Emplacement vide
+          </div>
         );
       })}
     </div>

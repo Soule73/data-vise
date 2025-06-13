@@ -1,5 +1,5 @@
+import type { SelectFieldProps } from '@/core/types/form-types';
 import { forwardRef } from 'react';
-import type { SelectFieldProps } from "@/core/types/ui";
 
 const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
   ({ label, options, error, id, className, ...props }, ref) => (

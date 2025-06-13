@@ -5,7 +5,7 @@ import { useRoleCreate } from "@/core/hooks/useRoleCreate";
 import Button from "@/presentation/components/Button";
 import InputField from "@/presentation/components/InputField";
 import CheckboxField from "@/presentation/components/CheckboxField";
-import type { Permission, PermissionGroupCheckboxesProps } from "@/core/types/ui";
+import type { Permission, PermissionGroupCheckboxesProps } from "@/core/types/auth-types";
 
 export function PermissionGroupCheckboxes({
   permissions,

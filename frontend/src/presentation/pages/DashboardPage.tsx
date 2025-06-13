@@ -2,12 +2,8 @@ import DashboardGrid from "@/presentation/components/DashboardGrid";
 import Button from "@/presentation/components/Button";
 import WidgetSelectModal from "@/presentation/components/WidgetSelectModal";
 import { useDashboard } from "@/core/hooks/useDashboard";
-import { useEffect, useState } from "react";
 import Modal from "@/presentation/components/Modal";
 import InputField from "@/presentation/components/InputField";
-import { useLocation } from "react-router-dom";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { Link } from "react-router-dom";
 
 export default function DashboardPage() {
   const {
@@ -21,103 +17,19 @@ export default function DashboardPage() {
     setEditMode,
     hasUnsavedChanges,
     handleAddWidget,
-    handleSaveDashboard,
     handleSwapLayout,
-    handleCreateDashboard,
-    dashboard,
     setLocalTitle,
+    titleModalOpen,
+    setTitleModalOpen,
+    pendingTitle,
+    setPendingTitle,
+    handleSave,
+    handleConfirmSave,
+    handleCancelEdit,
+    isCreate,
   } = useDashboard();
 
-  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
-
-  const location = useLocation();
-  const isCreate = location.pathname.includes("/dashboards/create");
-
-  // Utilise directement dashboard et layout du hook
-  const [titleModalOpen, setTitleModalOpen] = useState(false);
-  const [pendingTitle, setPendingTitle] = useState("");
-  useEffect(() => {
-    // Met à jour le titre du breadcrumb uniquement si le dashboard est chargé et a un titre
-    if (isCreate) {
-      if (dashboard?.title) {
-        setBreadcrumb([
-          { url: "/dashboards", label: "Tableaux de bord" },
-          {
-            url: "/dashboards/create",
-            label: dashboard?.title || "Nouveau dashboard",
-          },
-        ]);
-      }
-    } else if (dashboard && dashboard._id && dashboard.title) {
-      setBreadcrumb([
-        { url: "/dashboards", label: "Tableaux de bord" },
-        { url: `/dashboards/${dashboard._id}`, label: dashboard.title },
-      ]);
-    }
-  }, [isCreate, dashboard?._id, dashboard?.title, setBreadcrumb]);
-
-  // Met à jour le titre du breadcrumb dès que l'ID change (titre temporaire)
-  useEffect(() => {
-    if (!isCreate && dashboard && dashboard._id) {
-      setBreadcrumb([
-        { url: "/dashboards", label: "Tableaux de bord" },
-        {
-          url: `/dashboards/${dashboard._id}`,
-          label: dashboard.title || "Dashboard",
-        },
-      ]);
-    } else if (isCreate) {
-      setBreadcrumb([
-        { url: "/dashboards", label: "Tableaux de bord" },
-        {
-          url: "/dashboards/create",
-          label: dashboard?.title || "Nouveau dashboard",
-        },
-      ]);
-    }
-  }, [dashboard?._id, isCreate, setBreadcrumb]);
-
-  // Met à jour le titre du breadcrumb dès que le titre réel arrive
-  useEffect(() => {
-    if (!isCreate && dashboard && dashboard._id && dashboard.title) {
-      setBreadcrumb([
-        { url: "/dashboards", label: "Tableaux de bord" },
-        { url: `/dashboards/${dashboard._id}`, label: dashboard.title },
-      ]);
-    } else if (isCreate && dashboard?.title) {
-      setBreadcrumb([
-        { url: "/dashboards", label: "Tableaux de bord" },
-        { url: "/dashboards/create", label: dashboard.title },
-      ]);
-    }
-  }, [dashboard?.title, dashboard?._id, isCreate, setBreadcrumb]);
-
-  // Gère le champ local de titre indépendamment du breadcrumb
-  useEffect(() => {
-    if (dashboard && dashboard.title) {
-      setPendingTitle(dashboard.title);
-    } else if (isCreate) {
-      setPendingTitle(dashboard?.title || "");
-    }
-  }, [dashboard?._id, dashboard?.title, isCreate]);
-
-  const handleSave = () => {
-    setTitleModalOpen(true);
-  };
-
-  const handleConfirmSave = async () => {
-    if (isCreate) {
-      try {
-        await handleCreateDashboard(pendingTitle);
-        setTitleModalOpen(false);
-      } catch (e) {}
-      return;
-    }
-    await handleSaveDashboard({ title: pendingTitle });
-    setEditMode(false);
-    setTitleModalOpen(false);
-  };
-
+  // UI purement déclarative, tout le reste est dans le hook
   return (
     <>
       <WidgetSelectModal
@@ -137,23 +49,6 @@ export default function DashboardPage() {
             onChange={(e) => {
               setPendingTitle(e.target.value);
               if (isCreate && setLocalTitle) setLocalTitle(e.target.value);
-              if (isCreate && setBreadcrumb) {
-                setBreadcrumb([
-                  { url: "/dashboards", label: "Tableaux de bord" },
-                  {
-                    url: "/dashboards/create",
-                    label: e.target.value || "Nouveau dashboard",
-                  },
-                ]);
-              } else if (dashboard && dashboard._id && setBreadcrumb) {
-                setBreadcrumb([
-                  { url: "/dashboards", label: "Tableaux de bord" },
-                  {
-                    url: `/dashboards/${dashboard._id}`,
-                    label: e.target.value || "Dashboard",
-                  },
-                ]);
-              }
             }}
             required
             autoFocus
@@ -179,52 +74,51 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between mb-2">
         {editMode || isCreate ? (
           <div className="flex items-center gap-2 md:gap-4">
-            <Link
+            <a
               className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-              to={"#"}
-              about="Ajouter un widget"
-              onClick={() => setSelectOpen(true)}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setSelectOpen(true);
+              }}
             >
               Ajouter un widget
-            </Link>
-            <Link
-              to={"#"}
-              about="Sauvegarder"
+            </a>
+            <a
+              href="#"
               className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-              onClick={handleSave}
+              onClick={(e) => {
+                e.preventDefault();
+                handleSave();
+              }}
             >
               {saving ? "Sauvegarde…" : "Sauvegarder"}
-            </Link>
+            </a>
             {editMode && !isCreate && (
-              <Link
-                about="Annuler"
-                to={"#"}
+              <a
+                href="#"
                 className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-                onClick={() => {
-                  // Remettre le layout et le titre à l'état initial du backend
-                  if (dashboard && dashboard.layout) {
-                    handleSwapLayout(dashboard.layout);
-                  }
-                  if (dashboard && dashboard.title) {
-                    setPendingTitle(dashboard.title);
-                  }
-                  setEditMode(false);
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleCancelEdit();
                 }}
               >
                 Annuler
-              </Link>
+              </a>
             )}
           </div>
         ) : !isCreate ? (
           <div>
-            <Link
-              about="Modifier le dashboard"
-              to={"#"}
+            <a
+              href="#"
               className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-              onClick={() => setEditMode(true)}
+              onClick={(e) => {
+                e.preventDefault();
+                setEditMode(true);
+              }}
             >
               Modifier
-            </Link>
+            </a>
           </div>
         ) : null}
       </div>
@@ -238,6 +132,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <DashboardGrid
+            isLoading={isLoading}
             layout={layout}
             onSwapLayout={handleSwapLayout}
             sources={sources ?? []}

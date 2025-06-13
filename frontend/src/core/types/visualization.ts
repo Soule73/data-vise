@@ -1,4 +1,5 @@
-import type { BucketConfig, MetricConfig } from "./ui";
+import type { BucketConfig, MetricConfig } from "./metric-bucket-types";
+
 
 // Classe de base pour la configuration d'un widget
 export abstract class WidgetConfigBase {

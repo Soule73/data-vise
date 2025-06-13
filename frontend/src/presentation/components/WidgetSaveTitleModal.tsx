@@ -1,7 +1,7 @@
 import Modal from "@/presentation/components/Modal";
 import InputField from "@/presentation/components/InputField";
 import Button from "@/presentation/components/Button";
-import type { WidgetSaveTitleModalProps } from "@/core/types/ui";
+import type { WidgetSaveTitleModalProps } from "@/core/types/widget-types";
 
 export default function WidgetSaveTitleModal({
   open,

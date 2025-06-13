@@ -11,6 +11,7 @@ import WidgetSaveTitleModal from "@/presentation/components/WidgetSaveTitleModal
 import WidgetMetricStyleConfigSection from "@/presentation/components/WidgetMetricStyleConfigSection";
 import WidgetParamsConfigSection from "@/presentation/components/WidgetParamsConfigSection";
 import { useSourceData } from "@/core/hooks/useSourceData";
+import type { WidgetType } from "@/core/types/widget-types";
 
 export default function WidgetEditPage() {
   const { id } = useParams();
@@ -84,7 +85,7 @@ export default function WidgetEditPage() {
 
   // Correction TS : typage explicite
   const type =
-    widget.type as import("@/data/adapters/visualizations").WidgetType;
+    widget.type as WidgetType;
   const WidgetComponent = WIDGETS[type]?.component;
 
   async function handleSave() {
@@ -140,10 +141,10 @@ export default function WidgetEditPage() {
                   handleConfigChange={(field, value) =>
                     setConfig((c: any) => ({ ...c, [field]: value }))
                   }
-                  handleDragStart={() => {}}
-                  handleDragOver={() => {}}
-                  handleDrop={() => {}}
-                  handleMetricAggOrFieldChange={() => {}}
+                  handleDragStart={() => { }}
+                  handleDragOver={() => { }}
+                  handleDrop={() => { }}
+                  handleMetricAggOrFieldChange={() => { }}
                 />
               )}
               {tab === "metricsAxes" && (
@@ -173,7 +174,7 @@ export default function WidgetEditPage() {
               step={2}
               loading={loading}
               onPrev={() => navigate("/widgets")}
-              onNext={() => {}}
+              onNext={() => { }}
               onSave={() => setShowSaveModal(true)}
               isSaving={loading}
             />

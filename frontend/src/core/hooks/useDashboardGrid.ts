@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useDashboardGrid({ layout, editMode, hasUnsavedChanges, onSwapLayout }: {
   layout: any[];
@@ -51,6 +51,12 @@ export function useDashboardGrid({ layout, editMode, hasUnsavedChanges, onSwapLa
     setHoveredIdx(null);
   };
 
+  // Suppression d'un widget
+  const handleRemove = (idx: number) => {
+    const newLayout = layout.filter((_, lidx) => lidx !== idx);
+    onSwapLayout && onSwapLayout(newLayout);
+  };
+
   // Alerte navigation/fermeture si édition non sauvegardée
   useEffect(() => {
     if (!editMode || !hasUnsavedChanges) return;
@@ -65,64 +71,6 @@ export function useDashboardGrid({ layout, editMode, hasUnsavedChanges, onSwapLa
     };
   }, [editMode, hasUnsavedChanges]);
 
-  // Gestion du resize natif (resize: both) pour chaque widget
-  function useWidgetResize(idx: number, hydratedLayout: any[]) {
-    const widgetRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-      if (!editMode || !widgetRef.current) return;
-      const el = widgetRef.current;
-      let resizing = false;
-      let lastWidth = el.offsetWidth;
-      let lastHeight = el.offsetHeight;
-      function getFlexContainer(element: HTMLElement): HTMLElement | null {
-        let parent = element.parentElement;
-        while (parent) {
-          if (parent.classList.contains("flex-wrap")) return parent;
-          parent = parent.parentElement;
-        }
-        return null;
-      }
-      const observer = new window.ResizeObserver(() => {
-        if (!resizing) {
-          resizing = true;
-          const onUp = () => {
-            resizing = false;
-            const flexContainer = getFlexContainer(el);
-            if (!flexContainer) return;
-            const parentWidth = flexContainer.offsetWidth;
-            const newWidthPx = el.offsetWidth;
-            const newHeightPx = el.offsetHeight;
-            const newWidthPercent = Math.round((newWidthPx / parentWidth) * 100);
-            if (
-              (newWidthPx !== lastWidth || newHeightPx !== lastHeight) &&
-              typeof idx === "number" &&
-              hydratedLayout &&
-              onSwapLayout
-            ) {
-              lastWidth = newWidthPx;
-              lastHeight = newHeightPx;
-              const newLayout = hydratedLayout.map((it: any, i: number) =>
-                i === idx
-                  ? {
-                      ...it,
-                      width: `${newWidthPercent}%`, // MAJ à la racine
-                      height: newHeightPx,         // MAJ à la racine
-                    }
-                  : it
-              );
-              onSwapLayout(newLayout);
-            }
-            window.removeEventListener("mouseup", onUp);
-          };
-          window.addEventListener("mouseup", onUp);
-        }
-      });
-      observer.observe(el);
-      return () => observer.disconnect();
-    }, [editMode, hydratedLayout, idx, onSwapLayout]);
-    return widgetRef;
-  }
-
   return {
     draggedIdx,
     hoveredIdx,
@@ -134,6 +82,6 @@ export function useDashboardGrid({ layout, editMode, hasUnsavedChanges, onSwapLa
     handleDragOver,
     handleDragEnd,
     handleDrop,
-    useWidgetResize, // hook à utiliser dans DashboardGrid
+    handleRemove,
   };
 }

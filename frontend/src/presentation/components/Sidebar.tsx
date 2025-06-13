@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useSidebarAutoClose, useSidebarStore } from "../../core/store/sidebar";
 import { useUserStore } from "@/core/store/user";
 import SidebarItem from "./SidebarItem";
+import type { Permission } from "@/core/types/auth-types";
 
 const sidebarGroups = [
   {
@@ -62,7 +63,7 @@ export default function Sidebar() {
   useSidebarAutoClose();
 
   // Permissions utilisateur (tableau de string)
-  const userPerms = user?.role?.permissions?.map((p) => p.name) || [];
+  const userPerms = user?.role?.permissions?.map((p: Permission) => p.name) || [];
 
   // État d'ouverture/fermeture des groupes
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -153,9 +154,8 @@ export default function Sidebar() {
                     >
                       <span className="flex-1 text-left">{group.label}</span>
                       <svg
-                        className={`w-4 h-4 ml-1 transition-transform ${
-                          isOpen ? "" : "rotate-180"
-                        }`}
+                        className={`w-4 h-4 ml-1 transition-transform ${isOpen ? "" : "rotate-180"
+                          }`}
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2"
@@ -178,6 +178,7 @@ export default function Sidebar() {
                           )
                           .map((item) => (
                             <SidebarItem
+                              label={item.label}
                               key={item.to}
                               to={item.to}
                               icon={item.icon}

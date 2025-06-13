@@ -1,24 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
-import Modal from "@/presentation/components/Modal";
+import { useWidgets } from "@/core/hooks/useWidgets";
+import ModalSidebarRight from "@/presentation/components/ModalSidebarRight";
 import Button from "@/presentation/components/Button";
-import type { WidgetSelectModalProps } from "@/core/types/ui";
+import type { WidgetSelectModalProps } from "@/core/types/widget-types";
 
 export default function WidgetSelectModal({
   open,
   onClose,
   onSelect,
 }: WidgetSelectModalProps) {
-  const { data: widgets = [], isLoading } = useQuery({
-    queryKey: ["widgets"],
-    queryFn: async () =>
-      (await import("@/data/services/api")).default
-        .get("/widgets")
-        .then((r) => r.data),
-    enabled: open,
-  });
+  const { data: widgets = [], isLoading } = useWidgets();
 
   return (
-    <Modal
+    <ModalSidebarRight
       size="lg"
       open={open}
       onClose={onClose}
@@ -55,6 +48,6 @@ export default function WidgetSelectModal({
           ))}
         </div>
       )}
-    </Modal>
+    </ModalSidebarRight>
   );
 }

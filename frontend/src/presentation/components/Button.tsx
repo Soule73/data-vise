@@ -1,4 +1,4 @@
-import type { ButtonProps } from '@/core/types/ui';
+import type { ButtonProps } from '@/core/types/form-types';
 import { Button as HeadlessButton } from '@headlessui/react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 

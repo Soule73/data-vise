@@ -4,7 +4,7 @@ import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
 } from "@heroicons/react/24/outline";
-import type { PaginationProps } from "@/core/types/ui";
+import type { PaginationProps } from "@/core/types/table-types";
 
 export default function Pagination({
   effectivePage,

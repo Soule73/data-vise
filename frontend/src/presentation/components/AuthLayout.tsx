@@ -1,4 +1,4 @@
-import type { AuthLayoutProps } from "@/core/types/ui";
+import type { AuthLayoutProps } from "@/core/types/layout-types";
 
 export default function AuthLayout({ title, children, logoUrl, bottomText }: AuthLayoutProps) {
   return (

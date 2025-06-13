@@ -1,7 +1,7 @@
 import Button from "@/presentation/components/Button";
 import InputField from "@/presentation/components/InputField";
 import CheckboxField from "@/presentation/components/CheckboxField";
-import type { PermissionGroupProps, RoleActionsProps, RoleInfoProps } from "@/core/types/ui";
+import type { PermissionGroupProps, RoleActionsProps, RoleInfoProps } from "@/core/types/auth-types";
 
 
 
@@ -98,24 +98,24 @@ export function RoleInfo({
   return (
     <div className="flex-1 min-w-0">
       {isEditing ? (
-        <InputField
-          label="Nom du rôle"
-          value={name}
-          onChange={(e) => onChangeName(e.target.value)}
-          className="mb-2"
-        />
+      <InputField
+        label="Nom du rôle"
+        value={name}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChangeName(e.target.value)}
+        className="mb-2"
+      />
       ) : (
-        <div className="font-semibold text-lg">{name}</div>
+      <div className="font-semibold text-lg">{name}</div>
       )}
       {isEditing ? (
-        <InputField
-          label="Description"
-          value={description}
-          onChange={(e) => onChangeDescription(e.target.value)}
-          className="mb-2"
-        />
+      <InputField
+        label="Description"
+        value={description}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChangeDescription(e.target.value)}
+        className="mb-2"
+      />
       ) : (
-        <div className="text-xs text-gray-500 mb-2">{description}</div>
+      <div className="text-xs text-gray-500 mb-2">{description}</div>
       )}
     </div>
   );

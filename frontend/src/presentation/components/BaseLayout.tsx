@@ -3,7 +3,7 @@ import Sidebar from "@/presentation/components/Sidebar";
 import Navbar from "@/presentation/components/Navbar";
 import Notification from "@/presentation/components/Notification";
 import { useNotificationStore } from "@/core/store/notification";
-import type { BaseLayoutProps } from "@/core/types/ui";
+import type { BaseLayoutProps } from "@/core/types/layout-types";
 
 export default function BaseLayout({ children }: BaseLayoutProps) {
   const notif = useNotificationStore((s) => s.notification);

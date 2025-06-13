@@ -8,7 +8,7 @@ import {
 } from "../../data/adapters/visualizations";
 import Button from "./Button";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import type { WidgetParamsConfigSectionProps } from "@/core/types/ui";
+import type { WidgetParamsConfigSectionProps } from "@/core/types/widget-types";
 
 export default function WidgetParamsConfigSection({
   type,

@@ -8,7 +8,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import Button from './Button';
-import type { AlertModalProps } from '@/core/types/ui';
+import type { AlertModalProps } from '@/core/types/notification-types';
 
 const ICONS = {
   error: ExclamationCircleIcon,

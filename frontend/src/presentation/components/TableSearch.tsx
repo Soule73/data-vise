@@ -1,5 +1,5 @@
+import type { TableSearchProps } from "@/core/types/table-types";
 import InputField from "./InputField";
-import type { TableSearchProps } from "@/core/types/ui";
 
 export default function TableSearch({
   value,

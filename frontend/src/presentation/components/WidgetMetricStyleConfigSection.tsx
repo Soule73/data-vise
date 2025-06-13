@@ -6,7 +6,7 @@ import {
 } from "../../data/adapters/visualizations";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import { useMetricUICollapseStore } from "@/core/store/metricUI";
-import type { WidgetMetricStyleConfigSectionProps } from "@/core/types/ui";
+import type { WidgetMetricStyleConfigSectionProps } from "@/core/types/widget-types";
 
 export default function WidgetMetricStyleConfigSection({
   type,

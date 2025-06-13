@@ -11,7 +11,7 @@ import AlertModal from "@/presentation/components/AlertModal";
 import { useEffect } from "react";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { Link } from "react-router-dom";
-import type { User } from "@/core/types/ui";
+import type { User } from "@/core/types/auth-types";
 
 function getErrorMsg(err: any) {
   if (!err) return undefined;

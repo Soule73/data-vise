@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { fetchDashboard, fetchSources, saveDashboardLayout, createDashboard as apiCreateDashboard } from '@/data/services/dashboard';
+import { fetchDashboard, saveDashboardLayout, createDashboard as apiCreateDashboard } from '@/data/services/dashboard';
 import { useDashboardStore } from '@/core/store/dashboard';
 import { useNotificationStore } from '@/core/store/notification';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { DashboardLayoutItem } from '../types/store';
+import type { DashboardLayoutItem } from '../types/dashboard-types';
+import { useSources } from './useSources';
 
 export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   const params = useParams();
@@ -18,10 +19,9 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     queryFn: () => dashboardId ? fetchDashboard(dashboardId) : undefined,
     enabled: !isCreate && !!dashboardId,
   });
-  const { data: sources = [] } = useQuery({
-    queryKey: ['sources'],
-    queryFn: fetchSources,
-  });
+  const { data: sources = [], isLoading: isLoadingSources,
+    // refetchWidgets
+  } = useSources();
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
@@ -33,10 +33,15 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   const hasUnsavedChanges = useDashboardStore(s => s.hasUnsavedChanges);
   const setHasUnsavedChanges = useDashboardStore(s => s.setHasUnsavedChanges);
   const showNotification = useNotificationStore((s) => s.showNotification);
+  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
   const navigate = useNavigate();
 
   // Dashboard local temporaire pour la création
   const [localDashboard, setLocalDashboard] = useState<{ _id?: string; title: string; layout: DashboardLayoutItem[] }>({ title: '', layout: [] });
+
+  // Gestion du titre local et du modal
+  const [titleModalOpen, setTitleModalOpen] = useState(false);
+  const [pendingTitle, setPendingTitle] = useState('');
 
   // Synchronise le layout Zustand avec le dashboard local uniquement au premier montage en création
   useEffect(() => {
@@ -54,24 +59,52 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     // eslint-disable-next-line
   }, [dashboard, isCreate]);
 
+  // Gestion du titre local en création et édition
+  useEffect(() => {
+    if (dashboard && dashboard.title) {
+      setPendingTitle(dashboard.title);
+    } else if (isCreate) {
+      setPendingTitle(dashboard?.title || '');
+    }
+  }, [dashboard?._id, dashboard?.title, isCreate]);
+
+  // Gestion du breadcrumb (centralisé ici)
+  useEffect(() => {
+    if (isCreate) {
+      setBreadcrumb([
+        { url: '/dashboards', label: 'Tableaux de bord' },
+        { url: '/dashboards/create', label: pendingTitle || 'Nouveau dashboard' },
+      ]);
+    } else if (dashboard && dashboard._id && dashboard.title) {
+      setBreadcrumb([
+        { url: '/dashboards', label: 'Tableaux de bord' },
+        { url: `/dashboards/${dashboard._id}`, label: dashboard.title },
+      ]);
+    }
+  }, [isCreate, dashboard?._id, dashboard?.title, pendingTitle, setBreadcrumb]);
+
   // Ajout d'un widget au dashboard (local ou distant)
   const handleAddWidget = (widget: any) => {
-    // Par défaut, 48% de largeur, 300px de hauteur
     const newItem = {
       widgetId: widget.widgetId,
       width: "48%",
       height: 300,
       x: 0,
-      y: layout.length,
+      y: isCreate ? localDashboard.layout.length : layout.length,
       widget,
     };
-    setLayout([...layout, newItem]);
+    if (isCreate) {
+      setLocalDashboard(ld => ({ ...ld, layout: [...ld.layout, newItem] }));
+    } else {
+      setLayout([...layout, newItem]);
+    }
     setHasUnsavedChanges(true);
   };
 
   // Gestion du titre local en création
   const setLocalTitle = (title: string) => {
     if (isCreate) setLocalDashboard(ld => ({ ...ld, title }));
+    setPendingTitle(title);
   };
 
   // Sauvegarde du layout côté backend
@@ -82,7 +115,15 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
       const layoutToSave = useDashboardStore.getState().layout;
       await saveDashboardLayout(
         (dashboardId || localDashboard._id) ?? "",
-        layoutToSave.map(({ widgetId, width, height, x, y }) => ({ widgetId, width, height, x, y })),
+        layoutToSave.map(({ widgetId, width, height, x, y }:
+          {
+            widgetId: string;
+            width: string;
+            height: number;
+            x: number;
+            y: number;
+          }
+        ) => ({ widgetId, width, height, x, y })),
         updates?.title || localDashboard.title
       );
       setHasUnsavedChanges(false);
@@ -142,12 +183,41 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     setHasUnsavedChanges(true);
   };
 
+  // Handler pour ouvrir le modal de titre
+  const handleSave = () => setTitleModalOpen(true);
+
+  // Handler pour confirmer la sauvegarde (création ou édition)
+  const handleConfirmSave = async () => {
+    if (isCreate) {
+      try {
+        await handleCreateDashboard(pendingTitle);
+        setTitleModalOpen(false);
+      } catch (e) { }
+      return;
+    }
+    await handleSaveDashboard({ title: pendingTitle });
+    setEditMode(false);
+    setTitleModalOpen(false);
+  };
+
+  // Handler pour annuler l'édition
+  const handleCancelEdit = () => {
+    if (dashboard && dashboard.layout) {
+      handleSwapLayout(dashboard.layout);
+    }
+    if (dashboard && dashboard.title) {
+      setPendingTitle(dashboard.title);
+    }
+    setEditMode(false);
+  };
+
   // Expose le dashboard à utiliser (local en création, sinon backend)
   const dashboardToUse = isCreate ? localDashboard : dashboard;
   const layoutToUse = isCreate ? localDashboard.layout : layout;
 
   return {
     isLoading,
+    isLoadingSources,
     sources,
     saving,
     selectOpen,
@@ -162,5 +232,14 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     handleCreateDashboard,
     dashboard: dashboardToUse,
     setLocalTitle,
+    // Ajouts pour centralisation UI
+    titleModalOpen,
+    setTitleModalOpen,
+    pendingTitle,
+    setPendingTitle,
+    handleSave,
+    handleConfirmSave,
+    handleCancelEdit,
+    isCreate,
   };
 }

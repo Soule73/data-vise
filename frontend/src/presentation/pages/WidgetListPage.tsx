@@ -7,6 +7,7 @@ import { useEffect, useState, useMemo } from "react";
 import { ROUTES } from "@/core/constants/routes";
 import Table from "@/presentation/components/Table";
 import Modal from "@/presentation/components/Modal";
+import { useWidgets } from "@/core/hooks/useWidgets";
 
 export default function WidgetListPage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
@@ -14,16 +15,17 @@ export default function WidgetListPage() {
     setBreadcrumb([{ url: "/widgets", label: "Visualisations" }]);
   }, [setBreadcrumb]);
 
-  const { data: widgets = [], isLoading } = useQuery({
-    queryKey: ["widgets"],
-    queryFn: async () => (await api.get("/widgets")).data,
-  });
+  // Chargement des widgets depuis l'API
+  // Utilisation de useQuery pour gérer le chargement et la mise en cache
+  const { data: widgets = [], isLoading,
+    // refetchWidgets
+  } = useWidgets();
+  const widgetsArray = Array.isArray(widgets) ? widgets : [];
+
   const { data: sources = [] } = useQuery({
     queryKey: ["sources"],
     queryFn: async () => (await api.get("/sources")).data,
   });
-
-  const widgetsArray = Array.isArray(widgets) ? widgets : [];
 
   // Utilisation de useMemo pour stabiliser columns et data
   const columns = useMemo(
@@ -74,6 +76,7 @@ export default function WidgetListPage() {
           data={tableData}
           emptyMessage="Aucune visualisation."
           actionsColumn={{
+            key: "actions",
             label: "Actions",
             render: (row: any) => (
               <div className="flex gap-2">

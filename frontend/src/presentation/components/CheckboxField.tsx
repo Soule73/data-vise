@@ -1,4 +1,4 @@
-import type { CheckboxFieldProps } from '@/core/types/ui';
+import type { CheckboxFieldProps } from '@/core/types/form-types';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import React from 'react';
 

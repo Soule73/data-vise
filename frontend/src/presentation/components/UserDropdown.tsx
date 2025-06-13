@@ -21,7 +21,7 @@ export default function UserDropdown() {
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <MenuButton className="inline-flex cursor-pointer items-center gap-2 rounded-md dark:bg-gray-800 px-3 py-1.5 text-sm/6 font-semibold dart:text-white shadow-inner  focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white dark:data-hover:bg-gray-700 dark:data-open:bg-gray-700">
+      <MenuButton className="inline-flex cursor-pointer items-center gap-2 rounded-md dark:bg-gray-800 px-3 py-1.5 text-sm/6 font-semibold dart:text-white  focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white dark:data-hover:bg-gray-700 dark:data-open:bg-gray-700">
         <span className="font-semibold  hidden md:block">
           {user.username || user.email}
         </span>
@@ -29,7 +29,7 @@ export default function UserDropdown() {
       </MenuButton>
       <MenuItems
         anchor="bottom end"
-        className="w-56 origin-top-right rounded-xl border border-white/5 bg-white dark:bg-gray-900 p-1 text-sm/6 text-gray-900 dark:text-gray-100 shadow-lg ring-1 ring-black focus:outline-none z-50 mt-2"
+        className=" rounded-xl bg-white dark:bg-gray-900 p-1 w-52 origin-top-right border border-white/5 shadow text-sm/6 text-white transition duration-100 ease-out [--anchor-gap:--spacing(1)] z-50 focus:outline-none data-closed:scale-95 data-closed:opacity-0"
       >
         <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 select-none">
           Connecté en tant que{" "}

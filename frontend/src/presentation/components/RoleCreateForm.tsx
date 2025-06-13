@@ -4,8 +4,7 @@ import Button from "@/presentation/components/Button";
 import { useMemo } from "react";
 import React from "react";
 import { useNotificationStore } from "@/core/store/notification";
-import type { Permission, PermissionGroupCheckboxesProps, RoleCreateFormProps } from "@/core/types/ui";
-
+import type { Permission, PermissionGroupCheckboxesProps, RoleCreateFormProps } from "@/core/types/auth-types";
 
 
 export function PermissionGroupCheckboxes({
@@ -128,7 +127,7 @@ export default function RoleCreateForm({
         <InputField
           label="Nom du rôle"
           value={form.name}
-          onChange={(e) => handleChange("name", e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("name", e.target.value)}
           required
           id="create-role-name"
           name="name"
@@ -137,7 +136,7 @@ export default function RoleCreateForm({
         <InputField
           label="Description"
           value={form.description}
-          onChange={(e) => handleChange("description", e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("description", e.target.value)}
           id="create-role-description"
           name="description"
           autoComplete="off"

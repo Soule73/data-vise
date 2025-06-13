@@ -1,15 +1,11 @@
+import type { DashboardLayoutItem } from '@/core/types/dashboard-types';
 import api from './api';
-import type { DashboardLayoutItem } from '@/core/hooks/useDashboard';
 
 export async function fetchDashboard(id?: string) {
   if (id) {
     return (await api.get(`/dashboards/${id}`)).data;
   }
   return (await api.get('/dashboards/me')).data;
-}
-
-export async function fetchSources() {
-  return (await api.get('/sources')).data;
 }
 
 export async function saveDashboardLayout(dashboardId: string, layout: DashboardLayoutItem[], title?: string) {

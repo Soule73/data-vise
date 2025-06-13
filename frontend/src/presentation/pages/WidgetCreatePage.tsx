@@ -11,6 +11,8 @@ import WidgetConfigFooter from "@/presentation/components/WidgetConfigFooter";
 import WidgetSaveTitleModal from "@/presentation/components/WidgetSaveTitleModal";
 import WidgetMetricStyleConfigSection from "@/presentation/components/WidgetMetricStyleConfigSection";
 import WidgetParamsConfigSection from "@/presentation/components/WidgetParamsConfigSection";
+import type { WidgetType } from "@/core/types/widget-types";
+import CheckboxField from "@/presentation/components/CheckboxField";
 
 export default function WidgetCreatePage() {
   const {
@@ -102,19 +104,42 @@ export default function WidgetCreatePage() {
             <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pb-24 config-scrollbar md:px-2">
               {step === 1 ? (
                 <>
-                  <SelectField
-                    label="Type de visualisation"
-                    value={type}
-                    onChange={(e) =>
-                      setType(e.target.value as keyof typeof WIDGETS)
-                    }
-                    name="type"
-                    id="widget-type"
-                    options={Object.entries(WIDGETS).map(([key, def]) => ({
-                      value: key,
-                      label: def.label,
-                    }))}
-                  />
+                  <div className="mb-4">
+                    <div className="font-semibold mb-2">
+                      Type de visualisation
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {Object.entries(WIDGETS).map(([key, def]) => (
+                        <div
+                          key={key}
+                          className={`relative border rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all hover:shadow-md min-h-[120px] ${
+                            type === key
+                              ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20"
+                              : "border-gray-300 bg-white dark:bg-gray-800/40"
+                          }`}
+                          onClick={() => setType(key as keyof typeof WIDGETS)}
+                        >
+                          <div className="absolute top-2 right-2">
+                            <CheckboxField
+                              checked={type === key}
+                              onChange={() =>
+                                setType(key as keyof typeof WIDGETS)
+                              }
+                              label=""
+                              name="widget-type"
+                              id={`widget-type-${key}`}
+                            />
+                          </div>
+                          <div className="flex flex-col items-center justify-center gap-2 mt-2">
+                            <def.icon className="w-8 h-8 text-indigo-600" />
+                            <span className="font-medium text-center text-sm mt-1">
+                              {def.label}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                   <SelectField
                     label="Source de données"
                     value={sourceId}
@@ -135,7 +160,7 @@ export default function WidgetCreatePage() {
                 <>
                   {tab === "data" && (
                     <WidgetDataConfigSection
-                      dataConfig={WIDGET_DATA_CONFIG[type]}
+                      dataConfig={WIDGET_DATA_CONFIG[type as WidgetType]}
                       config={{
                         ...config,
                         metrics: config.metrics.map((m: any, idx: number) => ({

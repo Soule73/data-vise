@@ -1,4 +1,4 @@
-import type { WidgetConfigTabsProps } from "@/core/types/ui";
+import type { WidgetConfigTabsProps } from "@/core/types/widget-types";
 import React from "react";
 
 

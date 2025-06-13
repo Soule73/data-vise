@@ -1,5 +1,8 @@
 import { usePieChartLogic } from "@/core/hooks/visualizations/usePieChartVM";
 import { Pie } from "react-chartjs-2";
+import { ChartPieIcon } from "@heroicons/react/24/outline";
+import { InvalideConfigWidget } from "./InvalideConfigWidget";
+import NoDataWidget from "./NoDataWidget";
 
 export default function PieChartWidget({
   data,
@@ -9,6 +12,24 @@ export default function PieChartWidget({
   config: any;
   editMode?: boolean;
 }) {
+  if (
+    !data ||
+    !config.metrics ||
+    !config.bucket ||
+    !Array.isArray(config.metrics) ||
+    !config.bucket.field
+  ) {
+    return (
+      <InvalideConfigWidget />
+    )
+  }
+
+  if (data.length === 0) {
+    return (
+      <NoDataWidget
+        icon={<ChartPieIcon className="w-12 h-12 stroke-gray-300 dark:stroke-gray-700" />} />
+    )
+  }
   const { chartData, options, showNativeValues, valueLabelsPlugin } =
     usePieChartLogic(data, config);
 

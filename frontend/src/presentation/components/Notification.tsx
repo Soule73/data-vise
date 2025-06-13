@@ -1,4 +1,4 @@
-import type { NotificationProps } from '@/core/types/ui';
+import type { NotificationProps } from '@/core/types/notification-types';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef } from 'react';
 
