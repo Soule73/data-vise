@@ -13,7 +13,7 @@ import { useUserStore } from "@/core/store/user";
 export default function WidgetListPage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
   useEffect(() => {
-    setBreadcrumb([{ url: "/widgets", label: "Visualisations" }]);
+    setBreadcrumb([{ url: ROUTES.widgets, label: "Visualisations" }]);
   }, [setBreadcrumb]);
 
   // Chargement des widgets depuis l'API

@@ -13,6 +13,7 @@ import WidgetMetricStyleConfigSection from "@/presentation/components/WidgetMetr
 import WidgetParamsConfigSection from "@/presentation/components/WidgetParamsConfigSection";
 import type { WidgetType } from "@/core/types/widget-types";
 import CheckboxField from "@/presentation/components/CheckboxField";
+import { ROUTES } from "@/core/constants/routes";
 
 export default function WidgetCreatePage() {
   const {
@@ -69,8 +70,8 @@ export default function WidgetCreatePage() {
   // Breadcrumb dynamique pour la création
   useEffect(() => {
     setBreadcrumb([
-      { url: "/widgets", label: "Visualisations" },
-      { url: "/widgets/create", label: widgetTitle || "Créer" },
+      { url: ROUTES.widgets, label: "Visualisations" },
+      { url: ROUTES.createWidget, label: widgetTitle || "Créer" },
     ]);
   }, [widgetTitle, setBreadcrumb]);
 

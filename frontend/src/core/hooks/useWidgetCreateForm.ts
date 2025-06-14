@@ -1,10 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import api from "@/data/services/api";
+import { createWidget } from "@/data/services/widget";
 import { useNavigate, useLocation } from "react-router-dom";
 import type { WidgetType } from "../types/widget-types";
 import { useSources } from "./useSources";
+import { ROUTES } from "../constants/routes";
+import api from "@/data/services/api";
 
 function getDefaultConfig(type: WidgetType, columns: string[]): any {
   // Génère un config complet selon le schéma du widget
@@ -125,10 +127,10 @@ export function useWidgetCreateForm() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      return await api.post("/widgets", {
+      return await createWidget({
         widgetId: uuidv4(),
         title,
-        private: privateWidget,
+        visibility: privateWidget,
         type,
         dataSourceId: sourceId,
         config,
@@ -141,14 +143,13 @@ export function useWidgetCreateForm() {
         type: "success",
         message: "Widget créé avec succès !",
       });
-      setTimeout(() => navigate("/widgets"), 1200);
+      setTimeout(() => navigate(ROUTES.widgets), 1200);
     },
     onError: (e: any) => {
       setNotif({
         open: true,
         type: "error",
-        message:
-          e.response?.data?.message || "Erreur lors de la création du widget",
+        message: e.message || "Erreur lors de la création du widget",
       });
     },
   });

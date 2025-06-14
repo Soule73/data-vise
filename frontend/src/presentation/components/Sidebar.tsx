@@ -10,6 +10,7 @@ import {
 import { useSidebarAutoClose } from "../../core/store/sidebar";
 import SidebarItem from "./SidebarItem";
 import { useSidebarLogic } from "./useSidebarLogic";
+import { ROUTES } from "@/core/constants/routes";
 
 const sidebarGroups = [
   {
@@ -17,19 +18,19 @@ const sidebarGroups = [
     permissions: ["dashboard:canView", "datasource:canView", "widget:canView"],
     items: [
       {
-        to: "/dashboards",
+        to: ROUTES.dashboards,
         label: "Mes dashboards",
         icon: <HomeIcon className="w-5 h-5" />,
         permission: "dashboard:canView",
       },
       {
-        to: "/sources",
+        to: ROUTES.sources,
         label: "Sources de données",
         icon: <TableCellsIcon className="w-5 h-5" />,
         permission: "datasource:canView",
       },
       {
-        to: "/widgets",
+        to: ROUTES.widgets,
         label: "Visualisations",
         icon: <ChartBarIcon className="w-5 h-5" />,
         permission: "widget:canView",
@@ -41,13 +42,13 @@ const sidebarGroups = [
     permissions: ["role:canView", "user:canView"],
     items: [
       {
-        to: "/roles",
+        to: ROUTES.roles,
         label: "Gestion des rôles",
         icon: <ShieldCheckIcon className="w-5 h-5" />,
         permission: "role:canView",
       },
       {
-        to: "/users",
+        to: ROUTES.users,
         label: "Gestion des utilisateurs",
         icon: <UserIcon className="w-5 h-5" />,
         permission: "user:canView",

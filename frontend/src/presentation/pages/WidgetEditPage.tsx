@@ -12,6 +12,8 @@ import WidgetMetricStyleConfigSection from "@/presentation/components/WidgetMetr
 import WidgetParamsConfigSection from "@/presentation/components/WidgetParamsConfigSection";
 import { useSourceData } from "@/core/hooks/useSourceData";
 import type { WidgetType } from "@/core/types/widget-types";
+import { ROUTES } from "@/core/constants/routes";
+import { fetchWidgetById, updateWidget } from "@/data/services/widget";
 
 export default function WidgetEditPage() {
   const { id } = useParams();
@@ -51,8 +53,8 @@ export default function WidgetEditPage() {
   useEffect(() => {
     if (id && widgetTitle) {
       setBreadcrumb([
-        { url: "/widgets", label: "Visualisations" },
-        { url: `/widgets/edit/${id}`, label: widgetTitle },
+        { url: ROUTES.widgets, label: "Visualisations" },
+        { url: ROUTES.editWidget.replace(":id", id), label: widgetTitle },
       ]);
     }
   }, [id, widgetTitle, setBreadcrumb]);
@@ -62,14 +64,14 @@ export default function WidgetEditPage() {
     async function fetchWidgetAndSource() {
       setLoading(true);
       try {
-        const res = await api.get(`/widgets/${id}`);
-        setWidget(res.data);
-        setConfig(res.data.config);
-        setWidgetTitle(res.data.title);
-        setPrivateWidget(res.data.private || "private");
+        const data = await fetchWidgetById(id!);
+        setWidget(data);
+        setConfig(data.config);
+        setWidgetTitle(data.title);
+        setPrivateWidget(data.visibility || "private");
         // Charge la source associée pour obtenir l'endpoint
-        if (res.data.dataSourceId) {
-          const srcRes = await api.get(`/sources/${res.data.dataSourceId}`);
+        if (data.dataSourceId) {
+          const srcRes = await api.get(`/sources/${data.dataSourceId}`);
           setSource(srcRes.data || { endpoint: null });
         } else {
           setSource({ endpoint: null });
@@ -93,9 +95,15 @@ export default function WidgetEditPage() {
 
   async function handleSave() {
     try {
-      await api.put(`/widgets/${id}`, {
+      if (!widgetTitle.trim()) {
+        setWidgetTitleError("Le titre est requis");
+        return;
+      }
+
+      await updateWidget(`${id}`, {
         ...widget,
         title: widgetTitle,
+        visibility: privateWidget,
         config,
       });
       showNotification({
@@ -104,7 +112,7 @@ export default function WidgetEditPage() {
         title: "Succès",
         description: "Widget modifié avec succès !",
       });
-      navigate("/widgets");
+      navigate(ROUTES.widgets);
     } catch (e: any) {
       showNotification({
         open: true,
@@ -177,7 +185,7 @@ export default function WidgetEditPage() {
             <WidgetConfigFooter
               step={2}
               loading={loading}
-              onPrev={() => navigate("/widgets")}
+              onPrev={() => navigate(ROUTES.widgets)}
               onNext={() => {}}
               onSave={() => setShowSaveModal(true)}
               isSaving={loading}

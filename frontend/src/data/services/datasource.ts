@@ -1,16 +1,24 @@
-import api from './api';
+import api from "./api";
 
 export async function getSources() {
-  const res = await api.get('/sources');
+  const res = await api.get("/sources");
   return res.data;
 }
 
-export async function createSource(data: { name: string; type: string; endpoint: string; config?: any }) {
-  const res = await api.post('/sources', data);
+export async function createSource(data: {
+  name: string;
+  type: string;
+  endpoint: string;
+  config?: any;
+}) {
+  const res = await api.post("/sources", data);
   return res.data;
 }
 
-export async function updateSource(id: string, data: { name: string; type: string; endpoint: string; config?: any }) {
+export async function updateSource(
+  id: string,
+  data: { name: string; type: string; endpoint: string; config?: any }
+) {
   const res = await api.put(`/sources/${id}`, data);
   return res.data;
 }
@@ -21,7 +29,7 @@ export async function deleteSource(id: string) {
 }
 
 export async function detectColumns(endpoint: string) {
-  const res = await api.post('/sources/detect-columns', { endpoint });
+  const res = await api.post("/sources/detect-columns", { endpoint });
   return res.data;
 }
 
