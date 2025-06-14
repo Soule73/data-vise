@@ -38,14 +38,16 @@ export default function TableWidget({
   );
 
   return (
-    <Table
-      columns={columns}
-      name={tableTitle}
-      data={displayData}
-      emptyMessage="Aucune donnée."
-      paginable={true}
-      searchable={true}
-      rowPerPage={config.pageSize || 5}
-    />
+    <div className="bg-white shadow dark:bg-gray-900 rounded w-full max-w-full h-full p-2">
+      <Table
+        columns={columns}
+        name={tableTitle}
+        data={displayData}
+        emptyMessage="Aucune donnée."
+        paginable={true}
+        searchable={true}
+        rowPerPage={config.pageSize || 5}
+      />
+    </div>
   );
 }

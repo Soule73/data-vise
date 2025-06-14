@@ -19,6 +19,56 @@ export default function WidgetMetricStyleConfigSection({
   const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
   const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
 
+  // Cas spécial pour Card (et potentiellement KPI/KPIGroup) : styles globaux
+  if (type === "card") {
+    return (
+      <div className="space-y-4">
+        <div className="rounded p-3 bg-gray-50">
+          <div className="font-semibold mb-2">Style de la carte</div>
+          <div className="grid grid-cols-2 gap-2">
+            {Object.entries(metricStyleSchema).map(([field, metaRaw]) => {
+              const meta = metaRaw as {
+                label?: string;
+                default?: any;
+                inputType?: string;
+              };
+              const label = meta.label || field;
+              const defaultValue = meta.default;
+              if (meta.inputType === "color") {
+                return (
+                  <ColorField
+                    key={field}
+                    label={label}
+                    value={metricStyles?.[0]?.[field] ?? defaultValue}
+                    onChange={(val) => handleMetricStyleChange(0, field, val)}
+                    name={`metric-style-0-${field}`}
+                    id={`metric-style-0-${field}`}
+                  />
+                );
+              }
+              if (meta.inputType === "number") {
+                return (
+                  <InputField
+                    key={field}
+                    label={label}
+                    type="number"
+                    value={metricStyles?.[0]?.[field] ?? defaultValue ?? ""}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleMetricStyleChange(0, field, Number(e.target.value))
+                    }
+                    name={`metric-style-0-${field}`}
+                    id={`metric-style-0-${field}`}
+                  />
+                );
+              }
+              return null;
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {metrics.map((metric, idx) => (

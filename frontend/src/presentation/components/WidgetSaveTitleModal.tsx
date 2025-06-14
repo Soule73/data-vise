@@ -2,6 +2,7 @@ import Modal from "@/presentation/components/Modal";
 import InputField from "@/presentation/components/InputField";
 import Button from "@/presentation/components/Button";
 import type { WidgetSaveTitleModalProps } from "@/core/types/widget-types";
+import CheckboxField from "./CheckboxField";
 
 export default function WidgetSaveTitleModal({
   open,
@@ -12,6 +13,8 @@ export default function WidgetSaveTitleModal({
   setError,
   onConfirm,
   loading,
+  privateWidget,
+  setPrivateWidget,
 }: WidgetSaveTitleModalProps) {
   return (
     <Modal
@@ -33,6 +36,15 @@ export default function WidgetSaveTitleModal({
           autoFocus
           required
         />
+
+        <div className="flex items-center gap-2">
+          <CheckboxField
+            label="Rendre le widget privé"
+            checked={privateWidget == "private"}
+            onChange={(val) => setPrivateWidget(val ? "private" : "public")}
+            name="private-widget"
+          />
+        </div>
         <div className="flex justify-end gap-2">
           <Button color="gray" variant="outline" onClick={onClose}>
             Annuler

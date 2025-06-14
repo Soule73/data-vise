@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { useEffect } from "react";
+import { useUserStore } from "@/core/store/user";
 
 export default function RoleManagementPage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
@@ -49,17 +50,20 @@ export default function RoleManagementPage() {
   });
 
   const permissions = useGlobalPermissions();
+  const hasPermission = useUserStore((s) => s.hasPermission);
 
   return (
     <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow-sm">
       <div className="flex items-center justify-end mb-6">
         <div>
-          <Link
-            to={ROUTES.roleCreate}
-            className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-          >
-            Nouveau rôle
-          </Link>
+          {hasPermission("role:canCreate") && (
+            <Link
+              to={ROUTES.roleCreate}
+              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+            >
+              Nouveau rôle
+            </Link>
+          )}
         </div>
       </div>
       {isLoading ? (
@@ -73,16 +77,22 @@ export default function RoleManagementPage() {
             >
               <RoleActions
                 isEditing={editRoleId === role._id}
-                onEdit={() => startEdit(role)}
+                onEdit={
+                  hasPermission("role:canUpdate")
+                    ? () => startEdit(role)
+                    : () => {}
+                }
                 onCancel={cancelEdit}
                 onSave={saveEdit}
                 onTogglePerms={() =>
                   setShowPerms(showPerms === role._id ? null : role._id)
                 }
                 showPerms={showPerms === role._id}
-                canDelete={role.canDelete}
+                canDelete={role.canDelete && hasPermission("role:canDelete")}
                 onDelete={
-                  role.canDelete ? () => setRoleToDelete(role) : undefined
+                  role.canDelete && hasPermission("role:canDelete")
+                    ? () => setRoleToDelete(role)
+                    : undefined
                 }
               />
               <div className="flex items-center justify-between gap-2 flex-wrap">

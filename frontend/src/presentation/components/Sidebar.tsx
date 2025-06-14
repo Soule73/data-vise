@@ -4,16 +4,17 @@ import {
   ChartBarIcon,
   ShieldCheckIcon,
   UserIcon,
+  Bars3Icon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
-import { useSidebarAutoClose, useSidebarStore } from "../../core/store/sidebar";
-import { useUserStore } from "@/core/store/user";
+import { useSidebarAutoClose } from "../../core/store/sidebar";
 import SidebarItem from "./SidebarItem";
-import type { Permission } from "@/core/types/auth-types";
+import { useSidebarLogic } from "./useSidebarLogic";
 
 const sidebarGroups = [
   {
     label: "Navigation",
+    permissions: ["dashboard:canView", "datasource:canView", "widget:canView"],
     items: [
       {
         to: "/dashboards",
@@ -37,6 +38,7 @@ const sidebarGroups = [
   },
   {
     label: "Administration",
+    permissions: ["role:canView", "user:canView"],
     items: [
       {
         to: "/roles",
@@ -56,32 +58,18 @@ const sidebarGroups = [
 ];
 
 export default function Sidebar() {
-  const user = useUserStore((s) => s.user);
-  const open = useSidebarStore((s) => s.open);
-  const closeSidebar = useSidebarStore((s) => s.closeSidebar);
-  const isMobile = useSidebarStore((s) => s.isMobile);
+  const sidebarLogic = useSidebarLogic(sidebarGroups);
+  const {
+    user,
+    open,
+    closeSidebar,
+    isMobile,
+    hasPermission,
+    openGroups,
+    toggleGroup,
+    filteredGroups,
+  } = sidebarLogic;
   useSidebarAutoClose();
-
-  // Permissions utilisateur (tableau de string)
-  const userPerms = user?.role?.permissions?.map((p: Permission) => p.name) || [];
-
-  // État d'ouverture/fermeture des groupes
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
-  const toggleGroup = (label: string) =>
-    setOpenGroups((prev) => ({ ...prev, [label]: !prev[label] }));
-
-  // Fermer le sidebar si on clique en dehors (overlay ou desktop)
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(e: MouseEvent) {
-      const sidebar = document.getElementById("sidebar-panel");
-      if (sidebar && !sidebar.contains(e.target as Node)) {
-        closeSidebar();
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [open, closeSidebar]);
 
   // Responsive sidebar : mobile = overlay, desktop = pliable (contrôlé par open)
   const showSidebar = open; // Affiche le sidebar seulement si open=true, même sur desktop
@@ -89,21 +77,12 @@ export default function Sidebar() {
   return (
     <>
       {showSidebar && (
-        <div
-          className={
-            //   isMobile
-            // ?
-            "fixed inset-0 z-10"
-            // : "hidden md:flex fixed top-0 left-0 flex-col w-64 h-screen z-20"
-          }
-        >
+        <div className={"fixed inset-0 z-10"}>
           {/* Overlay mobile */}
-          {/* {isMobile && ( */}
           <div
             className="absolute inset-0 bg-black/40 dark:bg-black/60 transition-colors duration-300"
             onClick={closeSidebar}
           />
-          {/* )} */}
           <aside
             id="sidebar-panel"
             className={
@@ -126,24 +105,12 @@ export default function Sidebar() {
                   className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none"
                   aria-label="Fermer le menu"
                 >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <Bars3Icon className="w-6 h-6" />
                 </button>
               </div>
             )}
             <nav className="flex-1 p-4 space-y-6">
-              {sidebarGroups.map((group) => {
+              {filteredGroups.map((group: any) => {
                 const isOpen = openGroups[group.label] ?? true;
                 return (
                   <div key={group.label}>
@@ -153,30 +120,16 @@ export default function Sidebar() {
                       aria-expanded={isOpen}
                     >
                       <span className="flex-1 text-left">{group.label}</span>
-                      <svg
-                        className={`w-4 h-4 ml-1 transition-transform ${isOpen ? "" : "rotate-180"
-                          }`}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
+                      {isOpen ? (
+                        <ChevronDownIcon className="w-4 h-4 ml-1" />
+                      ) : (
+                        <ChevronDownIcon className="w-4 h-4 ml-1 rotate-180" />
+                      )}
                     </button>
                     {isOpen && (
                       <div className="space-y-2">
-                        {group.items
-                          .filter(
-                            (item) =>
-                              !item.permission ||
-                              userPerms.includes(item.permission)
-                          )
-                          .map((item) => (
+                        {group.items.map((item: any) =>
+                          !item.permission || hasPermission(item.permission) ? (
                             <SidebarItem
                               label={item.label}
                               key={item.to}
@@ -185,7 +138,8 @@ export default function Sidebar() {
                             >
                               {item.label}
                             </SidebarItem>
-                          ))}
+                          ) : null
+                        )}
                       </div>
                     )}
                   </div>

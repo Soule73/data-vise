@@ -2,7 +2,17 @@
 // 1. Widgets & Configuration
 // ======================================================
 
-export type WidgetType = "bar" | "pie" | "table" | "line";
+export type WidgetType =
+  | "bar"
+  | "pie"
+  | "table"
+  | "line"
+  | "scatter"
+  | "bubble"
+  | "radar"
+  | "kpi"
+  | "kpi_group"
+  | "card";
 
 export interface WidgetDefinition {
   type: WidgetType;
@@ -11,6 +21,9 @@ export interface WidgetDefinition {
   configSchema: any;
   // Optional: default configuration values
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; // Ajout de l'icône (composant SVG)
+  allowMultipleMetrics?: boolean; // Ajouté : permet de désactiver l'ajout multiple de métriques
+  hideBucket?: boolean; // cache la section bucket
+  enableFilter?: boolean; // active la section filtre
 }
 
 // --- Widget Configuration Sections
@@ -85,6 +98,8 @@ export interface WidgetSaveTitleModalProps {
   setError: (e: string) => void;
   onConfirm: () => void;
   loading: boolean;
+  privateWidget: "public" | "private";
+  setPrivateWidget: (p: "public" | "private") => void;
 }
 
 export interface WidgetCreateSelectorResult {

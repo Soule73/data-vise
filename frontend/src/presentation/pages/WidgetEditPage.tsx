@@ -24,6 +24,9 @@ export default function WidgetEditPage() {
   const [config, setConfig] = useState<any>({});
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [widgetTitle, setWidgetTitle] = useState("");
+  const [privateWidget, setPrivateWidget] = useState<"public" | "private">(
+    "private"
+  );
   const [widgetTitleError, setWidgetTitleError] = useState("");
   const [tab, setTab] = useState<"data" | "metricsAxes" | "params">("data");
   const [columns, setColumns] = useState<string[]>([]);
@@ -63,6 +66,7 @@ export default function WidgetEditPage() {
         setWidget(res.data);
         setConfig(res.data.config);
         setWidgetTitle(res.data.title);
+        setPrivateWidget(res.data.private || "private");
         // Charge la source associée pour obtenir l'endpoint
         if (res.data.dataSourceId) {
           const srcRes = await api.get(`/sources/${res.data.dataSourceId}`);
@@ -84,8 +88,7 @@ export default function WidgetEditPage() {
   if (!widget) return null;
 
   // Correction TS : typage explicite
-  const type =
-    widget.type as WidgetType;
+  const type = widget.type as WidgetType;
   const WidgetComponent = WIDGETS[type]?.component;
 
   async function handleSave() {
@@ -135,16 +138,17 @@ export default function WidgetEditPage() {
             <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pb-24 config-scrollbar md:px-2">
               {tab === "data" && (
                 <WidgetDataConfigSection
+                  type={type}
                   dataConfig={WIDGET_DATA_CONFIG[type]}
                   config={config}
                   columns={columns}
                   handleConfigChange={(field, value) =>
                     setConfig((c: any) => ({ ...c, [field]: value }))
                   }
-                  handleDragStart={() => { }}
-                  handleDragOver={() => { }}
-                  handleDrop={() => { }}
-                  handleMetricAggOrFieldChange={() => { }}
+                  handleDragStart={() => {}}
+                  handleDragOver={() => {}}
+                  handleDrop={() => {}}
+                  handleMetricAggOrFieldChange={() => {}}
                 />
               )}
               {tab === "metricsAxes" && (
@@ -174,7 +178,7 @@ export default function WidgetEditPage() {
               step={2}
               loading={loading}
               onPrev={() => navigate("/widgets")}
-              onNext={() => { }}
+              onNext={() => {}}
               onSave={() => setShowSaveModal(true)}
               isSaving={loading}
             />
@@ -187,6 +191,8 @@ export default function WidgetEditPage() {
         onClose={() => setShowSaveModal(false)}
         title={widgetTitle}
         setTitle={setWidgetTitle}
+        privateWidget={privateWidget}
+        setPrivateWidget={setPrivateWidget}
         error={widgetTitleError}
         setError={setWidgetTitleError}
         loading={loading}

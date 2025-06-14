@@ -4,6 +4,7 @@ import WidgetSelectModal from "@/presentation/components/WidgetSelectModal";
 import { useDashboard } from "@/core/hooks/useDashboard";
 import Modal from "@/presentation/components/Modal";
 import InputField from "@/presentation/components/InputField";
+import { useUserStore } from "@/core/store/user";
 
 export default function DashboardPage() {
   const {
@@ -29,7 +30,13 @@ export default function DashboardPage() {
     isCreate,
   } = useDashboard();
 
-  // UI purement déclarative, tout le reste est dans le hook
+  const hasPermission = useUserStore((s) => s.hasPermission);
+
+  const openAddWidgetModal = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setSelectOpen(true);
+  };
+
   return (
     <>
       <WidgetSelectModal
@@ -74,27 +81,28 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between mb-2">
         {editMode || isCreate ? (
           <div className="flex items-center gap-2 md:gap-4">
-            <a
-              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setSelectOpen(true);
-              }}
-            >
-              Ajouter un widget
-            </a>
-            <a
-              href="#"
-              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-              onClick={(e) => {
-                e.preventDefault();
-                handleSave();
-              }}
-            >
-              {saving ? "Sauvegarde…" : "Sauvegarder"}
-            </a>
-            {editMode && !isCreate && (
+            {hasPermission("widget:canCreate") && (
+              <a
+                className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+                href="#"
+                onClick={openAddWidgetModal}
+              >
+                Ajouter un widget
+              </a>
+            )}
+            {hasPermission("dashboard:canUpdate") && (
+              <a
+                href="#"
+                className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSave();
+                }}
+              >
+                {saving ? "Sauvegarde…" : "Sauvegarder"}
+              </a>
+            )}
+            {editMode && !isCreate && hasPermission("dashboard:canUpdate") && (
               <a
                 href="#"
                 className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
@@ -109,16 +117,18 @@ export default function DashboardPage() {
           </div>
         ) : !isCreate ? (
           <div>
-            <a
-              href="#"
-              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-              onClick={(e) => {
-                e.preventDefault();
-                setEditMode(true);
-              }}
-            >
-              Modifier
-            </a>
+            {hasPermission("dashboard:canUpdate") && (
+              <a
+                href="#"
+                className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setEditMode(true);
+                }}
+              >
+                Modifier
+              </a>
+            )}
           </div>
         ) : null}
       </div>
@@ -138,6 +148,7 @@ export default function DashboardPage() {
             sources={sources ?? []}
             editMode={true}
             hasUnsavedChanges={hasUnsavedChanges}
+            handleAddWidget={openAddWidgetModal}
           />
         )
       ) : isLoading ? (
@@ -155,6 +166,7 @@ export default function DashboardPage() {
           sources={sources ?? []}
           editMode={editMode}
           hasUnsavedChanges={hasUnsavedChanges}
+          handleAddWidget={openAddWidgetModal}
         />
       )}
       {saving && (

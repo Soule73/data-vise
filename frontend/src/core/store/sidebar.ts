@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
-import { create } from 'zustand';
-import type { SidebarStore } from '../types/store';
+import { useEffect } from "react";
+import { create } from "zustand";
+import type { SidebarStore } from "../types/theme-types";
 
 export const useSidebarStore = create<SidebarStore>((set) => ({
   open: false,
-  isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : false,
+  isMobile: typeof window !== "undefined" ? window.innerWidth < 768 : false,
   setIsMobile: (mobile) => set({ isMobile: mobile }),
   openSidebar: () => set({ open: true }),
   closeSidebar: () => set({ open: false }),
@@ -20,7 +20,7 @@ export function useSidebarAutoClose() {
       setIsMobile(mobile);
       if (!mobile) closeSidebar();
     };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, [closeSidebar, setIsMobile]);
 }

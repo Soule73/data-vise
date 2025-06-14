@@ -8,6 +8,7 @@ import {
 } from "../../data/adapters/visualizations";
 import Button from "./Button";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import * as HeroIcons from "@heroicons/react/24/outline";
 import type { WidgetParamsConfigSectionProps } from "@/core/types/widget-types";
 
 export default function WidgetParamsConfigSection({
@@ -96,6 +97,54 @@ export default function WidgetParamsConfigSection({
               );
             }
           }
+          if (meta.inputType === "select" && field === "icon" && meta.options) {
+            return (
+              <div key={field} className="flex flex-col gap-1">
+                <label
+                  className="text-sm font-medium"
+                  htmlFor={`widget-param-${field}`}
+                >
+                  {label}
+                </label>
+                <select
+                  className="border rounded px-2 py-1 bg-white dark:bg-gray-900"
+                  value={config.widgetParams?.[field] || defaultValue || ""}
+                  onChange={(e) =>
+                    handleConfigChange("widgetParams", {
+                      ...config.widgetParams,
+                      [field]: e.target.value,
+                    })
+                  }
+                  name={`widget-param-${field}`}
+                  id={`widget-param-${field}`}
+                >
+                  {meta.options.map((opt: any) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                {/* Aperçu de l'icône sélectionnée */}
+                <div className="mt-1 flex items-center gap-2">
+                  {config.widgetParams?.[field] &&
+                    HeroIcons[
+                      config.widgetParams[field] as keyof typeof HeroIcons
+                    ] && (
+                      <>
+                        {HeroIcons[
+                          config.widgetParams[field] as keyof typeof HeroIcons
+                        ]({
+                          className: "w-6 h-6 text-indigo-500",
+                        })}
+                        <span className="text-xs text-gray-500">
+                          {config.widgetParams[field]}
+                        </span>
+                      </>
+                    )}
+                </div>
+              </div>
+            );
+          }
           if (meta.inputType === "color-array") {
             // Champ pour sélectionner plusieurs couleurs (tableau)
             return (
@@ -163,6 +212,23 @@ export default function WidgetParamsConfigSection({
                   </Button>
                 </div>
               </div>
+            );
+          }
+          if (field === "showIcon") {
+            return (
+              <CheckboxField
+                key={field}
+                label={meta.label || "Afficher une icône"}
+                checked={config.widgetParams?.[field] ?? defaultValue ?? true}
+                onChange={(val) =>
+                  handleConfigChange("widgetParams", {
+                    ...config.widgetParams,
+                    [field]: val,
+                  })
+                }
+                name={`widget-param-${field}`}
+                id={`widget-param-${field}`}
+              />
             );
           }
           return (

@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/core/constants/routes";
+import { useUserStore } from "@/core/store/user";
 
 export default function DashboardListPage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
@@ -20,6 +21,7 @@ export default function DashboardListPage() {
     queryFn: fetchDashboards,
   });
   const navigate = useNavigate();
+  const hasPermission = useUserStore((s) => s.hasPermission);
 
   const columns = [
     { key: "title", label: "Titre" },
@@ -36,13 +38,15 @@ export default function DashboardListPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <h1 className="text-2xl font-bold ">Mes tableaux de bord</h1>
           <div>
-            <Link
-              to={ROUTES.createDashboard}
-              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-              color="indigo"
-            >
-              Nouveau tableau de bord
-            </Link>
+            {hasPermission("dashboard:canCreate") && (
+              <Link
+                to={ROUTES.createDashboard}
+                className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+                color="indigo"
+              >
+                Nouveau tableau de bord
+              </Link>
+            )}
           </div>
         </div>
         {isLoading ? (
@@ -61,23 +65,24 @@ export default function DashboardListPage() {
             emptyMessage="Aucun dashboard."
             onClickItem={(row) => navigate(`/dashboards/${row._id}`)}
             actionsColumn={{
+              key: "actions",
               label: "",
-              render: (row: any) => (
-                <Button
-                  color="gray"
-                  size="sm"
-                  variant="outline"
-                  title="Ouvrir le dashboard"
-                  className=" w-max !border-none !bg-transparent hover:!bg-gray-100 dark:hover:!bg-gray-800"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/dashboards/${row._id}`);
-                  }}
-                >
-                  {/* Ouvrir */}
-                  <EyeIcon className="w-4 h-4 ml-1 inline" />
-                </Button>
-              ),
+              render: (row: any) =>
+                hasPermission("dashboard:canView") && (
+                  <Button
+                    color="gray"
+                    size="sm"
+                    variant="outline"
+                    title="Ouvrir le dashboard"
+                    className=" w-max !border-none !bg-transparent hover:!bg-gray-100 dark:hover:!bg-gray-800"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/dashboards/${row._id}`);
+                    }}
+                  >
+                    <EyeIcon className="w-4 h-4 ml-1 inline" />
+                  </Button>
+                ),
             }}
           />
         )}

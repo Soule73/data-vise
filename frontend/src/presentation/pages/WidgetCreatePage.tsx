@@ -38,6 +38,9 @@ export default function WidgetCreatePage() {
     setShowSaveModal,
     widgetTitle,
     setWidgetTitle,
+    privateWidget,
+    setPrivateWidget,
+    setPrivateW,
     widgetTitleError,
     setWidgetTitleError,
     WidgetComponent,
@@ -160,6 +163,7 @@ export default function WidgetCreatePage() {
                 <>
                   {tab === "data" && (
                     <WidgetDataConfigSection
+                      type={type}
                       dataConfig={WIDGET_DATA_CONFIG[type as WidgetType]}
                       config={{
                         ...config,
@@ -172,6 +176,7 @@ export default function WidgetCreatePage() {
                         })),
                       }}
                       columns={columns}
+                      data={dataPreview}
                       handleConfigChange={handleConfigChange}
                       handleDragStart={handleDragStart}
                       handleDragOver={handleDragOver}
@@ -228,6 +233,8 @@ export default function WidgetCreatePage() {
         onClose={() => setShowSaveModal(false)}
         title={widgetTitle}
         setTitle={setWidgetTitle}
+        privateWidget={privateWidget}
+        setPrivateWidget={setPrivateWidget}
         error={widgetTitleError}
         setError={setWidgetTitleError}
         loading={createMutation.isPending}
@@ -237,6 +244,7 @@ export default function WidgetCreatePage() {
             return;
           }
           setTitle(widgetTitle);
+          setPrivateW(privateWidget);
           setShowSaveModal(false);
           createMutation.mutate();
         }}

@@ -6,7 +6,10 @@ import {
   WIDGETS,
   WIDGET_CONFIG_FIELDS,
 } from "../../data/adapters/visualizations";
-import type { WidgetStyleConfigSectionProps, WidgetType } from "@/core/types/widget-types";
+import type {
+  WidgetStyleConfigSectionProps,
+  WidgetType,
+} from "@/core/types/widget-types";
 
 export default function WidgetStyleConfigSection({
   type,
@@ -85,12 +88,7 @@ export default function WidgetStyleConfigSection({
                 label={label}
                 multiple
                 value={config[field] || []}
-                onChange={(e) =>
-                  handleConfigChange(
-                    field,
-                    Array.from(e.target.selectedOptions).map((o) => o.value)
-                  )
-                }
+                onChange={(e) => handleConfigChange(field, e.target.value)}
                 name={field}
                 id={`widget-config-${field}`}
                 options={columns.map((col) => ({ value: col, label: col }))}
@@ -108,7 +106,8 @@ export default function WidgetStyleConfigSection({
                 label={label}
                 type="number"
                 value={config[field] ?? defaultValue ?? ""}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleConfigChange(field, Number(e.target.value))
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleConfigChange(field, Number(e.target.value))
                 }
                 name={field}
                 id={`widget-config-${field}`}
@@ -126,7 +125,7 @@ export default function WidgetStyleConfigSection({
                   key={field}
                   label={label}
                   value={config[field] || defaultValue || ""}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleConfigChange(field, e.target.value)}
+                  onChange={(e) => handleConfigChange(field, e.target.value)}
                   name={field}
                   id={`widget-config-${field}`}
                   options={meta.options}
@@ -138,7 +137,7 @@ export default function WidgetStyleConfigSection({
                 key={field}
                 label={label}
                 value={config[field] || ""}
-                onChange={(e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => handleConfigChange(field, e.target.value)}
+                onChange={(e) => handleConfigChange(field, e.target.value)}
                 name={field}
                 id={`widget-config-${field}`}
                 options={[
@@ -153,7 +152,9 @@ export default function WidgetStyleConfigSection({
               key={field}
               label={label}
               value={config[field] ?? defaultValue ?? ""}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleConfigChange(field, e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleConfigChange(field, e.target.value)
+              }
               name={field}
               id={`widget-config-${field}`}
             />

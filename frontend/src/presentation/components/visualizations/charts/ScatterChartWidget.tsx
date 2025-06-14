@@ -1,32 +1,28 @@
-import { useLineChartLogic } from "@/core/hooks/visualizations/useLineChartVM";
-import { PresentationChartLineIcon } from "@heroicons/react/24/outline";
+import { useScatterChartLogic } from "@/core/hooks/visualizations/useScatterChartVM";
 import {
   Chart as ChartJS,
-  LineElement,
+  ScatterController,
   PointElement,
-  CategoryScale,
   LinearScale,
   Title,
   Tooltip,
   Legend,
-  Filler,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
+import { Scatter } from "react-chartjs-2";
+import { ChartBarIcon } from "@heroicons/react/24/outline";
 import InvalideConfigWidget from "./InvalideConfigWidget";
 import NoDataWidget from "./NoDataWidget";
 
 ChartJS.register(
-  LineElement,
+  ScatterController,
   PointElement,
-  CategoryScale,
   LinearScale,
   Title,
   Tooltip,
-  Legend,
-  Filler
+  Legend
 );
 
-export default function LineChartWidget({
+export default function ScatterChartWidget({
   data,
   config,
 }: {
@@ -34,34 +30,33 @@ export default function LineChartWidget({
   config: any;
   editMode?: boolean;
 }) {
+  const { chartData, options, validDatasets } = useScatterChartLogic(
+    data,
+    config
+  );
   if (
     !data ||
     !config.metrics ||
-    !config.bucket ||
     !Array.isArray(config.metrics) ||
-    !config.bucket.field
+    validDatasets.length === 0
   ) {
     return <InvalideConfigWidget />;
   }
-
   if (data.length === 0) {
     return (
       <NoDataWidget
         icon={
-          <PresentationChartLineIcon className="w-12 h-12 stroke-gray-300 dark:stroke-gray-700" />
+          <ChartBarIcon className="w-12 h-12 stroke-gray-300 dark:stroke-gray-700" />
         }
       />
     );
   }
-  const { chartData, options, showNativeValues, valueLabelsPlugin } =
-    useLineChartLogic(data, config);
   return (
-    <div className="bg-white shadow dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-x-auto">
-      <Line
+    <div className="bg-white shadow dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
+      <Scatter
         className="w-full max-w-full h-auto p-1 md:p-2"
         data={chartData}
         options={options}
-        plugins={showNativeValues ? [valueLabelsPlugin] : []}
         style={{ width: "100%", maxWidth: "100%", height: "auto", minWidth: 0 }}
       />
     </div>

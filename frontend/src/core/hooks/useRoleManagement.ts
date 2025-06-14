@@ -1,14 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
-import { fetchRoles, updateRole, deleteRole } from '@/data/services/role';
-import { useNotificationStore } from '@/core/store/notification';
-import { useGlobalPermissions } from '@/core/store/permissions';
-import { useGlobalRoles } from '@/core/hooks/useGlobalRoles';
-import { useRoleStore } from '@/core/store/roles';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { fetchRoles, updateRole, deleteRole } from "@/data/services/role";
+import { useNotificationStore } from "@/core/store/notification";
+import { useGlobalPermissions } from "@/core/store/permissions";
+import { useGlobalRoles } from "@/core/hooks/useGlobalRoles";
+import { useRoleStore } from "@/core/store/roles";
 
 export function useRoleManagement() {
   const queryClient = useQueryClient();
-  const showNotification = useNotificationStore(s => s.showNotification);
+  const showNotification = useNotificationStore((s) => s.showNotification);
   const permissions = useGlobalPermissions();
   const roles = useGlobalRoles();
   const [showPerms, setShowPerms] = useState<string | null>(null);
@@ -18,22 +18,33 @@ export function useRoleManagement() {
   const [editConfirm, setEditConfirm] = useState(false);
 
   const rolesQuery = useQuery({
-    queryKey: ['roles'],
+    queryKey: ["roles"],
     queryFn: fetchRoles,
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, payload }: { id: string, payload: any }) => updateRole(id, payload),
+    mutationFn: async ({ id, payload }: { id: string; payload: any }) =>
+      updateRole(id, payload),
     onSuccess: () => {
       setEditRoleId(null);
       setEditRole(null);
       useRoleStore.getState().setRoles([]); // Vide le cache Zustand
-      queryClient.invalidateQueries({ queryKey: ['roles'] });
-      showNotification({ open: true, type: 'success', title: 'Rôle mis à jour', description: 'Les modifications ont été enregistrées avec succès.' });
+      queryClient.invalidateQueries({ queryKey: ["roles"] });
+      showNotification({
+        open: true,
+        type: "success",
+        title: "Rôle mis à jour",
+        description: "Les modifications ont été enregistrées avec succès.",
+      });
     },
     onError: () => {
-      showNotification({ open: true, type: 'error', title: 'Erreur', description: 'Erreur lors de la sauvegarde du rôle.' });
-    }
+      showNotification({
+        open: true,
+        type: "error",
+        title: "Erreur",
+        description: "Erreur lors de la sauvegarde du rôle.",
+      });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -41,12 +52,24 @@ export function useRoleManagement() {
     onSuccess: () => {
       setRoleToDelete(null);
       useRoleStore.getState().setRoles([]);
-      queryClient.invalidateQueries({ queryKey: ['roles'] });
-      showNotification({ open: true, type: 'success', title: 'Rôle supprimé', description: 'Le rôle a bien été supprimé.' });
+      queryClient.invalidateQueries({ queryKey: ["roles"] });
+      showNotification({
+        open: true,
+        type: "success",
+        title: "Rôle supprimé",
+        description: "Le rôle a bien été supprimé.",
+      });
     },
     onError: (e: any) => {
-      showNotification({ open: true, type: 'error', title: 'Erreur', description: e?.response?.data?.message || 'Erreur lors de la suppression du rôle.' });
-    }
+      showNotification({
+        open: true,
+        type: "error",
+        title: "Erreur",
+        description:
+          e?.response?.data?.message ||
+          "Erreur lors de la suppression du rôle.",
+      });
+    },
   });
 
   function startEdit(role: any) {
@@ -83,22 +106,35 @@ export function useRoleManagement() {
     if (!roleToDelete) return;
     deleteMutation.mutate(roleToDelete._id);
   }
-  const groupedPermissions = permissions.reduce((acc: Record<string, any[]>, perm: any) => {
-    const [model] = perm.name.split(':');
-    if (!acc[model]) acc[model] = [];
-    acc[model].push(perm);
-    return acc;
-  }, {});
+  const groupedPermissions = permissions.reduce(
+    (acc: Record<string, any[]>, perm: any) => {
+      const [model] = perm.name.split(":");
+      if (!acc[model]) acc[model] = [];
+      acc[model].push(perm);
+      return acc;
+    },
+    {}
+  );
 
   return {
     roles,
     isLoading: rolesQuery.isLoading,
-    showPerms, setShowPerms,
-    editRoleId, setEditRoleId,
-    editRole, setEditRole,
-    roleToDelete, setRoleToDelete,
-    editConfirm, setEditConfirm,
-    startEdit, cancelEdit, togglePermission, saveEdit, handleEditConfirm, handleDeleteRole,
+    showPerms,
+    setShowPerms,
+    editRoleId,
+    setEditRoleId,
+    editRole,
+    setEditRole,
+    roleToDelete,
+    setRoleToDelete,
+    editConfirm,
+    setEditConfirm,
+    startEdit,
+    cancelEdit,
+    togglePermission,
+    saveEdit,
+    handleEditConfirm,
+    handleDeleteRole,
     groupedPermissions,
     updateLoading: updateMutation.isPending,
     deleteLoading: deleteMutation.isPending,

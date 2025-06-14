@@ -9,6 +9,7 @@ import {
   DeleteSourceForm,
 } from "@/presentation/components/source/SourceForms";
 import { Link } from "react-router-dom";
+import { useUserStore } from "@/core/store/user";
 
 export default function SourcesPage() {
   const {
@@ -23,9 +24,9 @@ export default function SourcesPage() {
     handleEditError,
   } = useSourcesPage();
 
-  const { data: sources = [], isLoading,
-    // refetchWidgets
-  } = useSources();
+  const { data: sources = [], isLoading } = useSources();
+
+  const hasPermission = useUserStore((s) => s.hasPermission);
 
   const columns = [
     {
@@ -47,7 +48,7 @@ export default function SourcesPage() {
       render: (row: any) => (
         <span className="font-mono text-xs break-all">{row.endpoint}</span>
       ),
-    }
+    },
   ];
 
   return (
@@ -56,57 +57,64 @@ export default function SourcesPage() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold ">Sources de données</h1>
           <div className="flex items-center gap-2">
-            <Link
-              to={ROUTES.addSource}
-              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-
-              color="indigo"
-            >
-              Ajouter une source
-            </Link>
+            {hasPermission("datasource:canCreate") && (
+              <Link
+                to={ROUTES.addSource}
+                className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+                color="indigo"
+              >
+                Ajouter une source
+              </Link>
+            )}
           </div>
         </div>
         <div className="mt-10">
           <h2 className="text-lg font-semibold mb-2">Mes sources</h2>
-          {isLoading ? <div>Chargemnt...</div> : <Table
-            columns={columns}
-            data={sources}
-            emptyMessage="Aucune source enregistrée."
-            actionsColumn={
-              {
+          {isLoading ? (
+            <div>Chargemnt...</div>
+          ) : (
+            <Table
+              columns={columns}
+              data={sources}
+              emptyMessage="Aucune source enregistrée."
+              actionsColumn={{
                 key: "empty",
                 label: "",
                 render: (row: any) => (
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      color="indigo"
-                      className=" w-max"
-                      onClick={() => {
-                        setSelectedSource(row);
-                        setModalType("edit");
-                        setModalOpen(true);
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                    <Button
-                      size="sm"
-                      color="red"
-                      className=" w-max"
-                      onClick={() => {
-                        setSelectedSource(row);
-                        setModalType("delete");
-                        setModalOpen(true);
-                      }}
-                    >
-                      Supprimer
-                    </Button>
+                    {hasPermission("datasource:canUpdate") && (
+                      <Button
+                        size="sm"
+                        color="indigo"
+                        className=" w-max"
+                        onClick={() => {
+                          setSelectedSource(row);
+                          setModalType("edit");
+                          setModalOpen(true);
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    )}
+                    {hasPermission("datasource:canDelete") && (
+                      <Button
+                        size="sm"
+                        color="red"
+                        className=" w-max"
+                        onClick={() => {
+                          setSelectedSource(row);
+                          setModalType("delete");
+                          setModalOpen(true);
+                        }}
+                      >
+                        Supprimer
+                      </Button>
+                    )}
                   </div>
-                )
-              }
-            }
-          />}
+                ),
+              }}
+            />
+          )}
         </div>
         <Modal
           open={modalOpen}
@@ -115,7 +123,9 @@ export default function SourcesPage() {
             setSelectedSource(null);
           }}
           title={
-            modalType === "delete" ? "Supprimer la source" : "Modifier la source"
+            modalType === "delete"
+              ? "Supprimer la source"
+              : "Modifier la source"
           }
           size="sm"
           footer={null}

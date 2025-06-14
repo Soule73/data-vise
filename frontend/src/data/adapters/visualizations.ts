@@ -2,6 +2,12 @@ import BarChartWidget from "@/presentation/components/visualizations/charts/BarC
 import LineChartWidget from "@/presentation/components/visualizations/charts/LineChartWidget";
 import PieChartWidget from "@/presentation/components/visualizations/charts/PieChartWidget";
 import TableWidget from "@/presentation/components/visualizations/table/TableWidget";
+import ScatterChartWidget from "@/presentation/components/visualizations/charts/ScatterChartWidget";
+import BubbleChartWidget from "@/presentation/components/visualizations/charts/BubbleChartWidget";
+import RadarChartWidget from "@/presentation/components/visualizations/charts/RadarChartWidget";
+import KPIWidget from "@/presentation/components/visualizations/kpi/KPIWidget";
+import KPIGroupWidget from "@/presentation/components/visualizations/kpi/KPIGroupWidget";
+import CardWidget from "@/presentation/components/visualizations/CardWidget";
 import {
   BarChartConfig,
   LineChartConfig,
@@ -13,8 +19,13 @@ import {
   ChartBarIcon,
   ChartPieIcon,
   TableCellsIcon,
+  ArrowTrendingUpIcon,
+  ChatBubbleLeftIcon,
   PresentationChartLineIcon,
+  RectangleGroupIcon,
+  Squares2X2Icon,
 } from "@heroicons/react/24/outline";
+import * as HeroIcons from "@heroicons/react/24/outline";
 
 export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   bar: {
@@ -102,7 +113,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     type: "line",
     label: "Line Chart",
     component: LineChartWidget,
-    icon: PresentationChartLineIcon,
+    icon: ArrowTrendingUpIcon,
     configSchema: {
       ...LineChartConfig,
       metricStyles: {
@@ -205,6 +216,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     label: "Pie Chart",
     component: PieChartWidget,
     icon: ChartPieIcon,
+    allowMultipleMetrics: false,
     configSchema: {
       ...PieChartConfig,
       metricStyles: {
@@ -263,6 +275,230 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
       widgetParams: {
         pageSize: { default: 10, inputType: "number", label: "Taille de page" },
         title: { default: "", inputType: "text", label: "Titre du tableau" },
+      },
+    },
+  },
+  scatter: {
+    type: "scatter",
+    label: "Scatter Chart",
+    component: ScatterChartWidget,
+    icon: ArrowTrendingUpIcon,
+    configSchema: {
+      metricStyles: {
+        color: { default: "#2563eb", inputType: "color", label: "Couleur" },
+        borderColor: {
+          default: "#000000",
+          inputType: "color",
+          label: "Couleur de bordure",
+        },
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
+        },
+        opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
+      },
+      widgetParams: {
+        title: { default: "", inputType: "text", label: "Titre du graphique" },
+        xLabel: { default: "", inputType: "text", label: "Label de l'axe X" },
+        yLabel: { default: "", inputType: "text", label: "Label de l'axe Y" },
+        legend: {
+          default: true,
+          inputType: "checkbox",
+          label: "Afficher la légende",
+        },
+      },
+    },
+  },
+  bubble: {
+    type: "bubble",
+    label: "Bubble Chart",
+    component: BubbleChartWidget,
+    icon: ChatBubbleLeftIcon,
+    configSchema: {
+      metricStyles: {
+        color: { default: "#2563eb", inputType: "color", label: "Couleur" },
+        borderColor: {
+          default: "#000000",
+          inputType: "color",
+          label: "Couleur de bordure",
+        },
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
+        },
+        opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
+      },
+      widgetParams: {
+        title: { default: "", inputType: "text", label: "Titre du graphique" },
+        xLabel: { default: "", inputType: "text", label: "Label de l'axe X" },
+        yLabel: { default: "", inputType: "text", label: "Label de l'axe Y" },
+        legend: {
+          default: true,
+          inputType: "checkbox",
+          label: "Afficher la légende",
+        },
+      },
+    },
+  },
+  radar: {
+    type: "radar",
+    label: "Radar Chart",
+    component: RadarChartWidget,
+    icon: ArrowTrendingUpIcon,
+    configSchema: {
+      metricStyles: {
+        color: { default: "#2563eb", inputType: "color", label: "Couleur" },
+        borderColor: {
+          default: "#000000",
+          inputType: "color",
+          label: "Couleur de bordure",
+        },
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
+        },
+        opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
+      },
+      widgetParams: {
+        title: { default: "", inputType: "text", label: "Titre du graphique" },
+        legend: {
+          default: true,
+          inputType: "checkbox",
+          label: "Afficher la légende",
+        },
+      },
+      dataConfig: {
+        groupByFields: ["region", "category"], // Champs autorisés pour le groupBy
+        axisFields: [
+          "sales",
+          "profit",
+          "quantite",
+          "marge",
+          "discount",
+          "score",
+          "satisfaction",
+        ], // Champs numériques suggérés pour axes
+      },
+    },
+  },
+  kpi: {
+    type: "kpi",
+    label: "KPI (Valeur clé)",
+    component: KPIWidget,
+    icon: PresentationChartLineIcon,
+    allowMultipleMetrics: false,
+    hideBucket: true, // cache la section bucket
+    enableFilter: true, // active la section filtre
+    configSchema: {
+      metricStyles: {
+        valueColor: {
+          default: "#2563eb",
+          inputType: "color",
+          label: "Couleur de la valeur",
+        },
+      },
+      widgetParams: {
+        title: { default: "", inputType: "text", label: "Titre du KPI" },
+        valueColor: {
+          default: "#2563eb",
+          inputType: "color",
+          label: "Couleur de la valeur",
+        },
+        showTrend: {
+          default: true,
+          inputType: "checkbox",
+          label: "Afficher la tendance",
+        },
+      },
+    },
+  },
+  kpi_group: {
+    type: "kpi_group",
+    label: "KPI Group (Groupe de KPIs)",
+    component: KPIGroupWidget,
+    icon: Squares2X2Icon,
+    allowMultipleMetrics: true,
+    hideBucket: true,
+    enableFilter: true,
+    configSchema: {
+      metricStyles: {
+        valueColor: {
+          default: "#2563eb",
+          inputType: "color",
+          label: "Couleur de la valeur",
+        },
+      },
+      filters: {
+        // Schéma de filtre par KPI (tableau d'objets)
+        type: "array",
+        label: "Filtres par KPI",
+        itemSchema: {
+          field: { inputType: "select", label: "Champ" },
+          value: { inputType: "select", label: "Valeur" },
+        },
+        default: [],
+      },
+      widgetParams: {
+        title: { default: "", inputType: "text", label: "Titre du groupe" },
+        columns: {
+          default: 2,
+          inputType: "number",
+          label: "Colonnes",
+        },
+        showTrend: {
+          default: true,
+          inputType: "checkbox",
+          label: "Afficher la tendance",
+        },
+      },
+    },
+  },
+  card: {
+    type: "card",
+    label: "Card (Carte synthèse)",
+    component: CardWidget,
+    icon: RectangleGroupIcon,
+    allowMultipleMetrics: false,
+    hideBucket: true,
+    enableFilter: true,
+    configSchema: {
+      metricStyles: {
+        iconColor: {
+          default: "#6366f1",
+          inputType: "color",
+          label: "Couleur de l'icône",
+        },
+        valueColor: {
+          default: "#2563eb",
+          inputType: "color",
+          label: "Couleur de la valeur",
+        },
+        descriptionColor: {
+          default: "#6b7280",
+          inputType: "color",
+          label: "Couleur de la description",
+        },
+      },
+      widgetParams: {
+        title: { default: "", inputType: "text", label: "Titre de la carte" },
+        description: { default: "", inputType: "text", label: "Description" },
+        showIcon: {
+          default: true,
+          inputType: "checkbox",
+          label: "Afficher une icône",
+        },
+        icon: {
+          label: "Icône",
+          inputType: "select",
+          default: "ChartBarIcon",
+          options: Object.keys(HeroIcons).map((k) => ({
+            value: k,
+            label: k.replace(/Icon$/, ""),
+          })),
+        },
       },
     },
   },
@@ -401,6 +637,26 @@ export const WIDGET_CONFIG_FIELDS: Record<
   },
   xLabel: { label: "Label de l'axe X", inputType: "text", default: "" },
   yLabel: { label: "Label de l'axe Y", inputType: "text", default: "" },
+  valueColor: {
+    label: "Couleur de la valeur",
+    inputType: "color",
+    default: "#2563eb",
+  },
+  showTrend: {
+    label: "Afficher la tendance",
+    inputType: "checkbox",
+    default: true,
+  },
+  icon: {
+    label: "Icône",
+    inputType: "select",
+    default: "ChartBarIcon",
+    options: Object.keys(HeroIcons).map((k) => ({
+      value: k,
+      label: k.replace(/Icon$/, ""),
+    })),
+  },
+  // minBubbleSize et maxBubbleSize supprimés
   ...COMMON_FIELDS,
 };
 
@@ -454,6 +710,30 @@ export const WIDGET_DATA_CONFIG: Record<
   },
   table: {
     metrics: COMMON_METRICS,
+    bucket: COMMON_BUCKET,
+  },
+  scatter: {
+    metrics: COMMON_METRICS,
+    bucket: COMMON_BUCKET,
+  },
+  bubble: {
+    metrics: COMMON_METRICS,
+    bucket: COMMON_BUCKET,
+  },
+  radar: {
+    metrics: COMMON_METRICS,
+    bucket: COMMON_BUCKET,
+  },
+  kpi: {
+    metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
+    bucket: COMMON_BUCKET,
+  },
+  kpi_group: {
+    metrics: { ...COMMON_METRICS, allowMultiple: true, label: "KPIs" },
+    bucket: { ...COMMON_BUCKET, allow: false, label: "" },
+  },
+  card: {
+    metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
     bucket: COMMON_BUCKET,
   },
 };

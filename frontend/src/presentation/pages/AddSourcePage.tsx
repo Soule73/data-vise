@@ -40,7 +40,9 @@ export default function AddSourcePage() {
   return (
     <>
       <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow-sm">
-        <h1 className="text-2xl font-bold mb-6">Ajouter une source de données</h1>
+        <h1 className="text-2xl font-bold mb-6">
+          Ajouter une source de données
+        </h1>
         {step === 1 && (
           <div>
             <div className="mb-4 max-w-xl">
@@ -89,11 +91,15 @@ export default function AddSourcePage() {
                 emptyMessage="Aucune colonne détectée."
               />
               {/* Aperçu des données (collapsible) */}
-              <Collapsible title="Aperçu des données :" defaultOpen={false} className="mt-4">
+              <Collapsible
+                title="Aperçu des données :"
+                defaultOpen={false}
+                className="mt-4"
+              >
                 <SyntaxHighlighter
                   language="json"
                   style={okaidia}
-                // className="bg-gray-100 dark:bg-gray-900 config-scrollbar rounded p-2 text-xs overflow-x-auto max-h-40"
+                  // className="bg-gray-100 dark:bg-gray-900 config-scrollbar rounded p-2 text-xs overflow-x-auto max-h-40"
                 >
                   {JSON.stringify(dataPreview, null, 2)}
                 </SyntaxHighlighter>

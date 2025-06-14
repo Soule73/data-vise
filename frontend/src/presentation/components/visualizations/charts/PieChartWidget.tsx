@@ -19,22 +19,23 @@ export default function PieChartWidget({
     !Array.isArray(config.metrics) ||
     !config.bucket.field
   ) {
-    return (
-      <InvalideConfigWidget />
-    )
+    return <InvalideConfigWidget />;
   }
 
   if (data.length === 0) {
     return (
       <NoDataWidget
-        icon={<ChartPieIcon className="w-12 h-12 stroke-gray-300 dark:stroke-gray-700" />} />
-    )
+        icon={
+          <ChartPieIcon className="w-12 h-12 stroke-gray-300 dark:stroke-gray-700" />
+        }
+      />
+    );
   }
   const { chartData, options, showNativeValues, valueLabelsPlugin } =
     usePieChartLogic(data, config);
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-x-auto">
+    <div className="bg-white shadow dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-x-auto">
       <Pie
         className="w-full max-w-full h-auto p-1 md:p-2"
         data={chartData}

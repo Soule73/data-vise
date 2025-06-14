@@ -22,6 +22,8 @@ export function useWidgetCreateLogic() {
     setConfig,
     title,
     setTitle,
+    privateWidget: privateW,
+    setPrivateWidget: setPrivateW,
     loading,
     error,
     setError,
@@ -44,6 +46,9 @@ export function useWidgetCreateLogic() {
   const [tab, setTab] = useState<"data" | "metricsAxes" | "params">("data");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [widgetTitle, setWidgetTitle] = useState(title || "");
+  const [privateWidget, setPrivateWidget] = useState<"private" | "public">(
+    privateW || "private"
+  );
   const [widgetTitleError, setWidgetTitleError] = useState("");
 
   const WidgetComponent = WIDGETS[type]?.component;
@@ -271,6 +276,10 @@ export function useWidgetCreateLogic() {
     setShowSaveModal,
     widgetTitle,
     setWidgetTitle,
+    privateW,
+    setPrivateW,
+    privateWidget,
+    setPrivateWidget,
     widgetTitleError,
     setWidgetTitleError,
     WidgetComponent,

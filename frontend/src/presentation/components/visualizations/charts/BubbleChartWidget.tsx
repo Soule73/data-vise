@@ -1,28 +1,10 @@
-import { useBarChartLogic } from "@/core/hooks/visualizations/useBarChartVM";
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Bubble } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import InvalideConfigWidget from "./InvalideConfigWidget";
 import NoDataWidget from "./NoDataWidget";
+import { useBubbleChartLogic } from "@/core/hooks/visualizations/useBubbleChartVM";
 
-ChartJS.register(
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend
-);
-
-export default function BarChartWidget({
+export default function BubbleChartWidget({
   data,
   config,
 }: {
@@ -30,16 +12,18 @@ export default function BarChartWidget({
   config: any;
   editMode?: boolean;
 }) {
+  const { chartData, options, validDatasets } = useBubbleChartLogic(
+    data,
+    config
+  );
   if (
     !data ||
     !config.metrics ||
-    !config.bucket ||
     !Array.isArray(config.metrics) ||
-    !config.bucket.field
+    validDatasets.length === 0
   ) {
     return <InvalideConfigWidget />;
   }
-
   if (data.length === 0) {
     return (
       <NoDataWidget
@@ -49,11 +33,9 @@ export default function BarChartWidget({
       />
     );
   }
-  const { chartData, options } = useBarChartLogic(data, config);
-
   return (
-    <div className="shadow bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
-      <Bar
+    <div className="bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
+      <Bubble
         className="w-full max-w-full h-auto p-1 md:p-2"
         data={chartData}
         options={options}

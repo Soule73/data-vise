@@ -2,7 +2,10 @@ import DashboardGridItem from "./DashboardGridItem";
 import { useDashboardGrid } from "@/core/hooks/useDashboardGrid";
 import { useWidgets } from "@/core/hooks/useWidgets";
 import { useEffect, useState } from "react";
-import type { DashboardGridProps, DashboardLayoutItem } from "@/core/types/dashboard-types";
+import type {
+  DashboardGridProps,
+  DashboardLayoutItem,
+} from "@/core/types/dashboard-types";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 export default function DashboardGrid({
@@ -12,11 +15,11 @@ export default function DashboardGrid({
   editMode = false,
   isLoading = false,
   hasUnsavedChanges = false,
+  handleAddWidget,
 }: DashboardGridProps) {
-
-  const { data: widgets = [],
+  const {
+    data: widgets = [],
     // isLoading
-
   } = useWidgets();
 
   // Hydrate le layout avec le widget complet si absent
@@ -80,7 +83,12 @@ export default function DashboardGrid({
               key="add-slot"
               className="relative min-h-[160px] w-full max-w-full border-2 border-dashed rounded-lg flex items-center justify-center text-gray-400 hover:border-indigo-400 hover:text-indigo-600 cursor-pointer select-none overflow-x-auto"
               style={{ minWidth: "48%", minHeight: 300, flex: "1 1 48%" }}
-              onClick={() => editMode && onSwapLayout && onSwapLayout(layout)}
+              onClick={(e) => {
+                if (editMode && onSwapLayout) {
+                  onSwapLayout(layout);
+                }
+                handleAddWidget(e);
+              }}
             >
               <PlusIcon className="w-6 h-6 text-gray-400" />
               <span className="ml-2">Ajouter un widget</span>
@@ -89,7 +97,7 @@ export default function DashboardGrid({
         }
         const widget = item?.widget;
         return (
-          widget ? <DashboardGridItem
+          <DashboardGridItem
             key={widget.widgetId || idx}
             idx={idx}
             hydratedLayout={hydratedLayout}
@@ -107,9 +115,7 @@ export default function DashboardGrid({
             sources={sources}
             onRemove={editMode ? () => handleRemove(idx) : undefined}
             onSwapLayout={handleSwapLayout}
-          /> : <div className="text-gray-300 text-center py-12 select-none">
-            Emplacement vide
-          </div>
+          />
         );
       })}
     </div>

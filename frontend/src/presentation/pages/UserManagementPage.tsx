@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { Link } from "react-router-dom";
 import type { User } from "@/core/types/auth-types";
+import { useUserStore } from "@/core/store/user";
 
 function getErrorMsg(err: any) {
   if (!err) return undefined;
@@ -56,8 +57,12 @@ export default function UserManagementPage() {
 
   // Synchronise le form local et react-hook-form
   function handleFormChange(e: any) {
-    setForm((f: any) => ({ ...f, [e.target.name]: e.target.value }));
-    formHook.setValue(e.target.name, e.target.value);
+    let value = e.target.value;
+    if (value && typeof value === "object" && "value" in value) {
+      value = value.value;
+    }
+    setForm((f: any) => ({ ...f, [e.target.name]: value }));
+    formHook.setValue(e.target.name, value);
   }
 
   // Table columns (sans la colonne actions)
@@ -67,17 +72,22 @@ export default function UserManagementPage() {
     { key: "roleId", label: "Rôle", render: (u: any) => u.roleId?.name },
   ];
 
+  const hasPermission = useUserStore((s) => s.hasPermission);
+  const rolesList = roles.map((r: any) => ({ value: r._id, label: r.name }));
+
   return (
     <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow-sm">
       <div className="flex items-center justify-end mb-6">
         <div>
-          <Link
-            className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-            to={"#"}
-            onClick={() => openModal()}
-          >
-            Ajouter un utilisateur
-          </Link>
+          {hasPermission("user:canCreate") && (
+            <Link
+              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+              to={"#"}
+              onClick={() => openModal()}
+            >
+              Ajouter un utilisateur
+            </Link>
+          )}
         </div>
       </div>
       <Table
@@ -92,28 +102,32 @@ export default function UserManagementPage() {
           key: "actions",
           render: (u: User) => (
             <div className="flex items-center flex-wrap gap-2 px-4">
-              <div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => openModal(u)}
-                >
-                  Modifier
-                </Button>
-              </div>
-              <div>
-                <Button
-                  size="sm"
-                  color="red"
-                  variant="outline"
-                  onClick={() => {
-                    setUserToDelete(u);
-                    setDeleteModalOpen(true);
-                  }}
-                >
-                  Supprimer
-                </Button>
-              </div>
+              {hasPermission("user:canUpdate") && (
+                <div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openModal(u)}
+                  >
+                    Modifier
+                  </Button>
+                </div>
+              )}
+              {hasPermission("user:canDelete") && (
+                <div>
+                  <Button
+                    size="sm"
+                    color="red"
+                    variant="outline"
+                    onClick={() => {
+                      setUserToDelete(u);
+                      setDeleteModalOpen(true);
+                    }}
+                  >
+                    Supprimer
+                  </Button>
+                </div>
+              )}
             </div>
           ),
           className: "text-right",
@@ -190,10 +204,13 @@ export default function UserManagementPage() {
           <SelectField
             label="Rôle"
             name="role"
+            id="role"
             value={form.role}
-            onChange={handleFormChange}
+            onChange={(e) =>
+              handleFormChange({ ...e, target: { ...e.target, name: "role" } })
+            }
             required
-            options={roles.map((r: any) => ({ value: r._id, label: r.name }))}
+            options={rolesList}
             error={getErrorMsg(formHook.formState.errors.role)}
           />
         </form>

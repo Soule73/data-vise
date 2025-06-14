@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import type { Permission, PermissionStore } from '../types/ui';
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import type { Permission, PermissionStore } from "../types/auth-types";
 
 export const usePermissionStore = create<PermissionStore>()(
   devtools((set) => ({
@@ -12,19 +12,25 @@ export const usePermissionStore = create<PermissionStore>()(
 );
 
 export function useGlobalPermissions() {
-  const setPermissions = usePermissionStore(s => s.setPermissions);
-  const permissions = usePermissionStore(s => s.permissions);
+  const setPermissions = usePermissionStore((s) => s.setPermissions);
+  const permissions = usePermissionStore((s) => s.permissions);
   const queryClient = useQueryClient();
 
   // Utilise react-query pour le cache, mais ne refetch pas inutilement
   const { data } = useQuery({
-    queryKey: ['permissions'],
-    queryFn: async () => (await (await import('@/data/services/api')).default.get('/auth/permissions')).data,
+    queryKey: ["permissions"],
+    queryFn: async () =>
+      (
+        await (
+          await import("@/data/services/api")
+        ).default.get("/auth/permissions")
+      ).data,
     staleTime: 1000 * 60 * 60 * 24, // 24h
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    initialData: () => queryClient.getQueryData(['permissions']) as Permission[] | undefined,
+    initialData: () =>
+      queryClient.getQueryData(["permissions"]) as Permission[] | undefined,
   });
 
   useEffect(() => {

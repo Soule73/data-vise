@@ -18,9 +18,23 @@ import DashboardPage from "@/presentation/pages/DashboardPage";
 import DashboardListPage from "@/presentation/pages/DashboardListPage";
 import WidgetEditPage from "@/presentation/pages/WidgetEditPage";
 
-function RequireAuth({ children }: { children: ReactNode }) {
+function RequireAuth({
+  children,
+  permission,
+}: {
+  children: ReactNode;
+  permission?: string;
+}) {
   const user = useUserStore((s) => s.user);
+  const hasPermission = useUserStore((s) => s.hasPermission);
   if (!user) return <Navigate to={ROUTES.login} replace />;
+  if (permission && !hasPermission(permission)) {
+    return (
+      <div className="flex items-center justify-center h-full text-xl text-red-500">
+        Accès refusé
+      </div>
+    );
+  }
   return <BaseLayout>{children}</BaseLayout>;
 }
 
@@ -33,16 +47,16 @@ const App: React.FC = () => {
         <Route
           path={ROUTES.dashboards}
           element={
-            <RequireAuth>
-                <DashboardListPage />
+            <RequireAuth permission="dashboard:canView">
+              <DashboardListPage />
             </RequireAuth>
           }
         />
         <Route
           path={ROUTES.dashboardDetail}
           element={
-            <RequireAuth>
-                <DashboardPage />
+            <RequireAuth permission="dashboard:canView">
+              <DashboardPage />
             </RequireAuth>
           }
         />
@@ -53,64 +67,64 @@ const App: React.FC = () => {
         <Route
           path={ROUTES.sources}
           element={
-            <RequireAuth>
-                <SourcesPage />
+            <RequireAuth permission="datasource:canView">
+              <SourcesPage />
             </RequireAuth>
           }
         />
         <Route
           path={ROUTES.addSource}
           element={
-            <RequireAuth>
-                <AddSourcePage />
+            <RequireAuth permission="datasource:canCreate">
+              <AddSourcePage />
             </RequireAuth>
           }
         />
         <Route
           path={ROUTES.widgets}
           element={
-            <RequireAuth>
-                <WidgetListPage />
+            <RequireAuth permission="widget:canView">
+              <WidgetListPage />
             </RequireAuth>
           }
         />
         <Route
           path={ROUTES.createWidget}
           element={
-            <RequireAuth>
-                <WidgetCreatePage />
+            <RequireAuth permission="widget:canCreate">
+              <WidgetCreatePage />
             </RequireAuth>
           }
         />
         <Route
           path={ROUTES.roles}
           element={
-            <RequireAuth>
-                <RoleManagementPage />
+            <RequireAuth permission="role:canView">
+              <RoleManagementPage />
             </RequireAuth>
           }
         />
         <Route
           path={ROUTES.createRole}
           element={
-            <RequireAuth>
-                <RoleCreatePage />
+            <RequireAuth permission="role:canCreate">
+              <RoleCreatePage />
             </RequireAuth>
           }
         />
         <Route
           path={ROUTES.users}
           element={
-            <RequireAuth>
-                <UserManagementPage />
+            <RequireAuth permission="user:canView">
+              <UserManagementPage />
             </RequireAuth>
           }
         />
         <Route
           path={ROUTES.editWidget}
           element={
-            <RequireAuth>
-                <WidgetEditPage />
+            <RequireAuth permission="widget:canUpdate">
+              <WidgetEditPage />
             </RequireAuth>
           }
         />

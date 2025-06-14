@@ -8,24 +8,14 @@ import {
   PlusCircleIcon,
 } from "@heroicons/react/24/solid";
 import { useMetricUICollapseStore } from "@/core/store/metricUI";
-import type {
-  WidgetDataConfigSectionProps,
-  WidgetType,
-} from "@/core/types/widget-types";
-import WidgetBubbleDataConfigSection from "@/presentation/components/WidgetBubbleDataConfigSection";
-import WidgetScatterDataConfigSection from "@/presentation/components/WidgetScatterDataConfigSection";
-import WidgetRadarDataConfigSection from "@/presentation/components/WidgetRadarDataConfigSection";
-import WidgetKPIGroupDataConfigSection from "@/presentation/components/WidgetKPIGroupDataConfigSection";
-import { WIDGETS } from "@/data/adapters/visualizations";
+import type { WidgetDataConfigSectionProps } from "@/core/types/widget-types";
 
-interface WidgetDataConfigSectionFixedProps
+interface WidgetKPIGroupDataConfigSectionProps
   extends WidgetDataConfigSectionProps {
-  type: WidgetType;
-  data?: any[]; // Ajout de la prop data
+  data?: any[];
 }
 
-export default function WidgetDataConfigSection({
-  type,
+export default function WidgetKPIGroupDataConfigSection({
   dataConfig,
   config,
   columns,
@@ -34,115 +24,77 @@ export default function WidgetDataConfigSection({
   handleDragOver,
   handleDrop,
   handleMetricAggOrFieldChange,
-  data = [], // Ajout de la prop data avec valeur par défaut
-}: WidgetDataConfigSectionFixedProps) {
-  const widgetDef = WIDGETS[type];
+  data = [],
+}: WidgetKPIGroupDataConfigSectionProps) {
   const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
   const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
 
-  // --- UX spécifique Bubble Chart ---
-  if (type === "bubble") {
-    return (
-      <WidgetBubbleDataConfigSection
-        metrics={Array.isArray(config.metrics) ? config.metrics : []}
-        columns={columns}
-        handleConfigChange={handleConfigChange}
-      />
-    );
-  }
-  if (type === "scatter") {
-    return (
-      <WidgetScatterDataConfigSection
-        metrics={Array.isArray(config.metrics) ? config.metrics : []}
-        columns={columns}
-        handleConfigChange={handleConfigChange}
-      />
-    );
-  }
-  if (type === "radar") {
-    return (
-      <WidgetRadarDataConfigSection
-        metrics={Array.isArray(config.metrics) ? config.metrics : []}
-        columns={columns}
-        handleConfigChange={handleConfigChange}
-        configSchema={dataConfig}
-        data={data} // Passage des données pour le groupBy
-      />
-    );
-  }
-  if (type === "kpi_group") {
-    return (
-      <WidgetKPIGroupDataConfigSection
-        dataConfig={dataConfig}
-        config={config}
-        columns={columns}
-        handleConfigChange={handleConfigChange}
-        handleDragStart={handleDragStart}
-        handleDragOver={handleDragOver}
-        handleDrop={handleDrop}
-        handleMetricAggOrFieldChange={handleMetricAggOrFieldChange}
-        data={data}
-      />
-    );
-  }
-  // Section filtre simple pour KPI (champ + valeur)
-  const showFilter = widgetDef?.enableFilter;
   return (
     <div className="space-y-4">
-      {/* Section filtre pour KPI */}
-      {showFilter && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
-          <div className="font-semibold mb-1">Filtrer</div>
-          <div className="flex flex-col gap-2">
-            <SelectField
-              label="Champ"
-              value={config.filter?.field || ""}
-              onChange={(e) =>
-                handleConfigChange("filter", {
-                  ...config.filter,
-                  field: e.target.value,
-                  value: "",
-                })
-              }
-              options={[
-                { value: "", label: "-- Aucun --" },
-                ...columns.map((col) => ({ value: col, label: col })),
-              ]}
-              name="filter-field"
-              id="filter-field"
-            />
-            <SelectField
-              label="Valeur"
-              value={config.filter?.value || ""}
-              onChange={(e) =>
-                handleConfigChange("filter", {
-                  ...config.filter,
-                  value: e.target.value,
-                })
-              }
-              options={
-                config.filter?.field
-                  ? [
-                      { value: "", label: "-- Toutes --" },
-                      ...Array.from(
-                        new Set(
-                          (data || [])
-                            .map((row: any) => row[config.filter.field])
-                            .filter(
-                              (v) => v !== undefined && v !== null && v !== ""
-                            )
-                        )
-                      ).map((v) => ({ value: v, label: String(v) })),
-                    ]
-                  : [{ value: "", label: "-- Choisir --" }]
-              }
-              name="filter-value"
-              id="filter-value"
-              disabled={!config.filter?.field}
-            />
+      {/* Filtres par KPI (centralisé dans config.filters) */}
+      {Array.isArray(config.metrics) &&
+        config.metrics.map((metric: any, idx: number) => (
+          <div
+            key={idx}
+            className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow mb-2"
+          >
+            <div className="font-semibold mb-1">
+              Filtrer KPI {metric.label || metric.field || idx + 1}
+            </div>
+            <div className="flex flex-col gap-2">
+              <SelectField
+                label="Champ"
+                value={config.filters?.[idx]?.field || ""}
+                onChange={(e) => {
+                  const newFilters = [...(config.filters || [])];
+                  newFilters[idx] = {
+                    ...(newFilters[idx] || {}),
+                    field: e.target.value,
+                    value: "",
+                  };
+                  handleConfigChange("filters", newFilters);
+                }}
+                options={[
+                  { value: "", label: "-- Aucun --" },
+                  ...columns.map((col) => ({ value: col, label: col })),
+                ]}
+                name={`filter-field-${idx}`}
+                id={`filter-field-${idx}`}
+              />
+              <SelectField
+                label="Valeur"
+                value={config.filters?.[idx]?.value || ""}
+                onChange={(e) => {
+                  const newFilters = [...(config.filters || [])];
+                  newFilters[idx] = {
+                    ...(newFilters[idx] || {}),
+                    value: e.target.value,
+                  };
+                  handleConfigChange("filters", newFilters);
+                }}
+                options={
+                  config.filters?.[idx]?.field
+                    ? [
+                        { value: "", label: "-- Toutes --" },
+                        ...Array.from(
+                          new Set(
+                            (data || [])
+                              .map((row: any) => row[config.filters[idx].field])
+                              .filter(
+                                (v) => v !== undefined && v !== null && v !== ""
+                              )
+                          )
+                        ).map((v) => ({ value: v, label: String(v) })),
+                      ]
+                    : [{ value: "", label: "-- Choisir --" }]
+                }
+                name={`filter-value-${idx}`}
+                id={`filter-value-${idx}`}
+                disabled={!config.filters?.[idx]?.field}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        ))}
       {/* Métriques (metrics) */}
       {dataConfig.metrics.label && (
         <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
@@ -165,9 +117,9 @@ export default function WidgetDataConfigSection({
                   key={idx}
                   className="px-2 pb-2 flex flex-col relative group"
                   draggable={dataConfig.metrics.allowMultiple && !isOnlyMetric}
-                  onDragStart={() => handleDragStart(idx)}
-                  onDragOver={(e) => handleDragOver(idx, e)}
-                  onDrop={() => handleDrop(idx)}
+                  onDragStart={() => handleDragStart && handleDragStart(idx)}
+                  onDragOver={(e) => handleDragOver && handleDragOver(idx, e)}
+                  onDrop={() => handleDrop && handleDrop(idx)}
                 >
                   <div
                     className="flex items-center justify-between cursor-pointer"
@@ -326,64 +278,6 @@ export default function WidgetDataConfigSection({
           )}
         </div>
       )}
-      {/* Buckets (x-axis/groupBy) */}
-      {widgetDef &&
-        !widgetDef.hideBucket &&
-        dataConfig.bucket &&
-        dataConfig.bucket.allow && (
-          <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow flex flex-col relative group">
-            <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => toggleCollapse("bucket")}
-            >
-              <span className="font-medium">Champ de groupement</span>
-              <button
-                className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleConfigChange("bucket", {
-                    field: "",
-                    type: dataConfig.bucket.typeLabel || "x",
-                    label: dataConfig.bucket.label || "",
-                  });
-                }}
-                title="Réinitialiser"
-              >
-                <XMarkIcon className="w-5 h-5 text-red-500" />
-              </button>
-            </div>
-            {!collapsedMetrics["bucket"] && (
-              <div className="flex flex-col gap-2 mt-2">
-                <SelectField
-                  label="Champ"
-                  value={config.bucket?.field}
-                  onChange={(e) =>
-                    handleConfigChange("bucket", {
-                      ...config.bucket,
-                      field: e.target.value,
-                      label: config.bucket?.label || dataConfig.bucket.label,
-                    })
-                  }
-                  options={columns.map((col) => ({ value: col, label: col }))}
-                  name="bucket-field"
-                  id="bucket-field"
-                />
-                <InputField
-                  label="Label du champ de groupement"
-                  value={config.bucket?.label ?? dataConfig.bucket.label}
-                  onChange={(e) =>
-                    handleConfigChange("bucket", {
-                      ...config.bucket,
-                      label: e.target.value,
-                    })
-                  }
-                  name="bucket-label"
-                  id="bucket-label"
-                />
-              </div>
-            )}
-          </div>
-        )}
     </div>
   );
 }
