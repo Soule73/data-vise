@@ -34,9 +34,8 @@ export default function WidgetEditPage() {
   //Lisete Data source
   const { data: sources = [] } = useSources();
 
-  // Charge les données de la source via endpoint
-  // Toujours passer une valeur définie pour garantir l'ordre des hooks
-  const { data: realSourceData } = useSourceData(source?.endpoint ?? "");
+  // Charge les données de la source via id
+  const { data: realSourceData } = useSourceData(source?._id ?? "");
 
   // Initialise les colonnes à partir des données de la source (comme en création)
   useEffect(() => {

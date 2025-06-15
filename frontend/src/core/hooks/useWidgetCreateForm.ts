@@ -9,7 +9,7 @@ import type {
 } from "../types/widget-types";
 import { useSources } from "./useSources";
 import { ROUTES } from "../constants/routes";
-import api from "@/data/services/api";
+import { useSourceData } from "@/core/hooks/useSourceData";
 import {
   WIDGETS,
   WIDGET_DATA_CONFIG,
@@ -104,18 +104,19 @@ export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
   //Lisete Data source
   const { data: sources = [] } = useSources();
 
+  // Hook pour charger les données de la source (en mode synchrone via query)
+  const src = sources?.find((s: DataSource) => s._id === sourceId);
+  const { data: sourceData = [] } = useSourceData(src?._id);
+
   // Étape 1 : charger les colonnes et preview
   const loadSourceColumns = async () => {
     setError("");
     setLoading(true);
     try {
-      // Utilise la source du state global si possible
-      const src = sources?.find((s: DataSource) => s._id === sourceId);
       let data: any[] = [];
-
-      if (src) {
-        const res = await api.get(src.endpoint);
-        data = Array.isArray(res.data) ? res.data : [res.data];
+      if (src && src._id) {
+        // Utilise les données du hook (cache react-query)
+        data = sourceData || [];
       }
       setDataPreview(data.slice(0, 10));
       setColumns(data[0] ? Object.keys(data[0]) : []);

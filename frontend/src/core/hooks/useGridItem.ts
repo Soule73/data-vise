@@ -145,7 +145,7 @@ export function useGridItem({
   const source = sources?.find(
     (s: DataSource) => String(s._id) === String(widget?.dataSourceId)
   );
-  const { data: widgetData, loading, error } = useSourceData(source?.endpoint);
+  const { data: widgetData, loading, error } = useSourceData(source?._id);
   const widgetDef = widget
     ? WIDGETS[widget.type as keyof typeof WIDGETS]
     : null;
