@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useWidgetCreateLogic } from "../../core/hooks/useWidgetCreateLogic";
-import { WIDGETS, WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
+import { useWidgetCreateForm } from "../../core/hooks/useWidgetCreateForm";
+import { WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
 import SelectField from "@/presentation/components/SelectField";
 import { useNotificationStore } from "@/core/store/notification";
 import { useDashboardStore } from "@/core/store/dashboard";
@@ -12,8 +12,8 @@ import WidgetSaveTitleModal from "@/presentation/components/WidgetSaveTitleModal
 import WidgetMetricStyleConfigSection from "@/presentation/components/WidgetMetricStyleConfigSection";
 import WidgetParamsConfigSection from "@/presentation/components/WidgetParamsConfigSection";
 import type { WidgetType } from "@/core/types/widget-types";
-import CheckboxField from "@/presentation/components/CheckboxField";
 import { ROUTES } from "@/core/constants/routes";
+import VisualizationTypeSelector from "../components/visualizations/VisualizationTypeSelector";
 
 export default function WidgetCreatePage() {
   const {
@@ -39,9 +39,8 @@ export default function WidgetCreatePage() {
     setShowSaveModal,
     widgetTitle,
     setWidgetTitle,
-    privateWidget,
-    setPrivateWidget,
-    setPrivateW,
+    visibility,
+    setVisibility,
     widgetTitleError,
     setWidgetTitleError,
     WidgetComponent,
@@ -51,7 +50,7 @@ export default function WidgetCreatePage() {
     handleMetricAggOrFieldChange,
     metricLabelStore,
     notif,
-  } = useWidgetCreateLogic();
+  } = useWidgetCreateForm();
   const showNotification = useNotificationStore((s) => s.showNotification);
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
 
@@ -108,42 +107,6 @@ export default function WidgetCreatePage() {
             <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pb-24 config-scrollbar md:px-2">
               {step === 1 ? (
                 <>
-                  <div className="mb-4">
-                    <div className="font-semibold mb-2">
-                      Type de visualisation
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      {Object.entries(WIDGETS).map(([key, def]) => (
-                        <div
-                          key={key}
-                          className={`relative border rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all hover:shadow-md min-h-[120px] ${
-                            type === key
-                              ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20"
-                              : "border-gray-300 bg-white dark:bg-gray-800/40"
-                          }`}
-                          onClick={() => setType(key as keyof typeof WIDGETS)}
-                        >
-                          <div className="absolute top-2 right-2">
-                            <CheckboxField
-                              checked={type === key}
-                              onChange={() =>
-                                setType(key as keyof typeof WIDGETS)
-                              }
-                              label=""
-                              name="widget-type"
-                              id={`widget-type-${key}`}
-                            />
-                          </div>
-                          <div className="flex flex-col items-center justify-center gap-2 mt-2">
-                            <def.icon className="w-8 h-8 text-indigo-600" />
-                            <span className="font-medium text-center text-sm mt-1">
-                              {def.label}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                   <SelectField
                     label="Source de données"
                     value={sourceId}
@@ -159,6 +122,14 @@ export default function WidgetCreatePage() {
                     ]}
                   />
                   {error && <div className="text-red-500 text-sm">{error}</div>}
+
+                  <VisualizationTypeSelector
+                    type={type as WidgetType}
+                    setType={(newType: WidgetType) => {
+                      setType(newType);
+                      // setStep(2); // Passer à l'étape de configuration
+                    }}
+                  />
                 </>
               ) : (
                 <>
@@ -234,8 +205,8 @@ export default function WidgetCreatePage() {
         onClose={() => setShowSaveModal(false)}
         title={widgetTitle}
         setTitle={setWidgetTitle}
-        privateWidget={privateWidget}
-        setPrivateWidget={setPrivateWidget}
+        visibility={visibility}
+        setVisibility={setVisibility}
         error={widgetTitleError}
         setError={setWidgetTitleError}
         loading={createMutation.isPending}
@@ -245,7 +216,6 @@ export default function WidgetCreatePage() {
             return;
           }
           setTitle(widgetTitle);
-          setPrivateW(privateWidget);
           setShowSaveModal(false);
           createMutation.mutate();
         }}

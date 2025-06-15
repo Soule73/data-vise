@@ -1,6 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-export function useDashboardGrid({ layout, editMode, hasUnsavedChanges, onSwapLayout }: {
+export function useDashboardGrid({
+  layout,
+  editMode,
+  hasUnsavedChanges,
+  onSwapLayout,
+}: {
   layout: any[];
   editMode?: boolean;
   hasUnsavedChanges?: boolean;
@@ -8,11 +13,11 @@ export function useDashboardGrid({ layout, editMode, hasUnsavedChanges, onSwapLa
 }) {
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const gridWidth = isMobile ? 340 : 900;
 
   // Ajout d'un slot "Ajouter un widget" à la fin
-  const slots = [...layout.filter(item => !!item.widgetId), null];
+  const slots = [...layout.filter((item) => !!item.widgetId), null];
 
   // Trouver l'index réel dans le layout (hors slot null)
   const getLayoutIdx = (slotIdx: number) => {
@@ -62,12 +67,12 @@ export function useDashboardGrid({ layout, editMode, hasUnsavedChanges, onSwapLa
     if (!editMode || !hasUnsavedChanges) return;
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue = '';
-      return '';
+      e.returnValue = "";
+      return "";
     };
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [editMode, hasUnsavedChanges]);
 

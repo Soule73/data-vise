@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import type { DashboardStore } from '../types/store';
+import { create } from "zustand";
+import type { DashboardStore } from "../types/dashboard-types";
 
-export const useDashboardStore = create<DashboardStore>((set, get) => ({
+export const useDashboardStore = create<DashboardStore>((set) => ({
   editMode: false,
   setEditMode: (v) => set({ editMode: v }),
   hasUnsavedChanges: false,
@@ -10,7 +10,4 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   setLayout: (l) => set({ layout: l }),
   breadcrumb: [],
   setBreadcrumb: (items) => set({ breadcrumb: items }),
-  dashboardTitle: "",
-  setDashboardTitle: (_id: string, title: string) => set({ dashboardTitle: title }),
-  getDashboardDisplayTitle: () => get().dashboardTitle,
 }));

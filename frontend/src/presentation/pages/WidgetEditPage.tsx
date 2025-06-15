@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "@/data/services/api";
-import { WIDGETS, WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
+import { WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
 import { useNotificationStore } from "@/core/store/notification";
 import { useDashboardStore } from "@/core/store/dashboard";
 import WidgetConfigTabs from "@/presentation/components/WidgetConfigTabs";
@@ -11,12 +10,14 @@ import WidgetSaveTitleModal from "@/presentation/components/WidgetSaveTitleModal
 import WidgetMetricStyleConfigSection from "@/presentation/components/WidgetMetricStyleConfigSection";
 import WidgetParamsConfigSection from "@/presentation/components/WidgetParamsConfigSection";
 import { useSourceData } from "@/core/hooks/useSourceData";
-import type { WidgetType } from "@/core/types/widget-types";
+import { useWidgetCreateForm } from "@/core/hooks/useWidgetCreateForm";
 import { ROUTES } from "@/core/constants/routes";
 import { fetchWidgetById, updateWidget } from "@/data/services/widget";
+import { useSources } from "@/core/hooks/useSources";
+import type { DataSource } from "@/core/types/data-source";
 
 export default function WidgetEditPage() {
-  const { id } = useParams();
+  const { id: widgetId } = useParams();
   const navigate = useNavigate();
   const showNotification = useNotificationStore((s) => s.showNotification);
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
@@ -24,15 +25,14 @@ export default function WidgetEditPage() {
   const [error, setError] = useState("");
   const [widget, setWidget] = useState<any>(null);
   const [config, setConfig] = useState<any>({});
-  const [showSaveModal, setShowSaveModal] = useState(false);
   const [widgetTitle, setWidgetTitle] = useState("");
-  const [privateWidget, setPrivateWidget] = useState<"public" | "private">(
-    "private"
-  );
-  const [widgetTitleError, setWidgetTitleError] = useState("");
-  const [tab, setTab] = useState<"data" | "metricsAxes" | "params">("data");
+  const [visibility, setVisibility] = useState<"public" | "private">("private");
   const [columns, setColumns] = useState<string[]>([]);
   const [source, setSource] = useState<any>({ endpoint: null });
+  const [formReady, setFormReady] = useState(false);
+
+  //Lisete Data source
+  const { data: sources = [] } = useSources();
 
   // Charge les données de la source via endpoint
   // Toujours passer une valeur définie pour garantir l'ordre des hooks
@@ -51,28 +51,34 @@ export default function WidgetEditPage() {
 
   // Met à jour le titre du breadcrumb lorsque le widget est chargé ou que le titre change
   useEffect(() => {
-    if (id && widgetTitle) {
+    if (widgetId && widgetTitle) {
       setBreadcrumb([
         { url: ROUTES.widgets, label: "Visualisations" },
-        { url: ROUTES.editWidget.replace(":id", id), label: widgetTitle },
+        {
+          url: ROUTES.editWidget.replace(":widgetId", widgetId),
+          label: widgetTitle,
+        },
       ]);
     }
-  }, [id, widgetTitle, setBreadcrumb]);
+  }, [widgetId, widgetTitle, setBreadcrumb]);
 
   // Charge le widget puis la source pour récupérer l'endpoint
   useEffect(() => {
     async function fetchWidgetAndSource() {
       setLoading(true);
       try {
-        const data = await fetchWidgetById(id!);
+        const data = await fetchWidgetById(widgetId!);
+
         setWidget(data);
         setConfig(data.config);
         setWidgetTitle(data.title);
-        setPrivateWidget(data.visibility || "private");
-        // Charge la source associée pour obtenir l'endpoint
+        setVisibility(data.visibility || "private");
+
         if (data.dataSourceId) {
-          const srcRes = await api.get(`/sources/${data.dataSourceId}`);
-          setSource(srcRes.data || { endpoint: null });
+          const srcRes = sources?.find(
+            (s: DataSource) => String(s._id) === String(data.dataSourceId)
+          );
+          setSource(srcRes || { endpoint: null });
         } else {
           setSource({ endpoint: null });
         }
@@ -83,28 +89,68 @@ export default function WidgetEditPage() {
       }
     }
     fetchWidgetAndSource();
-  }, [id]);
+  }, [widgetId, sources]);
 
-  if (loading) return <div>Chargement…</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
-  if (!widget) return null;
+  // Préparer les valeurs initiales pour le hook formulaire dès que tout est chargé
+  useEffect(() => {
+    if (widget && source && columns.length > 0) {
+      setFormReady(true);
+    }
+  }, [widget, source, columns]);
 
-  // Correction TS : typage explicite
-  const type = widget.type as WidgetType;
-  const WidgetComponent = WIDGETS[type]?.component;
+  // Utilisation du hook formulaire avec initialValues (comme en création)
+  const form = useWidgetCreateForm(
+    formReady
+      ? {
+          type: widget?.type,
+          config: config,
+          title: widgetTitle,
+          sourceId: widget?.dataSourceId,
+          columns: columns,
+          dataPreview: realSourceData || [],
+          visibility: visibility,
+          disableAutoConfig: true,
+        }
+      : undefined
+  );
 
+  // Synchronise le formulaire avec les données chargées (widget, config, etc.)
+  useEffect(() => {
+    if (formReady) {
+      form.setType(widget?.type || "bar");
+      form.setConfig(config || {});
+      form.setTitle(widgetTitle || "");
+      form.setSourceId(widget?.dataSourceId || "");
+      form.setColumns(columns || []);
+      form.setVisibility(visibility || "private");
+      form.setWidgetTitle(widgetTitle || "");
+      // Pour la preview
+      if (realSourceData) {
+        form.setDataPreview(realSourceData);
+      }
+    }
+  }, [
+    formReady,
+    widget,
+    config,
+    widgetTitle,
+    columns,
+    visibility,
+    realSourceData,
+  ]);
+
+  // Gestion de la sauvegarde spécifique à l'édition
   async function handleSave() {
     try {
-      if (!widgetTitle.trim()) {
-        setWidgetTitleError("Le titre est requis");
+      if (!form.widgetTitle.trim()) {
+        form.setWidgetTitleError("Le titre est requis");
         return;
       }
-
-      await updateWidget(`${id}`, {
+      await updateWidget(`${widgetId}`, {
         ...widget,
-        title: widgetTitle,
-        visibility: privateWidget,
-        config,
+        title: form.widgetTitle,
+        visibility: form.visibility,
+        config: form.config,
       });
       showNotification({
         open: true,
@@ -125,59 +171,80 @@ export default function WidgetEditPage() {
     }
   }
 
+  if (loading || !formReady) return <div>Chargement…</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
+  if (!widget) return null;
+
+  // Rendu identique à la page de création, mais avec la logique du hook centralisé
   return (
     <>
       <div className="lg:h-[90vh] h-full flex flex-col min-h-0 overflow-hidden">
         <div className="flex flex-col md:flex-row lg:flex-row h-full min-h-0 gap-2">
           {/* Colonne aperçu (preview) : sticky/fixée, jamais scrollable */}
           <div className="order-1 md:w-1/2 lg:w-2/3 flex-shrink-0 flex flex-col lg:sticky lg:top-0 h-full p-1 md:p-2 ">
-            {WidgetComponent && (
-              <WidgetComponent
-                data={realSourceData || []}
-                config={{ ...config, title: widgetTitle }}
+            {form.WidgetComponent && (
+              <form.WidgetComponent
+                data={form.dataPreview}
+                config={{ ...form.config, title: form.widgetTitle }}
               />
             )}
           </div>
           {/* Colonne config (droite) : scrollable indépendamment, boutons sticky en bas */}
           <div className="order-2 md:w-1/2 lg:w-1/3 flex flex-col h-[90vh] bg-gray-300/30 dark:bg-gray-900/30 rounded shadow relative">
             {/* Tabs */}
-            <WidgetConfigTabs tab={tab} setTab={setTab} />
+            <WidgetConfigTabs tab={form.tab} setTab={form.setTab} />
             {/* Contenu scrollable : tout sauf les boutons */}
             <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pb-24 config-scrollbar md:px-2">
-              {tab === "data" && (
+              {form.tab === "data" && (
                 <WidgetDataConfigSection
-                  type={type}
-                  dataConfig={WIDGET_DATA_CONFIG[type]}
-                  config={config}
-                  columns={columns}
-                  handleConfigChange={(field, value) =>
-                    setConfig((c: any) => ({ ...c, [field]: value }))
+                  type={form.type}
+                  dataConfig={WIDGET_DATA_CONFIG[form.type]}
+                  config={{
+                    ...form.config,
+                    metrics: form.config.metrics?.map(
+                      (m: any, idx: number) => ({
+                        ...m,
+                        label:
+                          form.metricLabelStore.metricLabels[idx] ||
+                          m.label ||
+                          `Métrique ${idx + 1}`,
+                      })
+                    ),
+                  }}
+                  columns={form.columns}
+                  data={form.dataPreview}
+                  handleConfigChange={form.handleConfigChange}
+                  handleDragStart={form.handleDragStart}
+                  handleDragOver={form.handleDragOver}
+                  handleDrop={form.handleDrop}
+                  handleMetricAggOrFieldChange={
+                    form.handleMetricAggOrFieldChange
                   }
-                  handleDragStart={() => {}}
-                  handleDragOver={() => {}}
-                  handleDrop={() => {}}
-                  handleMetricAggOrFieldChange={() => {}}
                 />
               )}
-              {tab === "metricsAxes" && (
+              {form.tab === "metricsAxes" && (
                 <WidgetMetricStyleConfigSection
-                  type={type}
-                  metrics={config.metrics || []}
-                  metricStyles={config.metricStyles || []}
+                  type={form.type}
+                  metrics={form.config.metrics?.map((m: any, idx: number) => ({
+                    ...m,
+                    label:
+                      form.metricLabelStore.metricLabels[idx] ||
+                      m.label ||
+                      `Métrique ${idx + 1}`,
+                  }))}
+                  metricStyles={form.config.metricStyles || []}
                   handleMetricStyleChange={(idx, field, value) => {
-                    const newStyles = [...(config.metricStyles || [])];
+                    const newStyles = [...(form.config.metricStyles || [])];
                     newStyles[idx] = { ...newStyles[idx], [field]: value };
-                    setConfig((c: any) => ({ ...c, metricStyles: newStyles }));
+                    form.handleConfigChange("metricStyles", newStyles);
                   }}
                 />
               )}
-              {tab === "params" && (
+              {form.tab === "params" && (
                 <WidgetParamsConfigSection
-                  type={type}
-                  config={config}
-                  handleConfigChange={(field, value) =>
-                    setConfig((c: any) => ({ ...c, [field]: value }))
-                  }
+                  type={form.type}
+                  config={form.config}
+                  handleConfigChange={form.handleConfigChange}
                 />
               )}
             </div>
@@ -187,7 +254,7 @@ export default function WidgetEditPage() {
               loading={loading}
               onPrev={() => navigate(ROUTES.widgets)}
               onNext={() => {}}
-              onSave={() => setShowSaveModal(true)}
+              onSave={() => form.setShowSaveModal(true)}
               isSaving={loading}
             />
           </div>
@@ -195,21 +262,21 @@ export default function WidgetEditPage() {
       </div>
       {/* Modal de confirmation pour le titre du widget */}
       <WidgetSaveTitleModal
-        open={showSaveModal}
-        onClose={() => setShowSaveModal(false)}
-        title={widgetTitle}
-        setTitle={setWidgetTitle}
-        privateWidget={privateWidget}
-        setPrivateWidget={setPrivateWidget}
-        error={widgetTitleError}
-        setError={setWidgetTitleError}
+        open={form.showSaveModal}
+        onClose={() => form.setShowSaveModal(false)}
+        title={form.widgetTitle}
+        setTitle={form.setWidgetTitle}
+        visibility={form.visibility}
+        setVisibility={form.setVisibility}
+        error={form.widgetTitleError}
+        setError={form.setWidgetTitleError}
         loading={loading}
         onConfirm={() => {
-          if (!widgetTitle.trim()) {
-            setWidgetTitleError("Le titre est requis");
+          if (!form.widgetTitle.trim()) {
+            form.setWidgetTitleError("Le titre est requis");
             return;
           }
-          setShowSaveModal(false);
+          form.setShowSaveModal(false);
           handleSave();
         }}
       />

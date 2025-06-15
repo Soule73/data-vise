@@ -4,8 +4,12 @@ import Button from "@/presentation/components/Button";
 import { useMemo } from "react";
 import React from "react";
 import { useNotificationStore } from "@/core/store/notification";
-import type { Permission, PermissionGroupCheckboxesProps, RoleCreateFormProps } from "@/core/types/auth-types";
-
+import type {
+  Permission,
+  PermissionGroupCheckboxesProps,
+  RoleCreateFormProps,
+} from "@/core/types/auth-types";
+import { createRole } from "@/data/services/role";
 
 export function PermissionGroupCheckboxes({
   permissions,
@@ -53,7 +57,6 @@ export function PermissionGroupCheckboxes({
   );
 }
 
-
 export default function RoleCreateForm({
   permissions,
   onSuccess,
@@ -77,38 +80,31 @@ export default function RoleCreateForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim()) {
-      useNotificationStore
-        .getState()
-        .showNotification({
-          open: true,
-          type: "error",
-          title: "Nom requis",
-          description: "Le nom du rôle est obligatoire.",
-        });
+      useNotificationStore.getState().showNotification({
+        open: true,
+        type: "error",
+        title: "Nom requis",
+        description: "Le nom du rôle est obligatoire.",
+      });
       return;
     }
     try {
-      const api = (await import("@/data/services/api")).default;
-      await api.post("/auth/roles", form);
+      await createRole(form);
       setForm({ name: "", description: "", permissions: [] });
-      useNotificationStore
-        .getState()
-        .showNotification({
-          open: true,
-          type: "success",
-          title: "Rôle créé",
-          description: "Le nouveau rôle a été ajouté.",
-        });
+      useNotificationStore.getState().showNotification({
+        open: true,
+        type: "success",
+        title: "Rôle créé",
+        description: "Le nouveau rôle a été ajouté.",
+      });
       onSuccess();
     } catch (e) {
-      useNotificationStore
-        .getState()
-        .showNotification({
-          open: true,
-          type: "error",
-          title: "Erreur",
-          description: "Erreur lors de la création du rôle.",
-        });
+      useNotificationStore.getState().showNotification({
+        open: true,
+        type: "error",
+        title: "Erreur",
+        description: "Erreur lors de la création du rôle.",
+      });
     }
   };
   const allPermissionIds = permissions.map((p) => p._id);
@@ -127,7 +123,9 @@ export default function RoleCreateForm({
         <InputField
           label="Nom du rôle"
           value={form.name}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("name", e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleChange("name", e.target.value)
+          }
           required
           id="create-role-name"
           name="name"
@@ -136,7 +134,9 @@ export default function RoleCreateForm({
         <InputField
           label="Description"
           value={form.description}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("description", e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleChange("description", e.target.value)
+          }
           id="create-role-description"
           name="description"
           autoComplete="off"

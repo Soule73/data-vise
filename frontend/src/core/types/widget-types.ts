@@ -98,11 +98,22 @@ export interface WidgetSaveTitleModalProps {
   setError: (e: string) => void;
   onConfirm: () => void;
   loading: boolean;
-  privateWidget: "public" | "private";
-  setPrivateWidget: (p: "public" | "private") => void;
+  visibility: "public" | "private";
+  setVisibility: (p: "public" | "private") => void;
 }
 
 export interface WidgetCreateSelectorResult {
   type: WidgetType;
   sourceId: string;
+}
+
+export interface WidgetFormInitialValues {
+  type?: WidgetType;
+  config?: any;
+  title?: string;
+  sourceId?: string;
+  columns?: string[];
+  dataPreview?: any[];
+  visibility?: "public" | "private";
+  disableAutoConfig?: boolean;
 }

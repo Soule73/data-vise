@@ -10,6 +10,8 @@ import {
 } from "@/presentation/components/source/SourceForms";
 import { Link } from "react-router-dom";
 import { useUserStore } from "@/core/store/user";
+import { useDashboardStore } from "@/core/store/dashboard";
+import { useEffect } from "react";
 
 export default function SourcesPage() {
   const {
@@ -27,6 +29,12 @@ export default function SourcesPage() {
   const { data: sources = [], isLoading } = useSources();
 
   const hasPermission = useUserStore((s) => s.hasPermission);
+
+  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
+
+  useEffect(() => {
+    setBreadcrumb([{ url: ROUTES.sources, label: "Sources" }]);
+  }, [setBreadcrumb]);
 
   const columns = [
     {

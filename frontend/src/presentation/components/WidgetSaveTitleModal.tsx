@@ -13,8 +13,8 @@ export default function WidgetSaveTitleModal({
   setError,
   onConfirm,
   loading,
-  privateWidget,
-  setPrivateWidget,
+  visibility,
+  setVisibility,
 }: WidgetSaveTitleModalProps) {
   return (
     <Modal
@@ -40,8 +40,8 @@ export default function WidgetSaveTitleModal({
         <div className="flex items-center gap-2">
           <CheckboxField
             label="Rendre le widget privé"
-            checked={privateWidget == "private"}
-            onChange={(val) => setPrivateWidget(val ? "private" : "public")}
+            checked={visibility == "private"}
+            onChange={(val) => setVisibility(val ? "private" : "public")}
             name="private-widget"
           />
         </div>

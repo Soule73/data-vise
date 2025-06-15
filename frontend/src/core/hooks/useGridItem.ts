@@ -1,6 +1,7 @@
 import { useSourceData } from "@/core/hooks/useSourceData";
 import { WIDGETS } from "@/data/adapters/visualizations";
 import { useRef, useEffect, useMemo } from "react";
+import type { DataSource } from "../types/data-source";
 
 export function useGridItem({
   widget,
@@ -19,7 +20,7 @@ export function useGridItem({
   item,
 }: {
   widget: any;
-  sources: any[];
+  sources: DataSource[];
   idx: number;
   hydratedLayout: any[];
   editMode?: boolean;
@@ -142,14 +143,9 @@ export function useGridItem({
 
   // Trouver la source associée
   const source = sources?.find(
-    (s: any) => String(s._id) === String(widget?.dataSourceId)
+    (s: DataSource) => String(s._id) === String(widget?.dataSourceId)
   );
-  const initialData = Array.isArray(source?.data) ? source.data : undefined;
-  const {
-    data: widgetData,
-    loading,
-    error,
-  } = useSourceData(source?.endpoint, initialData);
+  const { data: widgetData, loading, error } = useSourceData(source?.endpoint);
   const widgetDef = widget
     ? WIDGETS[widget.type as keyof typeof WIDGETS]
     : null;

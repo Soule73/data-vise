@@ -35,9 +35,6 @@ export interface DashboardStore {
   setLayout: (l: DashboardLayoutItem[]) => void;
   breadcrumb: BreadcrumbItem[];
   setBreadcrumb: (items: BreadcrumbItem[]) => void;
-  dashboardTitle: string;
-  setDashboardTitle: (id: string, title: string) => void;
-  getDashboardDisplayTitle?: () => string;
 }
 
 export interface DashboardGridItemProps {

@@ -1,19 +1,20 @@
-import { useMutation } from '@tanstack/react-query';
-import { createSource, detectColumns } from '@/data/services/datasource';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMutation } from "@tanstack/react-query";
+import { createSource, detectColumns } from "@/data/services/datasource";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../constants/routes";
 
 export function useDataSourceForm() {
   // Gestion du flow multi-étapes
   const [step, setStep] = useState(1);
-  const [endpoint, setEndpoint] = useState('');
+  const [endpoint, setEndpoint] = useState("");
   const [columns, setColumns] = useState<{ name: string; type: string }[]>([]);
   const [columnsLoading, setColumnsLoading] = useState(false);
-  const [columnsError, setColumnsError] = useState('');
+  const [columnsError, setColumnsError] = useState("");
   const [dataPreview, setDataPreview] = useState<any[]>([]);
-  const [name, setName] = useState('');
-  const [type, setType] = useState('');
-  const [globalError, setGlobalError] = useState('');
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [globalError, setGlobalError] = useState("");
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
@@ -23,25 +24,27 @@ export function useDataSourceForm() {
       return await createSource({ name, type, endpoint });
     },
     onSuccess: () => {
-      setGlobalError('');
+      setGlobalError("");
       setSuccess(true);
-      setTimeout(() => navigate('/sources'), 1200);
+      setTimeout(() => navigate(ROUTES.sources), 1200);
     },
     onError: (e: any) => {
-      setGlobalError(e.response?.data?.message || 'Erreur lors de la création de la source');
+      setGlobalError(
+        e.response?.data?.message || "Erreur lors de la création de la source"
+      );
     },
   });
 
   // Étape 1 : détection colonnes + preview
   const handleNext = async () => {
-    setColumnsError('');
+    setColumnsError("");
     setColumns([]);
     setDataPreview([]);
     setColumnsLoading(true);
     try {
       const res = await detectColumns(endpoint);
       if (!res.columns || res.columns.length === 0) {
-        setColumnsError('Aucune colonne détectée.');
+        setColumnsError("Aucune colonne détectée.");
         setColumnsLoading(false);
         return;
       }
@@ -51,13 +54,20 @@ export function useDataSourceForm() {
       setDataPreview(Array.isArray(data) ? data.slice(0, 5) : [data]);
       // Détection du type de chaque colonne sur la première ligne
       const firstRow = Array.isArray(data) && data.length > 0 ? data[0] : data;
-      setColumns(res.columns.map((col: string) => ({
-        name: col,
-        type: firstRow && firstRow[col] !== undefined ? typeof firstRow[col] : 'inconnu',
-      })));
+      setColumns(
+        res.columns.map((col: string) => ({
+          name: col,
+          type:
+            firstRow && firstRow[col] !== undefined
+              ? typeof firstRow[col]
+              : "inconnu",
+        }))
+      );
       setStep(2);
     } catch (e: any) {
-      setColumnsError(e.response?.data?.message || 'Impossible de détecter les colonnes');
+      setColumnsError(
+        e.response?.data?.message || "Impossible de détecter les colonnes"
+      );
     } finally {
       setColumnsLoading(false);
     }
@@ -65,7 +75,7 @@ export function useDataSourceForm() {
 
   // Étape 3 : création
   const handleCreate = async () => {
-    setGlobalError('');
+    setGlobalError("");
     mutation.mutate();
   };
 

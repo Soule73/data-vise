@@ -3,7 +3,7 @@
 import React, { type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "@/presentation/pages/auth/LoginPage";
-import Register from "@/presentation/pages/auth/RegisterPage";
+// import Register from "@/presentation/pages/auth/RegisterPage";
 import SourcesPage from "@/presentation/pages/SourceListPage";
 import AddSourcePage from "@/presentation/pages/AddSourcePage";
 import BaseLayout from "@/presentation/components/BaseLayout";
@@ -43,7 +43,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path={ROUTES.login} element={<Login />} />
-        <Route path={ROUTES.register} element={<Register />} />
+        {/* <Route path={ROUTES.register} element={<Register />} /> */}
         <Route
           path={ROUTES.dashboards}
           element={

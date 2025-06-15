@@ -1,6 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
 import { WIDGETS } from "@/data/adapters/visualizations";
-import api from "@/data/services/api";
 import { Link } from "react-router-dom";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { useEffect, useState, useMemo } from "react";
@@ -9,6 +7,7 @@ import Table from "@/presentation/components/Table";
 import Modal from "@/presentation/components/Modal";
 import { useWidgets } from "@/core/hooks/useWidgets";
 import { useUserStore } from "@/core/store/user";
+import { useSources } from "@/core/hooks/useSources";
 
 export default function WidgetListPage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
@@ -21,10 +20,7 @@ export default function WidgetListPage() {
   const { data: widgets = [], isLoading } = useWidgets();
   const widgetsArray = Array.isArray(widgets) ? widgets : [];
 
-  const { data: sources = [] } = useQuery({
-    queryKey: ["sources"],
-    queryFn: async () => (await api.get("/sources")).data,
-  });
+  const { data: sources = [] } = useSources();
 
   // Utilisation de useMemo pour stabiliser columns et data
   const columns = useMemo(

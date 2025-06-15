@@ -1,15 +1,14 @@
-import api from './api';
+import api from "./api";
 
 export async function fetchUsers() {
-  return (await api.get('/auth/users')).data;
+  return (await api.get("/auth/users")).data;
 }
 
-export async function fetchRoles() {
-  return (await api.get('/auth/roles')).data;
+export async function createRole(payload: any) {
+  return (await api.post("/auth/roles", payload)).data;
 }
-
 export async function createUser(payload: any) {
-  return (await api.post('/auth/users', payload)).data;
+  return (await api.post("/auth/users", payload)).data;
 }
 
 export async function updateUser(id: string, payload: any) {

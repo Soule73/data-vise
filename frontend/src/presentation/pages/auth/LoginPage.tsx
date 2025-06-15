@@ -17,17 +17,17 @@ export default function Login() {
     <AuthLayout
       title="Connexion à votre compte"
       logoUrl="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-      bottomText={
-        <>
-          Pas encore de compte ?{" "}
-          <a
-            href="/register"
-            className="font-semibold text-indigo-600 hover:text-indigo-500"
-          >
-            Créer un compte
-          </a>
-        </>
-      }
+      // bottomText={
+      //   <>
+      //     Pas encore de compte ?{" "}
+      //     <a
+      //       href="/register"
+      //       className="font-semibold text-indigo-600 hover:text-indigo-500"
+      //     >
+      //       Créer un compte
+      //     </a>
+      //   </>
+      // }
     >
       {globalError && (
         <div

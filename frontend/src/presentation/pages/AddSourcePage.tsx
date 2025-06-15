@@ -8,6 +8,7 @@ import Table from "@/presentation/components/Table";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { useEffect } from "react";
 import Collapsible from "@/presentation/components/Collapsible";
+import { ROUTES } from "@/core/constants/routes";
 
 export default function AddSourcePage() {
   const {
@@ -30,12 +31,14 @@ export default function AddSourcePage() {
     setStep,
   } = useDataSourceForm();
 
-  const setDashboardTitle = useDashboardStore((s) => s.setDashboardTitle);
+  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
 
   useEffect(() => {
-    setDashboardTitle("add", "Ajouter une source");
-    setDashboardTitle("sources", "Sources");
-  }, [setDashboardTitle]);
+    setBreadcrumb([
+      { url: ROUTES.sources, label: "Sources" },
+      { url: ROUTES.addSource, label: "Ajouter une source" },
+    ]);
+  }, [setBreadcrumb]);
 
   return (
     <>

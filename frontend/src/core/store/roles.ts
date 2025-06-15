@@ -3,7 +3,7 @@ import { devtools } from "zustand/middleware";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import type { Role, RoleStore } from "../types/auth-types";
-import { fetchRoles } from "@/data/services/user";
+import { fetchRoles } from "@/data/services/role";
 
 export const useRoleStore = create<RoleStore>()(
   devtools((set) => ({
