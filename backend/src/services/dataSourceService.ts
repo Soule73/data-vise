@@ -16,8 +16,18 @@ function inferColumnTypes(
       types[col] = "inconnu";
       continue;
     }
-    // Si toutes les valeurs sont des nombres
-    if (values.every((v) => !isNaN(Number(v)))) {
+    // Détection date/datetime
+    const isDate = (val: any) =>
+      typeof val === "string" && /^\d{4}-\d{2}-\d{2}$/.test(val);
+    const isDateTime = (val: any) =>
+      typeof val === "string" &&
+      (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?$/.test(val) ||
+        (!isDate(val) && !isNaN(Date.parse(val))));
+    if (values.every(isDate)) {
+      types[col] = "date";
+    } else if (values.every(isDateTime)) {
+      types[col] = "datetime";
+    } else if (values.every((v) => !isNaN(Number(v)))) {
       types[col] = "number";
     } else if (values.every((v) => v === "true" || v === "false")) {
       types[col] = "boolean";
@@ -33,7 +43,15 @@ const dataSourceService = {
     const sources = await DataSource.find();
     return { data: sources };
   },
-  async create({ name, type, endpoint, filePath, config, ownerId }: any) {
+  async create({
+    name,
+    type,
+    endpoint,
+    filePath,
+    config,
+    ownerId,
+    timestampField,
+  }: any) {
     if (!name || !type || !ownerId)
       return { error: { message: "Champs requis manquants." }, status: 400 };
     if (type === "csv" && !endpoint && !filePath)
@@ -48,6 +66,7 @@ const dataSourceService = {
       filePath,
       config,
       ownerId,
+      ...(timestampField ? { timestampField } : {}),
     });
     return { data: source };
   },
