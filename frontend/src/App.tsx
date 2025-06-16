@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import React, { type ReactNode } from "react";
+import React, { useEffect, useState, type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "@/presentation/pages/auth/LoginPage";
 // import Register from "@/presentation/pages/auth/RegisterPage";
@@ -17,6 +17,7 @@ import UserManagementPage from "@/presentation/pages/UserManagementPage";
 import DashboardPage from "@/presentation/pages/DashboardPage";
 import DashboardListPage from "@/presentation/pages/DashboardListPage";
 import WidgetEditPage from "@/presentation/pages/WidgetEditPage";
+import AppLoader from "@/presentation/components/AppLoader";
 
 function RequireAuth({
   children,
@@ -39,6 +40,18 @@ function RequireAuth({
 }
 
 const App: React.FC = () => {
+  const user = useUserStore((s) => s.user);
+  const [showLoader, setShowLoader] = useState(true);
+
+  useEffect(() => {
+    // Affiche le loader au moins 3 secondes
+    const timer = setTimeout(() => setShowLoader(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (user === undefined || user === null || showLoader) {
+    return <AppLoader />;
+  }
   return (
     <BrowserRouter>
       <Routes>

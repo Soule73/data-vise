@@ -31,14 +31,20 @@ export default function DashboardPage() {
     isCreate,
     // --- config avancée ---
     autoRefreshIntervalValue,
-    setAutoRefreshIntervalValue,
     autoRefreshIntervalUnit,
-    setAutoRefreshIntervalUnit,
     timeRangeFrom,
-    setTimeRangeFrom,
     timeRangeTo,
-    setTimeRangeTo,
+    relativeValue,
+    relativeUnit,
+    timeRangeMode,
+    handleChangeAutoRefresh,
+    handleChangeTimeRangeAbsolute,
+    handleChangeTimeRangeRelative,
+    handleChangeTimeRangeMode,
     handleSaveConfig,
+    // --- Ajout from/to effectif ---
+    effectiveFrom,
+    effectiveTo,
   } = useDashboard();
 
   const hasPermission = useUserStore((s) => s.hasPermission);
@@ -145,13 +151,16 @@ export default function DashboardPage() {
         {/* Bloc UI avancé de configuration déplacé dans DashboardConfigFields */}
         <DashboardConfigFields
           autoRefreshIntervalValue={autoRefreshIntervalValue}
-          setAutoRefreshIntervalValue={setAutoRefreshIntervalValue}
           autoRefreshIntervalUnit={autoRefreshIntervalUnit}
-          setAutoRefreshIntervalUnit={setAutoRefreshIntervalUnit}
           timeRangeFrom={timeRangeFrom}
-          setTimeRangeFrom={setTimeRangeFrom}
           timeRangeTo={timeRangeTo}
-          setTimeRangeTo={setTimeRangeTo}
+          relativeValue={relativeValue}
+          relativeUnit={relativeUnit}
+          timeRangeMode={timeRangeMode}
+          handleChangeAutoRefresh={handleChangeAutoRefresh}
+          handleChangeTimeRangeAbsolute={handleChangeTimeRangeAbsolute}
+          handleChangeTimeRangeRelative={handleChangeTimeRangeRelative}
+          handleChangeTimeRangeMode={handleChangeTimeRangeMode}
           onSave={handleSaveConfig}
           saving={saving}
         />
@@ -176,8 +185,8 @@ export default function DashboardPage() {
             // --- Ajout config avancée ---
             autoRefreshIntervalValue={autoRefreshIntervalValue}
             autoRefreshIntervalUnit={autoRefreshIntervalUnit}
-            timeRangeFrom={timeRangeFrom}
-            timeRangeTo={timeRangeTo}
+            timeRangeFrom={effectiveFrom}
+            timeRangeTo={effectiveTo}
           />
         )
       ) : isLoading ? (
@@ -199,8 +208,8 @@ export default function DashboardPage() {
           // --- Ajout config avancée ---
           autoRefreshIntervalValue={autoRefreshIntervalValue}
           autoRefreshIntervalUnit={autoRefreshIntervalUnit}
-          timeRangeFrom={timeRangeFrom}
-          timeRangeTo={timeRangeTo}
+          timeRangeFrom={effectiveFrom}
+          timeRangeTo={effectiveTo}
         />
       )}
       {saving && (

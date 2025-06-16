@@ -208,6 +208,16 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
           inputType: "checkbox",
           label: "Remplir sous la ligne",
         },
+        xLabel: {
+          default: "",
+          inputType: "text",
+          label: "Label de l'axe X",
+        },
+        yLabel: {
+          default: "",
+          inputType: "text",
+          label: "Label de l'axe Y",
+        },
       },
     },
   },

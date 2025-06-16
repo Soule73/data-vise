@@ -7,6 +7,9 @@ import {
   getLegendPosition,
   getTitle,
   getTitleAlign,
+  isIsoTimestamp,
+  allSameDay,
+  formatXTicksLabel,
 } from "@/core/utils/chartUtils";
 
 export function useBarChartLogic(data: any[], config: any) {
@@ -80,6 +83,7 @@ export function useBarChartLogic(data: any[], config: any) {
   const options: ChartOptions<"bar"> = useMemo(
     () => ({
       responsive: true,
+      animation: false,
       plugins: {
         legend: {
           display:
@@ -116,6 +120,17 @@ export function useBarChartLogic(data: any[], config: any) {
         x: {
           grid: { display: showGrid },
           title: xLabel ? { display: true, text: xLabel } : undefined,
+          stacked,
+          ticks: isXTimestamps
+            ? {
+                callback: (_: any, idx: number) =>
+                  formatXTicksLabel(labels[idx], xAllSameDay),
+                maxRotation: 45,
+                minRotation: 0,
+                autoSkip: true,
+                maxTicksLimit: 12,
+              }
+            : undefined,
         },
         y: {
           grid: { display: showGrid },
@@ -123,7 +138,6 @@ export function useBarChartLogic(data: any[], config: any) {
           title: yLabel ? { display: true, text: yLabel } : undefined,
         },
       },
-      animation: false,
     }),
     [
       legendPosition,
@@ -139,6 +153,15 @@ export function useBarChartLogic(data: any[], config: any) {
       pluginsOptions,
     ]
   );
+  // Détection si les labels X sont des timestamps ISO
+  const isXTimestamps = useMemo(() => {
+    if (!labels || labels.length === 0) return false;
+    return isIsoTimestamp(labels[0]);
+  }, [labels]);
+  const xAllSameDay = useMemo(() => {
+    if (!isXTimestamps || !labels || labels.length === 0) return false;
+    return allSameDay(labels);
+  }, [isXTimestamps, labels]);
   return {
     chartData,
     options,

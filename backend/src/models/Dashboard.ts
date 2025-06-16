@@ -28,6 +28,16 @@ const DashboardHistoryItemSchema = new Schema<DashboardHistoryItem>(
   { _id: false }
 );
 
+const DashboardTimeRangeSchema = new Schema(
+  {
+    from: { type: Date },
+    to: { type: Date },
+    intervalValue: { type: Number },
+    intervalUnit: { type: String },
+  },
+  { _id: false }
+);
+
 const DashboardSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -39,13 +49,8 @@ const DashboardSchema = new Schema(
     autoRefreshInterval: { type: Number, default: 60000 }, // ms, 1min par défaut
     autoRefreshIntervalValue: { type: Number }, // valeur personnalisée (ex: 5)
     autoRefreshIntervalUnit: { type: String }, // unité (minute, heure, etc.)
-    // Ajout timeRange pour filtrage temporel global
-    timeRange: {
-      from: { type: Date },
-      to: { type: Date }, // plus de default: Date.now
-      intervalValue: { type: Number },
-      intervalUnit: { type: String },
-    },
+    // Plage temporelle globale (absolue ou relative)
+    timeRange: { type: DashboardTimeRangeSchema, default: undefined },
   },
   { timestamps: true }
 );

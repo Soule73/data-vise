@@ -1,5 +1,10 @@
 import { useMemo } from "react";
 import type { ChartOptions, ChartData } from "chart.js";
+import {
+  isIsoTimestamp,
+  allSameDay,
+  formatXTicksLabel,
+} from "@/core/utils/chartUtils";
 
 export function useScatterChartLogic(data: any[], config: any) {
   const validDatasets = useMemo(
@@ -46,6 +51,22 @@ export function useScatterChartLogic(data: any[], config: any) {
   const xLabel = config.widgetParams?.xLabel || "";
   const yLabel = config.widgetParams?.yLabel || "";
 
+  // Récupération des labels X (valeurs de la première série de données)
+  const labels = useMemo(() => {
+    const ds = validDatasets[0];
+    return ds ? data.map((row: any) => row[ds.x]) : [];
+  }, [validDatasets, data]);
+
+  // Détection si les labels X sont des timestamps ISO
+  const isXTimestamps = useMemo(() => {
+    if (!labels || labels.length === 0) return false;
+    return isIsoTimestamp(labels[0]);
+  }, [labels]);
+  const xAllSameDay = useMemo(() => {
+    if (!isXTimestamps || !labels || labels.length === 0) return false;
+    return allSameDay(labels);
+  }, [isXTimestamps, labels]);
+
   const chartData: ChartData<"scatter"> = useMemo(
     () => ({ datasets }),
     [datasets]
@@ -54,6 +75,7 @@ export function useScatterChartLogic(data: any[], config: any) {
   const options: ChartOptions<"scatter"> = useMemo(
     () => ({
       responsive: true,
+      animation: false,
       plugins: {
         legend: { display: showLegend },
         title: chartTitle
@@ -74,8 +96,18 @@ export function useScatterChartLogic(data: any[], config: any) {
       },
       scales: {
         x: {
-          title: xLabel ? { display: true, text: xLabel } : undefined,
           grid: { display: true },
+          title: xLabel ? { display: true, text: xLabel } : undefined,
+          ticks: isXTimestamps
+            ? {
+                callback: (_: any, idx: number) =>
+                  formatXTicksLabel(labels[idx], xAllSameDay),
+                maxRotation: 45,
+                minRotation: 0,
+                autoSkip: true,
+                maxTicksLimit: 12,
+              }
+            : undefined,
         },
         y: {
           title: yLabel ? { display: true, text: yLabel } : undefined,

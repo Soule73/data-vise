@@ -8,7 +8,8 @@ export function aggregate(rows: any[], agg: string, field: string) {
   }
   const nums = rows.map((r) => Number(r[field])).filter((v) => !isNaN(v));
   if (agg === "sum") return nums.reduce((a, b) => a + b, 0);
-  if (agg === "avg") return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
+  if (agg === "avg")
+    return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
   if (agg === "min") return nums.length ? Math.min(...nums) : 0;
   if (agg === "max") return nums.length ? Math.max(...nums) : 0;
   if (agg === "count") return rows.length;
@@ -66,4 +67,46 @@ export function getTitle(config: any) {
 
 export function getTitleAlign(config: any) {
   return config.widgetParams?.titleAlign || config.titleAlign || "center";
+}
+
+// Utilitaire : détecte si un label est un timestamp ISO
+export function isIsoTimestamp(val: any): boolean {
+  return typeof val === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(val);
+}
+
+// Utilitaire : tous les labels sont-ils du même jour ?
+export function allSameDay(labels: string[]): boolean {
+  if (!labels || labels.length === 0) return false;
+  const first = new Date(labels[0]);
+  return labels.every((l) => {
+    const d = new Date(l);
+    return (
+      d.getFullYear() === first.getFullYear() &&
+      d.getMonth() === first.getMonth() &&
+      d.getDate() === first.getDate()
+    );
+  });
+}
+
+// Utilitaire : formate un label timestamp pour l'axe X
+export function formatXTicksLabel(
+  raw: string,
+  onlyTimeIfSameDay = false
+): string {
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return raw;
+  if (onlyTimeIfSameDay) {
+    return d.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } else {
+    return d.toLocaleString("fr-FR", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 }

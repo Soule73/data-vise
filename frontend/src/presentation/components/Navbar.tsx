@@ -5,6 +5,7 @@ import { useSidebarStore } from "@/core/store/sidebar";
 import { Link } from "react-router-dom";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { ROUTES } from "@/core/constants/routes";
+import logoDataVise from "/logo-datavise.svg";
 
 export default function Navbar() {
   // Affiche le bouton menu sur toutes les tailles d'écran
@@ -59,7 +60,13 @@ export default function Navbar() {
         >
           <Bars3Icon className="w-6 h-6" />
         </button>
-        <span className="font-bold text-sm md:text-lg text-primary ml-2 border-x px-2 border-gray-300 dark:border-gray-700">
+        <img
+          src={logoDataVise}
+          alt="Logo DataVise"
+          className="h-10 w-auto "
+          style={{ minWidth: 40 }}
+        />
+        <span className="font-bold text-sm md:text-lg text-primary border-x px-2 border-gray-300 dark:border-gray-700">
           Data-Vise
         </span>
         {breadcrumbNav}

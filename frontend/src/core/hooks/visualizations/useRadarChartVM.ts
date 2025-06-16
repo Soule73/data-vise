@@ -103,6 +103,7 @@ export function useRadarChartLogic(data: any[], config: any) {
   const options: ChartOptions<"radar"> = useMemo(
     () => ({
       responsive: true,
+      animation: false,
       plugins: {
         legend: { display: showLegend },
         title: chartTitle

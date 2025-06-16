@@ -1,5 +1,10 @@
 import { useMemo } from "react";
 import type { ChartOptions, ChartData } from "chart.js";
+import {
+  isIsoTimestamp,
+  allSameDay,
+  formatXTicksLabel,
+} from "@/core/utils/chartUtils";
 
 export function useBubbleChartLogic(data: any[], config: any) {
   const validDatasets = useMemo(
@@ -47,6 +52,27 @@ export function useBubbleChartLogic(data: any[], config: any) {
   const xLabel = config.widgetParams?.xLabel || "";
   const yLabel = config.widgetParams?.yLabel || "";
 
+  // Récupération des labels X (pour les tooltips)
+  const labels = useMemo(() => {
+    const xLabels = new Set<string>();
+    data.forEach((row: any) => {
+      const xValue = row[validDatasets[0]?.x];
+      if (xValue) xLabels.add(String(xValue));
+    });
+    return Array.from(xLabels);
+  }, [data, validDatasets]);
+
+  // Détection si les labels X sont des timestamps ISO
+  const isXTimestamps = useMemo(() => {
+    if (!labels || labels.length === 0) return false;
+    return isIsoTimestamp(labels[0]);
+  }, [labels]);
+  // Détection si tous les labels X sont le même jour (pour formatage court)
+  const xAllSameDay = useMemo(() => {
+    if (!isXTimestamps || !labels || labels.length === 0) return false;
+    return allSameDay(labels);
+  }, [isXTimestamps, labels]);
+
   const chartData: ChartData<"bubble"> = useMemo(
     () => ({ datasets }),
     [datasets]
@@ -55,6 +81,7 @@ export function useBubbleChartLogic(data: any[], config: any) {
   const options: ChartOptions<"bubble"> = useMemo(
     () => ({
       responsive: true,
+      animation: false,
       plugins: {
         legend: { display: showLegend },
         title: chartTitle
@@ -75,8 +102,18 @@ export function useBubbleChartLogic(data: any[], config: any) {
       },
       scales: {
         x: {
-          title: xLabel ? { display: true, text: xLabel } : undefined,
           grid: { display: true },
+          title: xLabel ? { display: true, text: xLabel } : undefined,
+          ticks: isXTimestamps
+            ? {
+                callback: (_: any, idx: number) =>
+                  formatXTicksLabel(labels[idx], xAllSameDay),
+                maxRotation: 45,
+                minRotation: 0,
+                autoSkip: true,
+                maxTicksLimit: 12,
+              }
+            : undefined,
         },
         y: {
           title: yLabel ? { display: true, text: yLabel } : undefined,

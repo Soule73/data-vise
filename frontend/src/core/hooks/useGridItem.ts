@@ -1,6 +1,6 @@
 import { useSourceData } from "@/core/hooks/useSourceData";
 import { WIDGETS } from "@/data/adapters/visualizations";
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import type { DataSource } from "../types/data-source";
 
 export function useGridItem({
@@ -219,6 +219,17 @@ export function useGridItem({
     undefined,
     refreshMs
   );
+
+  // --- Mémorisation des dernières données valides pour UX fluide ---
+  const [lastValidData, setLastValidData] = useState<any>(undefined);
+  useEffect(() => {
+    if (widgetData && Array.isArray(widgetData) && widgetData.length > 0) {
+      setLastValidData(widgetData);
+    }
+  }, [widgetData]);
+  // isRefreshing : loading mais on a déjà des données affichables
+  const isRefreshing = loading && !!lastValidData;
+
   const widgetDef = widget
     ? WIDGETS[widget.type as keyof typeof WIDGETS]
     : null;
@@ -236,8 +247,9 @@ export function useGridItem({
   }
   const config = widget?.config || {};
   return {
-    widgetData,
+    widgetData: lastValidData || widgetData,
     loading,
+    isRefreshing,
     error: dataError,
     WidgetComponent,
     config,

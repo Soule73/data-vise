@@ -21,7 +21,7 @@ export default function DashboardGridItem({
   handleDrop,
   handleDragEnd,
   isMobile,
-  isLoading = false,
+  // isLoading = false,
   sources,
   onRemove,
   onSwapLayout,
@@ -30,10 +30,12 @@ export default function DashboardGridItem({
   autoRefreshIntervalUnit,
   timeRangeFrom,
   timeRangeTo,
-}: DashboardGridItemProps) {
+}: // Les props relatives ne sont plus nécessaires
+DashboardGridItemProps) {
   const {
     widgetData,
-    loading,
+    // loading,
+    isRefreshing,
     error: dataError,
     WidgetComponent,
     config,
@@ -60,8 +62,16 @@ export default function DashboardGridItem({
     autoRefreshIntervalUnit,
     timeRangeFrom,
     timeRangeTo,
+    // Les props relatives ne sont plus nécessaires
   });
   const widgetRef = handleResize();
+
+  // Overlay spinner pour le rafraîchissement asynchrone
+  const RefreshOverlay = isRefreshing ? (
+    <div className="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-gray-900/40 z-30 pointer-events-none">
+      <EllipsisVerticalIcon className="w-8 h-8 animate-spin text-indigo-400 opacity-80" />
+    </div>
+  ) : null;
 
   return (
     <div
@@ -104,15 +114,7 @@ export default function DashboardGridItem({
         </Menu>
       )}
       {/* Affichage du widget ou des messages d'état */}
-      {isLoading || loading ? (
-        <EmptyConfigWidget
-          icon={
-            <EllipsisVerticalIcon className="w-12 h-12 text-gray-300 dark:text-gray-700" />
-          }
-          message="Chargement des données"
-          details="Veuillez patienter pendant que les données sont récupérées."
-        />
-      ) : dataError || !widget ? (
+      {dataError || !widget ? (
         <EmptyConfigWidget
           icon={<ExclamationCircleIcon className="w-12 h-12 text-red-500" />}
           message="Erreur de données"
@@ -120,15 +122,16 @@ export default function DashboardGridItem({
             dataError || "Impossible de récupérer les données pour ce widget."
           }
         />
-      ) : (
-        WidgetComponent && (
+      ) : WidgetComponent ? (
+        <div className="relative w-full h-full">
           <WidgetComponent
             data={widgetData}
             config={config}
             editMode={editMode}
           />
-        )
-      )}
+          {RefreshOverlay}
+        </div>
+      ) : null}
     </div>
   );
 }

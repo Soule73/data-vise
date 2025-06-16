@@ -1,14 +1,28 @@
 import { useMemo } from "react";
-import { aggregate, getLabels, getLegendPosition, getTitle, getTitleAlign } from "@/core/utils/chartUtils";
+import {
+  aggregate,
+  getLabels,
+  getLegendPosition,
+  getTitle,
+  getTitleAlign,
+  isIsoTimestamp,
+  allSameDay,
+  formatXTicksLabel,
+} from "@/core/utils/chartUtils";
 
 import type { ChartOptions, ChartData } from "chart.js";
 import type { Chart as ChartJSInstance } from "chart.js";
 
 export function useLineChartLogic(data: any[], config: any) {
-  const labels = useMemo(() => getLabels(data, config.bucket?.field), [data, config.bucket?.field]);
+  const labels = useMemo(
+    () => getLabels(data, config.bucket?.field),
+    [data, config.bucket?.field]
+  );
   function getValues(metric: any) {
     return labels.map((labelVal: string) => {
-      const rows = data.filter((row: any) => row[config.bucket.field] === labelVal);
+      const rows = data.filter(
+        (row: any) => row[config.bucket.field] === labelVal
+      );
       return aggregate(rows, metric.agg, metric.field);
     });
   }
@@ -53,54 +67,62 @@ export function useLineChartLogic(data: any[], config: any) {
       : config.stepped !== undefined
       ? config.stepped
       : false;
-  const datasets = useMemo(() => config.metrics.map((metric: any, idx: number) => {
-    const values = getValues(metric);
-    const style = (config.metricStyles && config.metricStyles[idx]) || {};
-    let borderDash: number[] | undefined = undefined;
-    if (
-      style.borderDash ||
-      config.widgetParams?.borderDash ||
-      config.borderDash
-    ) {
-      const dashStr =
-        style.borderDash ||
-        config.widgetParams?.borderDash ||
-        config.borderDash;
-      if (dashStr && typeof dashStr === "string") {
-        borderDash = dashStr
-          .split(",")
-          .map((v: string) => parseInt(v.trim(), 10))
-          .filter((n: number) => !isNaN(n));
-      }
-    }
-    const fillColor =
-      style.fillColor ||
-      config.widgetParams?.fillColor ||
-      config.fillColor ||
-      (style.color ||
-        config.widgetParams?.color ||
-        `hsl(${(idx * 60) % 360}, 70%, 60%)`) + "33";
-    return {
-      label: metric.label || metric.field,
-      data: values,
-      borderColor:
-        style.color ||
-        config.widgetParams?.color ||
-        `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-      backgroundColor: fill ? fillColor : undefined,
-      borderWidth: style.borderWidth || config.widgetParams?.borderWidth || 2,
-      borderRadius:
-        style.borderRadius || config.widgetParams?.borderRadius || 0,
-      pointStyle:
-        style.pointStyle || config.widgetParams?.pointStyle || undefined,
-      pointBorderColor:
-        style.borderColor || config.widgetParams?.borderColor || undefined,
-      borderDash,
-      stepped,
-      fill,
-    };
-  }), [labels, config.metrics, config.metricStyles, fill, stepped, config]);
-  const chartData: ChartData<"line"> = useMemo(() => ({ labels, datasets }), [labels, datasets]);
+  const datasets = useMemo(
+    () =>
+      config.metrics.map((metric: any, idx: number) => {
+        const values = getValues(metric);
+        const style = (config.metricStyles && config.metricStyles[idx]) || {};
+        let borderDash: number[] | undefined = undefined;
+        if (
+          style.borderDash ||
+          config.widgetParams?.borderDash ||
+          config.borderDash
+        ) {
+          const dashStr =
+            style.borderDash ||
+            config.widgetParams?.borderDash ||
+            config.borderDash;
+          if (dashStr && typeof dashStr === "string") {
+            borderDash = dashStr
+              .split(",")
+              .map((v: string) => parseInt(v.trim(), 10))
+              .filter((n: number) => !isNaN(n));
+          }
+        }
+        const fillColor =
+          style.fillColor ||
+          config.widgetParams?.fillColor ||
+          config.fillColor ||
+          (style.color ||
+            config.widgetParams?.color ||
+            `hsl(${(idx * 60) % 360}, 70%, 60%)`) + "33";
+        return {
+          label: metric.label || metric.field,
+          data: values,
+          borderColor:
+            style.color ||
+            config.widgetParams?.color ||
+            `hsl(${(idx * 60) % 360}, 70%, 60%)`,
+          backgroundColor: fill ? fillColor : undefined,
+          borderWidth:
+            style.borderWidth || config.widgetParams?.borderWidth || 2,
+          borderRadius:
+            style.borderRadius || config.widgetParams?.borderRadius || 0,
+          pointStyle:
+            style.pointStyle || config.widgetParams?.pointStyle || undefined,
+          pointBorderColor:
+            style.borderColor || config.widgetParams?.borderColor || undefined,
+          borderDash,
+          stepped,
+          fill,
+        };
+      }),
+    [labels, config.metrics, config.metricStyles, fill, stepped, config]
+  );
+  const chartData: ChartData<"line"> = useMemo(
+    () => ({ labels, datasets }),
+    [labels, datasets]
+  );
   const hasData =
     labels.length > 0 &&
     datasets.length > 0 &&
@@ -108,96 +130,145 @@ export function useLineChartLogic(data: any[], config: any) {
   const legendPosition = getLegendPosition(config);
   const title = getTitle(config);
   const titleAlign = getTitleAlign(config);
-  const xLabel = config.widgetParams?.xLabel;
-  const yLabel = config.widgetParams?.yLabel;
+  // xLabel dynamique : si non renseigné, utiliser le label du champ de regroupement
+  let xLabel =
+    config.widgetParams?.xLabel ||
+    config.xLabel ||
+    config.bucket?.fieldLabel ||
+    config.bucket?.field ||
+    "";
+  const yLabel = config.widgetParams?.yLabel || config.yLabel || "";
   const showGrid = config.widgetParams?.showGrid ?? config.showGrid ?? true;
   const stacked = config.widgetParams?.stacked ?? config.stacked ?? false;
   const tension = config.widgetParams?.tension ?? config.tension ?? 0;
-  const options: ChartOptions<"line"> = useMemo(() => ({
-    responsive: true,
-    plugins: {
-      legend: {
-        display:
-          config.widgetParams?.legend !== false && config.legend !== false,
-        position: legendPosition as "top" | "left" | "right" | "bottom",
-      },
-      title: title
-        ? {
-            display: true,
-            text: title,
-            position: "top",
-            align: titleAlign as "start" | "center" | "end",
-            color: config.widgetParams?.labelColor,
-            font: config.widgetParams?.labelFontSize
-              ? { size: config.widgetParams.labelFontSize }
+  // Détection si les labels X sont des timestamps ISO
+  const isXTimestamps = useMemo(() => {
+    if (!labels || labels.length === 0) return false;
+    return isIsoTimestamp(labels[0]);
+  }, [labels]);
+  // Détection si tous les labels X sont le même jour (pour formatage court)
+  const xAllSameDay = useMemo(() => {
+    if (!isXTimestamps || !labels || labels.length === 0) return false;
+    return allSameDay(labels);
+  }, [isXTimestamps, labels]);
+  const options: ChartOptions<"line"> = useMemo(
+    () => ({
+      responsive: true,
+      animation: false,
+      plugins: {
+        legend: {
+          display:
+            config.widgetParams?.legend !== false && config.legend !== false,
+          position: legendPosition as "top" | "left" | "right" | "bottom",
+        },
+        title: title
+          ? {
+              display: true,
+              text: title,
+              position: "top",
+              align: titleAlign as "start" | "center" | "end",
+              color: config.widgetParams?.labelColor,
+              font: config.widgetParams?.labelFontSize
+                ? { size: config.widgetParams.labelFontSize }
+                : undefined,
+            }
+          : undefined,
+        tooltip: {
+          enabled: true,
+          callbacks:
+            config.widgetParams?.tooltipFormat || config.tooltipFormat
+              ? {
+                  label: function (context) {
+                    const label = context.label;
+                    const value = context.parsed.y;
+                    return (
+                      config.widgetParams?.tooltipFormat ||
+                      config.tooltipFormat ||
+                      "{label}: {value}"
+                    )
+                      .replace("{label}", label)
+                      .replace("{value}", String(value));
+                  },
+                }
               : undefined,
-          }
-        : undefined,
-      tooltip: {
-        enabled: true,
-        callbacks:
-          config.widgetParams?.tooltipFormat || config.tooltipFormat
+        },
+      },
+      elements: {
+        point: { radius: showPoints ? 3 : 0 },
+        line: {
+          borderWidth: config.borderWidth || 2,
+          tension,
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: showGrid },
+          title: xLabel ? { display: true, text: xLabel } : undefined,
+          stacked,
+          ticks: isXTimestamps
             ? {
-                label: function (context) {
-                  const label = context.label;
-                  const value = context.parsed.y;
-                  return (
-                    config.widgetParams?.tooltipFormat ||
-                    config.tooltipFormat ||
-                    "{label}: {value}"
-                  )
-                    .replace("{label}", label)
-                    .replace("{value}", String(value));
-                },
+                callback: (_: any, idx: number) =>
+                  formatXTicksLabel(labels[idx], xAllSameDay),
+                maxRotation: 45,
+                minRotation: 0,
+                autoSkip: true,
+                maxTicksLimit: 12,
               }
             : undefined,
+        },
+        y: {
+          grid: { display: showGrid },
+          title: yLabel ? { display: true, text: yLabel } : undefined,
+          stacked,
+        },
       },
-    },
-    elements: {
-      point: { radius: showPoints ? 3 : 0 },
-      line: {
-        borderWidth: config.borderWidth || 2,
-        tension,
-      },
-    },
-    scales: {
-      x: {
-        grid: { display: showGrid },
-        title: xLabel ? { display: true, text: xLabel } : undefined,
-        stacked,
-      },
-      y: {
-        grid: { display: showGrid },
-        title: yLabel ? { display: true, text: yLabel } : undefined,
-        stacked,
-      },
-    },
-  }), [legendPosition, title, titleAlign, xLabel, yLabel, showGrid, stacked, tension, showPoints, config]);
+    }),
+    [
+      legendPosition,
+      title,
+      titleAlign,
+      xLabel,
+      yLabel,
+      showGrid,
+      stacked,
+      tension,
+      showPoints,
+      config,
+      isXTimestamps,
+      labels,
+      xAllSameDay,
+    ]
+  );
   const showNativeValues = showValues && hasData;
-  const valueLabelsPlugin = useMemo(() => ({
-    id: "valueLabelsPlugin",
-    afterDatasetsDraw(chart: ChartJSInstance) {
-      if (!showNativeValues) return;
-      const ctx = chart.ctx;
-      chart.data.datasets.forEach((dataset: any, i: number) => {
-        const meta = chart.getDatasetMeta(i);
-        meta.data.forEach((point: any, j: number) => {
-          const value = dataset.data[j];
-          if (value == null || isNaN(value)) return;
-          const labelFormat =
-            config.widgetParams?.labelFormat || config.labelFormat || "{value}";
-          const label = labelFormat.replace("{value}", value);
-          ctx.save();
-          ctx.font = "bold 11px sans-serif";
-          ctx.fillStyle = dataset.borderColor || "#333";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "bottom";
-          ctx.fillText(label, point.x, point.y - 6);
-          ctx.restore();
+  const valueLabelsPlugin = useMemo(
+    () => ({
+      id: "valueLabelsPlugin",
+      afterDatasetsDraw(chart: ChartJSInstance) {
+        if (!showNativeValues) return;
+        const ctx = chart.ctx;
+        chart.data.datasets.forEach((dataset: any, i: number) => {
+          const meta = chart.getDatasetMeta(i);
+          meta.data.forEach((point: any, j: number) => {
+            const value = dataset.data[j];
+            if (value == null || isNaN(value)) return;
+            const labelFormat =
+              config.widgetParams?.labelFormat ||
+              config.labelFormat ||
+              "{value}";
+            const label = labelFormat.replace("{value}", value);
+            ctx.save();
+            ctx.font = "bold 11px sans-serif";
+            ctx.fillStyle = dataset.borderColor || "#333";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(label, point.x, point.y - 6);
+            ctx.restore();
+          });
         });
-      });
-    },
-  }), [showNativeValues, config, datasets]);
+      },
+    }),
+    [showNativeValues, config, datasets]
+  );
   return {
     chartData,
     options,

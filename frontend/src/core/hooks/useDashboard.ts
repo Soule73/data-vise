@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   fetchDashboard,
   saveDashboardLayout,
@@ -63,17 +63,72 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   const [autoRefreshIntervalUnit, setAutoRefreshIntervalUnit] =
     useState<IntervalUnit>(dashboard?.autoRefreshIntervalUnit ?? "minute");
   // autoRefreshEnabled devient calculé automatiquement
-  const [timeRangeIntervalValue, setTimeRangeIntervalValue] = useState<
-    number | null
-  >(dashboard?.timeRange?.intervalValue ?? null);
-  const [timeRangeIntervalUnit, setTimeRangeIntervalUnit] =
-    useState<IntervalUnit | null>(dashboard?.timeRange?.intervalUnit ?? null);
+  // Plage absolue
   const [timeRangeFrom, setTimeRangeFrom] = useState<string | null>(
     dashboard?.timeRange?.from ?? null
   );
   const [timeRangeTo, setTimeRangeTo] = useState<string | null>(
     dashboard?.timeRange?.to ?? null
   );
+  // Plage relative
+  const [relativeValue, setRelativeValue] = useState<number | undefined>(
+    undefined
+  );
+  const [relativeUnit, setRelativeUnit] = useState<IntervalUnit>("minute");
+  // Mode de plage : 'absolute' ou 'relative'
+  const [timeRangeMode, setTimeRangeMode] = useState<"absolute" | "relative">(
+    "absolute"
+  );
+
+  // Calcul dynamique du from/to selon le mode
+  const getEffectiveTimeRange = () => {
+    if (timeRangeMode === "relative" && relativeValue && relativeUnit) {
+      const now = new Date();
+      let from = new Date(now);
+      switch (relativeUnit) {
+        case "second":
+          from.setSeconds(now.getSeconds() - relativeValue);
+          break;
+        case "minute":
+          from.setMinutes(now.getMinutes() - relativeValue);
+          break;
+        case "hour":
+          from.setHours(now.getHours() - relativeValue);
+          break;
+        case "day":
+          from.setDate(now.getDate() - relativeValue);
+          break;
+        case "week":
+          from.setDate(now.getDate() - 7 * relativeValue);
+          break;
+        case "month":
+          from.setMonth(now.getMonth() - relativeValue);
+          break;
+        case "year":
+          from.setFullYear(now.getFullYear() - relativeValue);
+          break;
+      }
+      return {
+        from: from.toISOString(),
+        to: now.toISOString(),
+        intervalValue: relativeValue,
+        intervalUnit: relativeUnit,
+      };
+    }
+    // Absolu
+    return {
+      from: timeRangeFrom || undefined,
+      to: timeRangeTo || undefined,
+      intervalValue: undefined,
+      intervalUnit: undefined,
+    };
+  };
+
+  // State pour la plage temporelle effective (from/to)
+  const [effectiveTimeRange, setEffectiveTimeRange] = useState(() =>
+    getEffectiveTimeRange()
+  );
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Synchronise le layout Zustand avec le dashboard local uniquement au premier montage en création
   useEffect(() => {
@@ -122,19 +177,83 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   useEffect(() => {
     setAutoRefreshIntervalValue(dashboard?.autoRefreshIntervalValue ?? 1);
     setAutoRefreshIntervalUnit(dashboard?.autoRefreshIntervalUnit ?? "minute");
-    setTimeRangeIntervalValue(
-      dashboard?.timeRange?.intervalValue !== undefined
-        ? dashboard.timeRange.intervalValue
-        : null
-    );
-    setTimeRangeIntervalUnit(
-      dashboard?.timeRange?.intervalUnit !== undefined
-        ? dashboard.timeRange.intervalUnit
-        : null
-    );
     setTimeRangeFrom(dashboard?.timeRange?.from ?? null);
     setTimeRangeTo(dashboard?.timeRange?.to ?? null);
+    // Si intervalValue présent, on restaure le mode relatif
+    if (
+      dashboard?.timeRange?.intervalValue &&
+      dashboard?.timeRange?.intervalUnit
+    ) {
+      setRelativeValue(dashboard.timeRange.intervalValue);
+      setRelativeUnit(dashboard.timeRange.intervalUnit);
+      setTimeRangeMode("relative");
+    } else {
+      setTimeRangeMode("absolute");
+    }
   }, [dashboard?._id]);
+
+  // Timer pour recalculer la plage from/to en mode relatif + auto-refresh
+  useEffect(() => {
+    // Nettoyage du timer précédent
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    // Conditions : mode relatif + auto-refresh actif
+    if (
+      timeRangeMode === "relative" &&
+      relativeValue &&
+      relativeUnit &&
+      autoRefreshIntervalValue &&
+      autoRefreshIntervalUnit
+    ) {
+      // Calcul de l'intervalle en ms
+      let ms = 0;
+      switch (autoRefreshIntervalUnit) {
+        case "second":
+          ms = autoRefreshIntervalValue * 1000;
+          break;
+        case "minute":
+          ms = autoRefreshIntervalValue * 60 * 1000;
+          break;
+        case "hour":
+          ms = autoRefreshIntervalValue * 60 * 60 * 1000;
+          break;
+        case "day":
+          ms = autoRefreshIntervalValue * 24 * 60 * 60 * 1000;
+          break;
+        default:
+          ms = 60 * 1000;
+      }
+      // Tick initial immédiat
+      setEffectiveTimeRange(getEffectiveTimeRange());
+      timerRef.current = setInterval(() => {
+        setEffectiveTimeRange(getEffectiveTimeRange());
+      }, ms);
+    } else {
+      // Mode absolu ou pas d'auto-refresh : on met à jour une fois
+      setEffectiveTimeRange(getEffectiveTimeRange());
+    }
+    // Nettoyage à l'unmount ou si dépendances changent
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+    // eslint-disable-next-line
+  }, [
+    timeRangeMode,
+    relativeValue,
+    relativeUnit,
+    autoRefreshIntervalValue,
+    autoRefreshIntervalUnit,
+    timeRangeFrom,
+    timeRangeTo,
+  ]);
+
+  // Calcul effectif du from/to à propager à la grille et aux widgets
+  const { from: effectiveFrom, to: effectiveTo } = effectiveTimeRange;
 
   // Ajout d'un widget au dashboard (local ou distant)
   const handleAddWidget = (widget: any) => {
@@ -298,25 +417,64 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     setEditMode(false);
   };
 
+  // --- Handlers centralisés pour la config avancée ---
+  const handleChangeAutoRefresh = (
+    value: number | undefined,
+    unit: IntervalUnit
+  ) => {
+    setAutoRefreshIntervalValue(value);
+    setAutoRefreshIntervalUnit(unit);
+  };
+
+  const handleChangeTimeRangeAbsolute = (
+    from: string | null,
+    to: string | null
+  ) => {
+    setTimeRangeFrom(from);
+    setTimeRangeTo(to);
+    setTimeRangeMode("absolute");
+  };
+
+  const handleChangeTimeRangeRelative = (
+    value: number | undefined,
+    unit: IntervalUnit
+  ) => {
+    setRelativeValue(value);
+    setRelativeUnit(unit);
+    setTimeRangeMode("relative");
+  };
+
+  const handleChangeTimeRangeMode = (mode: "absolute" | "relative") => {
+    setTimeRangeMode(mode);
+  };
+
   // Handler pour sauvegarder la config avancée
   const handleSaveConfig = async () => {
+    const tr = getEffectiveTimeRange();
     await handleSaveDashboard({
       autoRefreshIntervalValue,
       autoRefreshIntervalUnit,
-      timeRange: buildTimeRange(),
+      timeRange: tr,
     } as any);
   };
 
   const buildTimeRange = () => {
-    const tr: any = {
-      from: timeRangeFrom || undefined,
-      intervalValue: timeRangeIntervalValue,
-      intervalUnit: timeRangeIntervalUnit,
-    };
-    if (timeRangeTo && timeRangeTo !== "") {
-      tr.to = timeRangeTo;
+    if (timeRangeMode === "relative") {
+      // Mode relatif : on n'envoie que intervalValue et intervalUnit
+      if (relativeValue && relativeUnit) {
+        return {
+          intervalValue: relativeValue,
+          intervalUnit: relativeUnit,
+        };
+      }
+      return {};
+    } else {
+      // Mode absolu : on n'envoie que from/to
+      const tr: any = {};
+      if (timeRangeFrom) tr.from = timeRangeFrom;
+      if (timeRangeTo) tr.to = timeRangeTo;
+      return tr;
     }
-    return tr;
   };
 
   // Expose le dashboard à utiliser (local en création, sinon backend)
@@ -340,7 +498,6 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     handleCreateDashboard,
     dashboard: dashboardToUse,
     setLocalTitle,
-    // Ajouts pour centralisation UI
     titleModalOpen,
     setTitleModalOpen,
     pendingTitle,
@@ -349,19 +506,21 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     handleConfirmSave,
     handleCancelEdit,
     isCreate,
-    // --- Gestion centralisée de la config avancée ---
+    // --- config avancée centralisée ---
     autoRefreshIntervalValue: autoRefreshIntervalValue ?? undefined,
-    setAutoRefreshIntervalValue,
     autoRefreshIntervalUnit,
-    setAutoRefreshIntervalUnit,
-    timeRangeIntervalValue,
-    setTimeRangeIntervalValue,
-    timeRangeIntervalUnit,
-    setTimeRangeIntervalUnit,
     timeRangeFrom,
-    setTimeRangeFrom,
     timeRangeTo,
-    setTimeRangeTo,
+    relativeValue,
+    relativeUnit,
+    timeRangeMode,
+    // Handlers unifiés pour la config avancée
+    handleChangeAutoRefresh,
+    handleChangeTimeRangeAbsolute,
+    handleChangeTimeRangeRelative,
+    handleChangeTimeRangeMode,
     handleSaveConfig,
+    effectiveFrom,
+    effectiveTo,
   };
 }

@@ -1,6 +1,29 @@
 import Dashboard from "../models/Dashboard";
 import Widget from "../models/Widget";
 
+// Utilitaire pour nettoyer la timeRange selon le mode
+function cleanTimeRange(timeRange: any) {
+  if (!timeRange) return {};
+  // Mode relatif : intervalValue + intervalUnit
+  if (timeRange.intervalValue && timeRange.intervalUnit) {
+    return {
+      intervalValue: timeRange.intervalValue,
+      intervalUnit: timeRange.intervalUnit,
+    };
+  }
+  // Mode absolu : from/to
+  const cleaned: any = {};
+  if (timeRange.from)
+    cleaned.from =
+      typeof timeRange.from === "string"
+        ? new Date(timeRange.from)
+        : timeRange.from;
+  if (timeRange.to)
+    cleaned.to =
+      typeof timeRange.to === "string" ? new Date(timeRange.to) : timeRange.to;
+  return cleaned;
+}
+
 const dashboardService = {
   async getMyDashboard(userId: string) {
     let dashboard = await Dashboard.findOne({ userId });
@@ -34,8 +57,8 @@ const dashboardService = {
     return { data: { ...dashboard.toObject(), layout: enrichedLayout } };
   },
   async createDashboard(userId: string, data: any) {
-    // Ne pas forcer 'to' si non fourni
-    const timeRange = data.timeRange || {};
+    // Nettoyage de la timeRange selon le mode
+    const timeRange = cleanTimeRange(data.timeRange);
     const dashboard = await Dashboard.create({
       ...data,
       userId,
@@ -53,8 +76,8 @@ const dashboardService = {
     return { data: dashboard };
   },
   async updateDashboard(id: string, data: any) {
-    // Ne pas forcer 'to' si non fourni
-    const timeRange = data.timeRange || {};
+    // Nettoyage de la timeRange selon le mode
+    const timeRange = cleanTimeRange(data.timeRange);
     const dashboard = await Dashboard.findByIdAndUpdate(
       id,
       {
