@@ -121,16 +121,16 @@ export function useBarChartLogic(data: any[], config: any) {
           grid: { display: showGrid },
           title: xLabel ? { display: true, text: xLabel } : undefined,
           stacked,
-          ticks: isXTimestamps
-            ? {
-                callback: (_: any, idx: number) =>
-                  formatXTicksLabel(labels[idx], xAllSameDay),
-                maxRotation: 45,
-                minRotation: 0,
-                autoSkip: true,
-                maxTicksLimit: 12,
-              }
-            : undefined,
+          ticks: {
+            callback: (_: any, idx: number) =>
+              isXTimestamps
+                ? formatXTicksLabel(labels[idx], xAllSameDay)
+                : labels[idx],
+            maxRotation: 45,
+            minRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 12,
+          },
         },
         y: {
           grid: { display: showGrid },

@@ -93,6 +93,7 @@ export function formatXTicksLabel(
   raw: string,
   onlyTimeIfSameDay = false
 ): string {
+  if (!isIsoTimestamp(raw)) return raw;
   const d = new Date(raw);
   if (isNaN(d.getTime())) return raw;
   if (onlyTimeIfSameDay) {

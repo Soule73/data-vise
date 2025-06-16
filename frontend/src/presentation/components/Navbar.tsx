@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { ROUTES } from "@/core/constants/routes";
 import logoDataVise from "/logo-datavise.svg";
+import { useEffect } from "react";
 
 export default function Navbar() {
   // Affiche le bouton menu sur toutes les tailles d'écran
@@ -16,6 +17,16 @@ export default function Navbar() {
 
   // Récupère le tableau breadcrumb du store
   const breadcrumb = useDashboardStore((s) => s.breadcrumb);
+
+  // Met à jour dynamiquement le titre de la page selon le breadcrumb
+  useEffect(() => {
+    if (breadcrumb && breadcrumb.length > 0) {
+      document.title = `${breadcrumb[breadcrumb.length - 1].label} – DataVise`;
+    } else {
+      document.title = "DataVise";
+    }
+  }, [breadcrumb]);
+
   const breadcrumbNav = (
     <nav
       className=" items-center text-xs text-gray-500 dark:text-gray-300 gap-1 hidden sm:flex"
@@ -63,12 +74,9 @@ export default function Navbar() {
         <img
           src={logoDataVise}
           alt="Logo DataVise"
-          className="h-10 w-auto "
+          className="h-10 w-auto  border-x px-2 border-gray-300 dark:border-gray-700"
           style={{ minWidth: 40 }}
         />
-        <span className="font-bold text-sm md:text-lg text-primary border-x px-2 border-gray-300 dark:border-gray-700">
-          Data-Vise
-        </span>
         {breadcrumbNav}
       </div>
       <nav className="flex items-center gap-4">

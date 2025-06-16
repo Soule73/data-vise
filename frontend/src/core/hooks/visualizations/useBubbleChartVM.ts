@@ -104,16 +104,16 @@ export function useBubbleChartLogic(data: any[], config: any) {
         x: {
           grid: { display: true },
           title: xLabel ? { display: true, text: xLabel } : undefined,
-          ticks: isXTimestamps
-            ? {
-                callback: (_: any, idx: number) =>
-                  formatXTicksLabel(labels[idx], xAllSameDay),
-                maxRotation: 45,
-                minRotation: 0,
-                autoSkip: true,
-                maxTicksLimit: 12,
-              }
-            : undefined,
+          ticks: {
+            callback: (_: any, idx: number) =>
+              isXTimestamps
+                ? formatXTicksLabel(labels[idx], xAllSameDay)
+                : labels[idx],
+            maxRotation: 45,
+            minRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 12,
+          },
         },
         y: {
           title: yLabel ? { display: true, text: yLabel } : undefined,
