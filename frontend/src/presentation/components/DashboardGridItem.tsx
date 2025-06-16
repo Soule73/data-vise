@@ -25,6 +25,11 @@ export default function DashboardGridItem({
   sources,
   onRemove,
   onSwapLayout,
+  // --- Ajout config avancée ---
+  autoRefreshIntervalValue,
+  autoRefreshIntervalUnit,
+  timeRangeFrom,
+  timeRangeTo,
 }: DashboardGridItemProps) {
   const {
     widgetData,
@@ -50,6 +55,11 @@ export default function DashboardGridItem({
     handleDragEnd,
     isMobile,
     item,
+    // --- Ajout config avancée ---
+    autoRefreshIntervalValue,
+    autoRefreshIntervalUnit,
+    timeRangeFrom,
+    timeRangeTo,
   });
   const widgetRef = handleResize();
 

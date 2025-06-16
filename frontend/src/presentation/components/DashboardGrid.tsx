@@ -16,6 +16,11 @@ export default function DashboardGrid({
   isLoading = false,
   hasUnsavedChanges = false,
   handleAddWidget,
+  // --- Props de configuration avancée ---
+  autoRefreshIntervalValue,
+  autoRefreshIntervalUnit,
+  timeRangeFrom,
+  timeRangeTo,
 }: DashboardGridProps) {
   const {
     data: widgets = [],
@@ -66,13 +71,17 @@ export default function DashboardGrid({
 
   return (
     <div
-      className="w-full flex flex-wrap min-w-full"
+      className={`w-full flex flex-wrap min-w-full ${
+        editMode
+          ? "border-2 border-dashed border-gray-300 dark:border-gray-700"
+          : ""
+      }`}
       style={{
-        gap: 16,
+        gap: 12,
         maxWidth: gridWidth,
         margin: "0 auto",
         alignItems: "stretch",
-        minHeight: 320,
+        // minHeight: 320,
       }}
     >
       {slots.map((item, idx) => {
@@ -115,6 +124,11 @@ export default function DashboardGrid({
             sources={sources}
             onRemove={editMode ? () => handleRemove(idx) : undefined}
             onSwapLayout={handleSwapLayout}
+            // --- Ajout config avancée ---
+            autoRefreshIntervalValue={autoRefreshIntervalValue}
+            autoRefreshIntervalUnit={autoRefreshIntervalUnit}
+            timeRangeFrom={timeRangeFrom}
+            timeRangeTo={timeRangeTo}
           />
         );
       })}

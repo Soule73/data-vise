@@ -5,7 +5,8 @@ import { fetchSourceData } from "@/data/services/datasource";
 export function useSourceData(
   sourceId?: string,
   options?: { from?: string; to?: string },
-  initialData?: any[] | null
+  initialData?: any[] | null,
+  refreshMs?: number // nouvel argument pour le polling
 ) {
   const {
     data = null,
@@ -20,6 +21,7 @@ export function useSourceData(
     enabled: !!sourceId,
     initialData,
     staleTime: 1000 * 60 * 5, // 5 min de cache
+    refetchInterval: refreshMs && refreshMs > 0 ? refreshMs : false, // active le polling si défini
   });
   return {
     data,

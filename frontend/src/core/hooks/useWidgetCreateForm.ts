@@ -153,7 +153,7 @@ export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
         message: "Widget créé avec succès ! Redirection...",
       });
       setTimeout(() => {
-        const id = widget.widgetId || widget._id || "";
+        const id = widget._id || "";
         navigate(ROUTES.editWidget.replace(":id", String(id)));
       }, 1000);
     },

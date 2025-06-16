@@ -262,7 +262,18 @@ const dataSourceService = {
       data = data.filter((row) => {
         const ts = row[source.timestampField!];
         if (!ts) return false;
-        const date = new Date(ts);
+        // Supporte ISO string, timestamp numérique, ou Date
+        let date: Date | null = null;
+        if (typeof ts === "string" && !isNaN(Date.parse(ts))) {
+          date = new Date(ts);
+        } else if (typeof ts === "number") {
+          date = new Date(ts);
+        } else if (ts instanceof Date) {
+          date = ts;
+        } else {
+          return false;
+        }
+        if (!date || isNaN(date.getTime())) return false;
         if (options.from && date < new Date(options.from)) return false;
         if (options.to && date > new Date(options.to)) return false;
         return true;

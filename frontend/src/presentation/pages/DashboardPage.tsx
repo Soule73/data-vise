@@ -5,6 +5,7 @@ import { useDashboard } from "@/core/hooks/useDashboard";
 import Modal from "@/presentation/components/Modal";
 import InputField from "@/presentation/components/InputField";
 import { useUserStore } from "@/core/store/user";
+import DashboardConfigFields from "@/presentation/components/DashboardConfigFields";
 
 export default function DashboardPage() {
   const {
@@ -28,6 +29,16 @@ export default function DashboardPage() {
     handleConfirmSave,
     handleCancelEdit,
     isCreate,
+    // --- config avancée ---
+    autoRefreshIntervalValue,
+    setAutoRefreshIntervalValue,
+    autoRefreshIntervalUnit,
+    setAutoRefreshIntervalUnit,
+    timeRangeFrom,
+    setTimeRangeFrom,
+    timeRangeTo,
+    setTimeRangeTo,
+    handleSaveConfig,
   } = useDashboard();
 
   const hasPermission = useUserStore((s) => s.hasPermission);
@@ -131,6 +142,19 @@ export default function DashboardPage() {
             )}
           </div>
         ) : null}
+        {/* Bloc UI avancé de configuration déplacé dans DashboardConfigFields */}
+        <DashboardConfigFields
+          autoRefreshIntervalValue={autoRefreshIntervalValue}
+          setAutoRefreshIntervalValue={setAutoRefreshIntervalValue}
+          autoRefreshIntervalUnit={autoRefreshIntervalUnit}
+          setAutoRefreshIntervalUnit={setAutoRefreshIntervalUnit}
+          timeRangeFrom={timeRangeFrom}
+          setTimeRangeFrom={setTimeRangeFrom}
+          timeRangeTo={timeRangeTo}
+          setTimeRangeTo={setTimeRangeTo}
+          onSave={handleSaveConfig}
+          saving={saving}
+        />
       </div>
       {isCreate ? (
         layout.length === 0 ? (
@@ -149,6 +173,11 @@ export default function DashboardPage() {
             editMode={true}
             hasUnsavedChanges={hasUnsavedChanges}
             handleAddWidget={openAddWidgetModal}
+            // --- Ajout config avancée ---
+            autoRefreshIntervalValue={autoRefreshIntervalValue}
+            autoRefreshIntervalUnit={autoRefreshIntervalUnit}
+            timeRangeFrom={timeRangeFrom}
+            timeRangeTo={timeRangeTo}
           />
         )
       ) : isLoading ? (
@@ -167,6 +196,11 @@ export default function DashboardPage() {
           editMode={editMode}
           hasUnsavedChanges={hasUnsavedChanges}
           handleAddWidget={openAddWidgetModal}
+          // --- Ajout config avancée ---
+          autoRefreshIntervalValue={autoRefreshIntervalValue}
+          autoRefreshIntervalUnit={autoRefreshIntervalUnit}
+          timeRangeFrom={timeRangeFrom}
+          timeRangeTo={timeRangeTo}
         />
       )}
       {saving && (

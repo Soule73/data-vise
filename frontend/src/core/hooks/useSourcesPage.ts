@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSources } from "./useSources";
 
 export function useSourcesPage() {
-  const { data: sources, isLoading, refetch } = useSources();
+  const { data: sources, isLoading, refetch, refetchSources } = useSources();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
@@ -25,6 +25,7 @@ export function useSourcesPage() {
 
     //Recharger la liste de sources
     refetch();
+    refetchSources && refetchSources();
   };
   const handleEditError = (message: string) => {
     showNotification({
@@ -84,5 +85,6 @@ export function useSourcesPage() {
     handleEditSuccess,
     handleEditError,
     refetch,
+    refetchSources,
   };
 }

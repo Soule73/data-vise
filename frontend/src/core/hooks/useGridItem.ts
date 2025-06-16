@@ -18,6 +18,11 @@ export function useGridItem({
   handleDragEnd,
   isMobile,
   item,
+  // --- Ajout config avancée ---
+  autoRefreshIntervalValue,
+  autoRefreshIntervalUnit,
+  timeRangeFrom,
+  timeRangeTo,
 }: {
   widget: any;
   sources: DataSource[];
@@ -33,6 +38,11 @@ export function useGridItem({
   handleDragEnd?: () => void;
   isMobile?: boolean;
   item?: any;
+  // --- Ajout config avancée ---
+  autoRefreshIntervalValue?: number;
+  autoRefreshIntervalUnit?: string;
+  timeRangeFrom?: string | null;
+  timeRangeTo?: string | null;
 }) {
   // Resize natif (extraction depuis useDashboardGrid)
   function handleResize() {
@@ -122,7 +132,7 @@ export function useGridItem({
   // Style props centralisés
   const styleProps = useMemo(() => {
     let className =
-      "relative  rounded-lg  p-2 transition-all duration-200 overflow-hidden border-dashed border-2 border-spacing-4 ";
+      "relative  rounded-lg transition-all shadow duration-200 overflow-hidden border-dashed border-2 border-spacing-4 ";
     if (editMode) {
       if (draggedIdx === idx) className += " opacity-60 border-blue-400 ";
       else if (hoveredIdx === idx) className += " border-blue-300 ";
@@ -145,7 +155,70 @@ export function useGridItem({
   const source = sources?.find(
     (s: DataSource) => String(s._id) === String(widget?.dataSourceId)
   );
-  const { data: widgetData, loading, error } = useSourceData(source?._id);
+  // Calcul de l'intervalle de rafraîchissement en ms
+  let refreshMs: number | undefined = undefined;
+  // On active le polling uniquement si la source possède un champ timestampField
+  const hasTimestamp = !!source?.timestampField;
+  if (autoRefreshIntervalValue != null && hasTimestamp) {
+    if (autoRefreshIntervalValue && autoRefreshIntervalUnit) {
+      // Conversion en ms selon l'unité
+      const unit = autoRefreshIntervalUnit;
+      const value = autoRefreshIntervalValue;
+      switch (unit) {
+        case "second":
+          refreshMs = value * 1000;
+          break;
+        case "minute":
+          refreshMs = value * 60 * 1000;
+          break;
+        case "hour":
+          refreshMs = value * 60 * 60 * 1000;
+          break;
+        case "day":
+          refreshMs = value * 24 * 60 * 60 * 1000;
+          break;
+        case "week":
+          refreshMs = value * 7 * 24 * 60 * 60 * 1000;
+          break;
+        case "month":
+          refreshMs = value * 30 * 24 * 60 * 60 * 1000;
+          break;
+        case "year":
+          refreshMs = value * 365 * 24 * 60 * 60 * 1000;
+          break;
+        default:
+          refreshMs = undefined;
+      }
+    }
+  }
+
+  // Log pour vérifier le polling
+  useEffect(() => {
+    console.log({ hasTimestamp, refreshMs });
+  }, [
+    refreshMs,
+    hasTimestamp,
+    timeRangeFrom,
+    timeRangeTo,
+    autoRefreshIntervalValue,
+    widget?.widgetId,
+    idx,
+  ]);
+
+  // Utilisation des options de plage temporelle pour le hook useSourceData
+  const {
+    data: widgetData,
+    loading,
+    error,
+  } = useSourceData(
+    source?._id,
+    {
+      from: timeRangeFrom || undefined,
+      to: timeRangeTo || undefined,
+    },
+    undefined,
+    refreshMs
+  );
   const widgetDef = widget
     ? WIDGETS[widget.type as keyof typeof WIDGETS]
     : null;

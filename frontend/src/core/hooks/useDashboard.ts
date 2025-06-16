@@ -1,47 +1,79 @@
-import { useState, useEffect } from 'react';
-import { fetchDashboard, saveDashboardLayout, createDashboard as apiCreateDashboard } from '@/data/services/dashboard';
-import { useDashboardStore } from '@/core/store/dashboard';
-import { useNotificationStore } from '@/core/store/notification';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { DashboardLayoutItem } from '../types/dashboard-types';
-import { useSources } from './useSources';
+import { useState, useEffect } from "react";
+import {
+  fetchDashboard,
+  saveDashboardLayout,
+  createDashboard as apiCreateDashboard,
+} from "@/data/services/dashboard";
+import { useDashboardStore } from "@/core/store/dashboard";
+import { useNotificationStore } from "@/core/store/notification";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { DashboardLayoutItem } from "../types/dashboard-types";
+import { useSources } from "./useSources";
+import type { IntervalUnit } from "@/core/types/dashboard-model";
 
 export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   const params = useParams();
   const location = useLocation();
-  const isCreate = typeof window !== 'undefined' && location.pathname.includes('/dashboards/create');
+  const isCreate =
+    typeof window !== "undefined" &&
+    location.pathname.includes("/dashboards/create");
   const dashboardId = params.id;
 
   // Query dashboard uniquement si pas en création
   const { data: dashboard, isLoading } = useQuery({
-    queryKey: ['dashboard', dashboardId],
-    queryFn: () => dashboardId ? fetchDashboard(dashboardId) : undefined,
+    queryKey: ["dashboard", dashboardId],
+    queryFn: () => (dashboardId ? fetchDashboard(dashboardId) : undefined),
     enabled: !isCreate && !!dashboardId,
   });
-  const { data: sources = [], isLoading: isLoadingSources,
+  const {
+    data: sources = [],
+    isLoading: isLoadingSources,
     // refetchWidgets
   } = useSources();
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
   // Store Zustand pour l'état global du dashboard
-  const layout = useDashboardStore(s => s.layout);
-  const setLayout = useDashboardStore(s => s.setLayout);
-  const editMode = useDashboardStore(s => s.editMode);
-  const setEditMode = useDashboardStore(s => s.setEditMode);
-  const hasUnsavedChanges = useDashboardStore(s => s.hasUnsavedChanges);
-  const setHasUnsavedChanges = useDashboardStore(s => s.setHasUnsavedChanges);
+  const layout = useDashboardStore((s) => s.layout);
+  const setLayout = useDashboardStore((s) => s.setLayout);
+  const editMode = useDashboardStore((s) => s.editMode);
+  const setEditMode = useDashboardStore((s) => s.setEditMode);
+  const hasUnsavedChanges = useDashboardStore((s) => s.hasUnsavedChanges);
+  const setHasUnsavedChanges = useDashboardStore((s) => s.setHasUnsavedChanges);
   const showNotification = useNotificationStore((s) => s.showNotification);
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
   const navigate = useNavigate();
 
   // Dashboard local temporaire pour la création
-  const [localDashboard, setLocalDashboard] = useState<{ _id?: string; title: string; layout: DashboardLayoutItem[] }>({ title: '', layout: [] });
+  const [localDashboard, setLocalDashboard] = useState<{
+    _id?: string;
+    title: string;
+    layout: DashboardLayoutItem[];
+  }>({ title: "", layout: [] });
 
   // Gestion du titre local et du modal
   const [titleModalOpen, setTitleModalOpen] = useState(false);
-  const [pendingTitle, setPendingTitle] = useState('');
+  const [pendingTitle, setPendingTitle] = useState("");
+
+  // --- Gestion centralisée de la config avancée ---
+  const [autoRefreshIntervalValue, setAutoRefreshIntervalValue] = useState<
+    number | undefined
+  >(dashboard?.autoRefreshIntervalValue);
+  const [autoRefreshIntervalUnit, setAutoRefreshIntervalUnit] =
+    useState<IntervalUnit>(dashboard?.autoRefreshIntervalUnit ?? "minute");
+  // autoRefreshEnabled devient calculé automatiquement
+  const [timeRangeIntervalValue, setTimeRangeIntervalValue] = useState<
+    number | null
+  >(dashboard?.timeRange?.intervalValue ?? null);
+  const [timeRangeIntervalUnit, setTimeRangeIntervalUnit] =
+    useState<IntervalUnit | null>(dashboard?.timeRange?.intervalUnit ?? null);
+  const [timeRangeFrom, setTimeRangeFrom] = useState<string | null>(
+    dashboard?.timeRange?.from ?? null
+  );
+  const [timeRangeTo, setTimeRangeTo] = useState<string | null>(
+    dashboard?.timeRange?.to ?? null
+  );
 
   // Synchronise le layout Zustand avec le dashboard local uniquement au premier montage en création
   useEffect(() => {
@@ -64,7 +96,7 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     if (dashboard && dashboard.title) {
       setPendingTitle(dashboard.title);
     } else if (isCreate) {
-      setPendingTitle(dashboard?.title || '');
+      setPendingTitle(dashboard?.title || "");
     }
   }, [dashboard?._id, dashboard?.title, isCreate]);
 
@@ -72,16 +104,37 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   useEffect(() => {
     if (isCreate) {
       setBreadcrumb([
-        { url: '/dashboards', label: 'Tableaux de bord' },
-        { url: '/dashboards/create', label: pendingTitle || 'Nouveau dashboard' },
+        { url: "/dashboards", label: "Tableaux de bord" },
+        {
+          url: "/dashboards/create",
+          label: pendingTitle || "Nouveau dashboard",
+        },
       ]);
     } else if (dashboard && dashboard._id && dashboard.title) {
       setBreadcrumb([
-        { url: '/dashboards', label: 'Tableaux de bord' },
+        { url: "/dashboards", label: "Tableaux de bord" },
         { url: `/dashboards/${dashboard._id}`, label: dashboard.title },
       ]);
     }
   }, [isCreate, dashboard?._id, dashboard?.title, pendingTitle, setBreadcrumb]);
+
+  // Restaure la config avancée depuis le backend
+  useEffect(() => {
+    setAutoRefreshIntervalValue(dashboard?.autoRefreshIntervalValue ?? 1);
+    setAutoRefreshIntervalUnit(dashboard?.autoRefreshIntervalUnit ?? "minute");
+    setTimeRangeIntervalValue(
+      dashboard?.timeRange?.intervalValue !== undefined
+        ? dashboard.timeRange.intervalValue
+        : null
+    );
+    setTimeRangeIntervalUnit(
+      dashboard?.timeRange?.intervalUnit !== undefined
+        ? dashboard.timeRange.intervalUnit
+        : null
+    );
+    setTimeRangeFrom(dashboard?.timeRange?.from ?? null);
+    setTimeRangeTo(dashboard?.timeRange?.to ?? null);
+  }, [dashboard?._id]);
 
   // Ajout d'un widget au dashboard (local ou distant)
   const handleAddWidget = (widget: any) => {
@@ -94,7 +147,7 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
       widget,
     };
     if (isCreate) {
-      setLocalDashboard(ld => ({ ...ld, layout: [...ld.layout, newItem] }));
+      setLocalDashboard((ld) => ({ ...ld, layout: [...ld.layout, newItem] }));
     } else {
       setLayout([...layout, newItem]);
     }
@@ -103,7 +156,7 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
 
   // Gestion du titre local en création
   const setLocalTitle = (title: string) => {
-    if (isCreate) setLocalDashboard(ld => ({ ...ld, title }));
+    if (isCreate) setLocalDashboard((ld) => ({ ...ld, title }));
     setPendingTitle(title);
   };
 
@@ -115,22 +168,45 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
       const layoutToSave = useDashboardStore.getState().layout;
       await saveDashboardLayout(
         (dashboardId || localDashboard._id) ?? "",
-        layoutToSave.map(({ widgetId, width, height, x, y }:
-          {
+        layoutToSave.map(
+          ({
+            widgetId,
+            width,
+            height,
+            x,
+            y,
+          }: {
             widgetId: string;
             width: string;
             height: number;
             x: number;
             y: number;
-          }
-        ) => ({ widgetId, width, height, x, y })),
-        updates?.title || localDashboard.title
+          }) => ({ widgetId, width, height, x, y })
+        ),
+        updates?.title || localDashboard.title,
+        {
+          autoRefreshIntervalValue,
+          autoRefreshIntervalUnit,
+          timeRange: buildTimeRange(),
+        }
       );
       setHasUnsavedChanges(false);
-      showNotification({ open: true, type: "success", title: "Sauvegradé", description: "Les modifications ont bien été  sauvegardé !" });
-      queryClient.invalidateQueries({ queryKey: ["dashboard", dashboardId ?? ""] });
+      showNotification({
+        open: true,
+        type: "success",
+        title: "Sauvegradé",
+        description: "Les modifications ont bien été  sauvegardé !",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard", dashboardId ?? ""],
+      });
     } catch (e) {
-      showNotification({ open: true, type: "error", title: "Erreur", description: "Erreur lors de la sauvegarde" });
+      showNotification({
+        open: true,
+        type: "error",
+        title: "Erreur",
+        description: "Erreur lors de la sauvegarde",
+      });
       if (onSaveCallback) onSaveCallback(false);
     } finally {
       setSaving(false);
@@ -141,24 +217,29 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   const handleCreateDashboard = async (title: string) => {
     setSaving(true);
     try {
-      const newDashboard = await apiCreateDashboard({ title, layout: localDashboard.layout });
+      const newDashboard = await apiCreateDashboard({
+        title,
+        layout: localDashboard.layout,
+      });
       // Invalide le cache du dashboard et de la liste
-      await queryClient.invalidateQueries({ queryKey: ['dashboard', newDashboard._id] });
-      await queryClient.invalidateQueries({ queryKey: ['dashboards'] });
+      await queryClient.invalidateQueries({
+        queryKey: ["dashboard", newDashboard._id],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["dashboards"] });
       showNotification({
         open: true,
-        type: 'success',
-        title: 'Dashboard créé',
-        description: 'Votre dashboard a bien été créé.'
+        type: "success",
+        title: "Dashboard créé",
+        description: "Votre dashboard a bien été créé.",
       });
       navigate(`/dashboards/${newDashboard._id}`);
       return newDashboard;
     } catch (e: any) {
       showNotification({
         open: true,
-        type: 'error',
-        title: 'Erreur',
-        description: "La création du dashboard a échoué."
+        type: "error",
+        title: "Erreur",
+        description: "La création du dashboard a échoué.",
       });
       if (onSaveCallback) onSaveCallback(false);
     } finally {
@@ -169,13 +250,19 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   // Gestion du swap et du resize (drag & drop)
   const handleSwapLayout = (newLayout: DashboardLayoutItem[]) => {
     // Suppression des logs debug
-    const cleanedLayout = newLayout.map(({ widgetId, width, height, x, y }) => ({
-      widgetId, width, height, x, y
-    }));
+    const cleanedLayout = newLayout.map(
+      ({ widgetId, width, height, x, y }) => ({
+        widgetId,
+        width,
+        height,
+        x,
+        y,
+      })
+    );
     if (isCreate) {
-      setLocalDashboard(ld => ({
+      setLocalDashboard((ld) => ({
         ...ld,
-        layout: cleanedLayout
+        layout: cleanedLayout,
       }));
     } else {
       setLayout(cleanedLayout);
@@ -192,7 +279,7 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
       try {
         await handleCreateDashboard(pendingTitle);
         setTitleModalOpen(false);
-      } catch (e) { }
+      } catch (e) {}
       return;
     }
     await handleSaveDashboard({ title: pendingTitle });
@@ -209,6 +296,27 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
       setPendingTitle(dashboard.title);
     }
     setEditMode(false);
+  };
+
+  // Handler pour sauvegarder la config avancée
+  const handleSaveConfig = async () => {
+    await handleSaveDashboard({
+      autoRefreshIntervalValue,
+      autoRefreshIntervalUnit,
+      timeRange: buildTimeRange(),
+    } as any);
+  };
+
+  const buildTimeRange = () => {
+    const tr: any = {
+      from: timeRangeFrom || undefined,
+      intervalValue: timeRangeIntervalValue,
+      intervalUnit: timeRangeIntervalUnit,
+    };
+    if (timeRangeTo && timeRangeTo !== "") {
+      tr.to = timeRangeTo;
+    }
+    return tr;
   };
 
   // Expose le dashboard à utiliser (local en création, sinon backend)
@@ -241,5 +349,19 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     handleConfirmSave,
     handleCancelEdit,
     isCreate,
+    // --- Gestion centralisée de la config avancée ---
+    autoRefreshIntervalValue: autoRefreshIntervalValue ?? undefined,
+    setAutoRefreshIntervalValue,
+    autoRefreshIntervalUnit,
+    setAutoRefreshIntervalUnit,
+    timeRangeIntervalValue,
+    setTimeRangeIntervalValue,
+    timeRangeIntervalUnit,
+    setTimeRangeIntervalUnit,
+    timeRangeFrom,
+    setTimeRangeFrom,
+    timeRangeTo,
+    setTimeRangeTo,
+    handleSaveConfig,
   };
 }

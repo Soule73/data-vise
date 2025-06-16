@@ -24,6 +24,11 @@ export interface DashboardGridProps {
   isLoading?: boolean;
   hasUnsavedChanges?: boolean;
   handleAddWidget: (e: React.MouseEvent) => void;
+  // Ajout config avancée
+  autoRefreshIntervalValue?: number;
+  autoRefreshIntervalUnit?: string;
+  timeRangeFrom?: string | null;
+  timeRangeTo?: string | null;
 }
 
 export interface DashboardStore {
@@ -52,6 +57,11 @@ export interface DashboardGridItemProps {
   handleDrop: (idx: number) => void;
   handleDragEnd: () => void;
   onSwapLayout: (newLayout: DashboardLayoutItem[]) => void;
+  // Ajout config avancée
+  autoRefreshIntervalValue?: number;
+  autoRefreshIntervalUnit?: string;
+  timeRangeFrom?: string | null;
+  timeRangeTo?: string | null;
   sources: any[]; // Data sources
   onRemove?: () => void; // Callback pour supprimer le widget
 }
