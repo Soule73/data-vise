@@ -13,6 +13,7 @@ import {
   Legend,
   Title,
 } from "chart.js";
+import type { RadarChartConfig } from "@/core/types/visualization";
 
 ChartJS.register(
   RadialLinearScale,
@@ -28,8 +29,8 @@ export default function RadarChartWidget({
   data,
   config,
 }: {
-  data: any[];
-  config: any;
+  data: Record<string, any>[];
+  config: RadarChartConfig;
 }) {
   const { chartData, options, validDatasets } = useRadarChartLogic(
     data,

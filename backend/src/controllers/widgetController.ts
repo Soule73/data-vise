@@ -1,52 +1,37 @@
 import widgetService from "@/services/widgetService";
 import { Request, Response, NextFunction } from "express";
+import { handleServiceResult } from "@/utils/api";
+import { AuthRequest } from "@/types/authType";
 
 const widgetController = {
   async list(req: Request, res: Response, next: NextFunction) {
-    const { dashboardId } = req.query;
+    const dashboardId =
+      typeof req.query.dashboardId === "string"
+        ? req.query.dashboardId
+        : undefined;
     const result = await widgetService.list(dashboardId);
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
   async create(req: Request, res: Response, next: NextFunction) {
-    const userId = (req as any).user?.id;
+    const userId = (req as AuthRequest).user?.id;
     const result = await widgetService.create({ ...req.body, userId });
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.status(201).json({ data: result.data });
+    return handleServiceResult(res, result, 201);
   },
   async update(req: Request, res: Response, next: NextFunction) {
-    const userId = (req as any).user?.id;
+    const userId = (req as AuthRequest).user?.id;
     const result = await widgetService.update(req.params.id, {
       ...req.body,
       userId,
     });
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
   async remove(req: Request, res: Response, next: NextFunction) {
     const result = await widgetService.remove(req.params.id);
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
   async getById(req: Request, res: Response, next: NextFunction) {
     const result = await widgetService.getById(req.params.id);
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
 };
 

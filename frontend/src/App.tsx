@@ -49,7 +49,11 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (user === undefined || user === null || showLoader) {
+  // Le loader ne s'affiche que sur les pages RequireAuth
+  if (
+    (user === undefined || user === null || showLoader) &&
+    window.location.pathname !== ROUTES.login
+  ) {
     return <AppLoader />;
   }
   return (

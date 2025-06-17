@@ -2,19 +2,23 @@ import type { IntervalUnit } from "@/core/types/dashboard-model";
 import SelectField from "./SelectField";
 import Button from "./Button";
 import InputField from "./InputField";
-import { Popover, PopoverButton, PopoverPanel, Tab } from "@headlessui/react";
+import {
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
+} from "@headlessui/react";
 import { Cog6ToothIcon, ClockIcon } from "@heroicons/react/24/outline";
 import React from "react";
-
-const INTERVAL_UNITS: { label: string; value: IntervalUnit }[] = [
-  { label: "Secondes", value: "second" },
-  { label: "Minutes", value: "minute" },
-  { label: "Heures", value: "hour" },
-  { label: "Jours", value: "day" },
-  { label: "Semaines", value: "week" },
-  { label: "Mois", value: "month" },
-  { label: "Années", value: "year" },
-];
+import {
+  formatUnitFr,
+  formatShortDateTime,
+  INTERVAL_UNITS,
+} from "@/core/utils/timeUtils";
 
 type Props = {
   autoRefreshIntervalValue: number | undefined;
@@ -60,28 +64,6 @@ const DashboardConfigFields: React.FC<Props> = ({
   // Tab state synchronisé avec timeRangeMode global
   const tab = timeRangeMode;
 
-  // Fonction utilitaire pour formater l'unité en français (singulier/pluriel)
-  function formatUnitFr(unit: IntervalUnit, value: number): string {
-    switch (unit) {
-      case "second":
-        return value > 1 ? "secondes" : "seconde";
-      case "minute":
-        return value > 1 ? "minutes" : "minute";
-      case "hour":
-        return value > 1 ? "heures" : "heure";
-      case "day":
-        return value > 1 ? "jours" : "jour";
-      case "week":
-        return value > 1 ? "semaines" : "semaine";
-      case "month":
-        return "mois";
-      case "year":
-        return value > 1 ? "années" : "année";
-      default:
-        return unit;
-    }
-  }
-
   // Texte dynamique pour le bouton Popover auto-refresh
   let autoRefreshLabel = "Activer l'auto-refresh";
   if (autoRefreshIntervalValue && autoRefreshIntervalValue > 0) {
@@ -101,40 +83,21 @@ const DashboardConfigFields: React.FC<Props> = ({
     // Formatage court (date/heure)
     const from = new Date(timeRangeFrom);
     const to = new Date(timeRangeTo);
-    const format = (d: Date) =>
-      d.toLocaleString("fr-FR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    timeRangeLabel = `du ${format(from)} au ${format(to)}`;
+    timeRangeLabel = `du ${formatShortDateTime(from)} au ${formatShortDateTime(
+      to
+    )}`;
   }
 
   return (
-    <div className="flex gap-4">
+    <div className="flex flex-wrap items-center mb-2 gap-2 md:gap-0">
       {/* Popover pour le refresh automatique */}
-      <Popover className="relative inline-block text-left mb-4">
+      <Popover className="relative inline-block text-left">
         <PopoverButton
           as={Button}
-          color={
-            autoRefreshIntervalValue && autoRefreshIntervalValue > 0
-              ? "indigo"
-              : "gray"
-          }
-          // variant={
-          //   autoRefreshIntervalValue && autoRefreshIntervalValue > 0
-          //     ? "solid"
-          //     : "outline"
-          // }
+          color={"gray"}
           variant="outline"
           size="sm"
-          className={`flex items-center gap-2 ${
-            autoRefreshIntervalValue && autoRefreshIntervalValue > 0
-              ? "ring-1 ring-indigo-400"
-              : ""
-          }`}
+          className={`flex items-center gap-2 !border-gray-200 dark:!border-gray-700 md:rounded-r-none `}
         >
           <Cog6ToothIcon className="w-5 h-5 mr-1" />
           {autoRefreshLabel}
@@ -191,27 +154,13 @@ const DashboardConfigFields: React.FC<Props> = ({
         </PopoverPanel>
       </Popover>
       {/* Popover pour la plage temporelle */}
-      <Popover className="relative inline-block text-left mb-4">
+      <Popover className="relative inline-block text-left">
         <PopoverButton
           as={Button}
-          color={
-            timeRangeMode === "relative" && relativeValue && relativeUnit
-              ? "indigo"
-              : "gray"
-          }
-          // variant={
-          //   timeRangeMode === "relative" && relativeValue && relativeUnit
-          //     ? "solid"
-          //     : "outline"
-          // }
+          color={"gray"}
           variant="outline"
           size="sm"
-          className={`flex items-center gap-2 ${
-            (timeRangeMode === "relative" && relativeValue && relativeUnit) ||
-            (timeRangeMode === "absolute" && timeRangeFrom && timeRangeTo)
-              ? "ring-1 ring-indigo-400"
-              : ""
-          }`}
+          className={`flex items-center gap-2 !border-gray-200 dark:!border-gray-700 md:rounded-l-none `}
         >
           <ClockIcon className="w-5 h-5 mr-1" />
           {timeRangeLabel}
@@ -220,13 +169,13 @@ const DashboardConfigFields: React.FC<Props> = ({
           anchor="bottom end"
           className="z-50 mt-2 rounded-xl bg-white dark:bg-gray-900 p-4 shadow-xl border border-gray-200 dark:border-gray-700 flex flex-col gap-4 min-w-[340px]"
         >
-          <Tab.Group
+          <TabGroup
             selectedIndex={tab === "absolute" ? 0 : 1}
             onChange={(i) =>
               handleChangeTimeRangeMode(i === 0 ? "absolute" : "relative")
             }
           >
-            <Tab.List className="flex gap-2 mb-2">
+            <TabList className="flex gap-2 mb-2">
               <Tab
                 className={({ selected }) =>
                   selected
@@ -245,9 +194,9 @@ const DashboardConfigFields: React.FC<Props> = ({
               >
                 Relative
               </Tab>
-            </Tab.List>
-            <Tab.Panels>
-              <Tab.Panel>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
                 <div className="flex items-end gap-2">
                   <InputField
                     id="timeRangeFrom"
@@ -283,8 +232,8 @@ const DashboardConfigFields: React.FC<Props> = ({
                     Appliquer
                   </Button>
                 </div>
-              </Tab.Panel>
-              <Tab.Panel>
+              </TabPanel>
+              <TabPanel>
                 <div className="flex items-end gap-2">
                   <InputField
                     id="relativeValue"
@@ -326,9 +275,9 @@ const DashboardConfigFields: React.FC<Props> = ({
                     Appliquer
                   </Button>
                 </div>
-              </Tab.Panel>
-            </Tab.Panels>
-          </Tab.Group>
+              </TabPanel>
+            </TabPanels>
+          </TabGroup>
         </PopoverPanel>
       </Popover>
     </div>

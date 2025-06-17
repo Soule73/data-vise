@@ -14,6 +14,7 @@ import WidgetParamsConfigSection from "@/presentation/components/WidgetParamsCon
 import type { WidgetType } from "@/core/types/widget-types";
 import { ROUTES } from "@/core/constants/routes";
 import VisualizationTypeSelector from "../components/visualizations/VisualizationTypeSelector";
+import type { DataSource } from "@/core/types/data-source";
 
 export default function WidgetCreatePage() {
   const {
@@ -115,7 +116,7 @@ export default function WidgetCreatePage() {
                     id="widget-source"
                     options={[
                       { value: "", label: "Sélectionner une source" },
-                      ...sources.map((s: any) => ({
+                      ...sources.map((s: DataSource) => ({
                         value: s._id,
                         label: s.name,
                       })),
@@ -139,13 +140,15 @@ export default function WidgetCreatePage() {
                       dataConfig={WIDGET_DATA_CONFIG[type as WidgetType]}
                       config={{
                         ...config,
-                        metrics: config.metrics.map((m: any, idx: number) => ({
-                          ...m,
-                          label:
-                            metricLabelStore.metricLabels[idx] ||
-                            m.label ||
-                            `Métrique ${idx + 1}`,
-                        })),
+                        metrics: config.metrics.map(
+                          (m: Record<string, unknown>, idx: number) => ({
+                            ...m,
+                            label:
+                              metricLabelStore.metricLabels[idx] ||
+                              m.label ||
+                              `Métrique ${idx + 1}`,
+                          })
+                        ),
                       }}
                       columns={columns}
                       data={dataPreview}
@@ -161,13 +164,15 @@ export default function WidgetCreatePage() {
                   {tab === "metricsAxes" && (
                     <WidgetMetricStyleConfigSection
                       type={type}
-                      metrics={config.metrics.map((m: any, idx: number) => ({
-                        ...m,
-                        label:
-                          metricLabelStore.metricLabels[idx] ||
-                          m.label ||
-                          `Métrique ${idx + 1}`,
-                      }))}
+                      metrics={config.metrics.map(
+                        (m: Record<string, unknown>, idx: number) => ({
+                          ...m,
+                          label:
+                            metricLabelStore.metricLabels[idx] ||
+                            m.label ||
+                            `Métrique ${idx + 1}`,
+                        })
+                      )}
                       metricStyles={config.metricStyles || []}
                       handleMetricStyleChange={(idx, field, value) => {
                         const newStyles = [...(config.metricStyles || [])];

@@ -15,6 +15,9 @@ import { ROUTES } from "@/core/constants/routes";
 import { fetchWidgetById, updateWidget } from "@/data/services/widget";
 import { useSources } from "@/core/hooks/useSources";
 import type { DataSource } from "@/core/types/data-source";
+import type { Widget } from "@/core/models/Widget";
+import type { WidgetType } from "@/core/types/widget-types";
+import type { MetricConfig } from "@/core/types/metric-bucket-types";
 
 export default function WidgetEditPage() {
   const { id: widgetId } = useParams();
@@ -23,12 +26,12 @@ export default function WidgetEditPage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [widget, setWidget] = useState<any>(null);
-  const [config, setConfig] = useState<any>({});
+  const [widget, setWidget] = useState<Widget | null>(null);
+  const [config, setConfig] = useState<unknown>({});
   const [widgetTitle, setWidgetTitle] = useState("");
   const [visibility, setVisibility] = useState<"public" | "private">("private");
   const [columns, setColumns] = useState<string[]>([]);
-  const [source, setSource] = useState<any>({ endpoint: null });
+  const [source, setSource] = useState<DataSource | null>(null);
   const [formReady, setFormReady] = useState(false);
 
   //Lisete Data source
@@ -77,11 +80,11 @@ export default function WidgetEditPage() {
           const srcRes = sources?.find(
             (s: DataSource) => String(s._id) === String(data.dataSourceId)
           );
-          setSource(srcRes || { endpoint: null });
+          setSource(srcRes || null);
         } else {
-          setSource({ endpoint: null });
+          setSource(null);
         }
-      } catch (e: any) {
+      } catch (e) {
         setError("Impossible de charger le widget");
       } finally {
         setLoading(false);
@@ -101,12 +104,14 @@ export default function WidgetEditPage() {
   const form = useWidgetCreateForm(
     formReady
       ? {
-          type: widget?.type,
+          type: (widget?.type as WidgetType) || "bar",
           config: config,
           title: widgetTitle,
           sourceId: widget?.dataSourceId,
           columns: columns,
-          dataPreview: realSourceData || [],
+          dataPreview: Array.isArray(realSourceData)
+            ? (realSourceData as Record<string, unknown>[])
+            : [],
           visibility: visibility,
           disableAutoConfig: true,
         }
@@ -116,7 +121,7 @@ export default function WidgetEditPage() {
   // Synchronise le formulaire avec les données chargées (widget, config, etc.)
   useEffect(() => {
     if (formReady) {
-      form.setType(widget?.type || "bar");
+      form.setType((widget?.type as WidgetType) || "bar");
       form.setConfig(config || {});
       form.setTitle(widgetTitle || "");
       form.setSourceId(widget?.dataSourceId || "");
@@ -158,14 +163,14 @@ export default function WidgetEditPage() {
         description: "Widget modifié avec succès !",
       });
       navigate(ROUTES.widgets);
-    } catch (e: any) {
+    } catch (e) {
       showNotification({
         open: true,
         type: "error",
         title: "Erreur",
         description:
-          e.response?.data?.message ||
-          "Erreur lors de la modification du widget",
+          (e as { response?: { data?: { message?: string } } }).response?.data
+            ?.message || "Erreur lors de la modification du widget",
       });
     }
   }
@@ -201,7 +206,10 @@ export default function WidgetEditPage() {
                   config={{
                     ...form.config,
                     metrics: form.config.metrics?.map(
-                      (m: any, idx: number) => ({
+                      (
+                        m: import("@/core/types/metric-bucket-types").MetricConfig,
+                        idx: number
+                      ) => ({
                         ...m,
                         label:
                           form.metricLabelStore.metricLabels[idx] ||
@@ -224,13 +232,15 @@ export default function WidgetEditPage() {
               {form.tab === "metricsAxes" && (
                 <WidgetMetricStyleConfigSection
                   type={form.type}
-                  metrics={form.config.metrics?.map((m: any, idx: number) => ({
-                    ...m,
-                    label:
-                      form.metricLabelStore.metricLabels[idx] ||
-                      m.label ||
-                      `Métrique ${idx + 1}`,
-                  }))}
+                  metrics={form.config.metrics?.map(
+                    (m: MetricConfig, idx: number) => ({
+                      ...m,
+                      label:
+                        form.metricLabelStore.metricLabels[idx] ||
+                        m.label ||
+                        `Métrique ${idx + 1}`,
+                    })
+                  )}
                   metricStyles={form.config.metricStyles || []}
                   handleMetricStyleChange={(idx, field, value) => {
                     const newStyles = [...(form.config.metricStyles || [])];

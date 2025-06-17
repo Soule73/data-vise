@@ -16,7 +16,6 @@ export function useKPIGroupVM(config: any) {
   const columns = config.widgetParams?.columns || 2;
   const groupTitle = config.widgetParams?.title || "KPI Group";
 
-  // Nouvelle logique : calcul des widgetParams spécifiques à chaque KPI
   const widgetParamsList = useMemo(
     () =>
       metrics.map((metric: any, idx: number) => ({

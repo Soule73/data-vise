@@ -2,6 +2,7 @@ import AuthLayout from "@/presentation/components/AuthLayout";
 import InputField from "@/presentation/components/InputField";
 import Button from "@/presentation/components/Button";
 import { useRegisterForm } from "@/core/hooks/useRegisterForm";
+import logoDataVise from "../../../logo-datavise.svg";
 
 export default function Register() {
   const {
@@ -16,7 +17,7 @@ export default function Register() {
   return (
     <AuthLayout
       title="Créer un compte"
-      logoUrl="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+      logoUrl={logoDataVise}
       bottomText={
         <>
           Déjà inscrit ?{" "}

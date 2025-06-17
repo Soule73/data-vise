@@ -2,13 +2,14 @@ import { useCardWidgetVM } from "@/core/hooks/visualizations/useCardWidgetVM";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import InvalideConfigWidget from "./charts/InvalideConfigWidget";
 import NoDataWidget from "./charts/NoDataWidget";
+import type { CardWidgetConfig } from "@/core/types/visualization";
 
 export default function CardWidget({
   data,
   config,
 }: {
-  data: any[];
-  config: any;
+  data: Record<string, any>[];
+  config: CardWidgetConfig;
 }) {
   if (
     !data ||

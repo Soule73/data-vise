@@ -1,3 +1,17 @@
+import type {
+  BarChartConfig,
+  LineChartConfig,
+  PieChartConfig,
+  TableWidgetConfig,
+  ScatterChartConfig,
+  BubbleChartConfig,
+  RadarChartConfig,
+  KPIWidgetConfig,
+  KPIGroupWidgetConfig,
+  CardWidgetConfig,
+} from "@/core/types/visualization";
+import type { Widget } from "@/core/models/Widget";
+
 // ======================================================
 // 1. Widgets & Configuration
 // ======================================================
@@ -14,57 +28,121 @@ export type WidgetType =
   | "kpi_group"
   | "card";
 
-export interface WidgetDefinition {
-  type: WidgetType;
+export type VisualizationWidgetPropsMap = {
+  bar: {
+    data: Record<string, unknown>[];
+    config: BarChartConfig;
+    editMode?: boolean;
+  };
+  line: {
+    data: Record<string, unknown>[];
+    config: LineChartConfig;
+    editMode?: boolean;
+  };
+  pie: {
+    data: Record<string, unknown>[];
+    config: PieChartConfig;
+    editMode?: boolean;
+  };
+  table: {
+    data: Record<string, unknown>[];
+    config: TableWidgetConfig;
+    editMode?: boolean;
+  };
+  scatter: {
+    data: Record<string, unknown>[];
+    config: ScatterChartConfig;
+    editMode?: boolean;
+  };
+  bubble: {
+    data: Record<string, unknown>[];
+    config: BubbleChartConfig;
+    editMode?: boolean;
+  };
+  radar: {
+    data: Record<string, unknown>[];
+    config: RadarChartConfig;
+    editMode?: boolean;
+  };
+  kpi: {
+    data: Record<string, unknown>[];
+    config: KPIWidgetConfig;
+    editMode?: boolean;
+  };
+  kpi_group: {
+    data: Record<string, unknown>[];
+    config: KPIGroupWidgetConfig;
+    editMode?: boolean;
+  };
+  card: {
+    data: Record<string, unknown>[];
+    config: CardWidgetConfig;
+    editMode?: boolean;
+  };
+};
+
+export type VisualizationWidgetProps<T extends WidgetType = WidgetType> =
+  VisualizationWidgetPropsMap[T];
+
+export interface WidgetDefinition<
+  T extends WidgetType = WidgetType,
+  TConfig = unknown
+> {
+  type: T;
   label: string;
-  component: React.ComponentType<any>;
-  configSchema: any;
-  // Optional: default configuration values
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; // Ajout de l'icône (composant SVG)
-  allowMultipleMetrics?: boolean; // Ajouté : permet de désactiver l'ajout multiple de métriques
-  hideBucket?: boolean; // cache la section bucket
-  enableFilter?: boolean; // active la section filtre
+  component: React.ComponentType<VisualizationWidgetProps<T>>;
+  configSchema: TConfig;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  allowMultipleMetrics?: boolean;
+  hideBucket?: boolean;
+  enableFilter?: boolean;
 }
 
 // --- Widget Configuration Sections
 
-export interface WidgetDataConfigSectionProps {
-  dataConfig: any;
-  config: any;
+export interface WidgetDataConfigSectionProps<
+  TDataConfig = unknown,
+  TConfig = unknown
+> {
+  dataConfig: TDataConfig;
+  config: TConfig;
   columns: string[];
-  handleConfigChange: (field: string, value: any) => void;
+  handleConfigChange: (field: string, value: unknown) => void;
   handleDragStart: (idx: number) => void;
   handleDragOver: (idx: number, e: React.DragEvent) => void;
   handleDrop: (idx: number) => void;
   handleMetricAggOrFieldChange?: (
     idx: number,
     field: "agg" | "field",
-    value: any
+    value: string
   ) => void;
 }
 
-export interface WidgetMetricStyleConfigSectionProps {
+export interface WidgetMetricStyleConfigSectionProps<
+  TMetric = unknown,
+  TMetricStyle = unknown
+> {
   type: WidgetType;
-  metrics: any[];
-  metricStyles: any[];
+  metrics: TMetric[];
+  metricStyles: TMetricStyle[];
   handleMetricStyleChange: (
     metricIdx: number,
     field: string,
-    value: any
+    value: unknown
   ) => void;
 }
 
-export interface WidgetParamsConfigSectionProps {
+export interface WidgetParamsConfigSectionProps<TConfig = unknown> {
   type: WidgetType;
-  config: any;
-  handleConfigChange: (field: string, value: any) => void;
+  config: TConfig;
+  handleConfigChange: (field: string, value: unknown) => void;
 }
 
-export interface WidgetStyleConfigSectionProps {
+export interface WidgetStyleConfigSectionProps<TConfig = unknown> {
   type: WidgetType;
-  config: any;
+  config: TConfig;
   columns: string[];
-  handleConfigChange: (field: string, value: any) => void;
+  handleConfigChange: (field: string, value: unknown) => void;
 }
 
 // --- Widget Modals & Selecteurs
@@ -86,7 +164,7 @@ export interface WidgetConfigFooterProps {
 export interface WidgetSelectModalProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (widget: any) => void;
+  onSelect: (widget: Widget) => void;
 }
 
 export interface WidgetSaveTitleModalProps {
@@ -107,13 +185,13 @@ export interface WidgetCreateSelectorResult {
   sourceId: string;
 }
 
-export interface WidgetFormInitialValues {
+export interface WidgetFormInitialValues<TConfig = unknown> {
   type?: WidgetType;
-  config?: any;
+  config?: TConfig;
   title?: string;
   sourceId?: string;
   columns?: string[];
-  dataPreview?: any[];
+  dataPreview?: Record<string, unknown>[];
   visibility?: "public" | "private";
   disableAutoConfig?: boolean;
 }

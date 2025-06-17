@@ -13,11 +13,27 @@ export function useDashboardGrid({
 }) {
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const gridWidth = isMobile ? 340 : 900;
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
   // Ajout d'un slot "Ajouter un widget" à la fin
   const slots = [...layout.filter((item) => !!item.widgetId), null];
+
+  // Responsive slot style centralisé
+  function getSlotStyle() {
+    if (isMobile) {
+      return {
+        width: "100%",
+        minWidth: "100%",
+        maxWidth: "100%",
+        minHeight: 300,
+        height: 300,
+      };
+    }
+    if (typeof window !== "undefined" && window.innerWidth < 1280) {
+      return { width: "48%", minWidth: "48%", maxWidth: "48%" };
+    }
+    return { width: "32%", minWidth: "32%", maxWidth: "32%" };
+  }
 
   // Trouver l'index réel dans le layout (hors slot null)
   const getLayoutIdx = (slotIdx: number) => {
@@ -80,8 +96,8 @@ export function useDashboardGrid({
     draggedIdx,
     hoveredIdx,
     isMobile,
-    gridWidth,
     slots,
+    getSlotStyle,
     getLayoutIdx,
     handleDragStart,
     handleDragOver,

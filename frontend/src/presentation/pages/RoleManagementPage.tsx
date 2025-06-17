@@ -1,3 +1,4 @@
+import type { Role, Permission } from "@/core/types/auth-types";
 import {
   PermissionGroup,
   RoleActions,
@@ -70,7 +71,7 @@ export default function RoleManagementPage() {
         <div>Chargement…</div>
       ) : (
         <div className="space-y-6">
-          {roles.map((role: any) => (
+          {roles.map((role: Role) => (
             <div
               key={role._id}
               className="bg-white dark:bg-gray-900 rounded p-4 border border-gray-200 dark:border-gray-700"
@@ -105,10 +106,10 @@ export default function RoleManagementPage() {
                       : role.description
                   }
                   onChangeName={(v) =>
-                    setEditRole((prev: any) => ({ ...prev, name: v }))
+                    setEditRole((prev: Role) => ({ ...prev, name: v }))
                   }
                   onChangeDescription={(v) =>
-                    setEditRole((prev: any) => ({ ...prev, description: v }))
+                    setEditRole((prev: Role) => ({ ...prev, description: v }))
                   }
                 />
               </div>
@@ -124,18 +125,18 @@ export default function RoleManagementPage() {
                     }
                     onChange={() => {
                       if (!editRole) return;
-                      setEditRole((prev: any) => ({
+                      setEditRole((prev: Role) => ({
                         ...prev,
                         permissions:
                           prev.permissions.length === permissions.length
                             ? []
-                            : permissions.map((p: any) => p._id),
+                            : permissions.map((p: Permission) => p._id),
                       }));
                       formHook.setValue(
                         "permissions",
                         editRole.permissions.length === permissions.length
                           ? []
-                          : permissions.map((p: any) => p._id)
+                          : permissions.map((p: Permission) => p._id)
                       );
                     }}
                     id={`select-all-edit-${role._id}`}
@@ -149,11 +150,11 @@ export default function RoleManagementPage() {
                     <PermissionGroup
                       key={model}
                       model={model}
-                      perms={perms as any[]}
+                      perms={perms as Permission[]}
                       checkedPerms={
                         editRoleId === role._id
                           ? editRole.permissions
-                          : role.permissions.map((p: any) => p._id)
+                          : role.permissions.map((p: string) => p)
                       }
                       onToggle={togglePermission}
                       editable={editRoleId === role._id}
@@ -170,7 +171,7 @@ export default function RoleManagementPage() {
           Toutes les permissions existantes
         </h2>
         <div className="flex flex-wrap gap-2">
-          {permissions.map((perm: any) => (
+          {permissions.map((perm: Permission) => (
             <span
               key={perm._id}
               className="inline-block bg-gray-100 dark:bg-gray-800 text-xs px-2 py-1 rounded border border-gray-200 dark:border-gray-700 mb-1"

@@ -2,6 +2,7 @@ import { useSourceData } from "@/core/hooks/useSourceData";
 import { WIDGETS } from "@/data/adapters/visualizations";
 import { useRef, useEffect, useMemo, useState } from "react";
 import type { DataSource } from "../types/data-source";
+import type { DashboardLayoutItem } from "@/core/types/dashboard-types";
 
 export function useGridItem({
   widget,
@@ -18,18 +19,16 @@ export function useGridItem({
   handleDragEnd,
   isMobile,
   item,
-  // --- Ajout config avancée ---
-  autoRefreshIntervalValue,
-  autoRefreshIntervalUnit,
   timeRangeFrom,
   timeRangeTo,
+  refreshMs,
 }: {
-  widget: any;
+  widget: DashboardLayoutItem["widget"];
   sources: DataSource[];
   idx: number;
-  hydratedLayout: any[];
+  hydratedLayout: DashboardLayoutItem[];
   editMode?: boolean;
-  onSwapLayout?: (newLayout: any[]) => void;
+  onSwapLayout?: (newLayout: DashboardLayoutItem[]) => void;
   hoveredIdx?: number | null;
   draggedIdx?: number | null;
   handleDragStart?: (idx: number) => void;
@@ -37,14 +36,12 @@ export function useGridItem({
   handleDrop?: (idx: number) => void;
   handleDragEnd?: () => void;
   isMobile?: boolean;
-  item?: any;
-  // --- Ajout config avancée ---
-  autoRefreshIntervalValue?: number;
-  autoRefreshIntervalUnit?: string;
+  item?: DashboardLayoutItem;
   timeRangeFrom?: string | null;
   timeRangeTo?: string | null;
+  refreshMs?: number;
 }) {
-  // Resize natif (extraction depuis useDashboardGrid)
+  // Resize natif
   function handleResize() {
     const widgetRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -104,7 +101,7 @@ export function useGridItem({
     return widgetRef;
   }
 
-  // Drag & drop props centralisés
+  // Drag & drop props
   const dragProps = useMemo(() => {
     if (!editMode) return {};
     return {
@@ -129,14 +126,14 @@ export function useGridItem({
     handleDragEnd,
   ]);
 
-  // Style props centralisés
+  // Style props
   const styleProps = useMemo(() => {
     let className =
-      "relative  rounded-lg transition-all shadow duration-200 overflow-hidden border-dashed border-2 border-spacing-4 ";
+      "relative  rounded-lg transition-all duration-200 overflow-hidden border-dashed border-2 border-spacing-4 ";
     if (editMode) {
       if (draggedIdx === idx) className += " opacity-60 border-blue-400 ";
       else if (hoveredIdx === idx) className += " border-blue-300 ";
-      else className += " border-gray-300 "; // Toujours une bordure visible en édition
+      else className += " border-gray-300 ";
       className += " cursor-move ";
     } else {
       className += " border-transparent ";
@@ -147,6 +144,7 @@ export function useGridItem({
       height: item?.height || undefined,
       minHeight: 120,
       ...(editMode && draggedIdx === idx ? { zIndex: 10 } : {}),
+      ...(editMode ? { resize: "both", overflow: "auto" } : {}),
     };
     return { className, style };
   }, [editMode, draggedIdx, hoveredIdx, idx, isMobile, item]);
@@ -155,55 +153,13 @@ export function useGridItem({
   const source = sources?.find(
     (s: DataSource) => String(s._id) === String(widget?.dataSourceId)
   );
-  // Calcul de l'intervalle de rafraîchissement en ms
-  let refreshMs: number | undefined = undefined;
   // On active le polling uniquement si la source possède un champ timestampField
   const hasTimestamp = !!source?.timestampField;
-  if (autoRefreshIntervalValue != null && hasTimestamp) {
-    if (autoRefreshIntervalValue && autoRefreshIntervalUnit) {
-      // Conversion en ms selon l'unité
-      const unit = autoRefreshIntervalUnit;
-      const value = autoRefreshIntervalValue;
-      switch (unit) {
-        case "second":
-          refreshMs = value * 1000;
-          break;
-        case "minute":
-          refreshMs = value * 60 * 1000;
-          break;
-        case "hour":
-          refreshMs = value * 60 * 60 * 1000;
-          break;
-        case "day":
-          refreshMs = value * 24 * 60 * 60 * 1000;
-          break;
-        case "week":
-          refreshMs = value * 7 * 24 * 60 * 60 * 1000;
-          break;
-        case "month":
-          refreshMs = value * 30 * 24 * 60 * 60 * 1000;
-          break;
-        case "year":
-          refreshMs = value * 365 * 24 * 60 * 60 * 1000;
-          break;
-        default:
-          refreshMs = undefined;
-      }
-    }
-  }
 
   // Log pour vérifier le polling
   useEffect(() => {
-    console.log({ hasTimestamp, refreshMs });
-  }, [
-    refreshMs,
-    hasTimestamp,
-    timeRangeFrom,
-    timeRangeTo,
-    autoRefreshIntervalValue,
-    widget?.widgetId,
-    idx,
-  ]);
+    console.log({ hasTimestamp });
+  }, [hasTimestamp, timeRangeFrom, timeRangeTo, widget?.widgetId, idx]);
 
   // Utilisation des options de plage temporelle pour le hook useSourceData
   const {

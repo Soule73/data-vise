@@ -3,13 +3,16 @@ import { ChartBarIcon } from "@heroicons/react/24/outline";
 import InvalideConfigWidget from "./InvalideConfigWidget";
 import NoDataWidget from "./NoDataWidget";
 import { useBubbleChartLogic } from "@/core/hooks/visualizations/useBubbleChartVM";
+import type { BubbleChartConfig } from "@/core/types/visualization";
 
 export default function BubbleChartWidget({
   data,
   config,
+  //@ts-ignore
+  editMode,
 }: {
-  data: any[];
-  config: any;
+  data: Record<string, any>[];
+  config: BubbleChartConfig;
   editMode?: boolean;
 }) {
   const { chartData, options, validDatasets } = useBubbleChartLogic(

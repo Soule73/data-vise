@@ -8,6 +8,8 @@ import Modal from "@/presentation/components/Modal";
 import { useWidgets } from "@/core/hooks/useWidgets";
 import { useUserStore } from "@/core/store/user";
 import { useSources } from "@/core/hooks/useSources";
+import type { DataSource } from "@/core/types/data-source";
+import type { Widget } from "@/core/models/Widget";
 
 export default function WidgetListPage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
@@ -18,9 +20,10 @@ export default function WidgetListPage() {
   // Chargement des widgets depuis l'API
   // Utilisation de useQuery pour gérer le chargement et la mise en cache
   const { data: widgets = [], isLoading } = useWidgets();
-  const widgetsArray = Array.isArray(widgets) ? widgets : [];
+  const widgetsArray: Widget[] = Array.isArray(widgets) ? widgets : [];
 
   const { data: sources = [] } = useSources();
+  const sourcesArray: DataSource[] = Array.isArray(sources) ? sources : [];
 
   // Utilisation de useMemo pour stabiliser columns et data
   const columns = useMemo(
@@ -34,19 +37,19 @@ export default function WidgetListPage() {
 
   const tableData = useMemo(
     () =>
-      widgetsArray.map((w: any) => ({
+      widgetsArray.map((w) => ({
         ...w,
         type: WIDGETS[w.type as keyof typeof WIDGETS]?.label || w.type,
         dataSourceId:
-          sources.find((s: any) => String(s._id) === String(w.dataSourceId))
+          sourcesArray.find((s) => String(s._id) === String(w.dataSourceId))
             ?.name || w.dataSourceId,
       })),
-    [widgetsArray, sources]
+    [widgetsArray, sourcesArray]
   );
 
   // Ajout de l'état pour la modal de configuration
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedConfig, setSelectedConfig] = useState<any>(null);
+  const [selectedConfig, setSelectedConfig] = useState<Widget | null>(null);
   const hasPermission = useUserStore((s) => s.hasPermission);
 
   return (
@@ -76,11 +79,13 @@ export default function WidgetListPage() {
           actionsColumn={{
             key: "actions",
             label: "Actions",
-            render: (row: any) => (
+            render: (row: Widget) => (
               <div className="flex gap-2">
                 {hasPermission("widget:canUpdate") && (
                   <Link
-                    to={ROUTES.editWidget.replace(":id", row._id)}
+                    to={
+                      row._id ? ROUTES.editWidget.replace(":id", row._id) : "#"
+                    }
                     className="text-xs text-indigo-600 underline hover:text-indigo-800"
                   >
                     Modifier
@@ -90,7 +95,7 @@ export default function WidgetListPage() {
                   type="button"
                   className="text-xs text-indigo-500 underline hover:text-indigo-700"
                   onClick={() => {
-                    setSelectedConfig(row.config);
+                    setSelectedConfig(row);
                     setModalOpen(true);
                   }}
                 >

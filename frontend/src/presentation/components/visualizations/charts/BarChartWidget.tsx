@@ -12,6 +12,7 @@ import { Bar } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import InvalideConfigWidget from "./InvalideConfigWidget";
 import NoDataWidget from "./NoDataWidget";
+import type { BarChartConfig } from "@/core/types/visualization";
 
 ChartJS.register(
   BarElement,
@@ -25,9 +26,11 @@ ChartJS.register(
 export default function BarChartWidget({
   data,
   config,
+  //@ts-ignore
+  editMode,
 }: {
-  data: any[];
-  config: any;
+  data: Record<string, any>[];
+  config: BarChartConfig;
   editMode?: boolean;
 }) {
   if (

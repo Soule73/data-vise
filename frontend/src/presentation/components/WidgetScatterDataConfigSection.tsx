@@ -1,3 +1,4 @@
+import type { ScatterMetricConfig } from "@/core/types/metric-bucket-types";
 import SelectField from "@/presentation/components/SelectField";
 import InputField from "@/presentation/components/InputField";
 import Button from "@/presentation/components/Button";
@@ -6,9 +7,17 @@ import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 
 interface WidgetScatterDataConfigSectionProps {
-  metrics: any[];
+  metrics: ScatterMetricConfig[];
   columns: string[];
-  handleConfigChange: (field: string, value: any) => void;
+  handleConfigChange: (
+    field: string,
+    value:
+      | string
+      | number
+      | boolean
+      | ScatterMetricConfig
+      | ScatterMetricConfig[]
+  ) => void;
 }
 
 export default function WidgetScatterDataConfigSection({
@@ -25,7 +34,7 @@ export default function WidgetScatterDataConfigSection({
       <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
         <div className="font-semibold mb-1">Datasets (x, y)</div>
         <div className="space-y-2">
-          {metrics.map((dataset: any, idx: number) => (
+          {metrics.map((dataset: ScatterMetricConfig, idx: number) => (
             <div
               key={idx}
               className="flex flex-col border-b pb-2 mb-2 relative group bg-white/60 dark:bg-gray-900/60 p-2 border-gray-200 dark:border-gray-700 "
@@ -101,8 +110,9 @@ export default function WidgetScatterDataConfigSection({
                     label="Label du dataset"
                     value={dataset.label || ""}
                     onChange={(e) => {
+                      const target = e.target as HTMLInputElement;
                       const newMetrics = [...metrics];
-                      newMetrics[idx] = { ...dataset, label: e.target.value };
+                      newMetrics[idx] = { ...dataset, label: target.value };
                       handleConfigChange("metrics", newMetrics);
                     }}
                     name={`scatter-label-${idx}`}
@@ -120,7 +130,13 @@ export default function WidgetScatterDataConfigSection({
           onClick={() => {
             handleConfigChange("metrics", [
               ...metrics,
-              { x: columns[0] || "", y: columns[1] || "", label: "" },
+              {
+                agg: "none",
+                field: "",
+                x: columns[0] || "",
+                y: columns[1] || "",
+                label: "",
+              },
             ]);
           }}
         >

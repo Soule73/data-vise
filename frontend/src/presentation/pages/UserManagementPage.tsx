@@ -11,13 +11,14 @@ import AlertModal from "@/presentation/components/AlertModal";
 import { useEffect } from "react";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { Link } from "react-router-dom";
-import type { User } from "@/core/types/auth-types";
+import type { User, Role } from "@/core/types/auth-types";
 import { useUserStore } from "@/core/store/user";
 
-function getErrorMsg(err: any) {
+function getErrorMsg(err: unknown) {
   if (!err) return undefined;
   if (typeof err === "string") return err;
-  if (typeof err.message === "string") return err.message;
+  if (typeof (err as { message?: string }).message === "string")
+    return (err as { message?: string }).message;
   return undefined;
 }
 
@@ -56,12 +57,14 @@ export default function UserManagementPage() {
   });
 
   // Synchronise le form local et react-hook-form
-  function handleFormChange(e: any) {
-    let value = e.target.value;
+  function handleFormChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
+    let value: string | number = e.target.value;
     if (value && typeof value === "object" && "value" in value) {
-      value = value.value;
+      value = (value as { value: string | number }).value;
     }
-    setForm((f: any) => ({ ...f, [e.target.name]: value }));
+    setForm((f: User) => ({ ...f, [e.target.name]: value }));
     formHook.setValue(e.target.name, value);
   }
 
@@ -69,11 +72,11 @@ export default function UserManagementPage() {
   const columns = [
     { key: "email", label: "Email" },
     { key: "username", label: "Nom d’utilisateur" },
-    { key: "roleId", label: "Rôle", render: (u: any) => u.roleId?.name },
+    { key: "roleId", label: "Rôle", render: (u: User) => u.roleId?.name },
   ];
 
   const hasPermission = useUserStore((s) => s.hasPermission);
-  const rolesList = roles.map((r: any) => ({ value: r._id, label: r.name }));
+  const rolesList = roles.map((r: Role) => ({ value: r._id, label: r.name }));
 
   return (
     <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow-sm">

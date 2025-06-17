@@ -1,27 +1,19 @@
 import dataSourceService from "@/services/dataSourceService";
 import { Request, Response, NextFunction } from "express";
-// Typage correct pour req.file
-import type { Multer } from "multer";
+import fs from "fs";
+import { handleServiceResult } from "@/utils/api";
 
 const dataSourceController = {
   async list(req: Request, res: Response, next: NextFunction) {
     const result = await dataSourceService.list();
-    if ("error" in result)
-      return res
-        .status(500)
-        .json({ error: (result as any).error, status: 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
   async create(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).user?.id;
     const file = (req as any).file as Express.Multer.File | undefined;
     let filePath = undefined;
     if (file) {
-      console.log("[BACKEND][CREATE] Fichier reçu:", file);
-      // Stockage du chemin relatif pour la BDD
       filePath = `uploads/${file.filename}`;
-    } else {
-      console.log("[BACKEND][CREATE] Pas de fichier uploadé");
     }
     const result = await dataSourceService.create({
       ...req.body,
@@ -30,42 +22,25 @@ const dataSourceController = {
       endpoint: file ? undefined : req.body.endpoint,
       ownerId: userId,
     });
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.status(201).json({ data: result.data });
+    return handleServiceResult(res, result, 201);
   },
   async getById(req: Request, res: Response, next: NextFunction) {
     const result = await dataSourceService.getById(req.params.id);
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
   async update(req: Request, res: Response, next: NextFunction) {
     const result = await dataSourceService.update(req.params.id, req.body);
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
   async remove(req: Request, res: Response, next: NextFunction) {
     const result = await dataSourceService.remove(req.params.id);
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
   async detectColumns(req: Request, res: Response, next: NextFunction) {
     const { type, endpoint, filePath } = req.body;
     const file = (req as any).file as Express.Multer.File | undefined;
     let tempFilePath = filePath;
     if (file) {
-      console.log("[BACKEND][DETECT] Fichier temporaire reçu:", file);
       tempFilePath = file.path;
     }
     const result = await dataSourceService.detectColumns({
@@ -75,19 +50,9 @@ const dataSourceController = {
     });
     // Nettoyage du fichier temporaire uploadé
     if (file) {
-      const fs = require("fs");
-      fs.unlink(file.path, () => {
-        console.log(
-          "[BACKEND][DETECT] Fichier temporaire supprimé:",
-          file.path
-        );
-      });
+      fs.unlink(file.path, () => {});
     }
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
   async demoVentes(req: Request, res: Response) {
     // Pas besoin de service ici, simple envoi de fichier
@@ -102,11 +67,7 @@ const dataSourceController = {
       from: from as string | undefined,
       to: to as string | undefined,
     });
-    if ("error" in result)
-      return res
-        .status(result.status ?? 500)
-        .json({ error: result.error, status: result.status ?? 500 });
-    res.json({ data: result.data });
+    return handleServiceResult(res, result);
   },
 };
 

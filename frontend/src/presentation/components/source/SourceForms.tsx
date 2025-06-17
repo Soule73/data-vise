@@ -2,9 +2,13 @@ import Button from "@/presentation/components/Button";
 import InputField from "@/presentation/components/InputField";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { dataSourceSchema, type DataSourceForm } from "@/core/validation/datasource";
+import {
+  dataSourceSchema,
+  type DataSourceForm,
+} from "@/core/validation/datasource";
 import { useState } from "react";
 import { updateSource } from "@/data/services/datasource";
+import type { DataSource } from "@/core/types/data-source";
 
 export function EditSourceForm({
   source,
@@ -12,7 +16,7 @@ export function EditSourceForm({
   afterEdit,
   onError,
 }: {
-  source: any;
+  source: DataSource;
   onClose: () => void;
   afterEdit: () => void;
   onError?: (message: string) => void;
@@ -37,10 +41,15 @@ export function EditSourceForm({
       await updateSource(source._id, data);
       afterEdit();
       onClose();
-    } catch (e: any) {
-      const msg = e.response?.data?.message || "Erreur lors de la modification";
-      setGlobalError(msg);
-      if (onError) onError(msg);
+    } catch (e) {
+      setGlobalError(
+        (e as { response?: { data?: { message?: string } } }).response?.data
+          ?.message || "Erreur lors de la modification de la source"
+      );
+      onError?.(
+        (e as { response?: { data?: { message?: string } } }).response?.data
+          ?.message || "Erreur lors de la modification de la source"
+      );
     }
   };
 
@@ -94,7 +103,7 @@ export function DeleteSourceForm({
   onCancel,
   loading,
 }: {
-  source: any;
+  source: DataSource;
   onDelete: () => void;
   onCancel: () => void;
   loading: boolean;

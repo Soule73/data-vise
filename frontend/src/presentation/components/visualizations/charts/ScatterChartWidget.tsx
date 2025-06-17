@@ -12,6 +12,7 @@ import { Scatter } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import InvalideConfigWidget from "./InvalideConfigWidget";
 import NoDataWidget from "./NoDataWidget";
+import type { ScatterChartConfig } from "@/core/types/visualization";
 
 ChartJS.register(
   ScatterController,
@@ -25,9 +26,11 @@ ChartJS.register(
 export default function ScatterChartWidget({
   data,
   config,
+  //@ts-ignore
+  editMode,
 }: {
-  data: any[];
-  config: any;
+  data: Record<string, any>[];
+  config: ScatterChartConfig;
   editMode?: boolean;
 }) {
   const { chartData, options, validDatasets } = useScatterChartLogic(

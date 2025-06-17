@@ -9,6 +9,7 @@ import { EyeIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/core/constants/routes";
 import { useUserStore } from "@/core/store/user";
+import type { Dashboard } from "@/core/types/dashboard-model";
 
 export default function DashboardListPage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
@@ -28,7 +29,7 @@ export default function DashboardListPage() {
     {
       key: "widgets",
       label: "Widgets",
-      render: (row: any) => row.layout?.length || 0,
+      render: (row: Dashboard) => row.layout?.length || 0,
     },
   ];
 
@@ -67,7 +68,7 @@ export default function DashboardListPage() {
             actionsColumn={{
               key: "actions",
               label: "",
-              render: (row: any) =>
+              render: (row: Dashboard) =>
                 hasPermission("dashboard:canView") && (
                   <Button
                     color="gray"

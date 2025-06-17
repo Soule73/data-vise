@@ -2,6 +2,7 @@ import AuthLayout from "@/presentation/components/AuthLayout";
 import InputField from "@/presentation/components/InputField";
 import { useLoginForm } from "@/core/hooks/useLoginForm";
 import Button from "@/presentation/components/Button";
+import logoDataVise from "../../../logo-datavise.svg";
 
 export default function Login() {
   const {
@@ -16,7 +17,7 @@ export default function Login() {
   return (
     <AuthLayout
       title="Connexion à votre compte"
-      logoUrl="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+      logoUrl={logoDataVise}
       // bottomText={
       //   <>
       //     Pas encore de compte ?{" "}

@@ -1,67 +1,25 @@
 import Dashboard from "../models/Dashboard";
 import Widget from "../models/Widget";
-
-// Utilitaire pour nettoyer la timeRange selon le mode
-function cleanTimeRange(timeRange: any) {
-  if (!timeRange) return {};
-  // Mode relatif : intervalValue + intervalUnit
-  if (timeRange.intervalValue && timeRange.intervalUnit) {
-    return {
-      intervalValue: timeRange.intervalValue,
-      intervalUnit: timeRange.intervalUnit,
-    };
-  }
-  // Mode absolu : from/to
-  const cleaned: any = {};
-  if (timeRange.from)
-    cleaned.from =
-      typeof timeRange.from === "string"
-        ? new Date(timeRange.from)
-        : timeRange.from;
-  if (timeRange.to)
-    cleaned.to =
-      typeof timeRange.to === "string" ? new Date(timeRange.to) : timeRange.to;
-  return cleaned;
-}
+import type {
+  IDashboard,
+  DashboardCreatePayload,
+  DashboardUpdatePayload,
+} from "@/types/dashboardType";
+import type { IWidget } from "@/types/widgetType";
+import type { ApiResponse } from "@/types/api";
+import { cleanTimeRange } from "@/utils/dataSourceUtils";
 
 const dashboardService = {
-  async getMyDashboard(userId: string) {
-    let dashboard = await Dashboard.findOne({ userId });
-    if (!dashboard) {
-      dashboard = await Dashboard.create({
-        userId,
-        ownerId: userId,
-        title: "Mon dashboard",
-        layout: [],
-      });
-    }
-    const layout = dashboard.layout || [];
-    const widgetIds = layout.map((item: any) => item.widgetId);
-    const widgets = await Widget.find({ widgetId: { $in: widgetIds } });
-    const widgetMap = new Map(widgets.map((w) => [w.widgetId, w]));
-    const notFound = widgetIds.filter((id) => !widgetMap.has(id));
-    if (notFound.length > 0) {
-      console.warn("Widget(s) non trouvés pour le dashboard:", notFound);
-    }
-    const enrichedLayout = layout.map((item: any) => {
-      const base = item._doc ? item._doc : item;
-      return {
-        widgetId: base.widgetId,
-        w: base.w,
-        h: base.h,
-        x: base.x,
-        y: base.y,
-        widget: widgetMap.get(base.widgetId) || null,
-      };
-    });
-    return { data: { ...dashboard.toObject(), layout: enrichedLayout } };
-  },
-  async createDashboard(userId: string, data: any) {
+  async createDashboard(
+    userId: string,
+    data: DashboardCreatePayload
+  ): Promise<ApiResponse<IDashboard>> {
     // Nettoyage de la timeRange selon le mode
     const timeRange = cleanTimeRange(data.timeRange);
     const dashboard = await Dashboard.create({
       ...data,
       userId,
+      visibility: data.visibility ?? "private",
       autoRefreshInterval: data.autoRefreshInterval ?? 60000,
       autoRefreshIntervalValue: data.autoRefreshIntervalValue,
       autoRefreshIntervalUnit: data.autoRefreshIntervalUnit,
@@ -69,19 +27,23 @@ const dashboardService = {
     });
     return { data: dashboard };
   },
-  async getDashboardById(id: string) {
+  async getDashboardById(id: string): Promise<ApiResponse<IDashboard>> {
     const dashboard = await Dashboard.findById(id);
     if (!dashboard)
       return { error: { message: "Dashboard non trouvé." }, status: 404 };
     return { data: dashboard };
   },
-  async updateDashboard(id: string, data: any) {
+  async updateDashboard(
+    id: string,
+    data: DashboardUpdatePayload
+  ): Promise<ApiResponse<IDashboard>> {
     // Nettoyage de la timeRange selon le mode
     const timeRange = cleanTimeRange(data.timeRange);
-    const dashboard = await Dashboard.findByIdAndUpdate(
+    const updated = await Dashboard.findByIdAndUpdate(
       id,
       {
         ...data,
+        visibility: data.visibility ?? "private",
         autoRefreshInterval: data.autoRefreshInterval ?? 60000,
         autoRefreshIntervalValue: data.autoRefreshIntervalValue,
         autoRefreshIntervalUnit: data.autoRefreshIntervalUnit,
@@ -89,21 +51,24 @@ const dashboardService = {
       },
       { new: true }
     );
-    if (!dashboard)
+    if (!updated)
       return { error: { message: "Dashboard non trouvé." }, status: 404 };
-    return { data: dashboard };
+    return { data: updated };
   },
-  async deleteDashboard(id: string) {
+  async deleteDashboard(id: string): Promise<ApiResponse<{ message: string }>> {
     const dashboard = await Dashboard.findByIdAndDelete(id);
     if (!dashboard)
       return { error: { message: "Dashboard non trouvé." }, status: 404 };
     return { data: { message: "Dashboard supprimé." } };
   },
-  async debugWidgets() {
+  async debugWidgets(): Promise<IWidget[]> {
     return await Widget.find({}, { widgetId: 1, _id: 1, title: 1 });
   },
-  async listUserDashboards(userId: string) {
-    return await Dashboard.find({ ownerId: userId });
+  async listUserDashboards(userId: string): Promise<ApiResponse<IDashboard[]>> {
+    const dashboards = await Dashboard.find({
+      $or: [{ ownerId: userId }, { visibility: "public" }],
+    });
+    return { data: dashboards };
   },
 };
 

@@ -8,6 +8,12 @@ import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import { useMetricUICollapseStore } from "@/core/store/metricUI";
 import type { WidgetMetricStyleConfigSectionProps } from "@/core/types/widget-types";
 
+interface MetricStyleFieldSchema {
+  label?: string;
+  default?: string | number | boolean;
+  inputType?: "color" | "number" | "text";
+}
+
 export default function WidgetMetricStyleConfigSection({
   type,
   metrics,
@@ -15,7 +21,17 @@ export default function WidgetMetricStyleConfigSection({
   handleMetricStyleChange,
 }: WidgetMetricStyleConfigSectionProps) {
   const widgetDef = WIDGETS[type];
-  const metricStyleSchema = widgetDef.configSchema.metricStyles || {};
+  const metricStyleSchema =
+    (
+      widgetDef.configSchema as {
+        metricStyles?: Record<string, MetricStyleFieldSchema>;
+      }
+    )?.metricStyles || {};
+  const safeMetricStyles = (metricStyles ?? []) as Record<
+    string,
+    string | number | boolean
+  >[];
+  const safeMetrics = (metrics ?? []) as { label?: string }[];
   const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
   const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
 
@@ -27,11 +43,7 @@ export default function WidgetMetricStyleConfigSection({
           <div className="font-semibold mb-2">Style de la carte</div>
           <div className="grid grid-cols-2 gap-2">
             {Object.entries(metricStyleSchema).map(([field, metaRaw]) => {
-              const meta = metaRaw as {
-                label?: string;
-                default?: any;
-                inputType?: string;
-              };
+              const meta = metaRaw as MetricStyleFieldSchema;
               const label = meta.label || field;
               const defaultValue = meta.default;
               if (meta.inputType === "color") {
@@ -39,7 +51,9 @@ export default function WidgetMetricStyleConfigSection({
                   <ColorField
                     key={field}
                     label={label}
-                    value={metricStyles?.[0]?.[field] ?? defaultValue}
+                    value={String(
+                      safeMetricStyles?.[0]?.[field] ?? defaultValue
+                    )}
                     onChange={(val) => handleMetricStyleChange(0, field, val)}
                     name={`metric-style-0-${field}`}
                     id={`metric-style-0-${field}`}
@@ -52,7 +66,9 @@ export default function WidgetMetricStyleConfigSection({
                     key={field}
                     label={label}
                     type="number"
-                    value={metricStyles?.[0]?.[field] ?? defaultValue ?? ""}
+                    value={String(
+                      safeMetricStyles?.[0]?.[field] ?? defaultValue
+                    )}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleMetricStyleChange(0, field, Number(e.target.value))
                     }
@@ -71,7 +87,7 @@ export default function WidgetMetricStyleConfigSection({
 
   return (
     <div className="space-y-4">
-      {metrics.map((metric, idx) => (
+      {safeMetrics.map((metric, idx) => (
         <div key={idx} className="rounded p-3 bg-gray-50">
           <div
             className="flex items-center justify-start cursor-pointer mb-2"
@@ -110,11 +126,11 @@ export default function WidgetMetricStyleConfigSection({
                     <ColorField
                       key={field}
                       label={label}
-                      value={
-                        metricStyles[idx]?.[field] ??
-                        defaultValue ??
-                        (field === "borderColor" ? "#000000" : "#2563eb")
-                      }
+                      value={String(
+                        safeMetricStyles[idx]?.[field] ??
+                          defaultValue ??
+                          (field === "borderColor" ? "#000000" : "#2563eb")
+                      )}
                       onChange={(val) =>
                         handleMetricStyleChange(idx, field, val)
                       }
@@ -129,7 +145,9 @@ export default function WidgetMetricStyleConfigSection({
                       key={field}
                       label={label}
                       type="number"
-                      value={metricStyles[idx]?.[field] ?? defaultValue ?? ""}
+                      value={String(
+                        safeMetricStyles[idx]?.[field] ?? defaultValue ?? ""
+                      )}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         handleMetricStyleChange(
                           idx,

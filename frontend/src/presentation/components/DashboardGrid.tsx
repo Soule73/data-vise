@@ -16,11 +16,9 @@ export default function DashboardGrid({
   isLoading = false,
   hasUnsavedChanges = false,
   handleAddWidget,
-  // --- Props de configuration avancée ---
-  autoRefreshIntervalValue,
-  autoRefreshIntervalUnit,
   timeRangeFrom,
   timeRangeTo,
+  refreshMs,
 }: DashboardGridProps) {
   const {
     data: widgets = [],
@@ -45,8 +43,8 @@ export default function DashboardGrid({
     draggedIdx,
     hoveredIdx,
     isMobile,
-    gridWidth,
     slots,
+    getSlotStyle, // <-- Utilisation de la fonction centralisée
     handleDragStart,
     handleDragOver,
     handleDragEnd,
@@ -77,11 +75,9 @@ export default function DashboardGrid({
           : ""
       }`}
       style={{
-        gap: 12,
-        maxWidth: gridWidth,
-        margin: "0 auto",
-        alignItems: "stretch",
-        // minHeight: 320,
+        gap: 8,
+        // margin: "0 auto",
+        // alignItems: "stretch",
       }}
     >
       {slots.map((item, idx) => {
@@ -91,7 +87,7 @@ export default function DashboardGrid({
             <div
               key="add-slot"
               className="relative min-h-[160px] w-full max-w-full border-2 border-dashed rounded-lg flex items-center justify-center text-gray-400 hover:border-indigo-400 hover:text-indigo-600 cursor-pointer select-none overflow-x-auto"
-              style={{ minWidth: "48%", minHeight: 300, flex: "1 1 48%" }}
+              style={{ ...getSlotStyle(), minHeight: 300 }}
               onClick={(e) => {
                 if (editMode && onSwapLayout) {
                   onSwapLayout(layout);
@@ -124,11 +120,9 @@ export default function DashboardGrid({
             sources={sources}
             onRemove={editMode ? () => handleRemove(idx) : undefined}
             onSwapLayout={handleSwapLayout}
-            // --- Ajout config avancée ---
-            autoRefreshIntervalValue={autoRefreshIntervalValue}
-            autoRefreshIntervalUnit={autoRefreshIntervalUnit}
             timeRangeFrom={timeRangeFrom}
             timeRangeTo={timeRangeTo}
+            refreshMs={refreshMs}
           />
         );
       })}

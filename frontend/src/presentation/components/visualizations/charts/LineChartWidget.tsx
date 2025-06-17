@@ -14,6 +14,7 @@ import {
 import { Line } from "react-chartjs-2";
 import InvalideConfigWidget from "./InvalideConfigWidget";
 import NoDataWidget from "./NoDataWidget";
+import type { LineChartConfig } from "@/core/types/visualization";
 
 ChartJS.register(
   LineElement,
@@ -29,9 +30,11 @@ ChartJS.register(
 export default function LineChartWidget({
   data,
   config,
+  //@ts-ignore
+  editMode,
 }: {
-  data: any[];
-  config: any;
+  data: Record<string, any>[];
+  config: LineChartConfig;
   editMode?: boolean;
 }) {
   if (

@@ -44,6 +44,11 @@ const DashboardSchema = new Schema(
     title: { type: String, required: true },
     layout: { type: [DashboardLayoutItemSchema], default: [] },
     ownerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    visibility: {
+      type: String,
+      enum: ["public", "private"],
+      default: "private",
+    },
     history: { type: [DashboardHistoryItemSchema], default: [] },
     // Auto-refresh config
     autoRefreshInterval: { type: Number, default: 60000 }, // ms, 1min par défaut

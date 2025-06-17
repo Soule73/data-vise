@@ -3,13 +3,16 @@ import { Pie } from "react-chartjs-2";
 import { ChartPieIcon } from "@heroicons/react/24/outline";
 import { InvalideConfigWidget } from "./InvalideConfigWidget";
 import NoDataWidget from "./NoDataWidget";
+import type { PieChartConfig } from "@/core/types/visualization";
 
 export default function PieChartWidget({
   data,
   config,
+  //@ts-ignore
+  editMode,
 }: {
-  data: any[];
-  config: any;
+  data: Record<string, any>[];
+  config: PieChartConfig;
   editMode?: boolean;
 }) {
   if (

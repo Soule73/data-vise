@@ -3,6 +3,7 @@ import { devtools } from "zustand/middleware";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import type { Permission, PermissionStore } from "../types/auth-types";
+import api from "@/data/services/api";
 
 export const usePermissionStore = create<PermissionStore>()(
   devtools((set) => ({
@@ -19,13 +20,8 @@ export function useGlobalPermissions() {
   // Utilise react-query pour le cache, mais ne refetch pas inutilement
   const { data } = useQuery({
     queryKey: ["permissions"],
-    queryFn: async () =>
-      (
-        await (
-          await import("@/data/services/api")
-        ).default.get("/auth/permissions")
-      ).data,
-    staleTime: 1000 * 60 * 60 * 24, // 24h
+    queryFn: async () => (await api.get("/auth/permissions")).data,
+    staleTime: 1000 * 60 * 60 * 24,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,

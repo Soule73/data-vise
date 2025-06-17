@@ -5,7 +5,7 @@ import { useSidebarStore } from "@/core/store/sidebar";
 import { Link } from "react-router-dom";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { ROUTES } from "@/core/constants/routes";
-import logoDataVise from "/logo-datavise.svg";
+import logoDataVise from "../../logo-datavise.svg";
 import { useEffect } from "react";
 
 export default function Navbar() {

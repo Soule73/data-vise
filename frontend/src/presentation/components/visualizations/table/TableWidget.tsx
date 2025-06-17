@@ -9,7 +9,7 @@ export default function TableWidget({
   data,
   config,
 }: {
-  data: any[];
+  data: Record<string, any>[];
   config: TableWidgetConfig;
   editMode?: boolean;
 }) {

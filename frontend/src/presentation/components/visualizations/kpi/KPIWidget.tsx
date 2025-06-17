@@ -8,13 +8,14 @@ import {
 import { useKPIWidgetVM } from "@/core/hooks/visualizations/useKPIWidgetVM";
 import InvalideConfigWidget from "../charts/InvalideConfigWidget";
 import NoDataWidget from "../charts/NoDataWidget";
+import type { KPIWidgetConfig } from "@/core/types/visualization";
 
 export default function KPIWidget({
   data,
   config,
 }: {
-  data: any[];
-  config: any;
+  data: Record<string, any>[];
+  config: KPIWidgetConfig;
 }) {
   if (
     !data ||
@@ -65,7 +66,7 @@ export default function KPIWidget({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-white dark:bg-gray-900 shadow w-full max-w-full rounded-lg ">
+    <div className="flex flex-col  shadow items-center justify-center h-full bg-white dark:bg-gray-900 w-full max-w-full rounded-lg ">
       <span className="text-xs text-gray-500 dark:text-gray-400 mb-1">
         {title}
       </span>

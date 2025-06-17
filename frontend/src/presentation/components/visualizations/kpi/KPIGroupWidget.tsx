@@ -4,13 +4,15 @@ import NoDataWidget from "../charts/NoDataWidget";
 import KPIWidget from "./KPIWidget";
 import { useKPIGroupVM } from "@/core/hooks/visualizations/useKPIGroupVM";
 import { useEffect, useState } from "react";
+import type { KPIGroupWidgetConfig } from "@/core/types/visualization";
+import type { MetricConfig } from "@/core/types/metric-bucket-types";
 
 export default function KPIGroupWidget({
   data,
   config,
 }: {
-  data: any[];
-  config: any;
+  data: Record<string, any>[];
+  config: KPIGroupWidgetConfig;
 }) {
   if (
     !data ||
@@ -30,16 +32,9 @@ export default function KPIGroupWidget({
     );
   }
 
-  const {
-    metrics,
-    metricStyles,
-    filters,
-    columns,
-    // groupTitle,
-    widgetParamsList,
-  } = useKPIGroupVM(config);
+  const { metrics, metricStyles, filters, columns, widgetParamsList } =
+    useKPIGroupVM(config);
 
-  // Responsive columns: 1 colonne sur mobile, columns à partir de sm
   const [gridColumns, setGridColumns] = useState(1);
 
   useEffect(() => {
@@ -56,27 +51,25 @@ export default function KPIGroupWidget({
   }, [columns]);
 
   return (
-    // <div className="flex flex-col items-center justify-between h-full w-full">
-    //   {/* <span className="text-xs mt-2 h-4">{groupTitle}</span> */}
     <div
       className="grid gap-4 w-full h-full"
       style={{
         gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
       }}
     >
-      {metrics.map((metric: any, idx: number) => (
+      {metrics.map((metric: MetricConfig, idx: number) => (
         <KPIWidget
           key={idx}
           data={data}
           config={{
             metrics: [metric],
             metricStyles: [metricStyles[idx] || {}],
-            filter: filters[idx] || undefined, // applique le filtre spécifique à chaque KPI
+            filters: filters[idx] ? [filters[idx]] : undefined,
             widgetParams: widgetParamsList[idx],
+            bucket: config.bucket,
           }}
         />
       ))}
     </div>
-    // {/* </div> */}
   );
 }

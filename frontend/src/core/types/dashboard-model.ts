@@ -14,7 +14,7 @@ export interface DashboardTimeRange {
   intervalUnit?: IntervalUnit; // unité (minute, heure, etc.)
 }
 
-export interface DashboardModel {
+export interface Dashboard {
   _id?: string;
   title: string;
   layout: any[];
@@ -23,6 +23,7 @@ export interface DashboardModel {
   autoRefreshIntervalValue?: number; // valeur numérique (ex: 5)
   autoRefreshIntervalUnit?: IntervalUnit; // unité (minute, heure, etc.)
   timeRange: DashboardTimeRange;
+  visibility?: "public" | "private";
   createdAt?: string;
   updatedAt?: string;
 }

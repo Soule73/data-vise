@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { useUserStore } from "@/core/store/user";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { useEffect } from "react";
+import type { DataSource } from "@/core/types/data-source";
 
 export default function SourcesPage() {
   const {
@@ -40,7 +41,7 @@ export default function SourcesPage() {
     {
       key: "name",
       label: "Nom",
-      render: (row: any) => (
+      render: (row: DataSource) => (
         <span className="font-medium text-gray-900 whitespace-nowrap dark:text-white">
           {row.name}
         </span>
@@ -53,7 +54,7 @@ export default function SourcesPage() {
     {
       key: "endpoint",
       label: "Endpoint",
-      render: (row: any) => (
+      render: (row: DataSource) => (
         <span className="font-mono text-xs break-all">{row.endpoint}</span>
       ),
     },
@@ -88,7 +89,7 @@ export default function SourcesPage() {
               actionsColumn={{
                 key: "empty",
                 label: "",
-                render: (row: any) => (
+                render: (row: DataSource) => (
                   <div className="flex gap-2">
                     {hasPermission("datasource:canUpdate") && (
                       <Button

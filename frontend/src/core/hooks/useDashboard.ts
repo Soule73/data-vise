@@ -11,6 +11,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { DashboardLayoutItem } from "../types/dashboard-types";
 import { useSources } from "./useSources";
 import type { IntervalUnit } from "@/core/types/dashboard-model";
+import { intervalToMs } from "@/core/utils/timeUtils";
 
 export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   const params = useParams();
@@ -255,6 +256,12 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   // Calcul effectif du from/to à propager à la grille et aux widgets
   const { from: effectiveFrom, to: effectiveTo } = effectiveTimeRange;
 
+  // --- Calcul de l'intervalle d'auto-refresh (refreshMs) ---
+  const refreshMs = intervalToMs(
+    autoRefreshIntervalValue,
+    autoRefreshIntervalUnit
+  );
+
   // Ajout d'un widget au dashboard (local ou distant)
   const handleAddWidget = (widget: any) => {
     const newItem = {
@@ -279,11 +286,24 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     setPendingTitle(title);
   };
 
+  // Ajout du state pour la visibilité (public/private)
+  const [visibility, setVisibility] = useState<"public" | "private">("private");
+
+  // Synchronise visibility avec le dashboard courant (édition)
+  useEffect(() => {
+    if (!isCreate && dashboard && dashboard.visibility) {
+      setVisibility(dashboard.visibility);
+    } else if (isCreate) {
+      setVisibility("private");
+    }
+  }, [isCreate, dashboard?.visibility]);
+
   // Sauvegarde du layout côté backend
-  const handleSaveDashboard = async (updates?: Partial<{ title: string }>) => {
+  const handleSaveDashboard = async (
+    updates?: Partial<{ title: string; visibility: "public" | "private" }>
+  ) => {
     setSaving(true);
     try {
-      // Suppression du log debug
       const layoutToSave = useDashboardStore.getState().layout;
       await saveDashboardLayout(
         (dashboardId || localDashboard._id) ?? "",
@@ -307,6 +327,7 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
           autoRefreshIntervalValue,
           autoRefreshIntervalUnit,
           timeRange: buildTimeRange(),
+          visibility: updates?.visibility ?? visibility,
         }
       );
       setHasUnsavedChanges(false);
@@ -333,12 +354,16 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   };
 
   // Création d'un nouveau dashboard (mode création)
-  const handleCreateDashboard = async (title: string) => {
+  const handleCreateDashboard = async (
+    title: string,
+    customVisibility?: "public" | "private"
+  ) => {
     setSaving(true);
     try {
       const newDashboard = await apiCreateDashboard({
         title,
         layout: localDashboard.layout,
+        visibility: customVisibility ?? visibility,
       });
       // Invalide le cache du dashboard et de la liste
       await queryClient.invalidateQueries({
@@ -366,6 +391,23 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     }
   };
 
+  // Handler pour confirmer la sauvegarde (création ou édition)
+  const handleConfirmSave = async (customVisibility?: "public" | "private") => {
+    if (isCreate) {
+      try {
+        await handleCreateDashboard(pendingTitle, customVisibility);
+        setTitleModalOpen(false);
+      } catch (e) {}
+      return;
+    }
+    await handleSaveDashboard({
+      title: pendingTitle,
+      visibility: customVisibility ?? visibility,
+    });
+    setEditMode(false);
+    setTitleModalOpen(false);
+  };
+
   // Gestion du swap et du resize (drag & drop)
   const handleSwapLayout = (newLayout: DashboardLayoutItem[]) => {
     // Suppression des logs debug
@@ -391,20 +433,6 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
 
   // Handler pour ouvrir le modal de titre
   const handleSave = () => setTitleModalOpen(true);
-
-  // Handler pour confirmer la sauvegarde (création ou édition)
-  const handleConfirmSave = async () => {
-    if (isCreate) {
-      try {
-        await handleCreateDashboard(pendingTitle);
-        setTitleModalOpen(false);
-      } catch (e) {}
-      return;
-    }
-    await handleSaveDashboard({ title: pendingTitle });
-    setEditMode(false);
-    setTitleModalOpen(false);
-  };
 
   // Handler pour annuler l'édition
   const handleCancelEdit = () => {
@@ -506,6 +534,8 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     handleConfirmSave,
     handleCancelEdit,
     isCreate,
+    visibility,
+    setVisibility,
     // --- config avancée centralisée ---
     autoRefreshIntervalValue: autoRefreshIntervalValue ?? undefined,
     autoRefreshIntervalUnit,
@@ -522,5 +552,6 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     handleSaveConfig,
     effectiveFrom,
     effectiveTo,
+    refreshMs, // <-- exposé pour la grille/widgets
   };
 }

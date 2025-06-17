@@ -9,10 +9,12 @@ import {
 } from "@heroicons/react/24/solid";
 import { useMetricUICollapseStore } from "@/core/store/metricUI";
 import type { WidgetDataConfigSectionProps } from "@/core/types/widget-types";
+import type { MetricConfig } from "@/core/types/metric-bucket-types";
+import type { KPIGroupWidgetConfig } from "@/core/types/visualization";
 
 interface WidgetKPIGroupDataConfigSectionProps
   extends WidgetDataConfigSectionProps {
-  data?: any[];
+  data?: Record<string, unknown>[];
 }
 
 export default function WidgetKPIGroupDataConfigSection({
@@ -29,11 +31,18 @@ export default function WidgetKPIGroupDataConfigSection({
   const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
   const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
 
+  const kpiConfig = config as KPIGroupWidgetConfig;
+  const kpiDataConfig = dataConfig as { metrics: any };
+  const filters = (kpiConfig.filters ?? []) as {
+    field: string;
+    value: string;
+  }[];
+
   return (
     <div className="space-y-4">
       {/* Filtres par KPI (centralisé dans config.filters) */}
-      {Array.isArray(config.metrics) &&
-        config.metrics.map((metric: any, idx: number) => (
+      {Array.isArray(kpiConfig.metrics) &&
+        kpiConfig.metrics.map((metric: MetricConfig, idx: number) => (
           <div
             key={idx}
             className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow mb-2"
@@ -44,9 +53,9 @@ export default function WidgetKPIGroupDataConfigSection({
             <div className="flex flex-col gap-2">
               <SelectField
                 label="Champ"
-                value={config.filters?.[idx]?.field || ""}
+                value={filters[idx]?.field || ""}
                 onChange={(e) => {
-                  const newFilters = [...(config.filters || [])];
+                  const newFilters = [...filters];
                   newFilters[idx] = {
                     ...(newFilters[idx] || {}),
                     field: e.target.value,
@@ -56,16 +65,26 @@ export default function WidgetKPIGroupDataConfigSection({
                 }}
                 options={[
                   { value: "", label: "-- Aucun --" },
-                  ...columns.map((col) => ({ value: col, label: col })),
+                  ...columns.map((col) => ({ value: String(col), label: col })),
+                  ...Array.from(
+                    new Set(
+                      (data || [])
+                        .map((row) => row[filters[idx]?.field ?? ""])
+                        .filter(
+                          (val) =>
+                            val !== undefined && val !== null && val !== ""
+                        )
+                    )
+                  ).map((val) => ({ value: String(val), label: String(val) })),
                 ]}
                 name={`filter-field-${idx}`}
                 id={`filter-field-${idx}`}
               />
               <SelectField
                 label="Valeur"
-                value={config.filters?.[idx]?.value || ""}
+                value={filters[idx]?.value || ""}
                 onChange={(e) => {
-                  const newFilters = [...(config.filters || [])];
+                  const newFilters = [...filters];
                   newFilters[idx] = {
                     ...(newFilters[idx] || {}),
                     value: e.target.value,
@@ -73,36 +92,41 @@ export default function WidgetKPIGroupDataConfigSection({
                   handleConfigChange("filters", newFilters);
                 }}
                 options={
-                  config.filters?.[idx]?.field
+                  filters[idx]?.field
                     ? [
                         { value: "", label: "-- Toutes --" },
                         ...Array.from(
                           new Set(
                             (data || [])
-                              .map((row: any) => row[config.filters[idx].field])
+                              .map(
+                                (row: Record<string, unknown>) =>
+                                  row[filters[idx]?.field ?? ""]
+                              )
                               .filter(
                                 (v) => v !== undefined && v !== null && v !== ""
                               )
                           )
-                        ).map((v) => ({ value: v, label: String(v) })),
+                        ).map((v) => ({ value: String(v), label: String(v) })),
                       ]
                     : [{ value: "", label: "-- Choisir --" }]
                 }
                 name={`filter-value-${idx}`}
                 id={`filter-value-${idx}`}
-                disabled={!config.filters?.[idx]?.field}
+                disabled={!filters[idx]?.field}
               />
             </div>
           </div>
         ))}
       {/* Métriques (metrics) */}
-      {dataConfig.metrics.label && (
+      {kpiDataConfig.metrics?.label && (
+        <div className="font-semibold mb-1">{kpiDataConfig.metrics.label}</div>
+      )}
+      {Array.isArray(kpiConfig.metrics) && (
         <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
-          <div className="font-semibold mb-1">{dataConfig.metrics.label}</div>
           <div className="space-y-1 divide-y divide-gray-300 dark:divide-gray-700 ">
-            {config.metrics.map((metric: any, idx: number) => {
+            {kpiConfig.metrics.map((metric: MetricConfig, idx: number) => {
               const aggLabel =
-                dataConfig.metrics.allowedAggs.find(
+                kpiDataConfig.metrics?.allowedAggs.find(
                   (a: any) => a.value === metric.agg
                 )?.label ||
                 metric.agg ||
@@ -111,12 +135,14 @@ export default function WidgetKPIGroupDataConfigSection({
               const headerLabel = `${aggLabel}${
                 fieldLabel ? " · " + fieldLabel : ""
               }`;
-              const isOnlyMetric = config.metrics.length === 1;
+              const isOnlyMetric = kpiConfig.metrics.length === 1;
               return (
                 <div
                   key={idx}
                   className="px-2 pb-2 flex flex-col relative group"
-                  draggable={dataConfig.metrics.allowMultiple && !isOnlyMetric}
+                  draggable={
+                    kpiDataConfig.metrics?.allowMultiple && !isOnlyMetric
+                  }
                   onDragStart={() => handleDragStart && handleDragStart(idx)}
                   onDragOver={(e) => handleDragOver && handleDragOver(idx, e)}
                   onDrop={() => handleDrop && handleDrop(idx)}
@@ -130,58 +156,62 @@ export default function WidgetKPIGroupDataConfigSection({
                       {headerLabel}
                     </span>
                     <div className="flex items-center gap-1">
-                      {dataConfig.metrics.allowMultiple && !isOnlyMetric && (
-                        <>
-                          <button
-                            className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
-                              idx === 0 ? "opacity-50 cursor-not-allowed" : ""
-                            }`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (idx === 0) return;
-                              const newMetrics = [...config.metrics];
-                              [newMetrics[idx - 1], newMetrics[idx]] = [
-                                newMetrics[idx],
-                                newMetrics[idx - 1],
-                              ];
-                              handleConfigChange("metrics", newMetrics);
-                            }}
-                            disabled={idx === 0}
-                            aria-disabled={idx === 0}
-                            title="Monter"
-                          >
-                            <ChevronUpIcon className="w-4 h-4" />
-                          </button>
-                          <button
-                            className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
-                              idx === config.metrics.length - 1
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (idx === config.metrics.length - 1) return;
-                              const newMetrics = [...config.metrics];
-                              [newMetrics[idx], newMetrics[idx + 1]] = [
-                                newMetrics[idx + 1],
-                                newMetrics[idx],
-                              ];
-                              handleConfigChange("metrics", newMetrics);
-                            }}
-                            disabled={idx === config.metrics.length - 1}
-                            aria-disabled={idx === config.metrics.length - 1}
-                            title="Descendre"
-                          >
-                            <ChevronDownIcon className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
+                      {kpiDataConfig.metrics?.allowMultiple &&
+                        !isOnlyMetric && (
+                          <>
+                            <button
+                              className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
+                                idx === 0 ? "opacity-50 cursor-not-allowed" : ""
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (idx === 0) return;
+                                const newMetrics = [...kpiConfig.metrics];
+                                [newMetrics[idx - 1], newMetrics[idx]] = [
+                                  newMetrics[idx],
+                                  newMetrics[idx - 1],
+                                ];
+                                handleConfigChange("metrics", newMetrics);
+                              }}
+                              disabled={idx === 0}
+                              aria-disabled={idx === 0}
+                              title="Monter"
+                            >
+                              <ChevronUpIcon className="w-4 h-4" />
+                            </button>
+                            <button
+                              className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
+                                idx === kpiConfig.metrics.length - 1
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (idx === kpiConfig.metrics.length - 1)
+                                  return;
+                                const newMetrics = [...kpiConfig.metrics];
+                                [newMetrics[idx], newMetrics[idx + 1]] = [
+                                  newMetrics[idx + 1],
+                                  newMetrics[idx],
+                                ];
+                                handleConfigChange("metrics", newMetrics);
+                              }}
+                              disabled={idx === kpiConfig.metrics.length - 1}
+                              aria-disabled={
+                                idx === kpiConfig.metrics.length - 1
+                              }
+                              title="Descendre"
+                            >
+                              <ChevronDownIcon className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
                       {!isOnlyMetric && (
                         <button
                           className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
                           onClick={(e) => {
                             e.stopPropagation();
-                            const newMetrics = config.metrics.filter(
+                            const newMetrics = kpiConfig.metrics.filter(
                               (_: any, i: number) => i !== idx
                             );
                             handleConfigChange("metrics", newMetrics);
@@ -206,12 +236,12 @@ export default function WidgetKPIGroupDataConfigSection({
                               e.target.value
                             );
                           } else {
-                            const newMetrics = [...config.metrics];
+                            const newMetrics = [...kpiConfig.metrics];
                             newMetrics[idx].agg = e.target.value;
                             handleConfigChange("metrics", newMetrics);
                           }
                         }}
-                        options={dataConfig.metrics.allowedAggs}
+                        options={kpiDataConfig.metrics?.allowedAggs}
                         name={`metric-agg-${idx}`}
                         id={`metric-agg-${idx}`}
                       />
@@ -226,7 +256,7 @@ export default function WidgetKPIGroupDataConfigSection({
                               e.target.value
                             );
                           } else {
-                            const newMetrics = [...config.metrics];
+                            const newMetrics = [...kpiConfig.metrics];
                             newMetrics[idx].field = e.target.value;
                             handleConfigChange("metrics", newMetrics);
                           }
@@ -242,7 +272,7 @@ export default function WidgetKPIGroupDataConfigSection({
                         label="Label"
                         value={metric.label}
                         onChange={(e) => {
-                          const newMetrics = [...config.metrics];
+                          const newMetrics = [...kpiConfig.metrics];
                           newMetrics[idx].label = e.target.value;
                           handleConfigChange("metrics", newMetrics);
                         }}
@@ -255,22 +285,22 @@ export default function WidgetKPIGroupDataConfigSection({
               );
             })}
           </div>
-          {dataConfig.metrics.allowMultiple && (
+          {kpiDataConfig.metrics?.allowMultiple && (
             <Button
               color="indigo"
               className="mt-2 w-max mx-auto !bg-gray-300 dark:!bg-gray-700 hover:!bg-gray-200 dark:hover:!bg-gray-600 !border-none"
               variant="outline"
               onClick={() => {
                 handleConfigChange("metrics", [
-                  ...config.metrics,
+                  ...kpiConfig.metrics,
                   {
-                    agg: dataConfig.metrics.defaultAgg,
+                    agg: kpiDataConfig.metrics.defaultAgg,
                     field: columns[1] || "",
                     label: "",
                   },
                 ]);
               }}
-              disabled={!dataConfig.metrics.allowMultiple}
+              disabled={!kpiDataConfig.metrics.allowMultiple}
             >
               <PlusCircleIcon className="w-5 h-5 mr-1" />
               Ajouter

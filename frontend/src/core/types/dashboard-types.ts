@@ -24,11 +24,11 @@ export interface DashboardGridProps {
   isLoading?: boolean;
   hasUnsavedChanges?: boolean;
   handleAddWidget: (e: React.MouseEvent) => void;
-  // Ajout config avancée
   autoRefreshIntervalValue?: number;
   autoRefreshIntervalUnit?: string;
   timeRangeFrom?: string | null;
   timeRangeTo?: string | null;
+  refreshMs?: number;
 }
 
 export interface DashboardStore {
@@ -64,4 +64,5 @@ export interface DashboardGridItemProps {
   timeRangeTo?: string | null;
   sources: any[]; // Data sources
   onRemove?: () => void; // Callback pour supprimer le widget
+  refreshMs?: number;
 }

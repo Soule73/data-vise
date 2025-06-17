@@ -13,7 +13,7 @@ export function useDataSourceForm() {
   const [columns, setColumns] = useState<{ name: string; type: string }[]>([]);
   const [columnsLoading, setColumnsLoading] = useState(false);
   const [columnsError, setColumnsError] = useState("");
-  const [dataPreview, setDataPreview] = useState<any[]>([]);
+  const [dataPreview, setDataPreview] = useState<Record<string, unknown>[]>([]);
   const [name, setName] = useState("");
   const [type, setType] = useState<"json" | "csv">("json");
   const [globalError, setGlobalError] = useState("");
@@ -68,15 +68,19 @@ export function useDataSourceForm() {
       });
       setTimeout(() => navigate(ROUTES.sources), 1200);
     },
-    onError: (e: any) => {
+    onError: (e: unknown) => {
       setGlobalError("");
+      const err = e as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       showNotification({
         open: true,
         type: "error",
         title: "Erreur lors de la création",
         description:
-          e.response?.data?.message ||
-          e.message ||
+          err.response?.data?.message ||
+          err.message ||
           "Erreur lors de la création de la source",
       });
     },
@@ -91,7 +95,7 @@ export function useDataSourceForm() {
     try {
       let res: {
         columns: string[];
-        preview?: any[];
+        preview?: Record<string, unknown>[];
         types?: Record<string, string>;
       };
       if (type === "csv" && csvOrigin === "upload" && csvFile) {
@@ -114,7 +118,7 @@ export function useDataSourceForm() {
         return;
       }
       // Aperçu des données (5 premières lignes)
-      let data: any[] = res.preview || [];
+      let data: Record<string, unknown>[] = res.preview || [];
       setDataPreview(data);
       // Détection du type de chaque colonne (utilise types du backend si dispo)
       setColumns(
@@ -138,9 +142,10 @@ export function useDataSourceForm() {
       );
       setTimestampField(autoTimestamp || "");
       setStep(2);
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } };
       setColumnsError(
-        e.response?.data?.message || "Impossible de détecter les colonnes"
+        err.response?.data?.message || "Impossible de détecter les colonnes"
       );
     } finally {
       setColumnsLoading(false);

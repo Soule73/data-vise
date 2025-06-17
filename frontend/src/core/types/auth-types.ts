@@ -9,6 +9,7 @@ export interface User {
   email: string;
   username: string;
   roleId?: { _id: string; name: string };
+  role?: UserRole;
 }
 
 // --- Rôles et Permissions
@@ -45,22 +46,9 @@ export interface UserRole {
 }
 
 export interface UserState {
-  user: {
-    id: string;
-    username: string;
-    email: string;
-    role: UserRole | null;
-  } | null;
+  user: User | null;
   token: string | null;
-  setUser: (
-    user: {
-      id: string;
-      username: string;
-      email: string;
-      role: UserRole | null;
-    },
-    token: string
-  ) => void;
+  setUser: (user: User | null, token: string) => void;
   logout: () => void;
   hasPermission: (permName: string) => boolean;
 }

@@ -27,6 +27,68 @@ import {
 } from "@heroicons/react/24/outline";
 import * as HeroIcons from "@heroicons/react/24/outline";
 
+// Styles communs pour les métriques (charts)
+const COMMON_METRIC_STYLES = {
+  color: { default: "#2563eb", inputType: "color", label: "Couleur" },
+  borderColor: {
+    default: "#000000",
+    inputType: "color",
+    label: "Couleur de bordure",
+  },
+  borderWidth: { default: 1, inputType: "number", label: "Épaisseur bordure" },
+  labelColor: {
+    default: "#000000",
+    inputType: "color",
+    label: "Couleur des labels",
+  },
+  labelFontSize: {
+    default: 12,
+    inputType: "number",
+    label: "Taille de police des labels",
+  },
+};
+
+// Params communs pour les widgets (charts)
+const COMMON_WIDGET_PARAMS = {
+  legend: {
+    default: true,
+    inputType: "checkbox",
+    label: "Afficher la légende",
+  },
+  showGrid: {
+    default: true,
+    inputType: "checkbox",
+    label: "Afficher la grille",
+  },
+  showValues: {
+    default: false,
+    inputType: "checkbox",
+    label: "Afficher les valeurs",
+  },
+  title: { default: "", inputType: "text", label: "Titre du graphique" },
+  legendPosition: {
+    default: "top",
+    inputType: "select",
+    label: "Position de la légende",
+    options: [
+      { value: "top", label: "Haut" },
+      { value: "left", label: "Gauche" },
+      { value: "right", label: "Droite" },
+      { value: "bottom", label: "Bas" },
+    ],
+  },
+  titleAlign: {
+    default: "center",
+    inputType: "select",
+    label: "Alignement du titre",
+    options: [
+      { value: "start", label: "Début" },
+      { value: "center", label: "Centre" },
+      { value: "end", label: "Fin" },
+    ],
+  },
+};
+
 export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   bar: {
     type: "bar",
@@ -36,17 +98,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     configSchema: {
       ...BarChartConfig,
       metricStyles: {
-        color: { default: "#2563eb", inputType: "color", label: "Couleur" },
-        borderColor: {
-          default: "#000000",
-          inputType: "color",
-          label: "Couleur de bordure",
-        },
-        borderWidth: {
-          default: 1,
-          inputType: "number",
-          label: "Épaisseur bordure",
-        },
+        ...COMMON_METRIC_STYLES,
         barThickness: {
           default: undefined,
           inputType: "number",
@@ -57,55 +109,9 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
           inputType: "number",
           label: "Arrondi des barres",
         },
-        labelColor: {
-          default: "#000000",
-          inputType: "color",
-          label: "Couleur des labels",
-        },
-        labelFontSize: {
-          default: 12,
-          inputType: "number",
-          label: "Taille de police des labels",
-        },
       },
       widgetParams: {
-        legend: {
-          default: true,
-          inputType: "checkbox",
-          label: "Afficher la légende",
-        },
-        showGrid: {
-          default: true,
-          inputType: "checkbox",
-          label: "Afficher la grille",
-        },
-        showValues: {
-          default: false,
-          inputType: "checkbox",
-          label: "Afficher les valeurs",
-        },
-        title: { default: "", inputType: "text", label: "Titre du graphique" },
-        legendPosition: {
-          default: "top",
-          inputType: "select",
-          label: "Position de la légende",
-          options: [
-            { value: "top", label: "Haut" },
-            { value: "left", label: "Gauche" },
-            { value: "right", label: "Droite" },
-            { value: "bottom", label: "Bas" },
-          ],
-        },
-        titleAlign: {
-          default: "center",
-          inputType: "select",
-          label: "Alignement du titre",
-          options: [
-            { value: "start", label: "Début" },
-            { value: "center", label: "Centre" },
-            { value: "end", label: "Fin" },
-          ],
-        },
+        ...COMMON_WIDGET_PARAMS,
       },
     },
   },
@@ -117,17 +123,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     configSchema: {
       ...LineChartConfig,
       metricStyles: {
-        color: { default: "#2563eb", inputType: "color", label: "Couleur" },
-        borderColor: {
-          default: "#000000",
-          inputType: "color",
-          label: "Couleur de bordure",
-        },
-        borderWidth: {
-          default: 1,
-          inputType: "number",
-          label: "Épaisseur bordure",
-        },
+        ...COMMON_METRIC_STYLES,
         pointStyle: {
           default: "circle",
           inputType: "select",
@@ -144,55 +140,9 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
             { value: "dash", label: "Tiret" },
           ],
         },
-        labelColor: {
-          default: "#000000",
-          inputType: "color",
-          label: "Couleur des labels",
-        },
-        labelFontSize: {
-          default: 12,
-          inputType: "number",
-          label: "Taille de police des labels",
-        },
       },
       widgetParams: {
-        legend: {
-          default: true,
-          inputType: "checkbox",
-          label: "Afficher la légende",
-        },
-        showGrid: {
-          default: true,
-          inputType: "checkbox",
-          label: "Afficher la grille",
-        },
-        showValues: {
-          default: false,
-          inputType: "checkbox",
-          label: "Afficher les valeurs",
-        },
-        title: { default: "", inputType: "text", label: "Titre du graphique" },
-        legendPosition: {
-          default: "top",
-          inputType: "select",
-          label: "Position de la légende",
-          options: [
-            { value: "top", label: "Haut" },
-            { value: "left", label: "Gauche" },
-            { value: "right", label: "Droite" },
-            { value: "bottom", label: "Bas" },
-          ],
-        },
-        titleAlign: {
-          default: "center",
-          inputType: "select",
-          label: "Alignement du titre",
-          options: [
-            { value: "start", label: "Début" },
-            { value: "center", label: "Centre" },
-            { value: "end", label: "Fin" },
-          ],
-        },
+        ...COMMON_WIDGET_PARAMS,
         showPoints: {
           default: true,
           inputType: "checkbox",
@@ -230,27 +180,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     configSchema: {
       ...PieChartConfig,
       metricStyles: {
-        color: { default: "#2563eb", inputType: "color", label: "Couleur" },
-        borderColor: {
-          default: "#000000",
-          inputType: "color",
-          label: "Couleur de bordure",
-        },
-        borderWidth: {
-          default: 1,
-          inputType: "number",
-          label: "Épaisseur bordure",
-        },
-        labelColor: {
-          default: "#000000",
-          inputType: "color",
-          label: "Couleur des labels",
-        },
-        labelFontSize: {
-          default: 12,
-          inputType: "number",
-          label: "Taille de police des labels",
-        },
+        ...COMMON_METRIC_STYLES,
       },
       widgetParams: {
         legend: {
@@ -295,17 +225,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     icon: ArrowTrendingUpIcon,
     configSchema: {
       metricStyles: {
-        color: { default: "#2563eb", inputType: "color", label: "Couleur" },
-        borderColor: {
-          default: "#000000",
-          inputType: "color",
-          label: "Couleur de bordure",
-        },
-        borderWidth: {
-          default: 1,
-          inputType: "number",
-          label: "Épaisseur bordure",
-        },
+        ...COMMON_METRIC_STYLES,
         opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
       },
       widgetParams: {
@@ -327,17 +247,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     icon: ChatBubbleLeftIcon,
     configSchema: {
       metricStyles: {
-        color: { default: "#2563eb", inputType: "color", label: "Couleur" },
-        borderColor: {
-          default: "#000000",
-          inputType: "color",
-          label: "Couleur de bordure",
-        },
-        borderWidth: {
-          default: 1,
-          inputType: "number",
-          label: "Épaisseur bordure",
-        },
+        ...COMMON_METRIC_STYLES,
         opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
       },
       widgetParams: {
@@ -359,17 +269,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     icon: ArrowTrendingUpIcon,
     configSchema: {
       metricStyles: {
-        color: { default: "#2563eb", inputType: "color", label: "Couleur" },
-        borderColor: {
-          default: "#000000",
-          inputType: "color",
-          label: "Couleur de bordure",
-        },
-        borderWidth: {
-          default: 1,
-          inputType: "number",
-          label: "Épaisseur bordure",
-        },
+        ...COMMON_METRIC_STYLES,
         opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
       },
       widgetParams: {

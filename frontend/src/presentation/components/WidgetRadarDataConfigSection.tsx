@@ -9,14 +9,22 @@ import {
   ChevronUpIcon,
 } from "@heroicons/react/24/solid";
 import { useState } from "react";
+import type { MetricConfig } from "@/core/types/metric-bucket-types";
+
+interface RadarMetricConfig extends MetricConfig {
+  fields?: string[];
+  groupBy?: string;
+  groupByValue?: string;
+}
 
 interface WidgetRadarDataConfigSectionProps {
-  metrics: any[];
+  metrics: RadarMetricConfig[];
   columns: string[];
-  handleConfigChange: (field: string, value: any) => void;
-  configSchema?: any; // Ajout pour passer la config centralisée
-  // Ajout d'une prop data pour accéder aux valeurs du dataset
-  data?: any[];
+  handleConfigChange: (field: string, value: RadarMetricConfig[]) => void;
+  configSchema?: {
+    dataConfig?: { groupByFields?: string[]; axisFields?: string[] };
+  };
+  data?: Record<string, unknown>[];
 }
 
 export default function WidgetRadarDataConfigSection({
@@ -40,7 +48,7 @@ export default function WidgetRadarDataConfigSection({
       <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
         <div className="font-semibold mb-1">Datasets (axes multiples)</div>
         <div className="space-y-2">
-          {metrics.map((dataset: any, idx: number) => (
+          {metrics.map((dataset: RadarMetricConfig, idx: number) => (
             <div
               key={idx}
               className="flex flex-col border-b pb-2 mb-2 relative group bg-white/60 dark:bg-gray-900/60 p-2 border-gray-200 dark:border-gray-700 "
@@ -173,14 +181,19 @@ export default function WidgetRadarDataConfigSection({
                           new Set(
                             (data || [])
                               .filter(
-                                (row: any) =>
+                                (row: Record<string, unknown>) =>
+                                  dataset.groupBy &&
                                   row[dataset.groupBy] !== undefined &&
                                   row[dataset.groupBy] !== null &&
                                   row[dataset.groupBy] !== ""
                               )
-                              .map((row: any) => row[dataset.groupBy])
+                              .map((row: Record<string, unknown>) =>
+                                dataset.groupBy
+                                  ? String(row[dataset.groupBy])
+                                  : ""
+                              )
                           )
-                        ).map((v) => ({ value: v, label: String(v) })),
+                        ).map((val) => ({ value: val, label: String(val) })),
                       ]}
                       name={`radar-groupby-value-${idx}`}
                       id={`radar-groupby-value-${idx}`}
@@ -198,7 +211,12 @@ export default function WidgetRadarDataConfigSection({
           onClick={() => {
             handleConfigChange("metrics", [
               ...metrics,
-              { label: "", fields: [columns[0] || ""] },
+              {
+                agg: "count",
+                field: columns[0] || "",
+                label: "",
+                fields: [columns[0] || ""],
+              },
             ]);
           }}
         >

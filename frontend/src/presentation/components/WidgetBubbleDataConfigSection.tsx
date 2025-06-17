@@ -2,11 +2,15 @@ import SelectField from "@/presentation/components/SelectField";
 import InputField from "@/presentation/components/InputField";
 import Button from "@/presentation/components/Button";
 import { XMarkIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
+import type { BubbleMetricConfig } from "@/core/types/metric-bucket-types";
 
 interface WidgetBubbleDataConfigSectionProps {
-  metrics: any[];
+  metrics: BubbleMetricConfig[];
   columns: string[];
-  handleConfigChange: (field: string, value: any) => void;
+  handleConfigChange: (
+    field: string,
+    value: BubbleMetricConfig[] | BubbleMetricConfig
+  ) => void;
 }
 
 export default function WidgetBubbleDataConfigSection({
@@ -19,7 +23,7 @@ export default function WidgetBubbleDataConfigSection({
       <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
         <div className="font-semibold mb-1">Datasets (x, y, r)</div>
         <div className="space-y-2">
-          {metrics.map((dataset: any, idx: number) => (
+          {metrics.map((dataset: BubbleMetricConfig, idx: number) => (
             <div
               key={idx}
               className="flex flex-col gap-2 border-b pb-2 mb-2 relative group bg-white/60 dark:bg-gray-900/60 rounded p-2"
@@ -33,7 +37,7 @@ export default function WidgetBubbleDataConfigSection({
                     className="ml-auto p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
                     onClick={() => {
                       const newMetrics = metrics.filter(
-                        (_: any, i: number) => i !== idx
+                        (_: BubbleMetricConfig, i: number) => i !== idx
                       );
                       handleConfigChange("metrics", newMetrics);
                     }}
@@ -84,8 +88,9 @@ export default function WidgetBubbleDataConfigSection({
                   label="Label du dataset"
                   value={dataset.label || ""}
                   onChange={(e) => {
+                    const target = e.target as HTMLInputElement;
                     const newMetrics = [...metrics];
-                    newMetrics[idx] = { ...dataset, label: e.target.value };
+                    newMetrics[idx] = { ...dataset, label: target.value };
                     handleConfigChange("metrics", newMetrics);
                   }}
                   name={`bubble-label-${idx}`}
@@ -103,6 +108,8 @@ export default function WidgetBubbleDataConfigSection({
             handleConfigChange("metrics", [
               ...metrics,
               {
+                agg: "none",
+                field: "",
                 x: columns[0] || "",
                 y: columns[1] || "",
                 r: columns[2] || "",

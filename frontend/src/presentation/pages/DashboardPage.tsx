@@ -5,11 +5,11 @@ import { useDashboard } from "@/core/hooks/useDashboard";
 import Modal from "@/presentation/components/Modal";
 import InputField from "@/presentation/components/InputField";
 import { useUserStore } from "@/core/store/user";
-import DashboardConfigFields from "@/presentation/components/DashboardConfigFields";
+import DashboardHeader from "../components/DashboardHeader";
+import CheckboxField from "@/presentation/components/CheckboxField";
 
 export default function DashboardPage() {
   const {
-    isLoading,
     sources,
     saving,
     selectOpen,
@@ -42,9 +42,11 @@ export default function DashboardPage() {
     handleChangeTimeRangeRelative,
     handleChangeTimeRangeMode,
     handleSaveConfig,
-    // --- Ajout from/to effectif ---
     effectiveFrom,
     effectiveTo,
+    refreshMs,
+    visibility,
+    setVisibility,
   } = useDashboard();
 
   const hasPermission = useUserStore((s) => s.hasPermission);
@@ -64,11 +66,11 @@ export default function DashboardPage() {
       <Modal
         open={titleModalOpen}
         onClose={() => setTitleModalOpen(false)}
-        title="Titre du dashboard"
+        title="Sauvegarder"
       >
         <div className="space-y-4">
           <InputField
-            label="Titre du dashboard"
+            label="Titre du tableau de bord"
             value={pendingTitle}
             onChange={(e) => {
               setPendingTitle(e.target.value);
@@ -76,6 +78,14 @@ export default function DashboardPage() {
             }}
             required
             autoFocus
+          />
+          <CheckboxField
+            label="Privé(visble uniquement par vous)"
+            checked={visibility === "private"}
+            onChange={(checked) =>
+              setVisibility(checked ? "private" : "public")
+            }
+            name="dashboard-visibility"
           />
           <div className="flex gap-2 justify-end">
             <Button
@@ -87,7 +97,7 @@ export default function DashboardPage() {
             </Button>
             <Button
               color="green"
-              onClick={handleConfirmSave}
+              onClick={() => handleConfirmSave(visibility)}
               disabled={!pendingTitle.trim()}
             >
               Confirmer
@@ -95,79 +105,36 @@ export default function DashboardPage() {
           </div>
         </div>
       </Modal>
-      <div className="flex items-center justify-between mb-2">
-        {editMode || isCreate ? (
-          <div className="flex items-center gap-2 md:gap-4">
-            {hasPermission("widget:canCreate") && (
-              <a
-                className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-                href="#"
-                onClick={openAddWidgetModal}
-              >
-                Ajouter un widget
-              </a>
-            )}
-            {hasPermission("dashboard:canUpdate") && (
-              <a
-                href="#"
-                className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSave();
-                }}
-              >
-                {saving ? "Sauvegarde…" : "Sauvegarder"}
-              </a>
-            )}
-            {editMode && !isCreate && hasPermission("dashboard:canUpdate") && (
-              <a
-                href="#"
-                className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleCancelEdit();
-                }}
-              >
-                Annuler
-              </a>
-            )}
-          </div>
-        ) : !isCreate ? (
-          <div>
-            {hasPermission("dashboard:canUpdate") && (
-              <a
-                href="#"
-                className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setEditMode(true);
-                }}
-              >
-                Modifier
-              </a>
-            )}
-          </div>
-        ) : null}
-        {/* Bloc UI avancé de configuration déplacé dans DashboardConfigFields */}
-        <DashboardConfigFields
-          autoRefreshIntervalValue={autoRefreshIntervalValue}
-          autoRefreshIntervalUnit={autoRefreshIntervalUnit}
-          timeRangeFrom={timeRangeFrom}
-          timeRangeTo={timeRangeTo}
-          relativeValue={relativeValue}
-          relativeUnit={relativeUnit}
-          timeRangeMode={timeRangeMode}
-          handleChangeAutoRefresh={handleChangeAutoRefresh}
-          handleChangeTimeRangeAbsolute={handleChangeTimeRangeAbsolute}
-          handleChangeTimeRangeRelative={handleChangeTimeRangeRelative}
-          handleChangeTimeRangeMode={handleChangeTimeRangeMode}
-          onSave={handleSaveConfig}
-          saving={saving}
-        />
-      </div>
+      <DashboardHeader
+        editMode={editMode}
+        isCreate={isCreate}
+        hasPermission={hasPermission}
+        openAddWidgetModal={openAddWidgetModal}
+        handleSave={handleSave}
+        handleCancelEdit={handleCancelEdit}
+        setEditMode={setEditMode}
+        saving={saving}
+        handleSaveConfig={handleSaveConfig}
+        autoRefreshIntervalValue={autoRefreshIntervalValue}
+        autoRefreshIntervalUnit={autoRefreshIntervalUnit}
+        timeRangeFrom={timeRangeFrom}
+        timeRangeTo={timeRangeTo}
+        relativeValue={relativeValue}
+        relativeUnit={relativeUnit}
+        timeRangeMode={timeRangeMode}
+        handleChangeAutoRefresh={handleChangeAutoRefresh}
+        handleChangeTimeRangeAbsolute={handleChangeTimeRangeAbsolute}
+        handleChangeTimeRangeRelative={handleChangeTimeRangeRelative}
+        handleChangeTimeRangeMode={handleChangeTimeRangeMode}
+        savingConfig={saving}
+      />
+      <div className="flex flex-col md:flex-row space-y-4 justify-start items-start md:items-center md:justify-between mb-2"></div>
       {isCreate ? (
         layout.length === 0 ? (
-          <div className="text-gray-400 text-center py-12">
+          <div
+            className="text-gray-400 dark:text-gray-500
+           text-center py-12"
+          >
             Aucun widget sur ce dashboard.
             <br />
             Cliquez sur "Sauvegarder" après avoir donné un titre pour créer
@@ -175,7 +142,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <DashboardGrid
-            isLoading={isLoading}
+            isLoading={false}
             layout={layout}
             onSwapLayout={handleSwapLayout}
             sources={sources ?? []}
@@ -183,14 +150,11 @@ export default function DashboardPage() {
             hasUnsavedChanges={hasUnsavedChanges}
             handleAddWidget={openAddWidgetModal}
             // --- Ajout config avancée ---
-            autoRefreshIntervalValue={autoRefreshIntervalValue}
-            autoRefreshIntervalUnit={autoRefreshIntervalUnit}
             timeRangeFrom={effectiveFrom}
             timeRangeTo={effectiveTo}
+            refreshMs={refreshMs}
           />
         )
-      ) : isLoading ? (
-        <div>Chargement…</div>
       ) : layout.length === 0 ? (
         <div className="text-gray-400 text-center py-12">
           Aucun widget sur ce dashboard.
@@ -206,10 +170,9 @@ export default function DashboardPage() {
           hasUnsavedChanges={hasUnsavedChanges}
           handleAddWidget={openAddWidgetModal}
           // --- Ajout config avancée ---
-          autoRefreshIntervalValue={autoRefreshIntervalValue}
-          autoRefreshIntervalUnit={autoRefreshIntervalUnit}
           timeRangeFrom={effectiveFrom}
           timeRangeTo={effectiveTo}
+          refreshMs={refreshMs}
         />
       )}
       {saving && (
