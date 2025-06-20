@@ -1,5 +1,6 @@
 import api from "./api";
-import type { ApiError, ApiData, ApiResponse } from "@/core/types/api";
+import { extractApiData } from "../../core/utils/api-utils";
+import type { ApiResponse } from "@/core/types/api";
 import type { User } from "@/core/types/auth-types";
 
 interface LoginRegisterResponse {
@@ -18,11 +19,7 @@ export async function login(
       password,
     }
   );
-  if ((res.data as ApiError).error) {
-    const err = (res.data as ApiError).error;
-    throw { response: { data: err } };
-  }
-  return (res.data as ApiData<LoginRegisterResponse>).data;
+  return extractApiData(res);
 }
 
 export async function register(
@@ -38,9 +35,5 @@ export async function register(
       password,
     }
   );
-  if ((res.data as ApiError).error) {
-    const err = (res.data as ApiError).error;
-    throw { response: { data: err } };
-  }
-  return (res.data as ApiData<LoginRegisterResponse>).data;
+  return extractApiData(res);
 }

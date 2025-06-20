@@ -68,21 +68,38 @@ export function getAbsolutePath(filePath: string): string {
 }
 
 export async function readCsvFile(filePath: string): Promise<any[]> {
-  const absPath = getAbsolutePath(filePath);
-  const text = await fs.readFile(absPath, "utf-8");
-  return csv().fromString(text);
+  try {
+    const absPath = getAbsolutePath(filePath);
+    const text = await fs.readFile(absPath, "utf-8");
+    return csv().fromString(text);
+  } catch (err) {
+    console.error(`[readCsvFile] Erreur lecture CSV ${filePath}:`, err);
+    throw new Error(`Erreur lecture CSV: ${filePath}`);
+  }
 }
 
 export async function fetchRemoteCsv(endpoint: string): Promise<any[]> {
-  const response = await fetch(endpoint);
-  const text = await response.text();
-  return csv().fromString(text);
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const text = await response.text();
+    return csv().fromString(text);
+  } catch (err) {
+    console.error(`[fetchRemoteCsv] Erreur fetch CSV ${endpoint}:`, err);
+    throw new Error(`Erreur fetch CSV: ${endpoint}`);
+  }
 }
 
 export async function fetchRemoteJson(endpoint: string): Promise<any[]> {
-  const response = await fetch(endpoint);
-  const data = await response.json();
-  return Array.isArray(data) ? data : [data];
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    return Array.isArray(data) ? data : [data];
+  } catch (err) {
+    console.error(`[fetchRemoteJson] Erreur fetch JSON ${endpoint}:`, err);
+    throw new Error(`Erreur fetch JSON: ${endpoint}`);
+  }
 }
 
 export function filterByTimestamp(

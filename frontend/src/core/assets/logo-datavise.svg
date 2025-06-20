@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- <rect x="0" y="0" width="120" height="40" rx="10" fill="#F5F7FA"/> -->
+  <g>
+    <!-- Bar chart -->
+    <rect x="18" y="18" width="4" height="12" rx="2" fill="#6366F1"/>
+    <rect x="25" y="12" width="4" height="18" rx="2" fill="#22D3EE"/>
+    <rect x="32" y="8" width="4" height="22" rx="2" fill="#10B981"/>
+    <rect x="39" y="20" width="4" height="10" rx="2" fill="#F59E42"/>
+    <!-- Line chart -->
+    <polyline points="18,28 27,20 34,14 41,25" fill="none" stroke="#6366F1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Pie chart -->
+    <circle cx="60" cy="20" r="8" fill="#E0E7FF"/>
+    <path d="M60 20 L60 12 A8 8 0 0 1 68 20 Z" fill="#6366F1"/>
+    <path d="M60 20 L68 20 A8 8 0 0 1 60 28 Z" fill="#22D3EE"/>
+    <path d="M60 20 L60 28 A8 8 0 0 1 52 20 Z" fill="#10B981"/>
+    <!-- Dots for simplicity -->
+    <circle cx="90" cy="20" r="3.5" fill="#6366F1"/>
+    <circle cx="100" cy="20" r="3.5" fill="#22D3EE"/>
+    <circle cx="110" cy="20" r="3.5" fill="#10B981"/>
+  </g>
+  <text x="55" y="37" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10" fill="#6366F1" letter-spacing="1">DataVise</text>
+</svg>

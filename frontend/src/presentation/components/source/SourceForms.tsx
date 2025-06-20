@@ -1,5 +1,5 @@
-import Button from "@/presentation/components/Button";
-import InputField from "@/presentation/components/InputField";
+import Button from "@/presentation/components/forms/Button";
+import InputField from "@/presentation/components/forms/InputField";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -7,8 +7,9 @@ import {
   type DataSourceForm,
 } from "@/core/validation/datasource";
 import { useState } from "react";
-import { updateSource } from "@/data/services/datasource";
+import { useUpdateSourceMutation } from "@/data/repositories/sources";
 import type { DataSource } from "@/core/types/data-source";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function EditSourceForm({
   source,
@@ -34,23 +35,30 @@ export function EditSourceForm({
     resolver: zodResolver(dataSourceSchema),
   });
   const [globalError, setGlobalError] = useState("");
+const queryClient = useQueryClient();
+  const updateMutation = useUpdateSourceMutation({
+    queryClient,
+    onSuccess: () => {
+      afterEdit();
+      onClose();
+    },
+    onError: (e: any) => {
+      setGlobalError(
+        e?.response?.data?.message ||
+          e?.message ||
+          "Erreur lors de la modification de la source"
+      );
+      onError?.(
+        e?.response?.data?.message ||
+          e?.message ||
+          "Erreur lors de la modification de la source"
+      );
+    },
+  });
 
   const onSubmit = async (data: DataSourceForm) => {
     setGlobalError("");
-    try {
-      await updateSource(source._id, data);
-      afterEdit();
-      onClose();
-    } catch (e) {
-      setGlobalError(
-        (e as { response?: { data?: { message?: string } } }).response?.data
-          ?.message || "Erreur lors de la modification de la source"
-      );
-      onError?.(
-        (e as { response?: { data?: { message?: string } } }).response?.data
-          ?.message || "Erreur lors de la modification de la source"
-      );
-    }
+    updateMutation.mutate({ id: source._id, data });
   };
 
   return (
@@ -60,7 +68,6 @@ export function EditSourceForm({
         <InputField
           {...register("name")}
           value={undefined}
-          label=""
           error={errors.name?.message}
         />
       </div>
@@ -69,7 +76,6 @@ export function EditSourceForm({
         <InputField
           {...register("type")}
           value={undefined}
-          label=""
           error={errors.type?.message}
         />
       </div>
@@ -78,7 +84,6 @@ export function EditSourceForm({
         <InputField
           {...register("endpoint")}
           value={undefined}
-          label=""
           error={errors.endpoint?.message}
         />
       </div>

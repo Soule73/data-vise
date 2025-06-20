@@ -41,7 +41,7 @@ export default function CardWidget({
   } = useCardWidgetVM(data, config);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full shadow text-gray-700 dark:text-gray-200 rounded-lg p-4 bg-white dark:bg-gray-800 min-w-[180px] min-h-[120px]">
+    <div className="flex flex-col h-full shadow items-center justify-center  max-h-full bg-white dark:bg-gray-900 w-full max-w-full rounded-lg ">
       {showIcon && IconComponent && (
         <span className="mb-2">
           <IconComponent className="w-8 h-8" style={{ color: iconColor }} />

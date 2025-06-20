@@ -1,5 +1,5 @@
 import type { TableSearchProps } from "@/core/types/table-types";
-import InputField from "./InputField";
+import InputField from "./forms/InputField";
 
 export default function TableSearch({
   value,
@@ -14,7 +14,6 @@ export default function TableSearch({
         </div>
       )}
       <InputField
-        label=""
         placeholder="Rechercher..."
         value={value}
         onChange={onChange}

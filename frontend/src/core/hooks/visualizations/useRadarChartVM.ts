@@ -1,35 +1,58 @@
 import { useMemo } from "react";
-import type { ChartOptions, ChartData } from "chart.js";
+import type { RadarChartConfig } from "@/core/types/visualization";
+import type { ChartOptions, ChartData, ChartDataset } from "chart.js";
 
-export function useRadarChartLogic(data: any[], config: any) {
-  // On suppose que chaque dataset correspond à une métrique (ex: une série de valeurs sur les axes)
-  const validDatasets = useMemo(
+// On ne fait plus extends MetricConfig pour éviter le conflit sur agg
+interface RadarMetricConfig {
+  field: string;
+  label?: string;
+  agg?: string;
+  fields: string[];
+  groupBy?: string;
+  groupByValue?: string;
+}
+
+function isRadarMetricConfig(metric: unknown): metric is RadarMetricConfig {
+  return (
+    typeof metric === "object" &&
+    metric !== null &&
+    Array.isArray((metric as any).fields) &&
+    (metric as any).fields.length > 0
+  );
+}
+
+export function useRadarChartLogic(
+  data: Record<string, unknown>[],
+  config: RadarChartConfig
+): {
+  chartData: ChartData<"radar">;
+  options: ChartOptions<"radar">;
+  validDatasets: RadarMetricConfig[];
+  axisLabels: string[];
+} {
+  const validDatasets = useMemo<RadarMetricConfig[]>(
     () =>
       Array.isArray(config.metrics)
-        ? config.metrics.filter(
-            (ds: any) =>
-              ds.fields && Array.isArray(ds.fields) && ds.fields.length > 0
-          )
+        ? (config.metrics.filter(isRadarMetricConfig) as RadarMetricConfig[])
         : [],
     [config.metrics]
   );
 
   // Les labels des axes (ex: "axes" ou "features")
-  const axisLabels = useMemo(() => {
-    // On prend les labels des axes du premier dataset, ou on infère depuis les colonnes
+  const axisLabels = useMemo<string[]>(() => {
     if (validDatasets.length > 0 && validDatasets[0].fields) {
       return validDatasets[0].fields.map((f: string) => f);
     }
     return [];
   }, [validDatasets]);
 
-  const datasets = useMemo(
+  const datasets = useMemo<ChartDataset<"radar">[]>(
     () =>
-      validDatasets.map((ds: any, i: number) => {
+      validDatasets.map((ds, i) => {
         let color =
           config.metricStyles?.[i]?.color || `hsl(${(i * 60) % 360}, 70%, 60%)`;
         let opacity = config.metricStyles?.[i]?.opacity ?? 0.7;
-        if (color.startsWith("#") && opacity < 1) {
+        if (typeof color === "string" && color.startsWith("#") && opacity < 1) {
           const hex = color.replace("#", "");
           const bigint = parseInt(hex, 16);
           const r = (bigint >> 16) & 255;
@@ -41,7 +64,7 @@ export function useRadarChartLogic(data: any[], config: any) {
         let filteredData = data;
         if (ds.groupBy && ds.groupByValue) {
           filteredData = data.filter(
-            (row: any) => row[ds.groupBy] === ds.groupByValue
+            (row) => row[ds.groupBy!] === ds.groupByValue
           );
         }
         // Pour chaque axe, on agrège la valeur selon l'agg choisie (sum, avg, ...)
@@ -52,23 +75,23 @@ export function useRadarChartLogic(data: any[], config: any) {
             if (ds.agg && filteredData.length > 0) {
               if (ds.agg === "sum")
                 return filteredData.reduce(
-                  (acc: number, row: any) => acc + (Number(row[field]) || 0),
+                  (acc: number, row) => acc + (Number(row[field]) || 0),
                   0
                 );
               if (ds.agg === "avg")
                 return (
                   filteredData.reduce(
-                    (acc: number, row: any) => acc + (Number(row[field]) || 0),
+                    (acc: number, row) => acc + (Number(row[field]) || 0),
                     0
                   ) / filteredData.length
                 );
               if (ds.agg === "min")
                 return Math.min(
-                  ...filteredData.map((row: any) => Number(row[field]) || 0)
+                  ...filteredData.map((row) => Number(row[field]) || 0)
                 );
               if (ds.agg === "max")
                 return Math.max(
-                  ...filteredData.map((row: any) => Number(row[field]) || 0)
+                  ...filteredData.map((row) => Number(row[field]) || 0)
                 );
               if (ds.agg === "count") return filteredData.length;
             }
@@ -81,16 +104,10 @@ export function useRadarChartLogic(data: any[], config: any) {
           borderColor: config.metricStyles?.[i]?.borderColor || undefined,
           borderWidth: config.metricStyles?.[i]?.borderWidth || 1,
           pointBackgroundColor: color,
-        };
+        } as ChartDataset<"radar">;
       }),
     [validDatasets, data, config.metricStyles, axisLabels]
   );
-
-  const chartTitle = config.widgetParams?.title || "";
-  const showLegend =
-    config.widgetParams?.legend !== undefined
-      ? config.widgetParams.legend
-      : true;
 
   const chartData: ChartData<"radar"> = useMemo(
     () => ({
@@ -105,11 +122,11 @@ export function useRadarChartLogic(data: any[], config: any) {
       responsive: true,
       animation: false,
       plugins: {
-        legend: { display: showLegend },
-        title: chartTitle
+        legend: { display: config.widgetParams?.legend !== false },
+        title: config.widgetParams?.title
           ? {
               display: true,
-              text: chartTitle,
+              text: config.widgetParams.title,
             }
           : undefined,
         tooltip: { enabled: true },
@@ -121,7 +138,7 @@ export function useRadarChartLogic(data: any[], config: any) {
         },
       },
     }),
-    [showLegend, chartTitle]
+    [config.widgetParams]
   );
 
   return { chartData, options, validDatasets, axisLabels };

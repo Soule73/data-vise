@@ -44,4 +44,29 @@ router.get(
   requirePermission("dashboard:canView"),
   dashboardController.listUserDashboards
 );
+
+// Activer le partage public d'un dashboard
+router.post(
+  "/:id/share/enable",
+  requireAuth,
+  requirePermission("dashboard:canUpdate"),
+  dashboardController.enableShare
+);
+// Désactiver le partage public d'un dashboard
+router.post(
+  "/:id/share/disable",
+  requireAuth,
+  requirePermission("dashboard:canUpdate"),
+  dashboardController.disableShare
+);
+// Route publique pour accéder à un dashboard partagé (pas d'auth)
+router.get(
+  "/share/:shareId",
+  dashboardController.getSharedDashboard
+);
+// Route publique pour accéder aux sources d'un dashboard partagé (pas d'auth)
+router.get(
+  "/share/:shareId/sources",
+  dashboardController.getSharedDashboardSources
+);
 export default router;

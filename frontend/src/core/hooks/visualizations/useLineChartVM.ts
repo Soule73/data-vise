@@ -9,20 +9,30 @@ import {
   allSameDay,
   formatXTicksLabel,
 } from "@/core/utils/chartUtils";
-
-import type { ChartOptions, ChartData } from "chart.js";
+import type { LineChartConfig } from "@/core/types/visualization";
+import type { MetricConfig } from "@/core/types/metric-bucket-types";
+import type { ChartDataset, ChartOptions, ChartData } from "chart.js";
 import type { Chart as ChartJSInstance } from "chart.js";
 
-export function useLineChartLogic(data: any[], config: any) {
+export function useLineChartLogic(
+  data: Record<string, unknown>[],
+  config: LineChartConfig
+): {
+  chartData: ChartData<"line">;
+  options: ChartOptions<"line">;
+  showNativeValues: boolean;
+  valueLabelsPlugin: {
+    id: string;
+    afterDatasetsDraw: (chart: ChartJSInstance) => void;
+  };
+} {
   const labels = useMemo(
     () => getLabels(data, config.bucket?.field),
     [data, config.bucket?.field]
   );
-  function getValues(metric: any) {
+  function getValues(metric: MetricConfig): number[] {
     return labels.map((labelVal: string) => {
-      const rows = data.filter(
-        (row: any) => row[config.bucket.field] === labelVal
-      );
+      const rows = data.filter((row) => row[config.bucket.field] === labelVal);
       return aggregate(rows, metric.agg, metric.field);
     });
   }
@@ -34,8 +44,6 @@ export function useLineChartLogic(data: any[], config: any) {
       ? config.metricStyles[0].showPoints
       : config.widgetParams?.showPoints !== undefined
       ? config.widgetParams.showPoints
-      : config.showPoints !== undefined
-      ? config.showPoints
       : true;
   const showValues =
     config.metricStyles &&
@@ -44,8 +52,6 @@ export function useLineChartLogic(data: any[], config: any) {
       ? config.metricStyles[0].showValues
       : config.widgetParams?.showValues !== undefined
       ? config.widgetParams.showValues
-      : config.showValues !== undefined
-      ? config.showValues
       : false;
   const fill =
     config.metricStyles &&
@@ -54,8 +60,6 @@ export function useLineChartLogic(data: any[], config: any) {
       ? config.metricStyles[0].fill
       : config.widgetParams?.fill !== undefined
       ? config.widgetParams.fill
-      : config.fill !== undefined
-      ? config.fill
       : false;
   const stepped =
     config.metricStyles &&
@@ -64,35 +68,23 @@ export function useLineChartLogic(data: any[], config: any) {
       ? config.metricStyles[0].stepped
       : config.widgetParams?.stepped !== undefined
       ? config.widgetParams.stepped
-      : config.stepped !== undefined
-      ? config.stepped
       : false;
-  const datasets = useMemo(
+  const datasets = useMemo<ChartDataset<"line">[]>(
     () =>
-      config.metrics.map((metric: any, idx: number) => {
+      config.metrics.map((metric: MetricConfig, idx: number) => {
         const values = getValues(metric);
         const style = (config.metricStyles && config.metricStyles[idx]) || {};
         let borderDash: number[] | undefined = undefined;
-        if (
-          style.borderDash ||
-          config.widgetParams?.borderDash ||
-          config.borderDash
-        ) {
-          const dashStr =
-            style.borderDash ||
-            config.widgetParams?.borderDash ||
-            config.borderDash;
-          if (dashStr && typeof dashStr === "string") {
-            borderDash = dashStr
-              .split(",")
-              .map((v: string) => parseInt(v.trim(), 10))
-              .filter((n: number) => !isNaN(n));
-          }
+        const dashStr = style.borderDash || config.widgetParams?.borderDash;
+        if (dashStr && typeof dashStr === "string") {
+          borderDash = dashStr
+            .split(",")
+            .map((v: string) => parseInt(v.trim(), 10))
+            .filter((n: number) => !isNaN(n));
         }
         const fillColor =
           style.fillColor ||
           config.widgetParams?.fillColor ||
-          config.fillColor ||
           (style.color ||
             config.widgetParams?.color ||
             `hsl(${(idx * 60) % 360}, 70%, 60%)`) + "33";
@@ -115,7 +107,7 @@ export function useLineChartLogic(data: any[], config: any) {
           borderDash,
           stepped,
           fill,
-        };
+        } as ChartDataset<"line">;
       }),
     [labels, config.metrics, config.metricStyles, fill, stepped, config]
   );
@@ -126,21 +118,16 @@ export function useLineChartLogic(data: any[], config: any) {
   const hasData =
     labels.length > 0 &&
     datasets.length > 0 &&
-    datasets.every((ds: any) => Array.isArray(ds.data) && ds.data.length > 0);
+    datasets.every((ds) => Array.isArray(ds.data) && ds.data.length > 0);
   const legendPosition = getLegendPosition(config);
   const title = getTitle(config);
   const titleAlign = getTitleAlign(config);
   // xLabel dynamique : si non renseigné, utiliser le label du champ de regroupement
-  let xLabel =
-    config.widgetParams?.xLabel ||
-    config.xLabel ||
-    config.bucket?.fieldLabel ||
-    config.bucket?.field ||
-    "";
-  const yLabel = config.widgetParams?.yLabel || config.yLabel || "";
-  const showGrid = config.widgetParams?.showGrid ?? config.showGrid ?? true;
-  const stacked = config.widgetParams?.stacked ?? config.stacked ?? false;
-  const tension = config.widgetParams?.tension ?? config.tension ?? 0;
+  let xLabel = config.widgetParams?.xLabel || config.bucket?.field || "";
+  const yLabel = config.widgetParams?.yLabel || "";
+  const showGrid = config.widgetParams?.showGrid ?? true;
+  const stacked = config.widgetParams?.stacked ?? false;
+  const tension = config.widgetParams?.tension ?? 0;
   // Détection si les labels X sont des timestamps ISO
   const isXTimestamps = useMemo(() => {
     if (!labels || labels.length === 0) return false;
@@ -157,8 +144,7 @@ export function useLineChartLogic(data: any[], config: any) {
       animation: false,
       plugins: {
         legend: {
-          display:
-            config.widgetParams?.legend !== false && config.legend !== false,
+          display: config.widgetParams?.legend !== false,
           position: legendPosition as "top" | "left" | "right" | "bottom",
         },
         title: title
@@ -175,28 +161,25 @@ export function useLineChartLogic(data: any[], config: any) {
           : undefined,
         tooltip: {
           enabled: true,
-          callbacks:
-            config.widgetParams?.tooltipFormat || config.tooltipFormat
-              ? {
-                  label: function (context) {
-                    const label = context.label;
-                    const value = context.parsed.y;
-                    return (
-                      config.widgetParams?.tooltipFormat ||
-                      config.tooltipFormat ||
-                      "{label}: {value}"
-                    )
-                      .replace("{label}", label)
-                      .replace("{value}", String(value));
-                  },
-                }
-              : undefined,
+          callbacks: config.widgetParams?.tooltipFormat
+            ? {
+                label: function (context) {
+                  const label = context.label;
+                  const value = context.parsed.y;
+                  return (
+                    config.widgetParams?.tooltipFormat || "{label}: {value}"
+                  )
+                    .replace("{label}", label)
+                    .replace("{value}", String(value));
+                },
+              }
+            : undefined,
         },
       },
       elements: {
         point: { radius: showPoints ? 3 : 0 },
         line: {
-          borderWidth: config.borderWidth || 2,
+          borderWidth: config.widgetParams?.borderWidth || 2,
           tension,
         },
       },
@@ -246,19 +229,18 @@ export function useLineChartLogic(data: any[], config: any) {
       afterDatasetsDraw(chart: ChartJSInstance) {
         if (!showNativeValues) return;
         const ctx = chart.ctx;
-        chart.data.datasets.forEach((dataset: any, i: number) => {
+        chart.data.datasets.forEach((dataset, i) => {
           const meta = chart.getDatasetMeta(i);
+          // On caste dataset en ChartDataset<'line'> pour accéder à .data typée
+          const lineDataset = dataset as ChartDataset<"line">;
           meta.data.forEach((point: any, j: number) => {
-            const value = dataset.data[j];
+            const value = (lineDataset.data as number[])[j];
             if (value == null || isNaN(value)) return;
-            const labelFormat =
-              config.widgetParams?.labelFormat ||
-              config.labelFormat ||
-              "{value}";
-            const label = labelFormat.replace("{value}", value);
+            const labelFormat = config.widgetParams?.labelFormat || "{value}";
+            const label = labelFormat.replace("{value}", String(value));
             ctx.save();
             ctx.font = "bold 11px sans-serif";
-            ctx.fillStyle = dataset.borderColor || "#333";
+            ctx.fillStyle = (lineDataset.borderColor as string) || "#333";
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
             ctx.fillText(label, point.x, point.y - 6);

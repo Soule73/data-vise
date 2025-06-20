@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-
 import type { ChartOptions, ChartData } from "chart.js";
+import type { BarChartConfig } from "@/core/types/visualization";
+import type { MetricConfig } from "@/core/types/metric-bucket-types";
 import {
   aggregate,
   getLabels,
@@ -12,12 +13,15 @@ import {
   formatXTicksLabel,
 } from "@/core/utils/chartUtils";
 
-export function useBarChartLogic(data: any[], config: any) {
+export function useBarChartLogic(
+  data: Record<string, any>[],
+  config: BarChartConfig
+): { chartData: ChartData<"bar">; options: ChartOptions<"bar"> } {
   const labels = useMemo(
     () => getLabels(data, config.bucket?.field),
     [data, config.bucket?.field]
   );
-  function getValues(metric: any) {
+  function getValues(metric: MetricConfig) {
     return labels.map((labelVal: string) => {
       const rows = data.filter(
         (row: any) => row[config.bucket.field] === labelVal
@@ -25,16 +29,13 @@ export function useBarChartLogic(data: any[], config: any) {
       return aggregate(rows, metric.agg, metric.field);
     });
   }
-  const showValues =
-    config.widgetParams?.showValues ?? config.showValues ?? false;
-  const stacked = config.widgetParams?.stacked ?? config.stacked ?? false;
-  const labelFormat =
-    config.widgetParams?.labelFormat ||
-    config.labelFormat ||
-    "{label}: {value}";
+  // Toutes les options doivent venir de widgetParams
+  const showValues = config.widgetParams?.showValues ?? false;
+  const stacked = config.widgetParams?.stacked ?? false;
+  const labelFormat = config.widgetParams?.labelFormat || "{label}: {value}";
   const datasets = useMemo(
     () =>
-      config.metrics.map((metric: any, idx: number) => {
+      config.metrics.map((metric: MetricConfig, idx: number) => {
         const values = getValues(metric);
         const style = (config.metricStyles && config.metricStyles[idx]) || {};
         return {
@@ -58,9 +59,8 @@ export function useBarChartLogic(data: any[], config: any) {
   const titleAlign = getTitleAlign(config);
   const xLabel = config.widgetParams?.xLabel;
   const yLabel = config.widgetParams?.yLabel;
-  const showGrid = config.widgetParams?.showGrid ?? config.showGrid ?? true;
-  const isHorizontal =
-    config.widgetParams?.horizontal ?? config.horizontal ?? false;
+  const showGrid = config.widgetParams?.showGrid ?? true;
+  const isHorizontal = config.widgetParams?.horizontal ?? false;
   const indexAxis: "x" | "y" = isHorizontal ? "y" : "x";
   // Correction : ne pas dupliquer la clé plugins dans l'objet options
   const pluginsOptions = showValues
@@ -86,8 +86,7 @@ export function useBarChartLogic(data: any[], config: any) {
       animation: false,
       plugins: {
         legend: {
-          display:
-            config.widgetParams?.legend !== false && config.legend !== false,
+          display: config.widgetParams?.legend !== false,
           position: legendPosition as "top" | "left" | "right" | "bottom",
         },
         title: title

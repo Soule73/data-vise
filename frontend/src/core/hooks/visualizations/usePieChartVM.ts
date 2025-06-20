@@ -7,28 +7,44 @@ import {
   getTitle,
   getTitleAlign,
 } from "@/core/utils/chartUtils";
-
-import type { ChartOptions, ChartData } from "chart.js";
+import type { PieChartConfig } from "@/core/types/visualization";
+import type { MetricConfig } from "@/core/types/metric-bucket-types";
+import type { ChartOptions, ChartData, ChartDataset } from "chart.js";
 import type { Chart as ChartJSInstance } from "chart.js";
 
-export function usePieChartLogic(data: any[], config: any) {
+export function usePieChartLogic(
+  data: Record<string, unknown>[],
+  config: PieChartConfig
+): {
+  chartData: ChartData<"pie">;
+  options: ChartOptions<"pie">;
+  showNativeValues: boolean;
+  valueLabelsPlugin: {
+    id: string;
+    afterDraw: (chart: ChartJSInstance) => void;
+  };
+} {
   // On ne prend que la première métrique pour le pie (classique)
-  const metric = config.metrics?.[0] || { agg: "sum", field: "", label: "" };
+  const metric: MetricConfig = config.metrics?.[0] || {
+    agg: "sum",
+    field: "",
+    label: "",
+  };
   const labels = useMemo(
     () => getLabels(data, config.bucket?.field),
     [data, config.bucket?.field]
   );
-  const values = useMemo(
+  const values = useMemo<number[]>(
     () =>
       labels.map((labelVal: string) => {
         const rows = data.filter(
-          (row: any) => row[config.bucket.field] === labelVal
+          (row) => row[config.bucket.field] === labelVal
         );
         return aggregate(rows, metric.agg, metric.field);
       }),
     [labels, data, config.bucket?.field, metric.agg, metric.field]
   );
-  const backgroundColor = useMemo(
+  const backgroundColor = useMemo<string[]>(
     () => getColors(labels, config, 0),
     [labels, config]
   );
@@ -45,29 +61,22 @@ export function usePieChartLogic(data: any[], config: any) {
           borderWidth: config.metricStyles?.[0]?.borderWidth || 1,
           borderColor: config.metricStyles?.[0]?.borderColor || undefined,
           borderRadius: config.metricStyles?.[0]?.borderRadius || 0,
-        },
+        } as ChartDataset<"pie">,
       ],
     }),
     [labels, values, backgroundColor, config.metricStyles]
   );
-
   // Tooltip, cutout, labelFormat, showValues
   const tooltipFormat =
-    config.widgetParams?.tooltipFormat ||
-    config.tooltipFormat ||
-    "{label}: {value} ({percent}%)";
-  const cutout = config.widgetParams?.cutout || config.cutout || undefined;
+    config.widgetParams?.tooltipFormat || "{label}: {value} ({percent}%)";
+  const cutout = config.widgetParams?.cutout || undefined;
   const labelFormat =
-    config.widgetParams?.labelFormat ||
-    config.labelFormat ||
-    "{label}: {value} ({percent}%)";
+    config.widgetParams?.labelFormat || "{label}: {value} ({percent}%)";
   const showValues =
     config.metricStyles?.[0]?.showValues ??
     config.widgetParams?.showValues ??
-    config.showValues ??
     false;
   const showNativeValues = showValues && labels.length > 0 && values.length > 0;
-
   // Plugin natif pour afficher les valeurs sur chaque part si showValues
   const valueLabelsPlugin = useMemo(
     () => ({
@@ -104,7 +113,6 @@ export function usePieChartLogic(data: any[], config: any) {
     }),
     [showNativeValues, values, labelFormat, labels, backgroundColor]
   );
-
   const options: ChartOptions<"pie"> = useMemo(
     () => ({
       responsive: true,
@@ -112,8 +120,7 @@ export function usePieChartLogic(data: any[], config: any) {
       interaction: { mode: "nearest", intersect: true },
       plugins: {
         legend: {
-          display:
-            config.widgetParams?.legend !== false && config.legend !== false,
+          display: config.widgetParams?.legend !== false,
           position: legendPosition as "top" | "left" | "right" | "bottom",
         },
         title: title
@@ -148,7 +155,6 @@ export function usePieChartLogic(data: any[], config: any) {
     }),
     [legendPosition, title, titleAlign, tooltipFormat, cutout, values, config]
   );
-
   return {
     chartData,
     options,

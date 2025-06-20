@@ -15,5 +15,6 @@ export const ROUTES = {
   dashboardList: '/dashboards',
   createDashboard: '/dashboards/create',
   createRole: '/roles/create',
+  dashboardShare: '/dashboard/share/:shareId',
 
 };

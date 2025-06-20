@@ -1,35 +1,61 @@
 import { useMemo } from "react";
+import type { KPIWidgetConfig } from "@/core/types/visualization";
+import type { MetricConfig } from "@/core/types/metric-bucket-types";
 
-export function useKPIWidgetVM(data: any[], config: any) {
+interface KPIWidgetVM {
+  filteredData: Record<string, unknown>[];
+  value: number;
+  title: string;
+  valueColor: string;
+  showTrend: boolean;
+  showValue: boolean;
+  format: string;
+  currency: string;
+  decimals: number;
+  trendType: string;
+  showPercent: boolean;
+  threshold: number;
+  trend: "up" | "down" | null;
+  trendValue: number;
+  trendPercent: number;
+  formatValue: (val: number) => string;
+  getTrendColor: () => string;
+}
+
+export function useKPIWidgetVM(
+  data: Record<string, unknown>[],
+  config: KPIWidgetConfig
+): KPIWidgetVM {
   // Filtrage des données si un filtre est défini
   const filteredData = useMemo(() => {
-    if (
-      config.filter?.field &&
-      config.filter?.value !== undefined &&
-      config.filter?.value !== ""
-    ) {
-      return data.filter(
-        (row: any) =>
-          String(row[config.filter.field]) === String(config.filter.value)
-      );
+    if (Array.isArray(config.filters) && config.filters.length > 0) {
+      return config.filters.reduce((acc: Record<string, unknown>[], filter) => {
+        if (!filter.field || filter.value === undefined || filter.value === "")
+          return acc;
+        return acc.filter(
+          (row: Record<string, unknown>) =>
+            String(row[filter.field]) === String(filter.value)
+        );
+      }, data);
     }
     return data;
-  }, [data, config.filter]);
-
-  const metric = config.metrics?.[0];
+  }, [data, config.filters]);
+  const metric: MetricConfig | undefined = config.metrics?.[0];
   const value = useMemo(() => {
     if (!metric || !filteredData || filteredData.length === 0) return 0;
     const field = metric.field;
     const agg = metric.agg;
-    const values = filteredData.map((row: any) => Number(row[field]) || 0);
-    if (agg === "sum") return values.reduce((a, b) => a + b, 0);
-    if (agg === "avg") return values.reduce((a, b) => a + b, 0) / values.length;
+    const values = filteredData.map(
+      (row: Record<string, unknown>) => Number(row[field]) || 0
+    );
+    if (agg === "sum") return values.reduce((a: number, b: number) => a + b, 0);
+    if (agg === "avg")
+      return values.reduce((a: number, b: number) => a + b, 0) / values.length;
     if (agg === "min") return Math.min(...values);
     if (agg === "max") return Math.max(...values);
     if (agg === "count") return values.length;
     return values[0];
   }, [filteredData, metric]);
-
   const title =
     config.widgetParams?.title || metric?.label || metric?.field || "KPI";
   const valueColor =
@@ -38,14 +64,12 @@ export function useKPIWidgetVM(data: any[], config: any) {
     "#2563eb";
   const showTrend = config.widgetParams?.showTrend !== false;
   const showValue = config.widgetParams?.showValue !== false;
-  const format = config.widgetParams?.format || "number"; // "number", "currency", "percent"
+  const format = config.widgetParams?.format || "number";
   const currency = config.widgetParams?.currency || "€";
   const decimals = config.widgetParams?.decimals ?? 2;
-  const trendType = config.widgetParams?.trendType || "arrow"; // "arrow", "caret"
+  const trendType = config.widgetParams?.trendType || "arrow";
   const showPercent = config.widgetParams?.showPercent === true;
-  const threshold = config.widgetParams?.trendThreshold ?? 0; // en %
-
-  // Optionnel : calcul d'une tendance simple (diff entre 2 dernières valeurs)
+  const threshold = config.widgetParams?.trendThreshold ?? 0;
   const { trend, trendValue, trendPercent } = useMemo(() => {
     let trend: "up" | "down" | null = null;
     let trendValue = 0;
@@ -63,7 +87,6 @@ export function useKPIWidgetVM(data: any[], config: any) {
     }
     return { trend, trendValue, trendPercent };
   }, [showTrend, metric, filteredData]);
-
   function formatValue(val: number) {
     if (format === "currency")
       return val
@@ -79,7 +102,6 @@ export function useKPIWidgetVM(data: any[], config: any) {
       maximumFractionDigits: decimals,
     });
   }
-
   function getTrendColor() {
     if (trend === null) return "";
     if (threshold && Math.abs(trendPercent) >= threshold) {
@@ -87,7 +109,6 @@ export function useKPIWidgetVM(data: any[], config: any) {
     }
     return trend === "up" ? "text-green-500" : "text-red-500";
   }
-
   return {
     filteredData,
     value,

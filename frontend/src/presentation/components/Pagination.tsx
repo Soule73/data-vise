@@ -101,24 +101,23 @@ export default function Pagination({
         </button>
       </nav>
       <div className="flex items-center gap-2 ml-4">
-        <span className="text-xs">Lignes par page</span>
+        <div className="text-xs">Lignes par page</div>
         <SelectField
-          label=""
           options={[5, 10, 20, 50, 100].map((n) => ({
             value: String(n),
             label: String(n),
           }))}
           value={String(effectiveRowPerPage)}
           onChange={handleRowPerPageChange}
-          className="!w-auto !min-w-0 !text-xs !py-0.5 !px-1 !rounded"
+          className="!w-16 mb-2 !text-xs !py-0.5 !px-1 !rounded"
           style={{ minWidth: 60 }}
           aria-label="Lignes par page"
         />
-        <span className="text-xs">
+        <div className="text-xs">
           {effectiveRowPerPage * (effectivePage - 1) + 1}-
           {Math.min(effectivePage * effectiveRowPerPage, total)}
           &nbsp;sur&nbsp;{total}
-        </span>
+        </div>
       </div>
     </div>
   );

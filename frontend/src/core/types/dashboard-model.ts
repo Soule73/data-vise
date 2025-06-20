@@ -1,3 +1,5 @@
+import type { Widget } from "../types/widget-types";
+
 export type IntervalUnit =
   | "second"
   | "minute"
@@ -26,4 +28,8 @@ export interface Dashboard {
   visibility?: "public" | "private";
   createdAt?: string;
   updatedAt?: string;
+  widgets: Widget[];
+  // Partage public
+  shareEnabled?: boolean;
+  shareId?: string | null;
 }

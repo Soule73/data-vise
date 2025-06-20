@@ -16,12 +16,12 @@ export interface Option {
 
 export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   error?: string;
 }
 
 export interface CheckboxFieldProps {
-  label: string;
+  label?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
   name?: string;

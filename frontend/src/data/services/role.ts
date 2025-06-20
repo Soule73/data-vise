@@ -1,17 +1,30 @@
 import api from './api';
+import { extractApiData } from "../../core/utils/api-utils";
+import type { ApiResponse } from "@/core/types/api";
+import type { Role, Permission } from "@/core/types/auth-types";
 
-export async function fetchRoles() {
-  return (await api.get('/auth/roles')).data;
+export async function fetchRoles(): Promise<Role[]> {
+  const res = await api.get<ApiResponse<Role[]>>('/auth/roles');
+  return extractApiData(res);
 }
 
-export async function updateRole(id: string, payload: any) {
-  return (await api.put(`/auth/roles/${id}`, payload)).data;
+export async function updateRole(id: string, payload: Partial<Role>): Promise<Role> {
+  const res = await api.put<ApiResponse<Role>>(`/auth/roles/${id}`, payload);
+  return extractApiData(res);
 }
 
-export async function deleteRole(id: string) {
-  return (await api.delete(`/auth/roles/${id}`)).data;
+export async function deleteRole(id: string): Promise<{ message: string }> {
+  const res = await api.delete<ApiResponse<{ message: string }>>(`/auth/roles/${id}`);
+  return extractApiData(res);
 }
 
-export async function createRole(payload: any) {
-  return (await api.post('/auth/roles', payload)).data;
+export async function createRole(payload: Omit<Role, '_id' | 'canDelete'>): Promise<Role> {
+  const res = await api.post<ApiResponse<Role>>('/auth/roles', payload);
+  return extractApiData(res);
 }
+
+export async function fetchPermissions(): Promise<Permission[]> {
+  const res = await api.get<ApiResponse<Permission[]>>('/auth/permissions');
+  return extractApiData(res);
+}
+

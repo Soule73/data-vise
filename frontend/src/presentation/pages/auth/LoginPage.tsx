@@ -1,8 +1,8 @@
-import AuthLayout from "@/presentation/components/AuthLayout";
-import InputField from "@/presentation/components/InputField";
-import { useLoginForm } from "@/core/hooks/useLoginForm";
-import Button from "@/presentation/components/Button";
-import logoDataVise from "../../../logo-datavise.svg";
+import AuthLayout from "@/presentation/components/layouts/AuthLayout";
+import InputField from "@/presentation/components/forms/InputField";
+import { useLoginForm } from "@/core/hooks/auth/useLoginForm";
+import Button from "@/presentation/components/forms/Button";
+import logoDataVise from "../../../core/assets/logo-datavise.svg";
 
 export default function Login() {
   const {

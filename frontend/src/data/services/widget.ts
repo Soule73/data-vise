@@ -1,40 +1,23 @@
 import api from "./api";
-import type { Widget } from "@/core/models/Widget";
-import type { ApiError, ApiData, ApiResponse } from "@/core/types/api";
+import { extractApiData } from "../../core/utils/api-utils";
+import type { Widget } from "@/core/types/widget-types";
+import type { ApiResponse } from "@/core/types/api";
 
-function extractApiError(
-  err: { message: string } | { errors: Record<string, string> }
-): string {
-  if ("message" in err) return err.message;
-  if ("errors" in err) return Object.values(err.errors).join(", ");
-  return "Erreur inconnue";
-}
+// Les fonctions extractApiError et extractApiData seront déplacées dans un utilitaire commun.
 
 export async function fetchWidgets(): Promise<Widget[]> {
   const response = await api.get<ApiResponse<Widget[]>>("/widgets");
-  if ((response.data as ApiError).error) {
-    const err = (response.data as ApiError).error;
-    throw new Error(extractApiError(err));
-  }
-  return (response.data as ApiData<Widget[]>).data;
+  return extractApiData(response);
 }
 
 export async function fetchWidgetById(id: string): Promise<Widget> {
   const response = await api.get<ApiResponse<Widget>>(`/widgets/${id}`);
-  if ((response.data as ApiError).error) {
-    const err = (response.data as ApiError).error;
-    throw new Error(extractApiError(err));
-  }
-  return (response.data as ApiData<Widget>).data;
+  return extractApiData(response);
 }
 
 export async function createWidget(payload: Partial<Widget>): Promise<Widget> {
   const response = await api.post<ApiResponse<Widget>>("/widgets", payload);
-  if ((response.data as ApiError).error) {
-    const err = (response.data as ApiError).error;
-    throw new Error(extractApiError(err));
-  }
-  return (response.data as ApiData<Widget>).data;
+  return extractApiData(response);
 }
 
 export async function updateWidget(
@@ -45,20 +28,12 @@ export async function updateWidget(
     `/widgets/${id}`,
     payload
   );
-  if ((response.data as ApiError).error) {
-    const err = (response.data as ApiError).error;
-    throw new Error(extractApiError(err));
-  }
-  return (response.data as ApiData<Widget>).data;
+  return extractApiData(response);
 }
 
 export async function deleteWidget(id: string): Promise<{ success: boolean }> {
   const response = await api.delete<ApiResponse<{ success: boolean }>>(
     `/widgets/${id}`
   );
-  if ((response.data as ApiError).error) {
-    const err = (response.data as ApiError).error;
-    throw new Error(extractApiError(err));
-  }
-  return (response.data as ApiData<{ success: boolean }>).data;
+  return extractApiData(response);
 }

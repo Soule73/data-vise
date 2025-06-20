@@ -1,27 +1,38 @@
 import { useMemo } from "react";
 import type { ChartOptions, ChartData } from "chart.js";
+import type { BubbleChartConfig } from "@/core/types/visualization";
+import type { BubbleMetricConfig } from "@/core/types/metric-bucket-types";
 import {
   isIsoTimestamp,
   allSameDay,
   formatXTicksLabel,
 } from "@/core/utils/chartUtils";
 
-export function useBubbleChartLogic(data: any[], config: any) {
+export function useBubbleChartLogic(
+  data: Record<string, any>[],
+  config: BubbleChartConfig
+): {
+  chartData: ChartData<"bubble">;
+  options: ChartOptions<"bubble">;
+  validDatasets: BubbleMetricConfig[];
+} {
   const validDatasets = useMemo(
     () =>
       Array.isArray(config.metrics)
-        ? config.metrics.filter((ds: any) => ds.x && ds.y && ds.r)
+        ? (config.metrics.filter(
+            (ds: any) => ds.x && ds.y && ds.r
+          ) as BubbleMetricConfig[])
         : [],
     [config.metrics]
   );
 
   const datasets = useMemo(
     () =>
-      validDatasets.map((ds: any, i: number) => {
+      validDatasets.map((ds: BubbleMetricConfig, i: number) => {
         let color =
           config.metricStyles?.[i]?.color || `hsl(${(i * 60) % 360}, 70%, 60%)`;
         let opacity = config.metricStyles?.[i]?.opacity ?? 0.7;
-        if (color.startsWith("#") && opacity < 1) {
+        if (typeof color === "string" && color.startsWith("#") && opacity < 1) {
           const hex = color.replace("#", "");
           const bigint = parseInt(hex, 16);
           const r = (bigint >> 16) & 255;
@@ -121,7 +132,7 @@ export function useBubbleChartLogic(data: any[], config: any) {
         },
       },
     }),
-    [showLegend, chartTitle, xLabel, yLabel]
+    [showLegend, chartTitle, xLabel, yLabel, isXTimestamps, labels, xAllSameDay]
   );
 
   return { chartData, options, validDatasets };

@@ -53,6 +53,27 @@ const dashboardController = {
       next(e);
     }
   },
+  async enableShare(req: Request, res: Response, next: NextFunction) {
+    const result = await dashboardService.enableShare(req.params.id);
+    return handleServiceResult(res, result);
+  },
+  async disableShare(req: Request, res: Response, next: NextFunction) {
+    const result = await dashboardService.disableShare(req.params.id);
+    return handleServiceResult(res, result);
+  },
+  async getSharedDashboard(req: Request, res: Response, next: NextFunction) {
+    const result = await dashboardService.getSharedDashboard(req.params.shareId);
+    return handleServiceResult(res, result);
+  },
+  async getSharedDashboardSources(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { shareId } = req.params;
+      const result = await dashboardService.getSharedDashboardSources(shareId);
+      return handleServiceResult(res, result);
+    } catch (e) {
+      next(e);
+    }
+  },
 };
 
 export default dashboardController;

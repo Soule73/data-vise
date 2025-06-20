@@ -26,6 +26,8 @@ export interface IDashboard extends mongoose.Document {
   createdAt: Date;
   updatedAt: Date;
   history?: DashboardHistoryItem[];
+  shareEnabled: boolean;
+  shareId: string | null;
 }
 
 export interface DashboardBasePayload {

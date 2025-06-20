@@ -1,5 +1,5 @@
-import CheckboxField from "@/presentation/components/CheckboxField";
-import InputField from "@/presentation/components/InputField";
+import CheckboxField from "@/presentation/components/forms/CheckboxField";
+import InputField from "@/presentation/components/forms/InputField";
 import { WIDGETS } from "@/data/adapters/visualizations";
 import type { WidgetType } from "@/core/types/widget-types";
 import { useState } from "react";
@@ -21,7 +21,6 @@ export default function VisualizationTypeSelector({
     <div className="mb-4">
       <div className="font-semibold mb-2">Type de visualisation</div>
       <InputField
-        label=""
         placeholder="Rechercher un type de visualisation"
         id="search-visualization-type"
         value={search}
@@ -43,7 +42,6 @@ export default function VisualizationTypeSelector({
               <CheckboxField
                 checked={type === key}
                 onChange={() => setType(key as WidgetType)}
-                label=""
                 name="widget-type"
                 id={`widget-type-${key}`}
               />

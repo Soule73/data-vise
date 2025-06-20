@@ -2,10 +2,10 @@ import type { BucketConfig, MetricConfig } from "./metric-bucket-types";
 
 // Classe de base pour la configuration d'un widget
 export abstract class WidgetConfigBase<
-  TParams = unknown,
-  TStyles = unknown,
-  TFilters = unknown,
-  TDataConfig = unknown
+  TParams = any,
+  TStyles = any,
+  TFilters = any,
+  TDataConfig = any
 > {
   metrics: MetricConfig[];
   bucket: BucketConfig;
@@ -55,10 +55,10 @@ export class TableWidgetConfig extends WidgetConfigBase {
     minHeight?: string | number;
     maxWidth?: string | number;
     maxHeight?: string | number;
-    widgetParams?: unknown;
-    metricStyles?: unknown;
-    filters?: unknown;
-    dataConfig?: unknown;
+    widgetParams?: any;
+    metricStyles?: any;
+    filters?: any;
+    dataConfig?: any;
   }) {
     super(params);
     this.columns = params.columns;

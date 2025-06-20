@@ -12,6 +12,10 @@ import type {
   DataSourceCreatePayload,
   DataSourceUpdatePayload,
 } from "@/types/sourceType";
+import { sourceCache, getSourceCacheKey } from "@/utils/sourceCache";
+
+// Map pour suivre les chargements en cours (anti-stampede)
+const inflightLoads = new Map<string, Promise<any[]>>();
 
 const dataSourceService = {
   async list() {
@@ -65,13 +69,7 @@ const dataSourceService = {
       try {
         const absPath = getAbsolutePath(source.filePath);
         await fs.unlink(absPath);
-        console.log("[BACKEND][REMOVE] Fichier CSV supprimé:", absPath);
       } catch (e) {
-        console.warn(
-          "[BACKEND][REMOVE] Impossible de supprimer le fichier CSV:",
-          source.filePath,
-          e
-        );
       }
     }
     return { data: { message: "Source supprimée." } };
@@ -118,44 +116,127 @@ const dataSourceService = {
       };
     }
   },
-  async fetchData(sourceId: string, options?: { from?: string; to?: string }) {
+  async fetchData(
+    sourceId: string,
+    options?: {
+      from?: string;
+      to?: string;
+      page?: number;
+      pageSize?: number;
+      fields?: string;
+      forceRefresh?: boolean;
+    }
+  ) {
     const source = await DataSource.findById(sourceId);
     if (!source)
       return { error: { message: "Source non trouvée." }, status: 404 };
     let data: Record<string, unknown>[] = [];
-    try {
-      if (source.type === "json" && source.endpoint) {
-        data = await fetchRemoteJson(source.endpoint);
-      } else if (source.type === "csv" && source.endpoint) {
-        data = await fetchRemoteCsv(source.endpoint);
-      } else if (source.type === "csv" && source.filePath) {
-        data = await readCsvFile(source.filePath);
-      } else {
-        return {
-          error: { message: "Type ou configuration de source non supportée." },
-          status: 400,
-        };
-      }
-      if (source.timestampField && (options?.from || options?.to)) {
-        data = filterByTimestamp(
-          data,
-          source.timestampField,
-          options?.from,
-          options?.to
-        );
-      }
-      return { data };
-    } catch (e: unknown) {
-      return {
-        error: {
-          message:
-            e instanceof Error
-              ? e.message
-              : "Erreur lors de la récupération des données.",
-        },
-        status: 500,
-      };
+    // Gestion du cache
+    const hasTimestamp = !!source.timestampField;
+    // Normalisation des paramètres pour la clé de cache
+    const normFrom =
+      hasTimestamp && options?.from && options.from !== ""
+        ? options.from
+        : undefined;
+    const normTo =
+      hasTimestamp && options?.to && options.to !== "" ? options.to : undefined;
+    const cacheKey = getSourceCacheKey(sourceId, normFrom, normTo);
+    if (options?.forceRefresh) {
+      sourceCache.del(cacheKey);
+      inflightLoads.delete(cacheKey);
+      console.log(`[CACHE] Suppression du cache pour ${cacheKey}`);
     }
+    let cacheTTL = 3600; // 1h par défaut
+    if (hasTimestamp && normFrom && normTo) {
+      cacheTTL = 60; // 1 min si requête temporelle précise
+    } else if (hasTimestamp && !normFrom && !normTo) {
+      cacheTTL = 1800; // 30 min si timestampField mais pas de filtre
+    }
+    const cached = sourceCache.get(cacheKey);
+    if (cached) {
+      data = cached as Record<string, unknown>[];
+      console.log(`[CACHE] Hit pour ${cacheKey}`);
+    } else {
+      // Anti-stampede : si un chargement est déjà en cours, on attend la promesse
+      if (inflightLoads.has(cacheKey)) {
+        const inflight = await inflightLoads.get(cacheKey);
+        data = inflight ?? [];
+        console.log(`[CACHE] Wait for in-flight load for ${cacheKey}`);
+      } else {
+        // On lance le chargement et on stocke la promesse
+        const loadPromise = (async () => {
+          let loaded: any[] = [];
+          try {
+            if (source.type === "json" && source.endpoint) {
+              loaded = await fetchRemoteJson(source.endpoint);
+            } else if (source.type === "csv" && source.endpoint) {
+              loaded = await fetchRemoteCsv(source.endpoint);
+            } else if (source.type === "csv" && source.filePath) {
+              loaded = await readCsvFile(source.filePath);
+            } else {
+              return [];
+            }
+            if (
+              hasTimestamp &&
+              (options?.from || options?.to) &&
+              typeof source.timestampField === "string"
+            ) {
+              loaded = filterByTimestamp(
+                loaded,
+                source.timestampField,
+                options?.from,
+                options?.to
+              );
+            }
+            sourceCache.set(cacheKey, loaded, cacheTTL);
+            inflightLoads.delete(cacheKey);
+            return loaded;
+          } catch (e: any) {
+            inflightLoads.delete(cacheKey);
+            return Promise.reject({
+              error: {
+                message:
+                  e instanceof Error
+                    ? e.message
+                    : "Erreur lors de la récupération des données de la source.",
+              },
+              status: 500,
+            });
+          }
+        })();
+        inflightLoads.set(cacheKey, loadPromise);
+        try {
+          data = await loadPromise;
+          console.log(`[CACHE] Nouvelle entrée pour ${cacheKey} (TTL=${cacheTTL}s)`);
+        } catch (err: any) {
+          // Gestion de l'erreur levée par les utilitaires
+          return err;
+        }
+      }
+    }
+    // Sélection des colonnes si fields est défini
+    if (options?.fields) {
+      const fieldsArr = options.fields
+        .split(",")
+        .map((f) => f.trim())
+        .filter(Boolean);
+      data = data.map((row) =>
+        Object.fromEntries(
+          Object.entries(row).filter(([k]) => fieldsArr.includes(k))
+        )
+      );
+    }
+    // Pagination si demandée
+    if (options?.page && options?.pageSize) {
+      const total = data.length;
+      const page = options.page;
+      const pageSize = options.pageSize;
+      const start = (page - 1) * pageSize;
+      const pageData = data.slice(start, start + pageSize);
+      return { data: pageData, total };
+    }
+    // Par défaut, tout renvoyer (attention à la volumétrie)
+    return { data };
   },
 };
 

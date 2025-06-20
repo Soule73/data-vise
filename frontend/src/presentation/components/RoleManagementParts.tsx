@@ -1,6 +1,6 @@
-import Button from "@/presentation/components/Button";
-import InputField from "@/presentation/components/InputField";
-import CheckboxField from "@/presentation/components/CheckboxField";
+import Button from "@/presentation/components/forms/Button";
+import InputField from "@/presentation/components/forms/InputField";
+import CheckboxField from "@/presentation/components/forms/CheckboxField";
 import type { PermissionGroupProps, RoleActionsProps, RoleInfoProps } from "@/core/types/auth-types";
 
 

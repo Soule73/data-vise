@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { TableSearchState } from '../types/store';
+import type { TableSearchState } from '../types/theme-types';
 
 export const useTableSearchStore = create<TableSearchState>((set) => ({
   search: '',

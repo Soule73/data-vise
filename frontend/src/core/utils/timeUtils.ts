@@ -34,7 +34,8 @@ export function intervalToMs(
 /**
  * Formate l'unité d'intervalle en français (singulier/pluriel)
  */
-export function formatUnitFr(unit: IntervalUnit, value: number): string {
+export function formatUnitFr(unit: IntervalUnit | undefined, value: number): string {
+  if (!unit) return "inconnu";
   switch (unit) {
     case "second":
       return value > 1 ? "secondes" : "seconde";

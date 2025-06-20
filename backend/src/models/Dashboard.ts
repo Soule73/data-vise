@@ -50,6 +50,9 @@ const DashboardSchema = new Schema(
       default: "private",
     },
     history: { type: [DashboardHistoryItemSchema], default: [] },
+    // Partage public
+    shareEnabled: { type: Boolean, default: false },
+    shareId: { type: String, default: null, unique: true, sparse: true },
     // Auto-refresh config
     autoRefreshInterval: { type: Number, default: 60000 }, // ms, 1min par défaut
     autoRefreshIntervalValue: { type: Number }, // valeur personnalisée (ex: 5)

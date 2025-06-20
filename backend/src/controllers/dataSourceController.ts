@@ -62,10 +62,13 @@ const dataSourceController = {
   },
   async fetchData(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
-    const { from, to } = req.query;
+    const { from, to, page, pageSize, fields } = req.query;
     const result = await dataSourceService.fetchData(id, {
       from: from as string | undefined,
       to: to as string | undefined,
+      page: page ? Number(page) : undefined,
+      pageSize: pageSize ? Number(pageSize) : undefined,
+      fields: fields ? String(fields) : undefined,
     });
     return handleServiceResult(res, result);
   },

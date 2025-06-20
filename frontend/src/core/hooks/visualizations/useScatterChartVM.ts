@@ -1,27 +1,44 @@
 import { useMemo } from "react";
-import type { ChartOptions, ChartData } from "chart.js";
+import type { ScatterChartConfig } from "@/core/types/visualization";
+import type { ScatterMetricConfig } from "@/core/types/metric-bucket-types";
+import type { ChartOptions, ChartData, ChartDataset } from "chart.js";
 import {
   isIsoTimestamp,
   allSameDay,
   formatXTicksLabel,
 } from "@/core/utils/chartUtils";
 
-export function useScatterChartLogic(data: any[], config: any) {
-  const validDatasets = useMemo(
+function isScatterMetricConfig(metric: unknown): metric is ScatterMetricConfig {
+  return (
+    typeof metric === "object" &&
+    metric !== null &&
+    "x" in metric &&
+    "y" in metric
+  );
+}
+
+export function useScatterChartLogic(
+  data: Record<string, unknown>[],
+  config: ScatterChartConfig
+): {
+  chartData: ChartData<"scatter">;
+  options: ChartOptions<"scatter">;
+  validDatasets: ScatterMetricConfig[];
+} {
+  const validDatasets = useMemo<ScatterMetricConfig[]>(
     () =>
       Array.isArray(config.metrics)
-        ? config.metrics.filter((ds: any) => ds.x && ds.y)
+        ? config.metrics.filter(isScatterMetricConfig)
         : [],
     [config.metrics]
   );
-
-  const datasets = useMemo(
+  const datasets = useMemo<ChartDataset<"scatter">[]>(
     () =>
-      validDatasets.map((ds: any, i: number) => {
+      validDatasets.map((ds, i) => {
         let color =
           config.metricStyles?.[i]?.color || `hsl(${(i * 60) % 360}, 70%, 60%)`;
         let opacity = config.metricStyles?.[i]?.opacity ?? 0.7;
-        if (color.startsWith("#") && opacity < 1) {
+        if (typeof color === "string" && color.startsWith("#") && opacity < 1) {
           const hex = color.replace("#", "");
           const bigint = parseInt(hex, 16);
           const r = (bigint >> 16) & 255;
@@ -31,30 +48,22 @@ export function useScatterChartLogic(data: any[], config: any) {
         }
         return {
           label: ds.label || `Dataset ${i + 1}`,
-          data: data.map((row: any) => ({
+          data: data.map((row) => ({
             x: Number(row[ds.x]),
             y: Number(row[ds.y]),
           })),
           backgroundColor: color,
           borderColor: config.metricStyles?.[i]?.borderColor || undefined,
           borderWidth: config.metricStyles?.[i]?.borderWidth || 1,
-        };
+        } as ChartDataset<"scatter">;
       }),
     [validDatasets, data, config.metricStyles]
   );
 
-  const chartTitle = config.widgetParams?.title || "";
-  const showLegend =
-    config.widgetParams?.legend !== undefined
-      ? config.widgetParams.legend
-      : true;
-  const xLabel = config.widgetParams?.xLabel || "";
-  const yLabel = config.widgetParams?.yLabel || "";
-
   // Récupération des labels X (valeurs de la première série de données)
-  const labels = useMemo(() => {
+  const labels = useMemo<string[]>(() => {
     const ds = validDatasets[0];
-    return ds ? data.map((row: any) => row[ds.x]) : [];
+    return ds ? data.map((row) => String(row[ds.x] ?? "")) : [];
   }, [validDatasets, data]);
 
   // Détection si les labels X sont des timestamps ISO
@@ -64,24 +73,23 @@ export function useScatterChartLogic(data: any[], config: any) {
   }, [labels]);
   const xAllSameDay = useMemo(() => {
     if (!isXTimestamps || !labels || labels.length === 0) return false;
-    return allSameDay(labels);
+    return allSameDay(labels as string[]);
   }, [isXTimestamps, labels]);
 
   const chartData: ChartData<"scatter"> = useMemo(
     () => ({ datasets }),
     [datasets]
   );
-
   const options: ChartOptions<"scatter"> = useMemo(
     () => ({
       responsive: true,
       animation: false,
       plugins: {
-        legend: { display: showLegend },
-        title: chartTitle
+        legend: { display: config.widgetParams?.legend !== false },
+        title: config.widgetParams?.title
           ? {
               display: true,
-              text: chartTitle,
+              text: config.widgetParams.title,
             }
           : undefined,
         tooltip: {
@@ -97,11 +105,13 @@ export function useScatterChartLogic(data: any[], config: any) {
       scales: {
         x: {
           grid: { display: true },
-          title: xLabel ? { display: true, text: xLabel } : undefined,
+          title: config.widgetParams?.xLabel
+            ? { display: true, text: config.widgetParams.xLabel }
+            : undefined,
           ticks: {
             callback: (_: any, idx: number) =>
               isXTimestamps
-                ? formatXTicksLabel(labels[idx], xAllSameDay)
+                ? formatXTicksLabel(labels[idx] as string, xAllSameDay)
                 : labels[idx],
             maxRotation: 45,
             minRotation: 0,
@@ -110,12 +120,14 @@ export function useScatterChartLogic(data: any[], config: any) {
           },
         },
         y: {
-          title: yLabel ? { display: true, text: yLabel } : undefined,
+          title: config.widgetParams?.yLabel
+            ? { display: true, text: config.widgetParams.yLabel }
+            : undefined,
           grid: { display: true },
         },
       },
     }),
-    [showLegend, chartTitle, xLabel, yLabel]
+    [config.widgetParams, validDatasets, isXTimestamps, labels, xAllSameDay]
   );
 
   return { chartData, options, validDatasets };

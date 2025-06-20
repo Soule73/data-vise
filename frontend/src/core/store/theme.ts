@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ThemeMode, ThemeStore } from '../types/store';
+import type { ThemeMode, ThemeStore } from '../types/theme-types';
 
 
 function getInitialTheme(): ThemeMode {

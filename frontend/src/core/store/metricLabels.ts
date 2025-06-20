@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import type { MetricLabelState } from '../types/ui';
-
+import type { MetricLabelState } from '../types/metric-bucket-types';
 
 export const useMetricLabelStore = create<MetricLabelState>((set) => ({
   metricLabels: [],

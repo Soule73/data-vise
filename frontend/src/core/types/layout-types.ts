@@ -11,6 +11,9 @@ export interface AuthLayoutProps {
 
 export interface BaseLayoutProps {
     children: React.ReactNode;
+    hideSidebar?: boolean;
+    hideNavbar?: boolean;
+    hideUserInfo?: boolean;
 }
 
 export interface ModalProps {

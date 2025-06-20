@@ -110,7 +110,7 @@ export default function Table<T extends { [key: string]: any }>({
     if (onPageChange) onPageChange(newPage);
     else setLocalPage(newPage);
   };
-  const handleRowPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleRowPerPageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     if (onPageChange) {
       // Si pagination contrôlée, on notifie le parent

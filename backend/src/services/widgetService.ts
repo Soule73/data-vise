@@ -7,9 +7,12 @@ import type {
 import type { ApiResponse } from "@/types/api";
 
 const widgetService = {
-  async list(dashboardId?: string): Promise<ApiResponse<IWidget[]>> {
-    const filter: Record<string, unknown> = dashboardId ? { dashboardId } : {};
-    const widgets = await Widget.find(filter);
+  async list(
+    userId?: string
+  ): Promise<ApiResponse<IWidget[]>> {
+    const widgets = await Widget.find({
+      $or: [{ ownerId: userId }, { visibility: "public" }],
+    });
     return { data: widgets };
   },
   async create(payload: WidgetCreatePayload): Promise<ApiResponse<IWidget>> {

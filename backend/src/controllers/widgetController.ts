@@ -5,11 +5,10 @@ import { AuthRequest } from "@/types/authType";
 
 const widgetController = {
   async list(req: Request, res: Response, next: NextFunction) {
-    const dashboardId =
-      typeof req.query.dashboardId === "string"
-        ? req.query.dashboardId
-        : undefined;
-    const result = await widgetService.list(dashboardId);
+
+    const userId = (req as AuthRequest).user?.id;
+
+    const result = await widgetService.list(userId);
     return handleServiceResult(res, result);
   },
   async create(req: Request, res: Response, next: NextFunction) {

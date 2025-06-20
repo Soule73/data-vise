@@ -3,7 +3,6 @@ import InvalideConfigWidget from "../charts/InvalideConfigWidget";
 import NoDataWidget from "../charts/NoDataWidget";
 import KPIWidget from "./KPIWidget";
 import { useKPIGroupVM } from "@/core/hooks/visualizations/useKPIGroupVM";
-import { useEffect, useState } from "react";
 import type { KPIGroupWidgetConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 
@@ -32,23 +31,8 @@ export default function KPIGroupWidget({
     );
   }
 
-  const { metrics, metricStyles, filters, columns, widgetParamsList } =
+  const { metrics, metricStyles, filters, gridColumns, widgetParamsList } =
     useKPIGroupVM(config);
-
-  const [gridColumns, setGridColumns] = useState(1);
-
-  useEffect(() => {
-    function handleResize() {
-      if (window.innerWidth < 640) {
-        setGridColumns(1);
-      } else {
-        setGridColumns(columns);
-      }
-    }
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [columns]);
 
   return (
     <div

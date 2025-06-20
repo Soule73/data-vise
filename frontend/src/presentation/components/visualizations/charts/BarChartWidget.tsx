@@ -57,7 +57,7 @@ export default function BarChartWidget({
   return (
     <div className="shadow bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
       <Bar
-        className="w-full max-w-full h-auto p-1 md:p-2"
+        className="max-w-full max-h-full p-1 md:p-2"
         data={chartData}
         options={options}
         style={{ width: "100%", maxWidth: "100%", height: "auto", minWidth: 0 }}

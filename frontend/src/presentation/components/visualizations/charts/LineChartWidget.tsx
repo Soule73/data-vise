@@ -59,9 +59,9 @@ export default function LineChartWidget({
   const { chartData, options, showNativeValues, valueLabelsPlugin } =
     useLineChartLogic(data, config);
   return (
-    <div className="bg-white shadow dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-x-auto">
+    <div className=" bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
       <Line
-        className="w-full max-w-full h-auto p-1 md:p-2"
+        className="max-w-full max-h-full p-1 md:p-2"
         data={chartData}
         options={options}
         plugins={showNativeValues ? [valueLabelsPlugin] : []}

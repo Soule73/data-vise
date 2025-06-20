@@ -11,6 +11,7 @@ function getPermissionList(user: User | null): string[] {
 export interface UserStoreWithPerms extends UserState {
   getPermissions: () => string[];
   hasPermission: (permName: string) => boolean;
+  isOwner: (ownerId: string) => boolean;
 }
 
 export const useUserStore = create<UserStoreWithPerms>(
@@ -28,7 +29,14 @@ export const useUserStore = create<UserStoreWithPerms>(
       },
       getPermissions: () => getPermissionList(get().user),
       hasPermission: (permName: string) => {
-        return getPermissionList(get().user).includes(permName);
+        const can = getPermissionList(get().user).includes(permName);
+
+        return can;
+      },
+      isOwner: (ownerId: string) => {
+        const user = get().user;
+        if (!user || !user._id) return false;
+        return user._id === ownerId;
       },
     }),
     {

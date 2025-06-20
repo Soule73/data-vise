@@ -10,11 +10,32 @@ import type {
   KPIGroupWidgetConfig,
   CardWidgetConfig,
 } from "@/core/types/visualization";
-import type { Widget } from "@/core/models/Widget";
 
 // ======================================================
 // 1. Widgets & Configuration
 // ======================================================
+
+
+export interface Widget {
+  _id?: string;
+  widgetId: string;
+  title: string;
+  type: string;
+  dataSourceId: string;
+  config?: Record<string, any>;
+  ownerId: string;
+  visibility: "public" | "private";
+  history?: WidgetHistoryItem[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface WidgetHistoryItem {
+  userId: string;
+  date: string;
+  action: "create" | "update" | "delete";
+  changes?: Record<string, any>;
+}
 
 export type WidgetType =
   | "bar"
@@ -30,52 +51,52 @@ export type WidgetType =
 
 export type VisualizationWidgetPropsMap = {
   bar: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: BarChartConfig;
     editMode?: boolean;
   };
   line: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: LineChartConfig;
     editMode?: boolean;
   };
   pie: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: PieChartConfig;
     editMode?: boolean;
   };
   table: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: TableWidgetConfig;
     editMode?: boolean;
   };
   scatter: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: ScatterChartConfig;
     editMode?: boolean;
   };
   bubble: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: BubbleChartConfig;
     editMode?: boolean;
   };
   radar: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: RadarChartConfig;
     editMode?: boolean;
   };
   kpi: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: KPIWidgetConfig;
     editMode?: boolean;
   };
   kpi_group: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: KPIGroupWidgetConfig;
     editMode?: boolean;
   };
   card: {
-    data: Record<string, unknown>[];
+    data: Record<string, any>[];
     config: CardWidgetConfig;
     editMode?: boolean;
   };
@@ -86,7 +107,7 @@ export type VisualizationWidgetProps<T extends WidgetType = WidgetType> =
 
 export interface WidgetDefinition<
   T extends WidgetType = WidgetType,
-  TConfig = unknown
+  TConfig = any
 > {
   type: T;
   label: string;
@@ -101,13 +122,13 @@ export interface WidgetDefinition<
 // --- Widget Configuration Sections
 
 export interface WidgetDataConfigSectionProps<
-  TDataConfig = unknown,
-  TConfig = unknown
+  TDataConfig = any,
+  TConfig = any
 > {
   dataConfig: TDataConfig;
   config: TConfig;
   columns: string[];
-  handleConfigChange: (field: string, value: unknown) => void;
+  handleConfigChange: (field: string, value: any) => void;
   handleDragStart: (idx: number) => void;
   handleDragOver: (idx: number, e: React.DragEvent) => void;
   handleDrop: (idx: number) => void;
@@ -119,8 +140,8 @@ export interface WidgetDataConfigSectionProps<
 }
 
 export interface WidgetMetricStyleConfigSectionProps<
-  TMetric = unknown,
-  TMetricStyle = unknown
+  TMetric = any,
+  TMetricStyle = any
 > {
   type: WidgetType;
   metrics: TMetric[];
@@ -128,21 +149,21 @@ export interface WidgetMetricStyleConfigSectionProps<
   handleMetricStyleChange: (
     metricIdx: number,
     field: string,
-    value: unknown
+    value: any
   ) => void;
 }
 
-export interface WidgetParamsConfigSectionProps<TConfig = unknown> {
+export interface WidgetParamsConfigSectionProps<TConfig = any> {
   type: WidgetType;
   config: TConfig;
-  handleConfigChange: (field: string, value: unknown) => void;
+  handleConfigChange: (field: string, value: any) => void;
 }
 
-export interface WidgetStyleConfigSectionProps<TConfig = unknown> {
+export interface WidgetStyleConfigSectionProps<TConfig = any> {
   type: WidgetType;
   config: TConfig;
   columns: string[];
-  handleConfigChange: (field: string, value: unknown) => void;
+  handleConfigChange: (field: string, value: any) => void;
 }
 
 // --- Widget Modals & Selecteurs
@@ -185,13 +206,13 @@ export interface WidgetCreateSelectorResult {
   sourceId: string;
 }
 
-export interface WidgetFormInitialValues<TConfig = unknown> {
+export interface WidgetFormInitialValues<TConfig = any> {
   type?: WidgetType;
   config?: TConfig;
   title?: string;
   sourceId?: string;
   columns?: string[];
-  dataPreview?: Record<string, unknown>[];
+  dataPreview?: Record<string, any>[];
   visibility?: "public" | "private";
   disableAutoConfig?: boolean;
 }

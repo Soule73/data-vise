@@ -4,20 +4,22 @@ import React, { useEffect, useState, type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "@/presentation/pages/auth/LoginPage";
 // import Register from "@/presentation/pages/auth/RegisterPage";
-import SourcesPage from "@/presentation/pages/SourceListPage";
-import AddSourcePage from "@/presentation/pages/AddSourcePage";
-import BaseLayout from "@/presentation/components/BaseLayout";
+import SourcesPage from "@/presentation/pages/datasource/SourceListPage";
+import AddSourcePage from "@/presentation/pages/datasource/AddSourcePage";
+import BaseLayout from "@/presentation/components/layouts/BaseLayout";
 import { useUserStore } from "@/core/store/user";
 import { ROUTES } from "@/core/constants/routes";
-import WidgetListPage from "@/presentation/pages/WidgetListPage";
-import WidgetCreatePage from "@/presentation/pages/WidgetCreatePage";
-import RoleManagementPage from "@/presentation/pages/RoleManagementPage";
-import RoleCreatePage from "@/presentation/pages/RoleCreatePage";
-import UserManagementPage from "@/presentation/pages/UserManagementPage";
-import DashboardPage from "@/presentation/pages/DashboardPage";
-import DashboardListPage from "@/presentation/pages/DashboardListPage";
-import WidgetEditPage from "@/presentation/pages/WidgetEditPage";
-import AppLoader from "@/presentation/components/AppLoader";
+import WidgetListPage from "@/presentation/pages/widget/WidgetListPage";
+import WidgetCreatePage from "@/presentation/pages/widget/WidgetCreatePage";
+import RoleManagementPage from "@/presentation/pages/auth/RoleManagementPage";
+import RoleCreatePage from "@/presentation/pages/auth/RoleCreatePage";
+import UserManagementPage from "@/presentation/pages/auth/UserManagementPage";
+import DashboardPage from "@/presentation/pages/dashboard/DashboardPage";
+import DashboardListPage from "@/presentation/pages/dashboard/DashboardListPage";
+import WidgetEditPage from "@/presentation/pages/widget/WidgetEditPage";
+import AppLoader from "@/presentation/components/layouts/AppLoader";
+import DashboardSharePage from "@/presentation/pages/dashboard/DashboardSharePage";
+import ErrorPage from "./presentation/components/layouts/ErrorPage";
 
 function RequireAuth({
   children,
@@ -31,9 +33,11 @@ function RequireAuth({
   if (!user) return <Navigate to={ROUTES.login} replace />;
   if (permission && !hasPermission(permission)) {
     return (
-      <div className="flex items-center justify-center h-full text-xl text-red-500">
-        Accès refusé
-      </div>
+      <ErrorPage
+        code={403}
+        title="Accès refusé"
+        message="Vous n'avez pas les permissions nécessaires pour accéder à cette page."
+        />
     );
   }
   return <BaseLayout>{children}</BaseLayout>;
@@ -144,6 +148,10 @@ const App: React.FC = () => {
               <WidgetEditPage />
             </RequireAuth>
           }
+        />
+        <Route
+          path={ROUTES.dashboardShare}
+          element={<DashboardSharePage />}
         />
         <Route path="/" element={<Navigate to={ROUTES.dashboard} replace />} />
         <Route path="*" element={<Navigate to={ROUTES.dashboard} replace />} />

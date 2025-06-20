@@ -4,7 +4,6 @@ import {
   // getLabels, getLegendPosition, getTitle, getTitleAlign
 } from "@/core/utils/chartUtils";
 
-
 export function useTableWidgetLogic(data: any[], config: any) {
   const safeData = Array.isArray(data) ? data : [];
   const hasMetrics = Array.isArray(config.metrics) && config.metrics.length > 0;
@@ -56,7 +55,10 @@ export function useTableWidgetLogic(data: any[], config: any) {
                 .map((r: any) => Number(r[col.key]))
                 .filter((v: number) => !isNaN(v));
               if (nums.length === rows.length && nums.length > 0) {
-                summary[col.key] = nums.reduce((a: number, b: number) => a + b, 0);
+                summary[col.key] = nums.reduce(
+                  (a: number, b: number) => a + b,
+                  0
+                );
               } else {
                 summary[col.key] = rows[0][col.key] ?? "";
               }
