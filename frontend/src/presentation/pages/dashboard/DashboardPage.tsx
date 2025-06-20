@@ -5,7 +5,6 @@ import DashboardHeader from "../../components/dashoards/DashboardHeader";
 import { EmptyDashboard } from "@/presentation/components/dashoards/EmptyDashboard";
 import { DashboardSaveModal } from "./DashboardSaveModal";
 
-
 export default function DashboardPage() {
   // --- Hooks et stores ---
   const {
@@ -57,6 +56,7 @@ export default function DashboardPage() {
     handleEnableShare,
     handleDisableShare,
     handleCopyShareLink,
+    handleExportPDF,
   } = useDashboard();
 
   // --- Rendu ---
@@ -112,6 +112,7 @@ export default function DashboardPage() {
         handleEnableShare={handleEnableShare}
         handleDisableShare={handleDisableShare}
         handleCopyShareLink={handleCopyShareLink}
+        handleExportPDF={handleExportPDF}
       />
       {/* Grille ou placeholder */}
       {isCreate ? (
@@ -119,7 +120,7 @@ export default function DashboardPage() {
           <EmptyDashboard />
         ) : (
           <DashboardGrid
-          layout={layout ?? []}
+            layout={layout ?? []}
             onSwapLayout={handleSwapLayout}
             sources={sources ?? []}
             editMode={true}

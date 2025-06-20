@@ -86,7 +86,6 @@ export interface SaveModalProps {
   handleConfirmSave: (visibility: "public" | "private") => void;
 }
 
-
 export interface UseGridItemProps {
   widget: DashboardLayoutItem["widget"];
   sources: DataSource[];

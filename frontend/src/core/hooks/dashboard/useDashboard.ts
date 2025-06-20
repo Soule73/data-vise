@@ -13,8 +13,17 @@ import {
   updateDashboardQuery,
   createDashboardQuery,
 } from "@/data/repositories/dashboards";
-import { getEffectiveTimeRange, buildTimeRange, getAutoRefreshMs, getDashboardBreadcrumb, initDashboardTimeConfig } from "@/core/utils/dashboardUtils";
-import { enableDashboardShare, disableDashboardShare } from "@/data/services/dashboard";
+import {
+  getEffectiveTimeRange,
+  buildTimeRange,
+  getAutoRefreshMs,
+  getDashboardBreadcrumb,
+  initDashboardTimeConfig,
+} from "@/core/utils/dashboardUtils";
+import {
+  enableDashboardShare,
+  disableDashboardShare,
+} from "@/data/services/dashboard";
 
 // Hook principal pour la gestion d'un dashboard (création/édition)
 export function useDashboard(onSaveCallback?: (success: boolean) => void) {
@@ -34,9 +43,9 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     dashboardId,
     !isCreate && !!dashboardId
   );
-  const { data: sources = [], isLoading: isLoadingSources } = sourcesQuery(
-    {queryClient}
-  );
+  const { data: sources = [], isLoading: isLoadingSources } = sourcesQuery({
+    queryClient,
+  });
 
   // --- Stores Zustand ---
   const layout = useDashboardStore((s) => s.layout);
@@ -64,8 +73,9 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   const [autoRefreshIntervalValue, setAutoRefreshIntervalValue] = useState<
     number | undefined
   >(dashboard?.autoRefreshIntervalValue);
-  const [autoRefreshIntervalUnit, setAutoRefreshIntervalUnit] =
-    useState<IntervalUnit | undefined>(dashboard?.autoRefreshIntervalUnit ?? "minute");
+  const [autoRefreshIntervalUnit, setAutoRefreshIntervalUnit] = useState<
+    IntervalUnit | undefined
+  >(dashboard?.autoRefreshIntervalUnit ?? "minute");
   const [timeRangeFrom, setTimeRangeFrom] = useState<string | null>(
     dashboard?.timeRange?.from ?? null
   );
@@ -76,7 +86,9 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
   const [relativeValue, setRelativeValue] = useState<number | undefined>(
     undefined
   );
-  const [relativeUnit, setRelativeUnit] = useState<IntervalUnit | undefined>("minute");
+  const [relativeUnit, setRelativeUnit] = useState<IntervalUnit | undefined>(
+    "minute"
+  );
   const [timeRangeMode, setTimeRangeMode] = useState<"absolute" | "relative">(
     "absolute"
   );
@@ -97,7 +109,9 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     try {
       const { shareId } = await enableDashboardShare(dashboardId);
       setShareLink(window.location.origin + "/dashboard/share/" + shareId);
-      await queryClient.invalidateQueries({ queryKey: ["dashboard", dashboardId] });
+      await queryClient.invalidateQueries({
+        queryKey: ["dashboard", dashboardId],
+      });
     } catch (e: any) {
       setShareError(e?.message || "Erreur lors de l'activation du partage");
     } finally {
@@ -112,7 +126,9 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     try {
       await disableDashboardShare(dashboardId);
       setShareLink(null);
-      await queryClient.invalidateQueries({ queryKey: ["dashboard", dashboardId] });
+      await queryClient.invalidateQueries({
+        queryKey: ["dashboard", dashboardId],
+      });
     } catch (e: any) {
       setShareError(e?.message || "Erreur lors de la désactivation du partage");
     } finally {
@@ -209,7 +225,10 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
       autoRefreshIntervalValue &&
       autoRefreshIntervalUnit
     ) {
-      const ms = getAutoRefreshMs(autoRefreshIntervalValue, autoRefreshIntervalUnit);
+      const ms = getAutoRefreshMs(
+        autoRefreshIntervalValue,
+        autoRefreshIntervalUnit
+      );
       setEffectiveTimeRange(
         getEffectiveTimeRange({
           timeRangeMode,
@@ -266,7 +285,24 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
 
   // --- Helpers : calculs secondaires ---
   const { from: effectiveFrom, to: effectiveTo } = effectiveTimeRange;
-  const refreshMs = getAutoRefreshMs(autoRefreshIntervalValue, autoRefreshIntervalUnit);
+  const refreshMs = getAutoRefreshMs(
+    autoRefreshIntervalValue,
+    autoRefreshIntervalUnit
+  );
+
+  // --- Export PDF ---
+  const handleExportPDF = () => {
+    // eslint-disable-next-line no-console
+    console.log("[useDashboard] handleExportPDF appelé");
+    import("@/core/utils/dashboardExportUtils").then(
+      ({ exportDashboardToPDF }) => {
+        exportDashboardToPDF({
+          gridSelector: ".dashboard-grid",
+          filename: `${dashboard?.title || "dashboard"}.pdf`,
+        });
+      }
+    );
+  };
 
   // --- Handlers principaux ---
   const handleAddWidget = (widget: any) => {
@@ -295,22 +331,27 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     setSaving(true);
     try {
       // Correction : choisir le bon layout selon le mode
-      const layoutToSave = isCreate ? localDashboard.layout : useDashboardStore.getState().layout;
+      const layoutToSave = isCreate
+        ? localDashboard.layout
+        : useDashboardStore.getState().layout;
       // DEBUG : log des données envoyées
-      console.log("[DEBUG] updateDashboardQuery", { dashboardId, updates: {
-        ...updates,
-        layout: layoutToSave,
-        autoRefreshIntervalValue,
-        autoRefreshIntervalUnit,
-        timeRange: buildTimeRange({
-          timeRangeMode,
-          relativeValue,
-          relativeUnit,
-          timeRangeFrom,
-          timeRangeTo,
-        }),
-        visibility: updates?.visibility ?? visibility,
-      }});
+      console.log("[DEBUG] updateDashboardQuery", {
+        dashboardId,
+        updates: {
+          ...updates,
+          layout: layoutToSave,
+          autoRefreshIntervalValue,
+          autoRefreshIntervalUnit,
+          timeRange: buildTimeRange({
+            timeRangeMode,
+            relativeValue,
+            relativeUnit,
+            timeRangeFrom,
+            timeRangeTo,
+          }),
+          visibility: updates?.visibility ?? visibility,
+        },
+      });
       await updateDashboardQuery({
         dashboardId,
         updates: {
@@ -339,7 +380,10 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     } catch (e: any) {
       // Affichage de l'erreur réelle si possible
       console.error("[ERROR] updateDashboardQuery", e);
-      const errorMsg = e?.response?.data?.message || e?.message || "Erreur lors de la sauvegarde";
+      const errorMsg =
+        e?.response?.data?.message ||
+        e?.message ||
+        "Erreur lors de la sauvegarde";
       showNotification({
         open: true,
         type: "error",
@@ -387,7 +431,7 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
       try {
         await handleCreateDashboard(pendingTitle, customVisibility);
         setSaveModalOpen(false);
-      } catch (e) { }
+      } catch (e) {}
       return;
     }
     await handleSaveDashboard({
@@ -515,5 +559,6 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     handleEnableShare,
     handleDisableShare,
     handleCopyShareLink,
+    handleExportPDF,
   };
 }

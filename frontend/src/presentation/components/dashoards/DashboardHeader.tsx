@@ -10,6 +10,7 @@ export type IntervalUnit =
 
 import DashboardConfigFields from "@/presentation/components/dashoards/DashboardConfigFields";
 import DashboardSharePopover from "@/presentation/components/dashoards/DashboardSharePopover";
+import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 
 interface DashboardHeaderProps {
   editMode: boolean;
@@ -52,6 +53,7 @@ interface DashboardHeaderProps {
   handleEnableShare?: () => void;
   handleDisableShare?: () => void;
   handleCopyShareLink?: () => void;
+  handleExportPDF: () => void; // Ajout de la prop pour l'export PDF
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
@@ -85,6 +87,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   handleEnableShare,
   handleDisableShare,
   handleCopyShareLink,
+  handleExportPDF, // Récupération de la prop pour l'export PDF
 }) => {
   return (
     <div className="flex flex-col md:flex-row space-y-4 justify-start items-start md:items-center md:justify-between mb-2">
@@ -151,6 +154,15 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               handleCopyShareLink={handleCopyShareLink}
             />
           )}
+          {/* Bouton d'export PDF */}
+          <button
+            type="button"
+            className="flex items-center gap-1 text-xs text-indigo-600 hover:underline bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1"
+            onClick={handleExportPDF}
+            title="Exporter le dashboard en PDF"
+          >
+            <ArrowDownTrayIcon className="w-4 h-4" /> Exporter PDF
+          </button>
         </div>
       ) : null}
       {/* Bloc UI avancé de configuration déplacé dans DashboardConfigFields */}

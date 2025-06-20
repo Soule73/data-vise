@@ -76,7 +76,7 @@ export default function DashboardGridItem(props: DashboardGridItemProps) {
     <div
       ref={editMode ? widgetRef : undefined}
       key={item?.widgetId || idx}
-      className={styleProps.className}
+      className={"dashboard-widget " + styleProps.className}
       style={styleProps.style}
       {...dragProps}
     >

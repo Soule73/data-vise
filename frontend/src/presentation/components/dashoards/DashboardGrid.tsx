@@ -60,7 +60,7 @@ export default function DashboardGrid({
   // --- Rendu ---
   return (
     <div
-      className={`w-full flex flex-wrap min-w-full gap-2 ${
+      className={`dashboard-grid w-full flex flex-wrap min-w-full gap-2 ${
         editMode &&
         "border-2 border-dashed border-gray-300 dark:border-gray-700"
       }`}
