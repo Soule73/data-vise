@@ -4,6 +4,7 @@ import { useDashboard } from "@/core/hooks/dashboard/useDashboard";
 import DashboardHeader from "../../components/dashoards/DashboardHeader";
 import { EmptyDashboard } from "@/presentation/components/dashoards/EmptyDashboard";
 import { DashboardSaveModal } from "./DashboardSaveModal";
+import ExportPDFModal from "@/presentation/components/ExportPDFModal";
 
 export default function DashboardPage() {
   // --- Hooks et stores ---
@@ -57,6 +58,8 @@ export default function DashboardPage() {
     handleDisableShare,
     handleCopyShareLink,
     handleExportPDF,
+    exportPDFModalOpen,
+    setExportPDFModalOpen,
   } = useDashboard();
 
   // --- Rendu ---
@@ -112,7 +115,13 @@ export default function DashboardPage() {
         handleEnableShare={handleEnableShare}
         handleDisableShare={handleDisableShare}
         handleCopyShareLink={handleCopyShareLink}
-        handleExportPDF={handleExportPDF}
+        handleExportPDF={() => setExportPDFModalOpen(true)}
+      />
+      {/* Modal d'export PDF */}
+      <ExportPDFModal
+        open={exportPDFModalOpen}
+        onClose={() => setExportPDFModalOpen(false)}
+        onExport={handleExportPDF}
       />
       {/* Grille ou placeholder */}
       {isCreate ? (

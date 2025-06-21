@@ -9,6 +9,7 @@ import jsPDF from "jspdf";
 export async function exportDashboardToPDF({
   gridSelector = ".dashboard-grid",
   filename = "dashboard.pdf",
+  orientation = "landscape",
 } = {}) {
   // Log pour debug : vérifier que la fonction est bien appelée
   // eslint-disable-next-line no-console
@@ -70,11 +71,9 @@ export async function exportDashboardToPDF({
     await new Promise((resolve) => {
       img.onload = resolve;
     });
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "pt",
-      format: "a4",
-    });
+    // Correction : passer orientation en premier argument (signature jsPDF)
+    // Cast explicite pour satisfaire TypeScript
+    const pdf = new jsPDF(orientation as "landscape" | "portrait", "pt", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     // Calcul du ratio pour que l'image tienne dans la page

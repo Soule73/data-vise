@@ -24,6 +24,7 @@ import {
   enableDashboardShare,
   disableDashboardShare,
 } from "@/data/services/dashboard";
+import { exportDashboardToPDF } from "@/core/utils/dashboardExportUtils";
 
 // Hook principal pour la gestion d'un dashboard (création/édition)
 export function useDashboard(onSaveCallback?: (success: boolean) => void) {
@@ -93,6 +94,37 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     "absolute"
   );
   const [visibility, setVisibility] = useState<"public" | "private">("private");
+  // --- Export PDF Modal ---
+  const [exportPDFModalOpen, setExportPDFModalOpen] = useState(false);
+
+  // Utilitaire pour générer un nom de fichier PDF propre à partir du titre du dashboard
+  function getDashboardPDFFileName(title?: string) {
+    if (!title) return "dashboard.pdf";
+    // Remplace les espaces par des tirets, enlève les caractères spéciaux, minuscule
+    return (
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-+|-+$/g, "") + ".pdf"
+    );
+  }
+
+  // Handler appelé par le bouton d'export (ouvre le modal)
+  const handleOpenExportPDFModal = () => setExportPDFModalOpen(true);
+  // Handler appelé par le modal pour lancer l'export
+  const handleExportPDFConfirm = async (options: {
+    orientation: "portrait" | "landscape";
+  }) => {
+    setExportPDFModalOpen(false);
+    const filename = getDashboardPDFFileName(dashboard?.title);
+    await exportDashboardToPDF({
+      gridSelector: ".dashboard-grid",
+      filename,
+      orientation: options.orientation,
+    });
+  };
 
   // --- Partage public ---
   const [shareLoading, setShareLoading] = useState(false);
@@ -290,19 +322,19 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     autoRefreshIntervalUnit
   );
 
-  // --- Export PDF ---
-  const handleExportPDF = () => {
-    // eslint-disable-next-line no-console
-    console.log("[useDashboard] handleExportPDF appelé");
-    import("@/core/utils/dashboardExportUtils").then(
-      ({ exportDashboardToPDF }) => {
-        exportDashboardToPDF({
-          gridSelector: ".dashboard-grid",
-          filename: `${dashboard?.title || "dashboard"}.pdf`,
-        });
-      }
-    );
-  };
+  // // --- Export PDF ---
+  // const handleExportPDF = () => {
+  //   // eslint-disable-next-line no-console
+  //   console.log("[useDashboard] handleExportPDF appelé");
+  //   import("@/core/utils/dashboardExportUtils").then(
+  //     ({ exportDashboardToPDF }) => {
+  //       exportDashboardToPDF({
+  //         gridSelector: ".dashboard-grid",
+  //         filename: `${dashboard?.title || "dashboard"}.pdf`,
+  //       });
+  //     }
+  //   );
+  // };
 
   // --- Handlers principaux ---
   const handleAddWidget = (widget: any) => {
@@ -559,6 +591,9 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     handleEnableShare,
     handleDisableShare,
     handleCopyShareLink,
-    handleExportPDF,
+    exportPDFModalOpen,
+    setExportPDFModalOpen,
+    handleOpenExportPDFModal,
+    handleExportPDF: handleExportPDFConfirm,
   };
 }
