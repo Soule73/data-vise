@@ -1,6 +1,13 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { ClipboardDocumentIcon, LinkIcon, EyeSlashIcon, EyeIcon, ShareIcon } from "@heroicons/react/24/outline";
+import {
+  ClipboardDocumentIcon,
+  LinkIcon,
+  EyeSlashIcon,
+  EyeIcon,
+  ShareIcon,
+} from "@heroicons/react/24/outline";
 import React from "react";
+import { Link } from "react-router-dom";
 
 interface DashboardSharePopoverProps {
   isShareEnabled?: boolean;
@@ -37,8 +44,7 @@ const DashboardSharePopover: React.FC<DashboardSharePopoverProps> = ({
         className="z-50 mt-2 !w-xs rounded-xl bg-white dark:bg-gray-900 p-4 shadow-xl border border-gray-200 dark:border-gray-700 flex flex-col gap-3"
       >
         <span className="font-medium text-sm text-gray-700 dark:text-gray-200 mb-1">
-            Partage le tableau de bord
-
+          Partage le tableau de bord
         </span>
         {isShareEnabled ? (
           <div className="flex flex-col gap-2">
@@ -61,14 +67,16 @@ const DashboardSharePopover: React.FC<DashboardSharePopoverProps> = ({
               >
                 <ClipboardDocumentIcon className="w-4 h-4" /> Copier le lien
               </button>
-              <a
-                href={shareLink || (currentShareId ? `/dashboard/share/${currentShareId}` : undefined)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
-              >
-                <LinkIcon className="w-4 h-4" /> Voir le lien
-              </a>
+              {(currentShareId || shareLink) && (
+                <Link
+                  to={shareLink || `/dashboard/share/${currentShareId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                >
+                  <LinkIcon className="w-4 h-4" /> Voir le lien
+                </Link>
+              )}
             </div>
           </div>
         ) : (
@@ -77,7 +85,7 @@ const DashboardSharePopover: React.FC<DashboardSharePopoverProps> = ({
               <EyeSlashIcon className="w-4 h-4" /> Désactivé
             </span>
             <button
-              className="text-xs text-green-600 hover:underline w-max"
+              className="text-xs cursor-pointer text-green-600 hover:underline w-max"
               onClick={handleEnableShare}
               disabled={shareLoading}
             >
@@ -89,7 +97,9 @@ const DashboardSharePopover: React.FC<DashboardSharePopoverProps> = ({
           <span className="text-xs text-red-500 mt-1">{shareError}</span>
         )}
         <div className="text-xs text-gray-500 mt-2">
-          Toute personne disposant du lien peut consulter ce tableau de bord en lecture seule.</div>
+          Toute personne disposant du lien peut consulter ce tableau de bord en
+          lecture seule.
+        </div>
       </PopoverPanel>
     </Popover>
   );

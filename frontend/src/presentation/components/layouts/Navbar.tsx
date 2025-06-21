@@ -6,13 +6,14 @@ import { ROUTES } from "@/core/constants/routes";
 import logoDataVise from "../../../core/assets/logo-datavise.svg";
 import useNavBar from "@/core/hooks/useNavBar";
 
-export default function Navbar({ hideUserInfo = false,hideSidebar=false }: { hideUserInfo?: boolean,hideSidebar?: boolean }) {
- const {
-        open,
-        openSidebar,
-        closeSidebar,
-        breadcrumb,
-    } = useNavBar();
+export default function Navbar({
+  hideUserInfo = false,
+  hideSidebar = false,
+}: {
+  hideUserInfo?: boolean;
+  hideSidebar?: boolean;
+}) {
+  const { open, openSidebar, closeSidebar, breadcrumb } = useNavBar();
 
   return (
     <header
@@ -20,21 +21,25 @@ export default function Navbar({ hideUserInfo = false,hideSidebar=false }: { hid
     bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm"
     >
       <div className="flex items-center md:gap-2">
-        {!hideSidebar &&<button
-          className="p-2 cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
-          aria-label="Ouvrir le menu"
-          onClick={open ? closeSidebar : openSidebar}
-        >
-          {open ? (
-            <XMarkIcon className="w-6 h-6" aria-label="Fermer le menu" />
-          ) : (
-            <Bars3Icon className="w-6 h-6" aria-label="Ouvrir le menu" />
-          )}
-        </button>}
+        {!hideSidebar && (
+          <button
+            className="p-2 cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="Ouvrir le menu"
+            onClick={open ? closeSidebar : openSidebar}
+          >
+            {open ? (
+              <XMarkIcon className="w-6 h-6" aria-label="Fermer le menu" />
+            ) : (
+              <Bars3Icon className="w-6 h-6" aria-label="Ouvrir le menu" />
+            )}
+          </button>
+        )}
         <img
           src={logoDataVise}
           alt="Logo DataVise"
-          className={`h-10 w-auto  ${hideSidebar ? 'border-r': 'border-x'} px-2 border-gray-300 dark:border-gray-700`}
+          className={`h-10 w-auto  ${
+            hideSidebar ? "border-r" : "border-x"
+          } px-2 border-gray-300 dark:border-gray-700`}
           style={{ minWidth: 40 }}
         />
         <Breadcrumb breadcrumb={breadcrumb} hideSidebar={hideSidebar} />
@@ -59,19 +64,21 @@ function Breadcrumb({
       className=" hidden md:flex items-center text-xs text-gray-500 dark:text-gray-300 gap-1"
       aria-label="Ouvrir la barre de navigation"
     >
-      {!hideSidebar && <Link
-        to={ROUTES.dashboardList}
-        className="hover:underline cursor-pointer flex items-center gap-1"
-      >
-        <HomeIcon className="w-4 h-4" />
-      </Link>}
+      {!hideSidebar && (
+        <Link
+          to={ROUTES.dashboardList}
+          className="hover:underline cursor-pointer flex items-center gap-1"
+        >
+          <HomeIcon className="w-4 h-4" />
+        </Link>
+      )}
       {breadcrumb.map((item, idx) => {
         const isFirst = idx === 0;
         const isLast = idx === breadcrumb.length - 1;
 
         return (
           <span key={item.url} className="flex items-center gap-1">
-            {(!hideSidebar && isFirst) &&<span className="mx-1">/</span>}
+            {!hideSidebar && !isFirst && <span className="mx-1">/</span>}
             {isLast ? (
               <span className="font-semibold text-indigo-500 ">
                 {item.label}

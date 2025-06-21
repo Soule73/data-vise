@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
+import SelectField from "./SelectField";
+import Button from "./forms/Button";
 
 interface ExportPDFModalProps {
   open: boolean;
@@ -25,47 +27,29 @@ const ExportPDFModal: React.FC<ExportPDFModalProps> = ({
     >
       <div className="space-y-4">
         <div>
-          <label className="block font-medium mb-1">Format du PDF</label>
-          <div className="flex gap-4">
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                name="orientation"
-                value="landscape"
-                checked={orientation === "landscape"}
-                onChange={() => setOrientation("landscape")}
-                className="mr-2"
-              />
-              Paysage
-            </label>
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                name="orientation"
-                value="portrait"
-                checked={orientation === "portrait"}
-                onChange={() => setOrientation("portrait")}
-                className="mr-2"
-              />
-              Portrait
-            </label>
-          </div>
+          <SelectField
+            id="pdf-orientation"
+            label="Orientation"
+            value={orientation}
+            onChange={(e: any) => setOrientation(e.target.value)}
+            options={[
+              { value: "landscape", label: "Paysage" },
+              { value: "portrait", label: "Portrait" },
+            ]}
+          />
         </div>
-        {/* Option future : choix du contenu à exporter */}
       </div>
       <div className="flex justify-end gap-2 mt-6">
-        <button
-          className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
-          onClick={onClose}
-        >
+        <Button color="gray" variant="outline" onClick={onClose}>
           Annuler
-        </button>
-        <button
-          className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white"
+        </Button>
+        <Button
+          color="indigo"
+          variant="solid"
           onClick={() => onExport({ orientation })}
         >
           Exporter
-        </button>
+        </Button>
       </div>
     </Modal>
   );
