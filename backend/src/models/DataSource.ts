@@ -15,6 +15,13 @@ const DataSourceSchema = new Schema<IDataSource>(
       default: "private",
     },
     timestampField: { type: String },
+    httpMethod: { type: String, enum: ["GET", "POST"], default: "GET" },
+    authType: {
+      type: String,
+      enum: ["none", "bearer", "apiKey", "basic"],
+      default: "none",
+    },
+    authConfig: { type: Schema.Types.Mixed, default: {} },
   },
   { timestamps: true }
 );

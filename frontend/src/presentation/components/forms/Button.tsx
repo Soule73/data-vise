@@ -52,7 +52,7 @@ export default function Button({
     <HeadlessButton
       type={type}
       className={[
-        `flex w-full justify-center items-center rounded-md font-semibold shadow-xs focus-visible:outline-2 cursor-pointer focus-visible:outline-offset-2 ${sizeClass} ${colorClass} transition-colors duration-300 dark:shadow-none`,
+        `flex w-full disabled:opacity-30 justify-center items-center rounded-md font-semibold focus-visible:outline-2 cursor-pointer focus-visible:outline-offset-2 ${sizeClass} ${colorClass} transition-colors duration-300 disabled:cursor-not-allowed`,
         className,
       ]
         .filter(Boolean)

@@ -1,17 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { StateCreator } from "zustand";
-import type { UserState, Permission, User } from "../types/auth-types";
+import type { Permission, User, UserStoreWithPerms } from "../types/auth-types";
 
 function getPermissionList(user: User | null): string[] {
   if (!user || !user.role || !user.role.permissions) return [];
   return user.role.permissions.map((p: Permission) => p.name);
-}
-
-export interface UserStoreWithPerms extends UserState {
-  getPermissions: () => string[];
-  hasPermission: (permName: string) => boolean;
-  isOwner: (ownerId: string) => boolean;
 }
 
 export const useUserStore = create<UserStoreWithPerms>(

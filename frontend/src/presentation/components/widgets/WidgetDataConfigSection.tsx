@@ -8,21 +8,16 @@ import {
   PlusCircleIcon,
 } from "@heroicons/react/24/solid";
 import { useMetricUICollapseStore } from "@/core/store/metricUI";
-import type {
-  WidgetDataConfigSectionProps,
-  WidgetType,
-} from "@/core/types/widget-types";
+import type { WidgetDataConfigSectionFixedProps } from "@/core/types/widget-types";
 import WidgetBubbleDataConfigSection from "@/presentation/components/widgets/WidgetBubbleDataConfigSection";
 import WidgetScatterDataConfigSection from "@/presentation/components/widgets/WidgetScatterDataConfigSection";
 import WidgetRadarDataConfigSection from "@/presentation/components/widgets/WidgetRadarDataConfigSection";
 import WidgetKPIGroupDataConfigSection from "@/presentation/components/widgets/WidgetKPIGroupDataConfigSection";
 import { WIDGETS } from "@/data/adapters/visualizations";
-
-interface WidgetDataConfigSectionFixedProps
-  extends WidgetDataConfigSectionProps {
-  type: WidgetType;
-  data?: any[]; // Ajout de la prop data
-}
+import type {
+  BubbleMetricConfig,
+  RadarMetricConfig,
+} from "@/core/types/metric-bucket-types";
 
 export default function WidgetDataConfigSection({
   type,
@@ -44,7 +39,11 @@ export default function WidgetDataConfigSection({
   if (type === "bubble") {
     return (
       <WidgetBubbleDataConfigSection
-        metrics={Array.isArray(config.metrics) ? config.metrics : []}
+        metrics={
+          Array.isArray(config.metrics)
+            ? (config.metrics as BubbleMetricConfig[])
+            : []
+        }
         columns={columns}
         handleConfigChange={handleConfigChange}
       />
@@ -53,7 +52,11 @@ export default function WidgetDataConfigSection({
   if (type === "scatter") {
     return (
       <WidgetScatterDataConfigSection
-        metrics={Array.isArray(config.metrics) ? config.metrics : []}
+        metrics={
+          Array.isArray(config.metrics)
+            ? (config.metrics as BubbleMetricConfig[])
+            : []
+        }
         columns={columns}
         handleConfigChange={handleConfigChange}
       />
@@ -62,11 +65,15 @@ export default function WidgetDataConfigSection({
   if (type === "radar") {
     return (
       <WidgetRadarDataConfigSection
-        metrics={Array.isArray(config.metrics) ? config.metrics : []}
+        metrics={
+          Array.isArray(config.metrics)
+            ? (config.metrics as RadarMetricConfig[])
+            : []
+        }
         columns={columns}
         handleConfigChange={handleConfigChange}
-        configSchema={dataConfig}
-        data={data} // Passage des données pour le groupBy
+        configSchema={{ dataConfig }}
+        data={data}
       />
     );
   }
@@ -127,7 +134,11 @@ export default function WidgetDataConfigSection({
                       ...Array.from(
                         new Set(
                           (data || [])
-                            .map((row: any) => row[config.filter.field])
+                            .map((row) =>
+                              config?.filter?.field !== undefined
+                                ? row[config.filter.field]
+                                : undefined
+                            )
                             .filter(
                               (v) => v !== undefined && v !== null && v !== ""
                             )
@@ -150,7 +161,7 @@ export default function WidgetDataConfigSection({
           <div className="space-y-1 divide-y divide-gray-300 dark:divide-gray-700 ">
             {config.metrics.map((metric: any, idx: number) => {
               const aggLabel =
-                dataConfig.metrics.allowedAggs.find(
+                dataConfig.metrics.allowedAggs?.find(
                   (a: any) => a.value === metric.agg
                 )?.label ||
                 metric.agg ||
@@ -230,7 +241,7 @@ export default function WidgetDataConfigSection({
                           onClick={(e) => {
                             e.stopPropagation();
                             const newMetrics = config.metrics.filter(
-                              (_: any, i: number) => i !== idx
+                              (_, i: number) => i !== idx
                             );
                             handleConfigChange("metrics", newMetrics);
                           }}
@@ -259,7 +270,11 @@ export default function WidgetDataConfigSection({
                             handleConfigChange("metrics", newMetrics);
                           }
                         }}
-                        options={dataConfig.metrics.allowedAggs}
+                        options={
+                          Array.isArray(dataConfig.metrics.allowedAggs)
+                            ? dataConfig.metrics.allowedAggs
+                            : []
+                        }
                         name={`metric-agg-${idx}`}
                         id={`metric-agg-${idx}`}
                       />
@@ -279,10 +294,11 @@ export default function WidgetDataConfigSection({
                             handleConfigChange("metrics", newMetrics);
                           }
                         }}
-                        options={columns.map((col) => ({
-                          value: col,
-                          label: col,
-                        }))}
+                        options={
+                          Array.isArray(columns)
+                            ? columns.map((col) => ({ value: col, label: col }))
+                            : []
+                        }
                         name={`metric-field-${idx}`}
                         id={`metric-field-${idx}`}
                       />
@@ -343,8 +359,6 @@ export default function WidgetDataConfigSection({
                   e.stopPropagation();
                   handleConfigChange("bucket", {
                     field: "",
-                    type: dataConfig.bucket.typeLabel || "x",
-                    label: dataConfig.bucket.label || "",
                   });
                 }}
                 title="Réinitialiser"
@@ -361,25 +375,13 @@ export default function WidgetDataConfigSection({
                     handleConfigChange("bucket", {
                       ...config.bucket,
                       field: e.target.value,
-                      label: config.bucket?.label || dataConfig.bucket.label,
                     })
                   }
                   options={columns.map((col) => ({ value: col, label: col }))}
                   name="bucket-field"
                   id="bucket-field"
                 />
-                <InputField
-                  label="Label du champ de groupement"
-                  value={config.bucket?.label ?? dataConfig.bucket.label}
-                  onChange={(e) =>
-                    handleConfigChange("bucket", {
-                      ...config.bucket,
-                      label: e.target.value,
-                    })
-                  }
-                  name="bucket-label"
-                  id="bucket-label"
-                />
+                {/* Suppression du champ label du groupement */}
               </div>
             )}
           </div>

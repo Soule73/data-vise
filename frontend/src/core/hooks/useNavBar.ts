@@ -3,7 +3,7 @@ import { useDashboardStore } from "../store/dashboard";
 import { useSidebarStore } from "../store/sidebar";
 
 export default function useNavBar() {
-      // Affiche le bouton menu sur toutes les tailles d'écran
+  // Affiche le bouton menu sur toutes les tailles d'écran
   const { open, openSidebar, closeSidebar } = useSidebarStore();
 
   // Récupère le tableau breadcrumb du store
@@ -18,11 +18,10 @@ export default function useNavBar() {
     }
   }, [breadcrumb]);
 
-    return {
-        open,
-        openSidebar,
-        closeSidebar,
-        breadcrumb,
-    };
-
-    }
+  return {
+    open,
+    openSidebar,
+    closeSidebar,
+    breadcrumb,
+  };
+}

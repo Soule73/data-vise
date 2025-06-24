@@ -1,4 +1,4 @@
-import type { Dashboard, IntervalUnit } from "@/core/types/dashboard-model";
+import type { Dashboard, IntervalUnit } from "@/core/types/dashboard-types";
 
 /**
  * Calcule la période effective selon le mode (absolu/relatif).

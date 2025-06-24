@@ -1,15 +1,16 @@
 /**
  * Mappe les colonnes détectées avec leur type.
  */
-export function mapDetectedColumns(detectData: any, data: Record<string, unknown>[]): { name: string; type: string }[] {
+export function mapDetectedColumns(
+  detectData: any,
+  data: Record<string, unknown>[]
+): { name: string; type: string }[] {
   return (detectData.columns || []).map((col: string) => ({
     name: col,
     type:
       detectData.types && detectData.types[col]
         ? detectData.types[col]
-        : Array.isArray(data) &&
-          data.length > 0 &&
-          data[0][col] !== undefined
+        : Array.isArray(data) && data.length > 0 && data[0][col] !== undefined
         ? typeof data[0][col]
         : "inconnu",
   }));
@@ -32,11 +33,22 @@ export function autoDetectTimestampField(columns: string[]): string {
 /**
  * Construit les paramètres pour la détection des colonnes.
  */
-export function buildDetectParams({ type, csvOrigin, csvFile, endpoint }: {
+export function buildDetectParams({
+  type,
+  csvOrigin,
+  csvFile,
+  endpoint,
+  httpMethod,
+  authType,
+  authConfig,
+}: {
   type: "json" | "csv";
   csvOrigin: "url" | "upload";
   csvFile: File | null;
   endpoint: string;
+  httpMethod?: "GET" | "POST";
+  authType?: "none" | "bearer" | "apiKey" | "basic";
+  authConfig?: any;
 }): any {
   if (type === "csv" && csvOrigin === "upload" && csvFile) {
     return { type, file: csvFile };
@@ -46,6 +58,11 @@ export function buildDetectParams({ type, csvOrigin, csvFile, endpoint }: {
       params.endpoint = endpoint;
     } else if (type === "json") {
       params.endpoint = endpoint;
+    }
+    if (endpoint) {
+      if (httpMethod) params.httpMethod = httpMethod;
+      if (authType) params.authType = authType;
+      if (authConfig) params.authConfig = authConfig;
     }
     return params;
   }

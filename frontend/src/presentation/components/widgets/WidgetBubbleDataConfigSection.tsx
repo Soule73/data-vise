@@ -3,15 +3,7 @@ import InputField from "@/presentation/components/forms/InputField";
 import Button from "@/presentation/components/forms/Button";
 import { XMarkIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
 import type { BubbleMetricConfig } from "@/core/types/metric-bucket-types";
-
-interface WidgetBubbleDataConfigSectionProps {
-  metrics: BubbleMetricConfig[];
-  columns: string[];
-  handleConfigChange: (
-    field: string,
-    value: BubbleMetricConfig[] | BubbleMetricConfig
-  ) => void;
-}
+import type { WidgetBubbleDataConfigSectionProps } from "@/core/types/widget-types";
 
 export default function WidgetBubbleDataConfigSection({
   metrics,
@@ -56,7 +48,11 @@ export default function WidgetBubbleDataConfigSection({
                     newMetrics[idx] = { ...dataset, x: e.target.value };
                     handleConfigChange("metrics", newMetrics);
                   }}
-                  options={columns.map((col) => ({ value: col, label: col }))}
+                  options={
+                    Array.isArray(columns)
+                      ? columns.map((col) => ({ value: col, label: col }))
+                      : []
+                  }
                   name={`bubble-x-${idx}`}
                   id={`bubble-x-${idx}`}
                 />
@@ -68,7 +64,11 @@ export default function WidgetBubbleDataConfigSection({
                     newMetrics[idx] = { ...dataset, y: e.target.value };
                     handleConfigChange("metrics", newMetrics);
                   }}
-                  options={columns.map((col) => ({ value: col, label: col }))}
+                  options={
+                    Array.isArray(columns)
+                      ? columns.map((col) => ({ value: col, label: col }))
+                      : []
+                  }
                   name={`bubble-y-${idx}`}
                   id={`bubble-y-${idx}`}
                 />
@@ -80,7 +80,11 @@ export default function WidgetBubbleDataConfigSection({
                     newMetrics[idx] = { ...dataset, r: e.target.value };
                     handleConfigChange("metrics", newMetrics);
                   }}
-                  options={columns.map((col) => ({ value: col, label: col }))}
+                  options={
+                    Array.isArray(columns)
+                      ? columns.map((col) => ({ value: col, label: col }))
+                      : []
+                  }
                   name={`bubble-r-${idx}`}
                   id={`bubble-r-${idx}`}
                 />

@@ -35,7 +35,7 @@ export default function RoleManagementPage() {
     formHook,
   } = useRoleManagement();
 
-  const {data:permissions} = permissionsQuery();
+  const { data: permissions } = permissionsQuery();
   const hasPermission = useUserStore((s) => s.hasPermission);
 
   return (
@@ -110,18 +110,18 @@ export default function RoleManagementPage() {
                     }
                     onChange={() => {
                       if (!editRole) return;
+                      const allPermissionIds = (permissions ?? []).map(
+                        (p: Permission) => p._id
+                      );
+                      const shouldSelectAll =
+                        editRole.permissions.length !== allPermissionIds.length;
                       setEditRole((prev: Role) => ({
                         ...prev,
-                        permissions:
-                          prev.permissions.length === (permissions ?? []).length
-                            ? []
-                            : (permissions ?? []).map((p: Permission) => p._id),
+                        permissions: shouldSelectAll ? allPermissionIds : [],
                       }));
                       formHook.setValue(
                         "permissions",
-                        editRole.permissions.length === (permissions ?? []).length
-                          ? []
-                          : (permissions ?? []).map((p: Permission) => p._id)
+                        shouldSelectAll ? allPermissionIds : []
                       );
                     }}
                     id={`select-all-edit-${role._id}`}
@@ -139,7 +139,7 @@ export default function RoleManagementPage() {
                       checkedPerms={
                         editRoleId === role._id
                           ? editRole.permissions
-                          : role.permissions.map((p: any) => typeof p === 'string' ? p : p._id)
+                          : role.permissions
                       }
                       onToggle={togglePermission}
                       editable={editRoleId === role._id}

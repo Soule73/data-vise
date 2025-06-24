@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSidebarStore } from "@/core/store/sidebar";
 import { useUserStore } from "@/core/store/user";
+import type { SidebarGroup, SidebarGroupItem } from "../types/navigation-types";
 
-export function useSidebar(sidebarGroups: any[]) {
+export function useSidebar(sidebarGroups: SidebarGroup[]) {
   const user = useUserStore((s) => s.user);
   const open = useSidebarStore((s) => s.open);
   const closeSidebar = useSidebarStore((s) => s.closeSidebar);
@@ -12,7 +13,6 @@ export function useSidebar(sidebarGroups: any[]) {
   const toggleGroup = (label: string) =>
     setOpenGroups((prev) => ({ ...prev, [label]: !prev[label] }));
 
-  
   // Fermer le sidebar si on clique en dehors (overlay ou desktop)
   useEffect(() => {
     if (!open) return;
@@ -27,9 +27,10 @@ export function useSidebar(sidebarGroups: any[]) {
   }, [open, closeSidebar]);
 
   // Filtrage des groupes selon les permissions
-  const filteredGroups = sidebarGroups.filter((group: any) =>
+  const filteredGroups = sidebarGroups.filter((group: SidebarGroup) =>
     group.items.some(
-      (item: any) => !item.permission || hasPermission(item.permission)
+      (item: SidebarGroupItem) =>
+        !item.permission || hasPermission(item.permission)
     )
   );
 

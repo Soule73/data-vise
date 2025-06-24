@@ -1,4 +1,5 @@
 import DataSource from "../models/DataSource";
+import Widget from "../models/Widget";
 import {
   getAbsolutePath,
   readCsvFile,
@@ -20,11 +21,28 @@ const inflightLoads = new Map<string, Promise<any[]>>();
 const dataSourceService = {
   async list() {
     const sources = await DataSource.find();
-    return { data: sources };
+    // Pour chaque source, vérifier si elle est utilisée par au moins un widget
+    const sourcesWithUsage = await Promise.all(
+      sources.map(async (ds) => {
+        const count = await Widget.countDocuments({ dataSourceId: ds._id });
+        return { ...ds.toObject(), isUsed: count > 0 };
+      })
+    );
+    return { data: sourcesWithUsage };
   },
   async create(payload: DataSourceCreatePayload) {
-    const { name, type, endpoint, filePath, config, ownerId, timestampField } =
-      payload;
+    const {
+      name,
+      type,
+      endpoint,
+      filePath,
+      config,
+      ownerId,
+      timestampField,
+      httpMethod,
+      authType,
+      authConfig,
+    } = payload;
     if (!name || !type || !ownerId)
       return { error: { message: "Champs requis manquants." }, status: 400 };
     if (type === "csv" && !endpoint && !filePath)
@@ -40,6 +58,9 @@ const dataSourceService = {
       config,
       ownerId,
       ...(timestampField ? { timestampField } : {}),
+      ...(httpMethod ? { httpMethod } : {}),
+      ...(authType ? { authType } : {}),
+      ...(authConfig ? { authConfig } : {}),
     });
     return { data: source };
   },
@@ -47,20 +68,58 @@ const dataSourceService = {
     const source = await DataSource.findById(id);
     if (!source)
       return { error: { message: "Source non trouvée." }, status: 404 };
-    return { data: source };
+    const count = await Widget.countDocuments({ dataSourceId: source._id });
+    return { data: { ...source.toObject(), isUsed: count > 0 } };
   },
   async update(id: string, payload: DataSourceUpdatePayload) {
-    const { name, type, endpoint, filePath, config } = payload;
+    const {
+      name,
+      type,
+      endpoint,
+      filePath,
+      config,
+      httpMethod,
+      authType,
+      authConfig,
+    } = payload;
+    // Récupérer l'ancien fichier avant update
+    const oldSource = await DataSource.findById(id);
+    const oldFilePath = oldSource?.filePath;
     const source = await DataSource.findByIdAndUpdate(
       id,
-      { name, type, endpoint, filePath, config },
+      {
+        name,
+        type,
+        endpoint,
+        filePath,
+        config,
+        httpMethod,
+        authType,
+        authConfig,
+      },
       { new: true }
     );
     if (!source)
-      return { error: { message: "Source non trouvée." }, status: 404 };
+      return { error: { message: "Source non trouvée" }, status: 404 };
+    // Si le fichier a changé, supprimer l'ancien fichier
+    if (oldFilePath && filePath && oldFilePath !== filePath) {
+      const fs = require("fs");
+      fs.unlink(oldFilePath, (err: any) => {});
+    }
     return { data: source };
   },
   async remove(id: string) {
+    // Vérifier si la source est utilisée
+    const count = await Widget.countDocuments({ dataSourceId: id });
+    if (count > 0) {
+      return {
+        error: {
+          message:
+            "Impossible de supprimer une source utilisée par au moins un widget.",
+        },
+        status: 400,
+      };
+    }
     const source = await DataSource.findByIdAndDelete(id);
     if (!source)
       return { error: { message: "Source non trouvée." }, status: 404 };
@@ -69,28 +128,69 @@ const dataSourceService = {
       try {
         const absPath = getAbsolutePath(source.filePath);
         await fs.unlink(absPath);
-      } catch (e) {
-      }
+      } catch (e) {}
     }
     return { data: { message: "Source supprimée." } };
   },
   async detectColumns({
+    sourceId,
     type,
     endpoint,
     filePath,
+    httpMethod,
+    authType,
+    authConfig,
   }: {
+    sourceId?: string;
     type?: string;
     endpoint?: string;
     filePath?: string;
+    httpMethod?: "GET" | "POST";
+    authType?: "none" | "bearer" | "apiKey" | "basic";
+    authConfig?: any;
   }) {
     try {
       let rows: Record<string, unknown>[] = [];
-      if (type === "csv" && filePath) {
-        rows = await readCsvFile(filePath);
-      } else if (type === "csv" && endpoint) {
-        rows = await fetchRemoteCsv(endpoint);
-      } else if (type === "json" && endpoint) {
-        rows = await fetchRemoteJson(endpoint);
+      let finalType = type;
+      let finalEndpoint = endpoint;
+      let finalFilePath = filePath;
+      let finalHttpMethod = httpMethod;
+      let finalAuthType = authType;
+      let finalAuthConfig = authConfig;
+      // Si sourceId fourni et ni filePath ni endpoint, charger la datasource
+      if (sourceId && !filePath && !endpoint) {
+        const ds = await DataSource.findById(sourceId);
+        if (!ds) {
+          return {
+            error: {
+              message: "Source non trouvée pour la détection de colonnes.",
+            },
+            status: 404,
+          };
+        }
+        finalType = ds.type;
+        finalEndpoint = ds.endpoint;
+        finalFilePath = ds.filePath;
+        finalHttpMethod = ds.httpMethod;
+        finalAuthType = ds.authType;
+        finalAuthConfig = ds.authConfig;
+      }
+      if (finalType === "csv" && finalFilePath) {
+        rows = await readCsvFile(finalFilePath);
+      } else if (finalType === "csv" && finalEndpoint) {
+        rows = await fetchRemoteCsv(
+          finalEndpoint,
+          finalHttpMethod,
+          finalAuthType,
+          finalAuthConfig
+        );
+      } else if (finalType === "json" && finalEndpoint) {
+        rows = await fetchRemoteJson(
+          finalEndpoint,
+          finalHttpMethod,
+          finalAuthType,
+          finalAuthConfig
+        );
       } else {
         return {
           error: {
@@ -168,9 +268,19 @@ const dataSourceService = {
           let loaded: any[] = [];
           try {
             if (source.type === "json" && source.endpoint) {
-              loaded = await fetchRemoteJson(source.endpoint);
+              loaded = await fetchRemoteJson(
+                source.endpoint,
+                source.httpMethod,
+                source.authType,
+                source.authConfig
+              );
             } else if (source.type === "csv" && source.endpoint) {
-              loaded = await fetchRemoteCsv(source.endpoint);
+              loaded = await fetchRemoteCsv(
+                source.endpoint,
+                source.httpMethod,
+                source.authType,
+                source.authConfig
+              );
             } else if (source.type === "csv" && source.filePath) {
               loaded = await readCsvFile(source.filePath);
             } else {
@@ -207,7 +317,9 @@ const dataSourceService = {
         inflightLoads.set(cacheKey, loadPromise);
         try {
           data = await loadPromise;
-          console.log(`[CACHE] Nouvelle entrée pour ${cacheKey} (TTL=${cacheTTL}s)`);
+          console.log(
+            `[CACHE] Nouvelle entrée pour ${cacheKey} (TTL=${cacheTTL}s)`
+          );
         } catch (err: any) {
           // Gestion de l'erreur levée par les utilitaires
           return err;

@@ -9,23 +9,8 @@ import {
   ChevronUpIcon,
 } from "@heroicons/react/24/solid";
 import { useState } from "react";
-import type { MetricConfig } from "@/core/types/metric-bucket-types";
-
-interface RadarMetricConfig extends MetricConfig {
-  fields?: string[];
-  groupBy?: string;
-  groupByValue?: string;
-}
-
-interface WidgetRadarDataConfigSectionProps {
-  metrics: RadarMetricConfig[];
-  columns: string[];
-  handleConfigChange: (field: string, value: RadarMetricConfig[]) => void;
-  configSchema?: {
-    dataConfig?: { groupByFields?: string[]; axisFields?: string[] };
-  };
-  data?: Record<string, unknown>[];
-}
+import type { WidgetRadarDataConfigSectionProps } from "@/core/types/widget-types";
+import type { RadarMetricConfig } from "@/core/types/metric-bucket-types";
 
 export default function WidgetRadarDataConfigSection({
   metrics,
@@ -84,7 +69,7 @@ export default function WidgetRadarDataConfigSection({
                     onClick={(e) => {
                       e.stopPropagation();
                       const newMetrics = metrics.filter(
-                        (_: any, i: number) => i !== idx
+                        (_: RadarMetricConfig, i: number) => i !== idx
                       );
                       handleConfigChange("metrics", newMetrics);
                     }}

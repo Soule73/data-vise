@@ -9,6 +9,15 @@ export interface IDataSource extends Document {
   ownerId: mongoose.Types.ObjectId;
   visibility: "public" | "private";
   timestampField?: string;
+  httpMethod?: "GET" | "POST";
+  authType?: "none" | "bearer" | "apiKey" | "basic";
+  authConfig?: {
+    token?: string;
+    apiKey?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  };
 }
 
 export interface DataSourceBasePayload {
@@ -17,6 +26,15 @@ export interface DataSourceBasePayload {
   endpoint?: string;
   filePath?: string;
   config?: Record<string, unknown>;
+  httpMethod?: "GET" | "POST";
+  authType?: "none" | "bearer" | "apiKey" | "basic";
+  authConfig?: {
+    token?: string;
+    apiKey?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  };
 }
 
 export interface DataSourceCreatePayload extends DataSourceBasePayload {

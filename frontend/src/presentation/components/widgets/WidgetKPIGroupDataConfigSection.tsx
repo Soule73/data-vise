@@ -8,14 +8,9 @@ import {
   PlusCircleIcon,
 } from "@heroicons/react/24/solid";
 import { useMetricUICollapseStore } from "@/core/store/metricUI";
-import type { WidgetDataConfigSectionProps } from "@/core/types/widget-types";
+import type { WidgetKPIGroupDataConfigSectionProps } from "@/core/types/widget-types";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 import type { KPIGroupWidgetConfig } from "@/core/types/visualization";
-
-interface WidgetKPIGroupDataConfigSectionProps
-  extends WidgetDataConfigSectionProps {
-  data?: Record<string, unknown>[];
-}
 
 export default function WidgetKPIGroupDataConfigSection({
   dataConfig,
@@ -38,6 +33,138 @@ export default function WidgetKPIGroupDataConfigSection({
     value: string;
   }[];
 
+  // --- Handlers extraits ---
+  const handleFilterFieldChange = (idx: number, value: string) => {
+    const newFilters = [...filters];
+    newFilters[idx] = {
+      ...(newFilters[idx] || {}),
+      field: value,
+      value: "",
+    };
+    handleConfigChange("filters", newFilters);
+  };
+
+  const handleFilterValueChange = (idx: number, value: string) => {
+    const newFilters = [...filters];
+    newFilters[idx] = {
+      ...(newFilters[idx] || {}),
+      value,
+    };
+    handleConfigChange("filters", newFilters);
+  };
+
+  const handleMetricMoveUp = (idx: number) => {
+    if (idx === 0) return;
+    const newMetrics = [...kpiConfig.metrics];
+    [newMetrics[idx - 1], newMetrics[idx]] = [
+      newMetrics[idx],
+      newMetrics[idx - 1],
+    ];
+    handleConfigChange("metrics", newMetrics);
+  };
+
+  const handleMetricMoveDown = (idx: number) => {
+    if (idx === kpiConfig.metrics.length - 1) return;
+    const newMetrics = [...kpiConfig.metrics];
+    [newMetrics[idx], newMetrics[idx + 1]] = [
+      newMetrics[idx + 1],
+      newMetrics[idx],
+    ];
+    handleConfigChange("metrics", newMetrics);
+  };
+
+  const handleMetricDelete = (idx: number) => {
+    const newMetrics = kpiConfig.metrics.filter(
+      (_: any, i: number) => i !== idx
+    );
+    handleConfigChange("metrics", newMetrics);
+  };
+
+  const handleMetricAggChange = (idx: number, value: string) => {
+    if (handleMetricAggOrFieldChange) {
+      handleMetricAggOrFieldChange(idx, "agg", value);
+    } else {
+      const newMetrics = [...kpiConfig.metrics];
+      newMetrics[idx].agg = value;
+      handleConfigChange("metrics", newMetrics);
+    }
+  };
+
+  const handleMetricFieldChange = (idx: number, value: string) => {
+    if (handleMetricAggOrFieldChange) {
+      handleMetricAggOrFieldChange(idx, "field", value);
+    } else {
+      const newMetrics = [...kpiConfig.metrics];
+      newMetrics[idx].field = value;
+      handleConfigChange("metrics", newMetrics);
+    }
+  };
+
+  const handleMetricLabelChange = (idx: number, value: string) => {
+    const newMetrics = [...kpiConfig.metrics];
+    newMetrics[idx].label = value;
+    handleConfigChange("metrics", newMetrics);
+  };
+
+  const handleAddMetric = () => {
+    handleConfigChange("metrics", [
+      ...kpiConfig.metrics,
+      {
+        agg: kpiDataConfig.metrics.defaultAgg,
+        field: columns[1] || "",
+        label: "",
+      },
+    ]);
+  };
+
+  // --- Logique options et disabled extraites ---
+  const getFilterFieldOptions = (idx: number) => [
+    { value: "", label: "-- Aucun --" },
+    ...columns.map((col) => ({ value: String(col), label: col })),
+    ...Array.from(
+      new Set(
+        (data || [])
+          .map((row) => row[filters[idx]?.field ?? ""])
+          .filter((val) => val !== undefined && val !== null && val !== "")
+      )
+    ).map((val) => ({ value: String(val), label: String(val) })),
+  ];
+
+  const getFilterValueOptions = (idx: number) =>
+    filters[idx]?.field
+      ? [
+          { value: "", label: "-- Toutes --" },
+          ...Array.from(
+            new Set(
+              (data || [])
+                .map(
+                  (row: Record<string, unknown>) =>
+                    row[filters[idx]?.field ?? ""]
+                )
+                .filter((v) => v !== undefined && v !== null && v !== "")
+            )
+          ).map((v) => ({ value: String(v), label: String(v) })),
+        ]
+      : [{ value: "", label: "-- Choisir --" }];
+
+  const isFilterValueDisabled = (idx: number) => !filters[idx]?.field;
+
+  // --- Logique d'affichage des labels extraite ---
+  const getAggLabel = (metric: MetricConfig) =>
+    kpiDataConfig.metrics?.allowedAggs.find((a: any) => a.value === metric.agg)
+      ?.label ||
+    metric.agg ||
+    "";
+
+  const getFieldLabel = (metric: MetricConfig) => metric.field || "";
+
+  const getHeaderLabel = (metric: MetricConfig) => {
+    const aggLabel = getAggLabel(metric);
+    const fieldLabel = getFieldLabel(metric);
+    return `${aggLabel}${fieldLabel ? " · " + fieldLabel : ""}`;
+  };
+
+  // --- Rendu ---
   return (
     <div className="space-y-4">
       {/* Filtres par KPI (centralisé dans config.filters) */}
@@ -54,65 +181,27 @@ export default function WidgetKPIGroupDataConfigSection({
               <SelectField
                 label="Champ"
                 value={filters[idx]?.field || ""}
-                onChange={(e) => {
-                  const newFilters = [...filters];
-                  newFilters[idx] = {
-                    ...(newFilters[idx] || {}),
-                    field: e.target.value,
-                    value: "",
-                  };
-                  handleConfigChange("filters", newFilters);
-                }}
-                options={[
-                  { value: "", label: "-- Aucun --" },
-                  ...columns.map((col) => ({ value: String(col), label: col })),
-                  ...Array.from(
-                    new Set(
-                      (data || [])
-                        .map((row) => row[filters[idx]?.field ?? ""])
-                        .filter(
-                          (val) =>
-                            val !== undefined && val !== null && val !== ""
-                        )
-                    )
-                  ).map((val) => ({ value: String(val), label: String(val) })),
-                ]}
+                onChange={(e) => handleFilterFieldChange(idx, e.target.value)}
+                options={
+                  Array.isArray(getFilterFieldOptions(idx))
+                    ? getFilterFieldOptions(idx)
+                    : []
+                }
                 name={`filter-field-${idx}`}
                 id={`filter-field-${idx}`}
               />
               <SelectField
                 label="Valeur"
                 value={filters[idx]?.value || ""}
-                onChange={(e) => {
-                  const newFilters = [...filters];
-                  newFilters[idx] = {
-                    ...(newFilters[idx] || {}),
-                    value: e.target.value,
-                  };
-                  handleConfigChange("filters", newFilters);
-                }}
+                onChange={(e) => handleFilterValueChange(idx, e.target.value)}
                 options={
-                  filters[idx]?.field
-                    ? [
-                        { value: "", label: "-- Toutes --" },
-                        ...Array.from(
-                          new Set(
-                            (data || [])
-                              .map(
-                                (row: Record<string, unknown>) =>
-                                  row[filters[idx]?.field ?? ""]
-                              )
-                              .filter(
-                                (v) => v !== undefined && v !== null && v !== ""
-                              )
-                          )
-                        ).map((v) => ({ value: String(v), label: String(v) })),
-                      ]
-                    : [{ value: "", label: "-- Choisir --" }]
+                  Array.isArray(getFilterValueOptions(idx))
+                    ? getFilterValueOptions(idx)
+                    : []
                 }
                 name={`filter-value-${idx}`}
                 id={`filter-value-${idx}`}
-                disabled={!filters[idx]?.field}
+                disabled={isFilterValueDisabled(idx)}
               />
             </div>
           </div>
@@ -125,16 +214,7 @@ export default function WidgetKPIGroupDataConfigSection({
         <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
           <div className="space-y-1 divide-y divide-gray-300 dark:divide-gray-700 ">
             {kpiConfig.metrics.map((metric: MetricConfig, idx: number) => {
-              const aggLabel =
-                kpiDataConfig.metrics?.allowedAggs.find(
-                  (a: any) => a.value === metric.agg
-                )?.label ||
-                metric.agg ||
-                "";
-              const fieldLabel = metric.field || "";
-              const headerLabel = `${aggLabel}${
-                fieldLabel ? " · " + fieldLabel : ""
-              }`;
+              const headerLabel = getHeaderLabel(metric);
               const isOnlyMetric = kpiConfig.metrics.length === 1;
               return (
                 <div
@@ -165,13 +245,7 @@ export default function WidgetKPIGroupDataConfigSection({
                               }`}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (idx === 0) return;
-                                const newMetrics = [...kpiConfig.metrics];
-                                [newMetrics[idx - 1], newMetrics[idx]] = [
-                                  newMetrics[idx],
-                                  newMetrics[idx - 1],
-                                ];
-                                handleConfigChange("metrics", newMetrics);
+                                handleMetricMoveUp(idx);
                               }}
                               disabled={idx === 0}
                               aria-disabled={idx === 0}
@@ -187,14 +261,7 @@ export default function WidgetKPIGroupDataConfigSection({
                               }`}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (idx === kpiConfig.metrics.length - 1)
-                                  return;
-                                const newMetrics = [...kpiConfig.metrics];
-                                [newMetrics[idx], newMetrics[idx + 1]] = [
-                                  newMetrics[idx + 1],
-                                  newMetrics[idx],
-                                ];
-                                handleConfigChange("metrics", newMetrics);
+                                handleMetricMoveDown(idx);
                               }}
                               disabled={idx === kpiConfig.metrics.length - 1}
                               aria-disabled={
@@ -211,10 +278,7 @@ export default function WidgetKPIGroupDataConfigSection({
                           className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
                           onClick={(e) => {
                             e.stopPropagation();
-                            const newMetrics = kpiConfig.metrics.filter(
-                              (_: any, i: number) => i !== idx
-                            );
-                            handleConfigChange("metrics", newMetrics);
+                            handleMetricDelete(idx);
                           }}
                           title="Supprimer"
                         >
@@ -228,54 +292,37 @@ export default function WidgetKPIGroupDataConfigSection({
                       <SelectField
                         label="Agrégation"
                         value={metric.agg}
-                        onChange={(e) => {
-                          if (handleMetricAggOrFieldChange) {
-                            handleMetricAggOrFieldChange(
-                              idx,
-                              "agg",
-                              e.target.value
-                            );
-                          } else {
-                            const newMetrics = [...kpiConfig.metrics];
-                            newMetrics[idx].agg = e.target.value;
-                            handleConfigChange("metrics", newMetrics);
-                          }
-                        }}
-                        options={kpiDataConfig.metrics?.allowedAggs}
+                        onChange={(e) =>
+                          handleMetricAggChange(idx, e.target.value)
+                        }
+                        options={
+                          Array.isArray(kpiDataConfig.metrics?.allowedAggs)
+                            ? kpiDataConfig.metrics.allowedAggs
+                            : []
+                        }
                         name={`metric-agg-${idx}`}
                         id={`metric-agg-${idx}`}
                       />
                       <SelectField
                         label="Champ"
                         value={metric.field}
-                        onChange={(e) => {
-                          if (handleMetricAggOrFieldChange) {
-                            handleMetricAggOrFieldChange(
-                              idx,
-                              "field",
-                              e.target.value
-                            );
-                          } else {
-                            const newMetrics = [...kpiConfig.metrics];
-                            newMetrics[idx].field = e.target.value;
-                            handleConfigChange("metrics", newMetrics);
-                          }
-                        }}
-                        options={columns.map((col) => ({
-                          value: col,
-                          label: col,
-                        }))}
+                        onChange={(e) =>
+                          handleMetricFieldChange(idx, e.target.value)
+                        }
+                        options={
+                          Array.isArray(columns)
+                            ? columns.map((col) => ({ value: col, label: col }))
+                            : []
+                        }
                         name={`metric-field-${idx}`}
                         id={`metric-field-${idx}`}
                       />
                       <InputField
                         label="Label"
                         value={metric.label}
-                        onChange={(e) => {
-                          const newMetrics = [...kpiConfig.metrics];
-                          newMetrics[idx].label = e.target.value;
-                          handleConfigChange("metrics", newMetrics);
-                        }}
+                        onChange={(e) =>
+                          handleMetricLabelChange(idx, e.target.value)
+                        }
                         name={`metric-label-${idx}`}
                         id={`metric-label-${idx}`}
                       />
@@ -290,16 +337,7 @@ export default function WidgetKPIGroupDataConfigSection({
               color="indigo"
               className="mt-2 w-max mx-auto !bg-gray-300 dark:!bg-gray-700 hover:!bg-gray-200 dark:hover:!bg-gray-600 !border-none"
               variant="outline"
-              onClick={() => {
-                handleConfigChange("metrics", [
-                  ...kpiConfig.metrics,
-                  {
-                    agg: kpiDataConfig.metrics.defaultAgg,
-                    field: columns[1] || "",
-                    label: "",
-                  },
-                ]);
-              }}
+              onClick={handleAddMetric}
               disabled={!kpiDataConfig.metrics.allowMultiple}
             >
               <PlusCircleIcon className="w-5 h-5 mr-1" />

@@ -73,6 +73,7 @@ export default function DashboardPage() {
       />
       {/* Modal de sauvegarde */}
       <DashboardSaveModal
+        saving={saving}
         saveModalOpen={saveModalOpen}
         setSaveModalOpen={setSaveModalOpen}
         pendingTitle={pendingTitle}

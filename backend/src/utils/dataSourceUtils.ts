@@ -78,9 +78,60 @@ export async function readCsvFile(filePath: string): Promise<any[]> {
   }
 }
 
-export async function fetchRemoteCsv(endpoint: string): Promise<any[]> {
+// Construit les options de fetch selon la config datasource
+export function buildFetchOptionsFromConfig(
+  httpMethod: "GET" | "POST" = "GET",
+  authType: "none" | "bearer" | "apiKey" | "basic" = "none",
+  authConfig: any = {},
+  body?: any
+): import("node-fetch").RequestInit {
+  const headers: Record<string, string> = {};
+  let finalBody: any = undefined;
+  if (authType === "bearer" && authConfig.token) {
+    headers["Authorization"] = `Bearer ${authConfig.token}`;
+  } else if (authType === "apiKey" && authConfig.apiKey) {
+    const headerName = authConfig.headerName || "x-api-key";
+    headers[headerName] = authConfig.apiKey;
+  } else if (
+    authType === "basic" &&
+    authConfig.username &&
+    authConfig.password
+  ) {
+    const encoded = Buffer.from(
+      `${authConfig.username}:${authConfig.password}`
+    ).toString("base64");
+    headers["Authorization"] = `Basic ${encoded}`;
+  }
+  if (httpMethod === "POST" && body) {
+    if (typeof body === "string") {
+      finalBody = body;
+    } else {
+      finalBody = JSON.stringify(body);
+      headers["Content-Type"] = "application/json";
+    }
+  }
+  return {
+    method: httpMethod,
+    headers,
+    ...(finalBody ? { body: finalBody } : {}),
+  };
+}
+
+export async function fetchRemoteCsv(
+  endpoint: string,
+  httpMethod: "GET" | "POST" = "GET",
+  authType: "none" | "bearer" | "apiKey" | "basic" = "none",
+  authConfig: any = {},
+  body?: any
+): Promise<any[]> {
   try {
-    const response = await fetch(endpoint);
+    const options = buildFetchOptionsFromConfig(
+      httpMethod,
+      authType,
+      authConfig,
+      body
+    );
+    const response = await fetch(endpoint, options);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const text = await response.text();
     return csv().fromString(text);
@@ -90,9 +141,21 @@ export async function fetchRemoteCsv(endpoint: string): Promise<any[]> {
   }
 }
 
-export async function fetchRemoteJson(endpoint: string): Promise<any[]> {
+export async function fetchRemoteJson(
+  endpoint: string,
+  httpMethod: "GET" | "POST" = "GET",
+  authType: "none" | "bearer" | "apiKey" | "basic" = "none",
+  authConfig: any = {},
+  body?: any
+): Promise<any[]> {
   try {
-    const response = await fetch(endpoint);
+    const options = buildFetchOptionsFromConfig(
+      httpMethod,
+      authType,
+      authConfig,
+      body
+    );
+    const response = await fetch(endpoint, options);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     return Array.isArray(data) ? data : [data];

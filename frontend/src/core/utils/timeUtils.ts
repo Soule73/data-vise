@@ -1,4 +1,4 @@
-import type { IntervalUnit } from "@/core/types/dashboard-model";
+import type { IntervalUnit } from "@/core/types/dashboard-types";
 
 /**
  * Convertit une valeur et une unité d'intervalle en millisecondes.
@@ -34,7 +34,10 @@ export function intervalToMs(
 /**
  * Formate l'unité d'intervalle en français (singulier/pluriel)
  */
-export function formatUnitFr(unit: IntervalUnit | undefined, value: number): string {
+export function formatUnitFr(
+  unit: IntervalUnit | undefined,
+  value: number
+): string {
   if (!unit) return "inconnu";
   switch (unit) {
     case "second":

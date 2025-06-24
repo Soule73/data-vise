@@ -1,25 +1,29 @@
 import type { ColorFieldProps } from "@/core/types/form-types";
 
 export default function ColorField({
-  label = 'Couleur',
+  label = "Couleur",
   value,
   onChange,
-  name = 'color',
-  id = 'color-input',
+  name = "color",
+  id = "color-input",
   disabled = false,
 }: ColorFieldProps) {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium mb-2">{label}</label>
+      <label htmlFor={id} className="block text-sm font-medium mb-2">
+        {label}
+      </label>
       <input
         type="color"
-        className="p-1 h-10 w-14 block bg-white border border-gray-200 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
+        className="block w-full outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-700 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 transition-colors duration-300"
+        // className="p-1 h-10 w-14 block cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
         id={id}
         name={name}
-        value={value || '#2563eb'}
-        onChange={e => onChange(e.target.value)}
+        value={value || "#2563eb"}
+        onChange={(e) => onChange(e.target.value)}
         title="Choisissez votre couleur"
         disabled={disabled}
+        // style={{ backgroundColor: value || "#2563eb" }}
       />
     </div>
   );

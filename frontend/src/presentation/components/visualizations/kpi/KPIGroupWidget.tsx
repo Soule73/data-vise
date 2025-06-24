@@ -47,8 +47,8 @@ export default function KPIGroupWidget({
           data={data}
           config={{
             metrics: [metric],
-            metricStyles: [metricStyles[idx] || {}],
-            filters: filters[idx] ? [filters[idx]] : undefined,
+            metricStyles: metricStyles[idx] || {},
+            filters: filters && filters[idx] ? [filters[idx]] : undefined,
             widgetParams: widgetParamsList[idx],
             bucket: config.bucket,
           }}

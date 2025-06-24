@@ -7,6 +7,7 @@ import {
   allSameDay,
   formatXTicksLabel,
 } from "@/core/utils/chartUtils";
+import type { BubbleChartParams } from "@/core/types/visualization";
 
 export function useBubbleChartLogic(
   data: Record<string, any>[],
@@ -16,6 +17,9 @@ export function useBubbleChartLogic(
   options: ChartOptions<"bubble">;
   validDatasets: BubbleMetricConfig[];
 } {
+  // Extraction stricte des params
+  const widgetParams: BubbleChartParams = config.widgetParams ?? {};
+
   const validDatasets = useMemo(
     () =>
       Array.isArray(config.metrics)
@@ -49,19 +53,17 @@ export function useBubbleChartLogic(
           })),
           backgroundColor: color,
           borderColor: config.metricStyles?.[i]?.borderColor || undefined,
-          borderWidth: config.metricStyles?.[i]?.borderWidth || 1,
+          borderWidth: config.metricStyles?.[i]?.borderWidth ?? 1,
         };
       }),
     [validDatasets, data, config.metricStyles]
   );
 
-  const chartTitle = config.widgetParams?.title || "";
+  const chartTitle = widgetParams.title || "";
   const showLegend =
-    config.widgetParams?.legend !== undefined
-      ? config.widgetParams.legend
-      : true;
-  const xLabel = config.widgetParams?.xLabel || "";
-  const yLabel = config.widgetParams?.yLabel || "";
+    widgetParams.legend !== undefined ? widgetParams.legend : true;
+  const xLabel = widgetParams.xLabel || "";
+  const yLabel = widgetParams.yLabel || "";
 
   // Récupération des labels X (pour les tooltips)
   const labels = useMemo(() => {

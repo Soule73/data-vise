@@ -5,7 +5,7 @@ import { useNotificationStore } from "@/core/store/notification";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import type { DashboardLayoutItem } from "../../types/dashboard-types";
 import { sourcesQuery } from "../../../data/repositories/sources";
-import type { IntervalUnit } from "@/core/types/dashboard-model";
+import type { IntervalUnit } from "@/core/types/dashboard-types";
 import { useUserStore } from "../../store/user";
 import { ROUTES } from "../../constants/routes";
 import { dashboardIdQuery } from "@/data/repositories/dashboards";
@@ -321,20 +321,6 @@ export function useDashboard(onSaveCallback?: (success: boolean) => void) {
     autoRefreshIntervalValue,
     autoRefreshIntervalUnit
   );
-
-  // // --- Export PDF ---
-  // const handleExportPDF = () => {
-  //   // eslint-disable-next-line no-console
-  //   console.log("[useDashboard] handleExportPDF appelé");
-  //   import("@/core/utils/dashboardExportUtils").then(
-  //     ({ exportDashboardToPDF }) => {
-  //       exportDashboardToPDF({
-  //         gridSelector: ".dashboard-grid",
-  //         filename: `${dashboard?.title || "dashboard"}.pdf`,
-  //       });
-  //     }
-  //   );
-  // };
 
   // --- Handlers principaux ---
   const handleAddWidget = (widget: any) => {

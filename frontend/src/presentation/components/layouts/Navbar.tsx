@@ -76,9 +76,11 @@ function Breadcrumb({
         const isFirst = idx === 0;
         const isLast = idx === breadcrumb.length - 1;
 
+        const showFirstSlash = hideSidebar && isFirst;
+
         return (
           <span key={item.url} className="flex items-center gap-1">
-            {!hideSidebar && !isFirst && <span className="mx-1">/</span>}
+            <span className={`mx-1 ${showFirstSlash ? "hidden" : ""}`}>/</span>
             {isLast ? (
               <span className="font-semibold text-indigo-500 ">
                 {item.label}

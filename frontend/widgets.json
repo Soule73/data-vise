@@ -1,0 +1,1342 @@
+[{
+  "_id": {
+    "$oid": "68475b2fba6e56445e7653de"
+  },
+  "widgetId": "5c493f7e-e242-44d0-8e1c-94a417018b6c",
+  "title": "bar",
+  "type": "bar",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "metrics": [
+      {
+        "agg": "sum",
+        "field": "sales",
+        "label": "Somme · sales"
+      },
+      {
+        "agg": "avg",
+        "field": "sales",
+        "label": "Moyenne · sales"
+      }
+    ],
+    "bucket": {
+      "field": "region",
+      "type": "x"
+    },
+    "metricStyles": [
+      {},
+      {}
+    ],
+    "xField": "id",
+    "yField": "date",
+    "color": "",
+    "groupBy": ""
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-09T22:07:43.339Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "5c493f7e-e242-44d0-8e1c-94a417018b6c",
+        "title": "bar",
+        "type": "bar",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "metrics": [
+            {
+              "agg": "sum",
+              "field": "sales",
+              "label": "Somme · sales"
+            },
+            {
+              "agg": "avg",
+              "field": "sales",
+              "label": "Moyenne · sales"
+            }
+          ],
+          "bucket": {
+            "field": "region",
+            "type": "x"
+          },
+          "metricStyles": [
+            {},
+            {}
+          ],
+          "xField": "id",
+          "yField": "date",
+          "color": "",
+          "groupBy": ""
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-09T22:07:43.341Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-09T22:07:43.341Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68475be3ba6e56445e7653f7"
+  },
+  "widgetId": "70bfcbac-7fbf-49b7-9427-9eb124cfb5f5",
+  "title": "line",
+  "type": "line",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "metrics": [
+      {
+        "agg": "sum",
+        "field": "sales",
+        "label": "Somme · sales"
+      }
+    ],
+    "bucket": {
+      "field": "sales",
+      "type": "x"
+    },
+    "metricStyles": [
+      {}
+    ],
+    "xField": "id",
+    "yField": "date",
+    "color": ""
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-09T22:10:43.965Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "70bfcbac-7fbf-49b7-9427-9eb124cfb5f5",
+        "title": "line",
+        "type": "line",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "metrics": [
+            {
+              "agg": "sum",
+              "field": "sales",
+              "label": "Somme · sales"
+            }
+          ],
+          "bucket": {
+            "field": "sales",
+            "type": "x"
+          },
+          "metricStyles": [
+            {}
+          ],
+          "xField": "id",
+          "yField": "date",
+          "color": ""
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-09T22:10:43.966Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-09T22:10:43.966Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6848cb6f81f3af87b54e9b92"
+  },
+  "widgetId": "cc3d3b00-ff01-476f-91e1-0490721f8e8d",
+  "title": "Moyenne de vente",
+  "type": "table",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "columns": [
+      "id",
+      "date",
+      "region"
+    ],
+    "pageSize": 10,
+    "widgetParams": {
+      "title": "dfgh"
+    },
+    "metrics": [
+      {
+        "agg": "avg",
+        "field": "sales",
+        "label": "Moyenne"
+      }
+    ],
+    "bucket": {
+      "field": "date",
+      "type": "x",
+      "label": "Date"
+    },
+    "metricStyles": [
+      {}
+    ]
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-11T00:18:55.721Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "cc3d3b00-ff01-476f-91e1-0490721f8e8d",
+        "title": "Moyenne de vente",
+        "type": "table",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "columns": [
+            "id",
+            "date",
+            "region"
+          ],
+          "pageSize": 10,
+          "widgetParams": {
+            "title": "dfgh"
+          },
+          "metrics": [
+            {
+              "agg": "avg",
+              "field": "sales",
+              "label": "Moyenne"
+            }
+          ],
+          "bucket": {
+            "field": "date",
+            "type": "x",
+            "label": "Date"
+          },
+          "metricStyles": [
+            {}
+          ]
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-11T00:18:55.783Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-11T00:18:55.783Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6848d14881f3af87b54e9c23"
+  },
+  "widgetId": "4ff75723-4d5e-42b2-a2a7-dfbfaf624f0d",
+  "title": "Vente date par région",
+  "type": "table",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "columns": [
+      "id",
+      "date",
+      "region"
+    ],
+    "pageSize": 10,
+    "widgetParams": {
+      "title": "Vente date par région"
+    },
+    "metrics": [
+      {
+        "agg": "none",
+        "field": "region",
+        "label": "Région"
+      },
+      {
+        "agg": "sum",
+        "field": "sales",
+        "label": "Vente"
+      }
+    ],
+    "bucket": {
+      "field": "date",
+      "type": "x",
+      "label": "Date"
+    },
+    "metricStyles": [
+      {},
+      {}
+    ]
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-11T00:43:52.257Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "4ff75723-4d5e-42b2-a2a7-dfbfaf624f0d",
+        "title": "Vente date par région",
+        "type": "table",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "columns": [
+            "id",
+            "date",
+            "region"
+          ],
+          "pageSize": 10,
+          "widgetParams": {
+            "title": "Vente date par région"
+          },
+          "metrics": [
+            {
+              "agg": "none",
+              "field": "region",
+              "label": "Région"
+            },
+            {
+              "agg": "sum",
+              "field": "sales",
+              "label": "Vente"
+            }
+          ],
+          "bucket": {
+            "field": "date",
+            "type": "x",
+            "label": "Champ de groupement"
+          },
+          "metricStyles": [
+            {},
+            {}
+          ]
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-11T00:43:52.262Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-11T01:21:27.025Z"
+  },
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "684c7c4a0bb584f6d72e4530"
+  },
+  "widgetId": "2abf3cb0-b54d-49ba-a118-65c3a2f0471b",
+  "title": "Vente par Catégories",
+  "type": "bar",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "metrics": [
+      {
+        "agg": "sum",
+        "field": "sales",
+        "label": "Somme · sales"
+      },
+      {
+        "agg": "avg",
+        "field": "sales",
+        "label": "Moyenne · sales"
+      }
+    ],
+    "bucket": {
+      "field": "category",
+      "type": "x",
+      "label": "Champ de groupement (axe X)"
+    },
+    "metricStyles": [
+      {
+        "labelColor": "#000000",
+        "labelFontSize": 12,
+        "borderColor": "#000000",
+        "borderWidth": 1,
+        "barThickness": 50,
+        "borderRadius": 20,
+        "pointStyle": "circle",
+        "color": "#4313b4",
+        "label": "sum · sales"
+      },
+      {
+        "labelColor": "#000000",
+        "labelFontSize": 50,
+        "borderColor": "#cc3e3e",
+        "borderWidth": 3,
+        "barThickness": 50,
+        "borderRadius": 21,
+        "pointStyle": "circle",
+        "color": "#eb6924",
+        "label": "avg · sales"
+      }
+    ],
+    "widgetParams": {
+      "legendPosition": "bottom",
+      "titleAlign": "center",
+      "title": "Vente par Catégories",
+      "barPercentage": "50000",
+      "categoryPercentage": "50000",
+      "showValues": false
+    },
+    "xField": "id",
+    "yField": "date",
+    "color": "",
+    "groupBy": ""
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-13T19:30:18.541Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "2abf3cb0-b54d-49ba-a118-65c3a2f0471b",
+        "title": "Vente par Catégories",
+        "type": "bar",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "metrics": [
+            {
+              "agg": "sum",
+              "field": "sales",
+              "label": "Somme · sales"
+            },
+            {
+              "agg": "avg",
+              "field": "sales",
+              "label": "Moyenne · sales"
+            }
+          ],
+          "bucket": {
+            "field": "category",
+            "type": "x",
+            "label": "Champ de groupement (axe X)"
+          },
+          "metricStyles": [
+            {
+              "labelColor": "#000000",
+              "labelFontSize": 12,
+              "borderColor": "#000000",
+              "borderWidth": 1,
+              "barThickness": 50,
+              "borderRadius": 20,
+              "pointStyle": "circle",
+              "color": "#4313b4",
+              "label": "sum · sales"
+            },
+            {
+              "labelColor": "#000000",
+              "labelFontSize": 50,
+              "borderColor": "#cc3e3e",
+              "borderWidth": 3,
+              "barThickness": 50,
+              "borderRadius": 21,
+              "pointStyle": "circle",
+              "color": "#eb6924",
+              "label": "avg · sales"
+            }
+          ],
+          "widgetParams": {
+            "legendPosition": "bottom",
+            "titleAlign": "center",
+            "title": "Vente par Catégories",
+            "barPercentage": "50000",
+            "categoryPercentage": "50000",
+            "showValues": false
+          },
+          "xField": "id",
+          "yField": "date",
+          "color": "",
+          "groupBy": ""
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-13T19:30:18.551Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-13T19:30:18.551Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "684cb02230024d72a7504534"
+  },
+  "widgetId": "786b6b4e-b054-425c-af55-66f60aabf8d8",
+  "title": "Somme de vente",
+  "type": "card",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "metrics": [
+      {
+        "agg": "sum",
+        "field": "sales",
+        "label": "Vente"
+      }
+    ],
+    "bucket": {
+      "field": "id",
+      "type": "x"
+    },
+    "metricStyles": [
+      {
+        "labelColor": "#000000",
+        "labelFontSize": 12,
+        "borderColor": "#000000",
+        "borderWidth": 1,
+        "barThickness": "",
+        "borderRadius": 0,
+        "pointStyle": "circle",
+        "color": "#2563eb",
+        "iconColor": "#d30d63",
+        "valueColor": "#3bb543",
+        "descriptionColor": "#34373c",
+        "label": "sum · sales"
+      }
+    ],
+    "widgetParams": {
+      "description": "Somme de vente",
+      "icon": "ShoppingCartIcon",
+      "title": ""
+    }
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-13T23:11:30.053Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "786b6b4e-b054-425c-af55-66f60aabf8d8",
+        "title": "Nomre de vente",
+        "type": "card",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "metrics": [
+            {
+              "agg": "sum",
+              "field": "sales",
+              "label": "Nomre de vente"
+            }
+          ],
+          "bucket": {
+            "field": "id",
+            "type": "x"
+          },
+          "metricStyles": [
+            {
+              "labelColor": "#000000",
+              "labelFontSize": 12,
+              "borderColor": "#000000",
+              "borderWidth": 1,
+              "barThickness": "",
+              "borderRadius": 0,
+              "pointStyle": "circle",
+              "color": "#2563eb",
+              "iconColor": "#d30d63",
+              "valueColor": "#3bb543",
+              "descriptionColor": "#34373c",
+              "label": "sum · sales"
+            }
+          ],
+          "widgetParams": {
+            "description": "cvbncvbn",
+            "icon": "ArrowUturnUpIcon",
+            "title": ""
+          }
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-13T23:11:30.068Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-14T08:45:07.897Z"
+  },
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "684d335c30024d72a75045be"
+  },
+  "widgetId": "559b9835-266d-4c12-8c89-c8aa90e0729f",
+  "title": "Vente par région",
+  "type": "kpi_group",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "metrics": [
+      {
+        "agg": "sum",
+        "field": "sales",
+        "label": "Europe"
+      },
+      {
+        "agg": "sum",
+        "field": "sales",
+        "label": "Asie"
+      },
+      {
+        "agg": "sum",
+        "field": "sales",
+        "label": "Amerique"
+      }
+    ],
+    "metricStyles": [
+      {
+        "labelColor": "#000000",
+        "labelFontSize": 12,
+        "borderColor": "#000000",
+        "borderWidth": 1,
+        "barThickness": "",
+        "borderRadius": 0,
+        "pointStyle": "circle",
+        "color": "#2563eb",
+        "label": "sum · sales"
+      }
+    ],
+    "filters": [
+      {
+        "field": "region",
+        "value": "Europe"
+      },
+      {
+        "field": "region",
+        "value": "Asie"
+      },
+      {
+        "field": "region",
+        "value": "Amérique"
+      }
+    ],
+    "widgetParams": {
+      "columns": "3",
+      "title": "Vente par région"
+    }
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-14T08:31:24.886Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "559b9835-266d-4c12-8c89-c8aa90e0729f",
+        "title": "Vente par région",
+        "type": "kpi_group",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "metrics": [
+            {
+              "agg": "sum",
+              "field": "sales",
+              "label": "Europe"
+            },
+            {
+              "agg": "sum",
+              "field": "sales",
+              "label": "Asie"
+            },
+            {
+              "agg": "sum",
+              "field": "sales",
+              "label": "Amerique"
+            }
+          ],
+          "metricStyles": [
+            {
+              "labelColor": "#000000",
+              "labelFontSize": 12,
+              "borderColor": "#000000",
+              "borderWidth": 1,
+              "barThickness": "",
+              "borderRadius": 0,
+              "pointStyle": "circle",
+              "color": "#2563eb",
+              "label": "sum · sales"
+            }
+          ],
+          "filters": [
+            {
+              "field": "region",
+              "value": "Europe"
+            },
+            {
+              "field": "region",
+              "value": "Asie"
+            },
+            {
+              "field": "region",
+              "value": "Amérique"
+            }
+          ],
+          "widgetParams": {
+            "columns": "3",
+            "title": "Vente par région"
+          }
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-14T08:31:24.894Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-14T08:31:24.894Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "684e02555c11f4da236fd84d"
+  },
+  "widgetId": "0ce4a2d8-09d0-4ada-a52a-753b9ceb8ecf",
+  "title": "Comparaison radar",
+  "type": "radar",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "metrics": [
+      {
+        "agg": "sum",
+        "field": "date",
+        "label": "Comparaison",
+        "groupBy": "region",
+        "groupByValue": "Europe",
+        "fields": [
+          "sales",
+          "score",
+          "satisfaction",
+          "discount",
+          "profit",
+          "cout"
+        ]
+      }
+    ],
+    "bucket": {
+      "field": "id",
+      "type": "x"
+    },
+    "metricStyles": [
+      {
+        "labelColor": "#000000",
+        "labelFontSize": 12,
+        "borderColor": "#4ccd1d",
+        "borderWidth": 1,
+        "barThickness": "",
+        "borderRadius": 0,
+        "pointStyle": "circle",
+        "color": "#e20808",
+        "label": "sum · date"
+      }
+    ],
+    "widgetParams": {
+      "title": "Comparaison radar",
+      "legend": true
+    }
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-14T23:14:29.681Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "0ce4a2d8-09d0-4ada-a52a-753b9ceb8ecf",
+        "title": "Comparaison radar",
+        "type": "radar",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "metrics": [
+            {
+              "agg": "sum",
+              "field": "date",
+              "label": "Comparaison",
+              "groupBy": "region",
+              "groupByValue": "Europe",
+              "fields": [
+                "sales",
+                "score",
+                "satisfaction",
+                "discount",
+                "profit",
+                "cout"
+              ]
+            }
+          ],
+          "bucket": {
+            "field": "id",
+            "type": "x"
+          },
+          "metricStyles": [
+            {
+              "labelColor": "#000000",
+              "labelFontSize": 12,
+              "borderColor": "#4ccd1d",
+              "borderWidth": 1,
+              "barThickness": "",
+              "borderRadius": 0,
+              "pointStyle": "circle",
+              "color": "#e20808",
+              "label": "sum · date"
+            }
+          ],
+          "widgetParams": {
+            "title": "Comparaison radar",
+            "legend": true
+          }
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-14T23:14:29.691Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-14T23:14:29.691Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "684e9f2d3df44cbbeb35b418"
+  },
+  "widgetId": "b7fce1bb-b8a8-45b2-8b34-012d92d4bec4",
+  "title": "Details de ventes",
+  "type": "bar",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "metrics": [
+      {
+        "agg": "sum",
+        "field": "sales",
+        "label": "Ventes"
+      },
+      {
+        "agg": "sum",
+        "field": "profit",
+        "label": "Profits"
+      }
+    ],
+    "bucket": {
+      "field": "region",
+      "type": "x",
+      "label": "Région"
+    },
+    "metricStyles": [
+      {
+        "label": "sum · sales",
+        "color": "#1657e3",
+        "borderRadius": 20,
+        "barThickness": 48
+      },
+      {
+        "color": "#3beb24",
+        "borderWidth": 0,
+        "barThickness": 50,
+        "borderRadius": 15,
+        "labelFontSize": 25,
+        "label": "sum · profit"
+      }
+    ],
+    "widgetParams": {
+      "showValues": true,
+      "showGrid": true,
+      "legend": true,
+      "titleAlign": "center",
+      "title": "Details de vente",
+      "legendPosition": "bottom"
+    },
+    "xField": "id",
+    "yField": "date",
+    "color": "",
+    "groupBy": ""
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-15T10:23:41.579Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "b7fce1bb-b8a8-45b2-8b34-012d92d4bec4",
+        "title": "Details de ventes",
+        "type": "bar",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "metrics": [
+            {
+              "agg": "sum",
+              "field": "sales",
+              "label": "Ventes"
+            },
+            {
+              "agg": "sum",
+              "field": "profit",
+              "label": "Profits"
+            }
+          ],
+          "bucket": {
+            "field": "region",
+            "type": "x",
+            "label": "Région"
+          },
+          "metricStyles": [
+            {
+              "label": "sum · sales",
+              "color": "#1657e3",
+              "borderRadius": 20,
+              "barThickness": 48
+            },
+            {
+              "color": "#3beb24",
+              "borderWidth": 0,
+              "barThickness": 50,
+              "borderRadius": 15,
+              "labelFontSize": 25,
+              "label": "sum · profit"
+            }
+          ],
+          "widgetParams": {
+            "showValues": true,
+            "showGrid": true,
+            "legend": true,
+            "titleAlign": "center",
+            "title": "Details de vente",
+            "legendPosition": "bottom"
+          },
+          "xField": "id",
+          "yField": "date",
+          "color": "",
+          "groupBy": ""
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-15T10:23:41.588Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-15T10:23:41.588Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68505d3fd4ffadcfd138e8cb"
+  },
+  "widgetId": "17f90c09-111f-4dce-bf3e-c0be70badf4c",
+  "title": "Evolution temperature",
+  "type": "line",
+  "dataSourceId": {
+    "$oid": "68505bdad4ffadcfd138e8ae"
+  },
+  "config": {
+    "metricStyles": [
+      {
+        "labelColor": "#000000",
+        "labelFontSize": 12,
+        "borderColor": "#000000",
+        "borderWidth": 1,
+        "barThickness": "",
+        "borderRadius": 0,
+        "pointStyle": "circle",
+        "color": "#2563eb",
+        "label": "none · temperature"
+      }
+    ],
+    "widgetParams": {
+      "legend": true,
+      "showGrid": true,
+      "showValues": false,
+      "title": "Evolution du témperaure",
+      "legendPosition": "top",
+      "titleAlign": "center",
+      "showPoints": true,
+      "tension": 0,
+      "fill": true,
+      "yLabel": "Témperature",
+      "xLabel": "Temps"
+    },
+    "xField": "_id",
+    "yField": "temperature",
+    "metrics": [
+      {
+        "agg": "none",
+        "field": "temperature",
+        "label": "Temperature"
+      }
+    ],
+    "bucket": {
+      "field": "timestamp",
+      "type": "x",
+      "label": "Temps"
+    }
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-16T18:06:55.619Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "17f90c09-111f-4dce-bf3e-c0be70badf4c",
+        "title": "Evolution temperature",
+        "type": "line",
+        "dataSourceId": "68505bdad4ffadcfd138e8ae",
+        "config": {
+          "metricStyles": [
+            {
+              "labelColor": "#000000",
+              "labelFontSize": 12,
+              "borderColor": "#000000",
+              "borderWidth": 1,
+              "barThickness": "",
+              "borderRadius": 0,
+              "pointStyle": "circle",
+              "color": "#2563eb",
+              "label": "none · temperature"
+            }
+          ],
+          "widgetParams": {
+            "legend": true,
+            "showGrid": true,
+            "showValues": false,
+            "title": "",
+            "legendPosition": "top",
+            "titleAlign": "center",
+            "showPoints": true,
+            "tension": 0,
+            "fill": false
+          },
+          "xField": "_id",
+          "yField": "temperature",
+          "metrics": [
+            {
+              "agg": "none",
+              "field": "temperature",
+              "label": "Temperature"
+            }
+          ],
+          "bucket": {
+            "field": "timestamp",
+            "type": "x",
+            "label": "Temps"
+          }
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-16T18:06:55.625Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-19T15:48:10.156Z"
+  },
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "68505df0b5ab9f5f319e2376"
+  },
+  "widgetId": "9478b5e5-b186-4306-a4ea-d85b91b0a265",
+  "title": "Evolution de l'humidité",
+  "type": "line",
+  "dataSourceId": {
+    "$oid": "68505bdad4ffadcfd138e8ae"
+  },
+  "config": {
+    "metricStyles": [
+      {
+        "label": "none · humidity",
+        "color": "#24eb55"
+      }
+    ],
+    "widgetParams": {
+      "legend": true,
+      "showGrid": true,
+      "showValues": false,
+      "title": "",
+      "legendPosition": "top",
+      "titleAlign": "center",
+      "showPoints": true,
+      "tension": 0,
+      "fill": false
+    },
+    "xField": "_id",
+    "yField": "temperature",
+    "metrics": [
+      {
+        "agg": "none",
+        "field": "humidity",
+        "label": "Humidité"
+      }
+    ],
+    "bucket": {
+      "field": "timestamp",
+      "type": "x",
+      "label": "Temps"
+    }
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-16T18:09:52.300Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "9478b5e5-b186-4306-a4ea-d85b91b0a265",
+        "title": "Evolution de l'humidité",
+        "type": "line",
+        "dataSourceId": "68505bdad4ffadcfd138e8ae",
+        "config": {
+          "metricStyles": [
+            {
+              "label": "none · humidity",
+              "color": "#24eb55"
+            }
+          ],
+          "widgetParams": {
+            "legend": true,
+            "showGrid": true,
+            "showValues": false,
+            "title": "",
+            "legendPosition": "top",
+            "titleAlign": "center",
+            "showPoints": true,
+            "tension": 0,
+            "fill": false
+          },
+          "xField": "_id",
+          "yField": "temperature",
+          "metrics": [
+            {
+              "agg": "none",
+              "field": "humidity",
+              "label": "Humidité"
+            }
+          ],
+          "bucket": {
+            "field": "timestamp",
+            "type": "x",
+            "label": "Temps"
+          }
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-16T18:09:52.310Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-16T18:09:52.310Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68550ad54694108be301761a"
+  },
+  "widgetId": "a3ce66ca-abe5-49c2-a073-4cfaf0b12f36",
+  "title": "Scatter(Vente vs Profit)",
+  "type": "scatter",
+  "dataSourceId": {
+    "$oid": "68441c5310d9b5b8c9b30c52"
+  },
+  "config": {
+    "metricStyles": [
+      {
+        "labelColor": "#000000",
+        "labelFontSize": 12,
+        "borderColor": "#000000",
+        "borderWidth": 1,
+        "barThickness": "",
+        "borderRadius": 0,
+        "pointStyle": "circle",
+        "color": "#2563eb",
+        "label": "sum · date"
+      }
+    ],
+    "widgetParams": {
+      "title": "Scatter(Vente vs Profit)",
+      "xLabel": "Profit",
+      "yLabel": "Vente",
+      "legend": true
+    },
+    "metrics": [
+      {
+        "agg": "sum",
+        "field": "date",
+        "label": "Vente vs Profit",
+        "x": "sales",
+        "y": "profit"
+      }
+    ],
+    "bucket": {
+      "field": "id",
+      "type": "x"
+    }
+  },
+  "ownerId": {
+    "$oid": "684417fb5f5ca77214c9b547"
+  },
+  "visibility": "private",
+  "history": [
+    {
+      "userId": {
+        "$oid": "684417fb5f5ca77214c9b547"
+      },
+      "date": {
+        "$date": "2025-06-20T07:16:37.008Z"
+      },
+      "action": "create",
+      "changes": {
+        "widgetId": "a3ce66ca-abe5-49c2-a073-4cfaf0b12f36",
+        "title": "Scatter(Vente vs Profit)",
+        "type": "scatter",
+        "dataSourceId": "68441c5310d9b5b8c9b30c52",
+        "config": {
+          "metricStyles": [
+            {
+              "labelColor": "#000000",
+              "labelFontSize": 12,
+              "borderColor": "#000000",
+              "borderWidth": 1,
+              "barThickness": "",
+              "borderRadius": 0,
+              "pointStyle": "circle",
+              "color": "#2563eb",
+              "label": "sum · date"
+            }
+          ],
+          "widgetParams": {
+            "title": "Scatter(Vente vs Profit)",
+            "xLabel": "Profit",
+            "yLabel": "Vente",
+            "legend": true
+          },
+          "metrics": [
+            {
+              "agg": "sum",
+              "field": "date",
+              "label": "Vente vs Profit",
+              "x": "sales",
+              "y": "profit"
+            }
+          ],
+          "bucket": {
+            "field": "id",
+            "type": "x"
+          }
+        }
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-06-20T07:16:37.017Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-20T07:17:00.755Z"
+  },
+  "__v": 1
+}]

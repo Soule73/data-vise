@@ -128,7 +128,7 @@ export default function WidgetStyleConfigSection({
                   onChange={(e) => handleConfigChange(field, e.target.value)}
                   name={field}
                   id={`widget-config-${field}`}
-                  options={meta.options}
+                  options={Array.isArray(meta.options) ? meta.options : []}
                 />
               );
             }

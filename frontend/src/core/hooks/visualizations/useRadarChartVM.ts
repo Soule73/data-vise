@@ -1,16 +1,8 @@
 import { useMemo } from "react";
 import type { RadarChartConfig } from "@/core/types/visualization";
 import type { ChartOptions, ChartData, ChartDataset } from "chart.js";
-
-// On ne fait plus extends MetricConfig pour éviter le conflit sur agg
-interface RadarMetricConfig {
-  field: string;
-  label?: string;
-  agg?: string;
-  fields: string[];
-  groupBy?: string;
-  groupByValue?: string;
-}
+import type { RadarMetricConfig } from "@/core/types/metric-bucket-types";
+import type { RadarChartParams } from "@/core/types/visualization";
 
 function isRadarMetricConfig(metric: unknown): metric is RadarMetricConfig {
   return (
@@ -30,6 +22,9 @@ export function useRadarChartLogic(
   validDatasets: RadarMetricConfig[];
   axisLabels: string[];
 } {
+  // Extraction stricte des params
+  const widgetParams: RadarChartParams = config.widgetParams ?? {};
+
   const validDatasets = useMemo<RadarMetricConfig[]>(
     () =>
       Array.isArray(config.metrics)
@@ -100,10 +95,10 @@ export function useRadarChartLogic(
               ? Number(filteredData[0][field]) || 0
               : 0;
           }),
-          backgroundColor: color,
+          backgroundColor: config.metricStyles?.[i]?.color || color,
           borderColor: config.metricStyles?.[i]?.borderColor || undefined,
-          borderWidth: config.metricStyles?.[i]?.borderWidth || 1,
-          pointBackgroundColor: color,
+          borderWidth: config.metricStyles?.[i]?.borderWidth ?? 1,
+          pointBackgroundColor: config.metricStyles?.[i]?.color || color,
         } as ChartDataset<"radar">;
       }),
     [validDatasets, data, config.metricStyles, axisLabels]
@@ -122,11 +117,11 @@ export function useRadarChartLogic(
       responsive: true,
       animation: false,
       plugins: {
-        legend: { display: config.widgetParams?.legend !== false },
-        title: config.widgetParams?.title
+        legend: { display: widgetParams.legend !== false },
+        title: widgetParams.title
           ? {
               display: true,
-              text: config.widgetParams.title,
+              text: widgetParams.title,
             }
           : undefined,
         tooltip: { enabled: true },
@@ -138,7 +133,7 @@ export function useRadarChartLogic(
         },
       },
     }),
-    [config.widgetParams]
+    [widgetParams.legend, widgetParams.title]
   );
 
   return { chartData, options, validDatasets, axisLabels };

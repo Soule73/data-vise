@@ -1,12 +1,7 @@
 import api from "./api";
 import { extractApiData } from "../../core/utils/api-utils";
 import type { ApiResponse } from "@/core/types/api";
-import type { User } from "@/core/types/auth-types";
-
-interface LoginRegisterResponse {
-  user: User;
-  token: string;
-}
+import type { LoginRegisterResponse } from "@/core/types/auth-types";
 
 export async function login(
   email: string,

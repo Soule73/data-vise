@@ -1,9 +1,18 @@
-import { useCreateUserMutation, useUpdateUserMutation, useDeleteUserMutation } from "@/data/repositories/auth";
-import { useState } from "react";
+import {
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} from "@/data/repositories/auth";
+import { useState, useMemo } from "react";
 import { useNotificationStore } from "@/core/store/notification";
 import { rolesQuery } from "@/data/repositories/roles";
 import { usersQuery } from "@/data/repositories/users";
 import { useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useUserStore } from "@/core/store/user";
+import type { User, Role } from "@/core/types/auth-types";
+import { userSchema } from "@/core/validation/user";
 
 export function useUserManagement() {
   const showNotification = useNotificationStore((s) => s.showNotification);
@@ -34,7 +43,8 @@ export function useUserManagement() {
         open: true,
         type: "error",
         title: "Erreur",
-        description: e?.response?.data?.message || "Erreur lors de la sauvegarde.",
+        description:
+          e?.response?.data?.message || "Erreur lors de la sauvegarde.",
       });
     },
   });
@@ -56,7 +66,8 @@ export function useUserManagement() {
         open: true,
         type: "error",
         title: "Erreur",
-        description: e?.response?.data?.message || "Erreur lors de la sauvegarde.",
+        description:
+          e?.response?.data?.message || "Erreur lors de la sauvegarde.",
       });
     },
   });
@@ -78,10 +89,33 @@ export function useUserManagement() {
         open: true,
         type: "error",
         title: "Erreur",
-        description: e?.response?.data?.message || "Erreur lors de la suppression.",
+        description:
+          e?.response?.data?.message || "Erreur lors de la suppression.",
       });
     },
   });
+
+  const formHook = useForm({
+    resolver: zodResolver(userSchema),
+    defaultValues: form,
+    values: form,
+  });
+
+  // Table columns (sans la colonne actions)
+  const columns = useMemo(
+    () => [
+      { key: "email", label: "Email" },
+      { key: "username", label: "Nom d’utilisateur" },
+      { key: "roleId", label: "Rôle", render: (u: User) => u.roleId?.name },
+    ],
+    []
+  );
+
+  const hasPermission = useUserStore((s) => s.hasPermission);
+  const rolesList = useMemo(
+    () => roles.map((r: Role) => ({ value: r._id, label: r.name })),
+    [roles]
+  );
 
   function openModal(user?: any) {
     setEditingUser(user || null);
@@ -139,5 +173,9 @@ export function useUserManagement() {
     handleDeleteUser,
     isDeleting: deleteMutation.isPending,
     generatePassword,
+    formHook,
+    columns,
+    hasPermission,
+    rolesList,
   };
 }

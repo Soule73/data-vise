@@ -16,12 +16,16 @@ export async function getSourceById(id: string): Promise<DataSource> {
 export async function createSource(
   data:
     | {
-      name: string;
-      type: string;
-      endpoint?: string;
-      filePath?: string;
-      config?: Record<string, unknown>;
-    }
+        name: string;
+        type: string;
+        endpoint?: string;
+        filePath?: string;
+        config?: Record<string, unknown>;
+        httpMethod?: "GET" | "POST";
+        authType?: "none" | "bearer" | "apiKey" | "basic";
+        authConfig?: any;
+        timestampField?: string;
+      }
     | FormData
 ): Promise<DataSource> {
   if (data instanceof FormData) {
@@ -116,8 +120,16 @@ export async function fetchSourceData(
   if (options?.forceRefresh) {
     params.append("forceRefresh", "1");
   }
-  const url = `/sources/${sourceId}/data${params.toString() ? `?${params}` : ""
-    }`;
+  const url = `/sources/${sourceId}/data${
+    params.toString() ? `?${params}` : ""
+  }`;
   const res = await api.get<ApiResponse<any[]>>(url);
   return extractApiData(res);
+}
+
+export async function fetchUploadedFile(filename: string): Promise<Blob> {
+  const res = await api.get(`/uploads/${filename}`, {
+    responseType: "blob",
+  });
+  return res.data as Blob;
 }

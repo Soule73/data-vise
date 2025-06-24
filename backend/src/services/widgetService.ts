@@ -1,4 +1,5 @@
 import Widget from "../models/Widget";
+import Dashboard from "../models/Dashboard";
 import type {
   IWidget,
   WidgetCreatePayload,
@@ -7,13 +8,20 @@ import type {
 import type { ApiResponse } from "@/types/api";
 
 const widgetService = {
-  async list(
-    userId?: string
-  ): Promise<ApiResponse<IWidget[]>> {
+  async list(userId?: string): Promise<ApiResponse<IWidget[]>> {
     const widgets = await Widget.find({
       $or: [{ ownerId: userId }, { visibility: "public" }],
     });
-    return { data: widgets };
+    // Pour chaque widget, vérifier s'il est utilisé dans au moins un dashboard
+    const widgetsWithUsage = await Promise.all(
+      widgets.map(async (w) => {
+        const count = await Dashboard.countDocuments({
+          layout: { $elemMatch: { widgetId: w.widgetId } },
+        });
+        return { ...w.toObject(), isUsed: count > 0 };
+      })
+    );
+    return { data: widgetsWithUsage };
   },
   async create(payload: WidgetCreatePayload): Promise<ApiResponse<IWidget>> {
     const { widgetId, title, type, dataSourceId, config, userId } = payload;
@@ -71,9 +79,23 @@ const widgetService = {
     return { data: widget };
   },
   async remove(id: string): Promise<ApiResponse<{ success: boolean }>> {
-    const widget = await Widget.findByIdAndDelete(id);
+    // Vérifier si le widget est utilisé dans un dashboard
+    const widget = await Widget.findById(id);
     if (!widget)
       return { error: { message: "Widget non trouvé." }, status: 404 };
+    const count = await Dashboard.countDocuments({
+      layout: { $elemMatch: { widgetId: widget.widgetId } },
+    });
+    if (count > 0) {
+      return {
+        error: {
+          message:
+            "Impossible de supprimer un widget utilisé dans un dashboard.",
+        },
+        status: 400,
+      };
+    }
+    await Widget.findByIdAndDelete(id);
     return { data: { success: true } };
   },
   async getById(id: string): Promise<ApiResponse<IWidget>> {

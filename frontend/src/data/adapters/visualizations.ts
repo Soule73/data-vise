@@ -30,26 +30,55 @@ import * as HeroIcons from "@heroicons/react/24/outline";
 // Styles communs pour les métriques (charts)
 const COMMON_METRIC_STYLES = {
   color: { default: "#2563eb", inputType: "color", label: "Couleur" },
-  borderColor: {
-    default: "#000000",
-    inputType: "color",
-    label: "Couleur de bordure",
+  // labelColor et labelFontSize supprimés ici pour éviter mélange
+};
+
+// Params communs pour les widgets (charts)
+const COMMON_WIDGET_PARAMS = {
+  title: { default: "", inputType: "text", label: "Titre du graphique" },
+  legendPosition: {
+    default: "top",
+    inputType: "select",
+    label: "Position de la légende",
+    options: [
+      { value: "top", label: "Haut" },
+      { value: "left", label: "Gauche" },
+      { value: "right", label: "Droite" },
+      { value: "bottom", label: "Bas" },
+    ],
   },
-  borderWidth: { default: 1, inputType: "number", label: "Épaisseur bordure" },
-  labelColor: {
-    default: "#000000",
-    inputType: "color",
-    label: "Couleur des labels",
+  xLabel: { default: "", inputType: "text", label: "Label de l'axe X" },
+  yLabel: { default: "", inputType: "text", label: "Label de l'axe Y" },
+  labelFormat: {
+    default: "{label}: {value} ({percent}%)",
+    inputType: "text",
+    label: "Format des labels",
+  },
+  tooltipFormat: {
+    default: "{label}: {value}",
+    inputType: "text",
+    label: "Format des tooltips",
+  },
+  titleAlign: {
+    default: "center",
+    inputType: "select",
+    label: "Alignement du titre",
+    options: [
+      { value: "start", label: "Début" },
+      { value: "center", label: "Centre" },
+      { value: "end", label: "Fin" },
+    ],
   },
   labelFontSize: {
     default: 12,
     inputType: "number",
     label: "Taille de police des labels",
   },
-};
-
-// Params communs pour les widgets (charts)
-const COMMON_WIDGET_PARAMS = {
+  labelColor: {
+    default: "#000000",
+    inputType: "color",
+    label: "Couleur des labels",
+  },
   legend: {
     default: true,
     inputType: "checkbox",
@@ -65,28 +94,6 @@ const COMMON_WIDGET_PARAMS = {
     inputType: "checkbox",
     label: "Afficher les valeurs",
   },
-  title: { default: "", inputType: "text", label: "Titre du graphique" },
-  legendPosition: {
-    default: "top",
-    inputType: "select",
-    label: "Position de la légende",
-    options: [
-      { value: "top", label: "Haut" },
-      { value: "left", label: "Gauche" },
-      { value: "right", label: "Droite" },
-      { value: "bottom", label: "Bas" },
-    ],
-  },
-  titleAlign: {
-    default: "center",
-    inputType: "select",
-    label: "Alignement du titre",
-    options: [
-      { value: "start", label: "Début" },
-      { value: "center", label: "Centre" },
-      { value: "end", label: "Fin" },
-    ],
-  },
 };
 
 export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
@@ -99,6 +106,11 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
       ...BarChartConfig,
       metricStyles: {
         ...COMMON_METRIC_STYLES,
+        borderColor: {
+          default: "#000000",
+          inputType: "color",
+          label: "Couleur de bordure",
+        },
         barThickness: {
           default: undefined,
           inputType: "number",
@@ -109,9 +121,24 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
           inputType: "number",
           label: "Arrondi des barres",
         },
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
+        },
       },
       widgetParams: {
         ...COMMON_WIDGET_PARAMS,
+        stacked: {
+          default: false,
+          inputType: "checkbox",
+          label: "Empiler les barres",
+        },
+        horizontal: {
+          default: false,
+          inputType: "checkbox",
+          label: "Barres horizontales",
+        },
       },
     },
   },
@@ -124,6 +151,31 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
       ...LineChartConfig,
       metricStyles: {
         ...COMMON_METRIC_STYLES,
+        borderColor: {
+          default: "#000000",
+          inputType: "color",
+          label: "Couleur de bordure",
+        },
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
+        },
+        borderRadius: {
+          default: 0,
+          inputType: "number",
+          label: "Arrondi des lignes",
+        },
+        fill: {
+          default: false,
+          inputType: "checkbox",
+          label: "Remplir sous la ligne",
+        },
+        stepped: {
+          default: false,
+          inputType: "checkbox",
+          label: "Ligne en escalier",
+        },
         pointStyle: {
           default: "circle",
           inputType: "select",
@@ -140,6 +192,11 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
             { value: "dash", label: "Tiret" },
           ],
         },
+        borderDash: {
+          default: "",
+          inputType: "text",
+          label: "Pointillés (ex: 5,5)",
+        },
       },
       widgetParams: {
         ...COMMON_WIDGET_PARAMS,
@@ -153,20 +210,10 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
           inputType: "number",
           label: "Courbure (tension)",
         },
-        fill: {
+        stacked: {
           default: false,
           inputType: "checkbox",
-          label: "Remplir sous la ligne",
-        },
-        xLabel: {
-          default: "",
-          inputType: "text",
-          label: "Label de l'axe X",
-        },
-        yLabel: {
-          default: "",
-          inputType: "text",
-          label: "Label de l'axe Y",
+          label: "Empiler les lignes",
         },
       },
     },
@@ -183,24 +230,18 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
         ...COMMON_METRIC_STYLES,
       },
       widgetParams: {
-        legend: {
-          default: true,
-          inputType: "checkbox",
-          label: "Afficher la légende",
-        },
-        title: { default: "", inputType: "text", label: "Titre du graphique" },
-        legendPosition: {
-          default: "top",
-          inputType: "select",
-          label: "Position de la légende",
-          options: [
-            { value: "top", label: "Haut" },
-            { value: "left", label: "Gauche" },
-            { value: "right", label: "Droite" },
-            { value: "bottom", label: "Bas" },
-          ],
-        },
+        ...COMMON_WIDGET_PARAMS,
         cutout: { default: "0%", inputType: "text", label: "Trous (doughnut)" },
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
+        },
+        borderColor: {
+          default: "#000000",
+          inputType: "color",
+          label: "Couleur de bordure",
+        },
       },
     },
   },
@@ -229,13 +270,32 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
         opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
       },
       widgetParams: {
-        title: { default: "", inputType: "text", label: "Titre du graphique" },
-        xLabel: { default: "", inputType: "text", label: "Label de l'axe X" },
-        yLabel: { default: "", inputType: "text", label: "Label de l'axe Y" },
-        legend: {
+        ...COMMON_WIDGET_PARAMS,
+        showPoints: {
           default: true,
           inputType: "checkbox",
-          label: "Afficher la légende",
+          label: "Afficher les points",
+        },
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
+        },
+        pointStyle: {
+          default: "circle",
+          inputType: "select",
+          label: "Style des points",
+          options: [
+            { value: "circle", label: "Cercle" },
+            { value: "rect", label: "Rectangle" },
+            { value: "rectRounded", label: "Rectangle arrondi" },
+            { value: "rectRot", label: "Rectangle tourné" },
+            { value: "cross", label: "Croix" },
+            { value: "crossRot", label: "Croix tournée" },
+            { value: "star", label: "Étoile" },
+            { value: "line", label: "Ligne" },
+            { value: "dash", label: "Tiret" },
+          ],
         },
       },
     },
@@ -251,13 +311,32 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
         opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
       },
       widgetParams: {
-        title: { default: "", inputType: "text", label: "Titre du graphique" },
-        xLabel: { default: "", inputType: "text", label: "Label de l'axe X" },
-        yLabel: { default: "", inputType: "text", label: "Label de l'axe Y" },
-        legend: {
+        ...COMMON_WIDGET_PARAMS,
+        showPoints: {
           default: true,
           inputType: "checkbox",
-          label: "Afficher la légende",
+          label: "Afficher les points",
+        },
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
+        },
+        pointStyle: {
+          default: "circle",
+          inputType: "select",
+          label: "Style des points",
+          options: [
+            { value: "circle", label: "Cercle" },
+            { value: "rect", label: "Rectangle" },
+            { value: "rectRounded", label: "Rectangle arrondi" },
+            { value: "rectRot", label: "Rectangle tourné" },
+            { value: "cross", label: "Croix" },
+            { value: "crossRot", label: "Croix tournée" },
+            { value: "star", label: "Étoile" },
+            { value: "line", label: "Ligne" },
+            { value: "dash", label: "Tiret" },
+          ],
         },
       },
     },
@@ -273,24 +352,12 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
         opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
       },
       widgetParams: {
-        title: { default: "", inputType: "text", label: "Titre du graphique" },
-        legend: {
-          default: true,
-          inputType: "checkbox",
-          label: "Afficher la légende",
+        ...COMMON_WIDGET_PARAMS,
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
         },
-      },
-      dataConfig: {
-        groupByFields: ["region", "category"], // Champs autorisés pour le groupBy
-        axisFields: [
-          "sales",
-          "profit",
-          "quantite",
-          "marge",
-          "discount",
-          "score",
-          "satisfaction",
-        ], // Champs numériques suggérés pour axes
       },
     },
   },
@@ -416,13 +483,13 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
 
 // Champs de configuration communs factorisés
 const COMMON_FIELDS = {
+  title: { label: "Titre du graphique", inputType: "text", default: "" },
   color: { label: "Couleur", inputType: "color", default: "#2563eb" },
   legend: {
     label: "Afficher la légende",
     inputType: "checkbox",
     default: true,
   },
-  title: { label: "Titre du graphique", inputType: "text", default: "" },
   showGrid: {
     label: "Afficher la grille",
     inputType: "checkbox",
@@ -599,22 +666,21 @@ export const WIDGET_DATA_CONFIG: Record<
     metrics:
       | typeof COMMON_METRICS
       | (typeof COMMON_METRICS & { allowMultiple: false; label: string });
-    bucket: typeof COMMON_BUCKET & { label: string; typeLabel?: string };
+    bucket: typeof COMMON_BUCKET & { label?: string; typeLabel?: string };
   }
 > = {
   bar: {
     metrics: COMMON_METRICS,
-    bucket: { ...COMMON_BUCKET, label: "Champ de groupement (axe X)" },
+    bucket: { ...COMMON_BUCKET }, // label supprimé
   },
   line: {
     metrics: COMMON_METRICS,
-    bucket: { ...COMMON_BUCKET, label: "Champ de groupement (axe X)" },
+    bucket: { ...COMMON_BUCKET }, // label supprimé
   },
   pie: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
     bucket: {
       ...COMMON_BUCKET,
-      label: "Champ de groupement (part)",
       typeLabel: "part",
     },
   },
@@ -640,7 +706,7 @@ export const WIDGET_DATA_CONFIG: Record<
   },
   kpi_group: {
     metrics: { ...COMMON_METRICS, allowMultiple: true, label: "KPIs" },
-    bucket: { ...COMMON_BUCKET, allow: false, label: "" },
+    bucket: { ...COMMON_BUCKET, allow: false }, // label supprimé
   },
   card: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },

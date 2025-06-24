@@ -2,26 +2,43 @@ import { useEffect, useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { sourcesQuery, dataBySourceQuery } from "@/data/repositories/sources";
 import type { DataSource } from "@/core/types/data-source";
-import type { WidgetFormInitialValues, WidgetType } from "@/core/types/widget-types";
-import { WIDGETS, WIDGET_DATA_CONFIG, WIDGET_CONFIG_FIELDS } from "@/data/adapters/visualizations";
+import type {
+  WidgetFormInitialValues,
+  WidgetType,
+} from "@/core/types/widget-types";
+import {
+  WIDGETS,
+  WIDGET_DATA_CONFIG,
+  WIDGET_CONFIG_FIELDS,
+} from "@/data/adapters/visualizations";
 import { useMetricLabelStore } from "@/core/store/metricLabels";
 
 export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
   const [step, setStep] = useState(1);
   const [type, setType] = useState<WidgetType>(initialValues?.type || "bar");
   const [sourceId, setSourceId] = useState(initialValues?.sourceId || "");
-  const [columns, setColumns] = useState<string[]>(initialValues?.columns || []);
-  const [dataPreview, setDataPreview] = useState<any[]>(initialValues?.dataPreview || []);
+  const [columns, setColumns] = useState<string[]>(
+    initialValues?.columns || []
+  );
+  const [dataPreview, setDataPreview] = useState<any[]>(
+    initialValues?.dataPreview || []
+  );
   const [config, setConfig] = useState<any>(initialValues?.config || {});
   const [title, setTitle] = useState(initialValues?.title || "");
-  const [visibility, setVisibility] = useState<"public" | "private">(initialValues?.visibility || "private");
+  const [visibility, setVisibility] = useState<"public" | "private">(
+    initialValues?.visibility || "private"
+  );
   const [tab, setTab] = useState<"data" | "metricsAxes" | "params">("data");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [widgetTitle, setWidgetTitle] = useState(title || "");
   const [widgetTitleError, setWidgetTitleError] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [notif, setNotif] = useState<{ open: boolean; type: "success" | "error"; message: string }>({ open: false, type: "success", message: "" });
+  const [notif, setNotif] = useState<{
+    open: boolean;
+    type: "success" | "error";
+    message: string;
+  }>({ open: false, type: "success", message: "" });
   const [draggedMetric, setDraggedMetric] = useState<number | null>(null);
   const metricLabelStore = useMetricLabelStore();
   const WidgetComponent = WIDGETS[type]?.component;
@@ -88,23 +105,23 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
     return style;
   }
 
-  const dataConfig = WIDGET_DATA_CONFIG[type];
+  const widgetConfig = WIDGET_DATA_CONFIG[type];
   if (!initialValues?.disableAutoConfig) {
-    if (dataConfig && dataConfig.metrics.allowMultiple) {
+    if (widgetConfig && widgetConfig.metrics.allowMultiple) {
       if (!Array.isArray(config.metrics) || config.metrics.length === 0) {
         config.metrics = [
           {
-            agg: dataConfig.metrics.defaultAgg,
+            agg: widgetConfig.metrics.defaultAgg,
             field: columns[1] || "",
             label: columns[1] || "",
           },
         ];
       }
-    } else if (dataConfig) {
+    } else if (widgetConfig) {
       if (!Array.isArray(config.metrics) || config.metrics.length === 0) {
         config.metrics = [
           {
-            agg: dataConfig.metrics.defaultAgg,
+            agg: widgetConfig.metrics.defaultAgg,
             field: columns[1] || "",
             label: columns[1] || "",
           },
@@ -114,13 +131,13 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
       }
     }
     if (
-      dataConfig &&
-      dataConfig.bucket.allow &&
+      widgetConfig &&
+      widgetConfig.bucket.allow &&
       (!config.bucket || !config.bucket.field)
     ) {
       config.bucket = {
         field: columns[0] || "",
-        type: dataConfig.bucket.typeLabel || "x",
+        type: widgetConfig.bucket.typeLabel || "x",
       };
     }
   }
@@ -142,7 +159,9 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
   }
 
   // --- Synchronisation metrics/metricStyles ---
-  const prevMetricsRef = useRef<any[]>(config.metrics ? [...config.metrics] : []);
+  const prevMetricsRef = useRef<any[]>(
+    config.metrics ? [...config.metrics] : []
+  );
   useEffect(() => {
     const metrics = config.metrics || [];
     let metricStyles = config.metricStyles || [];
@@ -191,7 +210,9 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
             const metric = config.metrics[idx];
             const aggLabel = metric?.agg || "";
             const fieldLabel = metric?.field || "";
-            const autoLabel = `${aggLabel}${fieldLabel ? " · " + fieldLabel : ""}`;
+            const autoLabel = `${aggLabel}${
+              fieldLabel ? " · " + fieldLabel : ""
+            }`;
             if (style && style.customLabel) {
               return style;
             }
@@ -211,11 +232,15 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
   function handleConfigChange(field: string, value: any) {
     setConfig((c: any) => ({ ...c, [field]: value }));
   }
-  function handleMetricAggOrFieldChange(idx: number, field: "agg" | "field", value: any) {
+  function handleMetricAggOrFieldChange(
+    idx: number,
+    field: "agg" | "field",
+    value: any
+  ) {
     const newMetrics = [...config.metrics];
     newMetrics[idx] = { ...newMetrics[idx], [field]: value };
     const aggLabel =
-      dataConfig.metrics.allowedAggs.find(
+      widgetConfig.metrics.allowedAggs.find(
         (a: any) => a.value === (field === "agg" ? value : newMetrics[idx].agg)
       )?.label || (field === "agg" ? value : newMetrics[idx].agg);
     const fieldLabel = field === "field" ? value : newMetrics[idx].field;
@@ -235,9 +260,7 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
     (m: Record<string, unknown>, idx: number) => ({
       ...m,
       label:
-        metricLabelStore.metricLabels[idx] ||
-        m.label ||
-        `Métrique ${idx + 1}`,
+        metricLabelStore.metricLabels[idx] || m.label || `Métrique ${idx + 1}`,
     })
   );
 

@@ -1,4 +1,4 @@
-import type { IntervalUnit } from "@/core/types/dashboard-model";
+import type { IntervalUnit } from "@/core/types/dashboard-types";
 import SelectField from "../SelectField";
 import Button from "../forms/Button";
 import InputField from "../forms/InputField";

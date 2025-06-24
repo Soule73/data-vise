@@ -1,33 +1,25 @@
 import Button from "@/presentation/components/forms/Button";
-import { useNavigate } from "react-router-dom";
 import Table from "@/presentation/components/Table";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { useEffect } from "react";
+import type { Dashboard } from "@/core/types/dashboard-types";
+import Modal from "@/presentation/components/Modal";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/core/constants/routes";
-import { useUserStore } from "@/core/store/user";
-import type { Dashboard } from "@/core/types/dashboard-model";
-import { dashboardsQuery } from "@/data/repositories/dashboards";
+import { useDashboardList } from "@/core/hooks/dashboard/useDashboardList";
 
 export default function DashboardListPage() {
-  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
-  useEffect(() => {
-    setBreadcrumb([{ url: "/dashboards", label: "Tableaux de bord" }]);
-  }, [setBreadcrumb]);
-
-  const { data: dashboards = [], isLoading } = dashboardsQuery();
-  const navigate = useNavigate();
-  const hasPermission = useUserStore((s) => s.hasPermission);
-
-  const columns = [
-    { key: "title", label: "Titre" },
-    {
-      key: "widgets",
-      label: "Widgets",
-      render: (row: Dashboard) => row.layout?.length || 0,
-    },
-  ];
+  const {
+    dashboards,
+    isLoading,
+    modalOpen,
+    setModalOpen,
+    setSelectedDashboard,
+    deleteLoading,
+    handleDelete,
+    columns,
+    navigate,
+    hasPermission,
+  } = useDashboardList();
 
   return (
     <>
@@ -64,26 +56,77 @@ export default function DashboardListPage() {
             actionsColumn={{
               key: "actions",
               label: "",
-              render: (row: Dashboard) =>
-                hasPermission("dashboard:canView") && (
-                  <Button
-                    color="gray"
-                    size="sm"
-                    variant="outline"
-                    title="Ouvrir le dashboard"
-                    className=" w-max !border-none !bg-transparent hover:!bg-gray-100 dark:hover:!bg-gray-800"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/dashboards/${row._id}`);
-                    }}
-                  >
-                    <EyeIcon className="w-4 h-4 ml-1 inline" />
-                  </Button>
-                ),
+              render: (row: Dashboard) => (
+                <div className="flex gap-2">
+                  {hasPermission("dashboard:canView") && (
+                    <Button
+                      color="gray"
+                      size="sm"
+                      variant="outline"
+                      title="Ouvrir le dashboard"
+                      className=" w-max !border-none !bg-transparent hover:!bg-gray-100 dark:hover:!bg-gray-800"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/dashboards/${row._id}`);
+                      }}
+                    >
+                      <EyeIcon className="w-4 h-4 ml-1 inline" />
+                    </Button>
+                  )}
+                  {hasPermission("dashboard:canDelete") && (
+                    <Button
+                      color="red"
+                      size="sm"
+                      variant="outline"
+                      title="Supprimer le dashboard"
+                      className=" w-max !border-none !bg-transparent hover:!bg-red-100 dark:hover:!bg-red-900"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedDashboard(row);
+                        setModalOpen(true);
+                      }}
+                    >
+                      Supprimer
+                    </Button>
+                  )}
+                </div>
+              ),
             }}
           />
         )}
       </div>
+      <Modal
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedDashboard(null);
+        }}
+        title="Supprimer le dashboard"
+        size="sm"
+        footer={null}
+      >
+        <div className="space-y-8 py-2">
+          <div className="text-gray-700 dark:text-gray-300  text-center">
+            Voulez-vous vraiment supprimer ce dashboard&nbsp;?
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button
+              color="gray"
+              variant="outline"
+              onClick={() => {
+                setModalOpen(false);
+                setSelectedDashboard(null);
+              }}
+              disabled={deleteLoading}
+            >
+              Annuler
+            </Button>
+            <Button color="red" onClick={handleDelete} loading={deleteLoading}>
+              Supprimer
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

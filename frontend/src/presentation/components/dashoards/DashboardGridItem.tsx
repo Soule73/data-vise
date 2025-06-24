@@ -97,9 +97,9 @@ export default function DashboardGridItem(props: DashboardGridItemProps) {
               </button>
             </MenuItem>
             <MenuItem>
-              {item.widget._id && (
+              {item && (
                 <Link
-                  to={ROUTES.editWidget.replace(":id", item.widget._id)}
+                  to={ROUTES.editWidget.replace(":id", item?.widget?._id ?? "")}
                   className="flex items-center w-full px-3 py-2 text-sm rounded-md gap-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
                 >
                   <EllipsisVerticalIcon className="w-4 h-4" />

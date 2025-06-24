@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { getSlotStyleUtil } from "@/core/utils/dashboardGridUtils";
-
-// Typage des props du hook (DRY)
-interface UseDashboardGridProps {
-  layout: any[];
-  editMode?: boolean;
-  hasUnsavedChanges?: boolean;
-  onSwapLayout?: (newLayout: any[]) => void;
-}
+import type { UseDashboardGridProps } from "@/core/types/dashboard-types";
 
 export function useDashboardGrid({
   layout,

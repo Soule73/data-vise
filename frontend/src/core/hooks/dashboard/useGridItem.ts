@@ -3,10 +3,13 @@ import { useRef, useEffect, useMemo, useState } from "react";
 import type { DataSource } from "../../types/data-source";
 import { getWidgetDataFields } from "@/core/utils/widgetDataFields";
 import { dataBySourceQuery } from "@/data/repositories/sources";
-import { getWidgetComponent, getDataError, getGridItemStyleProps, useGridItemResizeObserver } from "@/core/utils/gridItemUtils";
+import {
+  getWidgetComponent,
+  getDataError,
+  getGridItemStyleProps,
+  useGridItemResizeObserver,
+} from "@/core/utils/gridItemUtils";
 import type { UseGridItemProps } from "../../types/dashboard-types";
-
-
 
 export function useGridItem({
   widget,
@@ -32,7 +35,9 @@ export function useGridItem({
 }: UseGridItemProps) {
   // --- Gestion du resize natif ---
   function handleResize() {
-    const widgetRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+    const widgetRef = useRef<HTMLDivElement>(
+      null
+    ) as React.RefObject<HTMLDivElement>;
     useGridItemResizeObserver({
       widgetRef,
       editMode,
@@ -71,15 +76,16 @@ export function useGridItem({
   ]);
 
   // --- Style props ---
-  const styleProps = useMemo(() =>
-    getGridItemStyleProps({
-      editMode,
-      isMobile,
-      draggedIdx,
-      hoveredIdx,
-      idx,
-      item,
-    }),
+  const styleProps = useMemo(
+    () =>
+      getGridItemStyleProps({
+        editMode,
+        isMobile,
+        draggedIdx,
+        hoveredIdx,
+        idx,
+        item,
+      }),
     [editMode, isMobile, draggedIdx, hoveredIdx, idx, item]
   );
 
@@ -91,7 +97,7 @@ export function useGridItem({
   // --- Colonnes nécessaires à la visualisation ---
   const config = widget?.config || {};
   const fields = useMemo(
-    () => getWidgetDataFields(widget?.type, config),
+    () => getWidgetDataFields(config, widget?.type),
     [widget?.type, config]
   );
 

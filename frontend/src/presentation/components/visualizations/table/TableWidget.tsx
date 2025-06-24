@@ -46,7 +46,7 @@ export default function TableWidget({
         emptyMessage="Aucune donnée."
         paginable={true}
         searchable={true}
-        rowPerPage={config.pageSize || 5}
+        rowPerPage={config.widgetParams?.pageSize ?? config.pageSize ?? 5}
       />
     </div>
   );

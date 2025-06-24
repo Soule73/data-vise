@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import type { KPIGroupWidgetConfig } from "@/core/types/visualization";
+import type {
+  Filter,
+  KPIGroupWidgetConfig,
+  MetricStyleConfig,
+} from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 
 export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
   gridColumns: number;
   metrics: MetricConfig[];
-  metricStyles: any[];
-  filters: any[];
+  metricStyles: MetricStyleConfig[];
+  filters: Filter[] | undefined;
   groupTitle: string;
   widgetParamsList: Array<Record<string, unknown>>;
 } {
@@ -35,8 +39,8 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
     () => (Array.isArray(config.metricStyles) ? config.metricStyles : []),
     [config.metricStyles]
   );
-  const filters = useMemo<any[]>(
-    () => (Array.isArray(config.filters) ? config.filters : []),
+  const filters = useMemo<Filter[] | undefined>(
+    () => config.filters,
     [config.filters]
   );
 

@@ -5,20 +5,7 @@ import Button from "@/presentation/components/forms/Button";
 import { XMarkIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
-
-interface WidgetScatterDataConfigSectionProps {
-  metrics: ScatterMetricConfig[];
-  columns: string[];
-  handleConfigChange: (
-    field: string,
-    value:
-      | string
-      | number
-      | boolean
-      | ScatterMetricConfig
-      | ScatterMetricConfig[]
-  ) => void;
-}
+import type { WidgetScatterDataConfigSectionProps } from "@/core/types/widget-types";
 
 export default function WidgetScatterDataConfigSection({
   metrics,
@@ -70,7 +57,7 @@ export default function WidgetScatterDataConfigSection({
                     onClick={(e) => {
                       e.stopPropagation();
                       const newMetrics = metrics.filter(
-                        (_: any, i: number) => i !== idx
+                        (_: ScatterMetricConfig, i: number) => i !== idx
                       );
                       handleConfigChange("metrics", newMetrics);
                     }}
@@ -90,7 +77,11 @@ export default function WidgetScatterDataConfigSection({
                       newMetrics[idx] = { ...dataset, x: e.target.value };
                       handleConfigChange("metrics", newMetrics);
                     }}
-                    options={columns.map((col) => ({ value: col, label: col }))}
+                    options={
+                      Array.isArray(columns)
+                        ? columns.map((col) => ({ value: col, label: col }))
+                        : []
+                    }
                     name={`scatter-x-${idx}`}
                     id={`scatter-x-${idx}`}
                   />
@@ -102,7 +93,11 @@ export default function WidgetScatterDataConfigSection({
                       newMetrics[idx] = { ...dataset, y: e.target.value };
                       handleConfigChange("metrics", newMetrics);
                     }}
-                    options={columns.map((col) => ({ value: col, label: col }))}
+                    options={
+                      Array.isArray(columns)
+                        ? columns.map((col) => ({ value: col, label: col }))
+                        : []
+                    }
                     name={`scatter-y-${idx}`}
                     id={`scatter-y-${idx}`}
                   />

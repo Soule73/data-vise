@@ -12,50 +12,7 @@ import DashboardConfigFields from "@/presentation/components/dashoards/Dashboard
 import DashboardSharePopover from "@/presentation/components/dashoards/DashboardSharePopover";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import Button from "../forms/Button";
-
-interface DashboardHeaderProps {
-  editMode: boolean;
-  isCreate: boolean;
-  hasPermission: (perm: string) => boolean;
-  openAddWidgetModal: (e: React.MouseEvent) => void;
-  handleSave: () => void;
-  handleCancelEdit: () => void;
-  setEditMode: (v: boolean) => void;
-  saving: boolean;
-  handleSaveConfig: () => void;
-  autoRefreshIntervalValue: number | undefined;
-  autoRefreshIntervalUnit: IntervalUnit | undefined;
-  timeRangeFrom: string | null;
-  timeRangeTo: string | null;
-  relativeValue: number | undefined;
-  relativeUnit: IntervalUnit | undefined;
-  timeRangeMode: "absolute" | "relative";
-  handleChangeAutoRefresh: (
-    value: number | undefined,
-    unit: IntervalUnit | undefined
-  ) => void;
-  handleChangeTimeRangeAbsolute: (
-    from: string | null,
-    to: string | null
-  ) => void;
-  handleChangeTimeRangeRelative: (
-    value: number | undefined,
-    unit: IntervalUnit | undefined
-  ) => void;
-  handleChangeTimeRangeMode: (mode: "absolute" | "relative") => void;
-  savingConfig?: boolean;
-  onForceRefresh?: () => void;
-  // Ajout des props pour le partage public
-  shareLoading?: boolean;
-  shareError?: string | null;
-  shareLink?: string | null;
-  isShareEnabled?: boolean;
-  currentShareId?: string | null;
-  handleEnableShare?: () => void;
-  handleDisableShare?: () => void;
-  handleCopyShareLink?: () => void;
-  handleExportPDF: () => void; // Ajout de la prop pour l'export PDF
-}
+import type { DashboardHeaderProps } from "@/core/types/dashboard-types";
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   editMode,
@@ -95,52 +52,64 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       {editMode || isCreate ? (
         <div className="hidden md:flex items-center gap-2 md:gap-4">
           {hasPermission("widget:canCreate") && (
-            <a
-              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
-              href="#"
+            <Button
+              color="indigo"
+              size="sm"
+              variant="outline"
+              title="Ajouter un widget"
+              className=" w-max !border-none"
               onClick={openAddWidgetModal}
             >
               Ajouter un widget
-            </a>
+            </Button>
           )}
           {hasPermission("dashboard:canUpdate") && (
-            <a
-              href="#"
-              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+            <Button
+              color="indigo"
+              size="sm"
+              variant="solid"
+              title="Sauvegarder le dashboard"
+              className=" w-max"
               onClick={(e) => {
                 e.preventDefault();
                 handleSave();
               }}
             >
               {saving ? "Sauvegarde…" : "Sauvegarder"}
-            </a>
+            </Button>
           )}
           {editMode && !isCreate && hasPermission("dashboard:canUpdate") && (
-            <a
-              href="#"
-              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+            <Button
+              variant="outline"
+              color="gray"
+              size="sm"
+              className=" w-max !border-none"
+              title="Annuler les modifications"
               onClick={(e) => {
                 e.preventDefault();
                 handleCancelEdit();
               }}
             >
               Annuler
-            </a>
+            </Button>
           )}
         </div>
       ) : !isCreate ? (
         <div className="flex items-center gap-2 md:gap-4">
           {hasPermission("dashboard:canUpdate") && (
-            <a
-              href="#"
-              className="hidden md:block w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+            <Button
+              color="indigo"
+              size="sm"
+              variant="outline"
+              title="Modifier le dashboard"
+              className=" w-max !border-none"
               onClick={(e) => {
                 e.preventDefault();
                 setEditMode(true);
               }}
             >
               Modifier
-            </a>
+            </Button>
           )}
           {/* Bloc de partage public */}
           {!isCreate && hasPermission("dashboard:canUpdate") && (
@@ -161,6 +130,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             type="button"
             size="sm"
             color="gray"
+            className="w-max !border-none"
             // className="flex items-center gap-1 text-xs text-indigo-600 hover:underline bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1"
             onClick={handleExportPDF}
             title="Exporter le dashboard en PDF"

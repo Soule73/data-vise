@@ -3,20 +3,17 @@ import Table from "@/presentation/components/Table";
 import Modal from "@/presentation/components/Modal";
 import { useSourcesPage } from "@/core/hooks/datasource/useSourcesPage";
 import { ROUTES } from "@/core/constants/routes";
-import {
-  EditSourceForm,
-  DeleteSourceForm,
-} from "@/presentation/components/source/SourceForms";
 import { Link } from "react-router-dom";
-import { useUserStore } from "@/core/store/user";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { useEffect } from "react";
+import { DeleteSourceForm } from "@/presentation/components/source/DeleteSourceForm";
 import type { DataSource } from "@/core/types/data-source";
-import { sourcesQuery } from "@/data/repositories/sources";
-import { useQueryClient } from "@tanstack/react-query";
+import Badge from "@/presentation/components/Badge";
+import { DocumentTextIcon, TableCellsIcon } from "@heroicons/react/24/outline";
+import { useMemo } from "react";
 
 export default function SourcesPage() {
   const {
+    sources,
+    isLoading,
     modalOpen,
     setModalOpen,
     selectedSource,
@@ -24,42 +21,76 @@ export default function SourcesPage() {
     modalType,
     setModalType,
     deleteMutation,
-    handleEditSuccess,
-    handleEditError,
+    hasPermission,
+    handleDownload,
+    navigate,
   } = useSourcesPage();
-const queryClient = useQueryClient();
-  const { data: sources = [], isLoading } = sourcesQuery({queryClient});
 
-  const hasPermission = useUserStore((s) => s.hasPermission);
-
-  const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
-
-  useEffect(() => {
-    setBreadcrumb([{ url: ROUTES.sources, label: "Sources" }]);
-  }, [setBreadcrumb]);
-
-  const columns = [
-    {
-      key: "name",
-      label: "Nom",
-      render: (row: DataSource) => (
-        <span className="font-medium text-gray-900 whitespace-nowrap dark:text-white">
-          {row.name}
-        </span>
-      ),
-    },
-    {
-      key: "type",
-      label: "Type",
-    },
-    {
-      key: "endpoint",
-      label: "Endpoint",
-      render: (row: DataSource) => (
-        <span className="font-mono text-xs break-all">{row.endpoint}</span>
-      ),
-    },
-  ];
+  const columns = useMemo(
+    () => [
+      {
+        key: "icon",
+        label: " ",
+        render: (row: DataSource) => {
+          // Affiche une icône différente selon le type de source (CSV ou JSON)
+          if (row.type === "csv") {
+            return (
+              <span className="flex items-center justify-center w-8 h-8">
+                <TableCellsIcon className="w-6 h-6 text-indigo-500" />
+              </span>
+            );
+          }
+          if (row.type === "json") {
+            return (
+              <span className="flex items-center justify-center w-8 h-8">
+                <DocumentTextIcon className="w-6 h-6 text-indigo-500" />
+              </span>
+            );
+          }
+          return <span className="w-8 h-8" />;
+        },
+      },
+      {
+        key: "name",
+        label: "Nom",
+        render: (row: DataSource) => (
+          <span className="font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            {row.name}
+            {row.isUsed && <Badge color="yellow">utilisée</Badge>}
+          </span>
+        ),
+      },
+      {
+        key: "type",
+        label: "Type",
+      },
+      {
+        key: "endpoint",
+        label: "Endpoint",
+        render: (row: DataSource) =>
+          row.endpoint ? (
+            <span className="font-mono text-xs break-all">{row.endpoint}</span>
+          ) : row.filePath ? (
+            <Button
+              color="indigo"
+              size="sm"
+              variant="outline"
+              title="Télécharger le fichier"
+              className=" w-max !border-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDownload(row.filePath, row.name + ".csv");
+              }}
+            >
+              Télécharger le fichier
+            </Button>
+          ) : (
+            <span className="text-gray-500 italic">Non applicable</span>
+          ),
+      },
+    ],
+    [handleDownload]
+  );
 
   return (
     <>
@@ -94,13 +125,13 @@ const queryClient = useQueryClient();
                   <div className="flex gap-2">
                     {hasPermission("datasource:canUpdate") && (
                       <Button
-                        size="sm"
                         color="indigo"
-                        className=" w-max"
+                        size="sm"
+                        variant="outline"
+                        title="Modfier la source"
+                        className=" w-max !border-none"
                         onClick={() => {
-                          setSelectedSource(row);
-                          setModalType("edit");
-                          setModalOpen(true);
+                          navigate(`/sources/edit/${row._id}`);
                         }}
                       >
                         Modifier
@@ -108,14 +139,21 @@ const queryClient = useQueryClient();
                     )}
                     {hasPermission("datasource:canDelete") && (
                       <Button
-                        size="sm"
                         color="red"
-                        className=" w-max"
+                        size="sm"
+                        variant="outline"
+                        className="w-max !border-none "
+                        title={
+                          row.isUsed
+                            ? "Impossible de supprimer une source utilisée"
+                            : "Supprimer la source"
+                        }
                         onClick={() => {
                           setSelectedSource(row);
                           setModalType("delete");
                           setModalOpen(true);
                         }}
+                        disabled={row.isUsed}
                       >
                         Supprimer
                       </Button>
@@ -127,16 +165,12 @@ const queryClient = useQueryClient();
           )}
         </div>
         <Modal
-          open={modalOpen}
+          open={modalOpen && modalType === "delete"}
           onClose={() => {
             setModalOpen(false);
             setSelectedSource(null);
           }}
-          title={
-            modalType === "delete"
-              ? "Supprimer la source"
-              : "Modifier la source"
-          }
+          title={"Supprimer la source"}
           size="sm"
           footer={null}
         >
@@ -148,17 +182,6 @@ const queryClient = useQueryClient();
               }
               onCancel={() => setModalOpen(false)}
               loading={deleteMutation.isPending}
-            />
-          )}
-          {modalType === "edit" && selectedSource && (
-            <EditSourceForm
-              source={selectedSource}
-              onClose={() => {
-                setModalOpen(false);
-                setSelectedSource(null);
-              }}
-              afterEdit={handleEditSuccess}
-              onError={handleEditError}
             />
           )}
         </Modal>

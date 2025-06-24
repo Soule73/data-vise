@@ -10,8 +10,13 @@ import { useSidebarAutoClose } from "@/core/store/sidebar";
 import SidebarItem from "../SidebarItem";
 import { ROUTES } from "@/core/constants/routes";
 import { useSidebar } from "@/core/hooks/useSidebar";
+import { Transition } from "@headlessui/react";
+import type {
+  SidebarGroup,
+  SidebarGroupItem,
+} from "@/core/types/navigation-types";
 
-const sidebarGroups = [
+const sidebarGroups: SidebarGroup[] = [
   {
     label: "Navigation",
     permissions: ["dashboard:canView", "datasource:canView", "widget:canView"],
@@ -57,7 +62,6 @@ const sidebarGroups = [
 ];
 
 export default function Sidebar() {
-  const sidebarLogic = useSidebar(sidebarGroups);
   const {
     user,
     open,
@@ -66,44 +70,52 @@ export default function Sidebar() {
     openGroups,
     toggleGroup,
     filteredGroups,
-  } = sidebarLogic;
+  } = useSidebar(sidebarGroups);
   useSidebarAutoClose();
 
   return (
-    <>
-      {open && (
-        <div className={"fixed inset-0 z-10 md:pt-16"}>
-          <div
-            className="absolute inset-0 bg-black/40 dark:bg-black/60 transition-colors duration-300"
-            onClick={closeSidebar}
-          />
-          <aside
-            id="sidebar-panel"
-            className={
-              "absolute top-0 left-0 pt-16 flex flex-col w-64 h-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-transform duration-300 border-r border-gray-200 dark:border-gray-700  "
-            }
-          >
-            <nav className="flex-1 p-4 space-y-6">
-              {filteredGroups.map((group: any) => {
-                const isOpen = openGroups[group.label] ?? true;
-                return (
-                  <SideBarGroupItem
-                    group={group}
-                    isOpen={isOpen}
-                    toggleGroup={toggleGroup}
-                    hasPermission={hasPermission}
-                  />
-                );
-              })}
-            </nav>
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 text-xs opacity-70  transition-colors duration-300">
-              Connecté en tant que{" "}
-              <span className="font-semibold">{user?.email}</span>
-            </div>
-          </aside>
-        </div>
-      )}
-    </>
+    <div className={`fixed inset-0 z-10 md:pt-16 ${open ? "block" : "hidden"}`}>
+      <div
+        className="absolute inset-0 bg-black/40 dark:bg-black/60 transition-colors duration-300"
+        onClick={closeSidebar}
+      />
+      <Transition
+        show={open}
+        enter="transition-transform transition-opacity duration-500"
+        enterFrom="-translate-x-full scale-90 opacity-0"
+        enterTo="translate-x-0 scale-100 opacity-100"
+        leave="transition-transform transition-opacity duration-400"
+        leaveFrom="translate-x-0 scale-100 opacity-100"
+        leaveTo="-translate-x-full scale-90 opacity-0"
+        unmount={false}
+      >
+        <aside
+          id="sidebar-panel"
+          className={
+            "absolute top-0 left-0 pt-16 flex flex-col w-64 h-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-transform duration-300 border-r border-gray-200 dark:border-gray-700  "
+          }
+        >
+          <nav className="flex-1 p-4 space-y-6">
+            {filteredGroups.map((group: SidebarGroup) => {
+              const isOpen = openGroups[group.label] ?? true;
+              return (
+                <SideBarGroupItem
+                  key={group.label}
+                  group={group}
+                  isOpen={isOpen}
+                  toggleGroup={toggleGroup}
+                  hasPermission={hasPermission}
+                />
+              );
+            })}
+          </nav>
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700 text-xs opacity-70  transition-colors duration-300">
+            Connecté en tant que{" "}
+            <span className="font-semibold">{user?.email}</span>
+          </div>
+        </aside>
+      </Transition>
+    </div>
   );
 }
 
@@ -113,7 +125,7 @@ function SideBarGroupItem({
   toggleGroup,
   hasPermission,
 }: {
-  group: any;
+  group: SidebarGroup;
   isOpen: boolean;
   toggleGroup: (label: string) => void;
   hasPermission: (permission: string) => boolean;
@@ -134,7 +146,7 @@ function SideBarGroupItem({
       </button>
       {isOpen && (
         <div className="space-y-2">
-          {group.items.map((item: any) =>
+          {group.items.map((item: SidebarGroupItem) =>
             !item.permission || hasPermission(item.permission) ? (
               <SidebarItem
                 label={item.label}

@@ -37,16 +37,28 @@ const dataSourceController = {
     return handleServiceResult(res, result);
   },
   async detectColumns(req: Request, res: Response, next: NextFunction) {
-    const { type, endpoint, filePath } = req.body;
+    const {
+      type,
+      endpoint,
+      filePath,
+      sourceId,
+      httpMethod,
+      authType,
+      authConfig,
+    } = req.body;
     const file = (req as any).file as Express.Multer.File | undefined;
     let tempFilePath = filePath;
     if (file) {
       tempFilePath = file.path;
     }
     const result = await dataSourceService.detectColumns({
+      sourceId,
       type,
       endpoint,
       filePath: tempFilePath,
+      httpMethod,
+      authType,
+      authConfig,
     });
     // Nettoyage du fichier temporaire uploadé
     if (file) {

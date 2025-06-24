@@ -1,16 +1,28 @@
-// ======================================================
-// 7. Métriques & Buckets
-// ======================================================
-
-export interface MetricConfig {
-  agg: string;
-  field: string;
+interface Base {
   label?: string;
+  field: string;
+}
+export interface MetricConfig extends Base {
+  agg: string;
 }
 
-export interface BucketConfig {
-  field: string;
+export interface BucketConfig extends Base {
   type?: string;
+}
+
+export interface ScatterMetricConfig extends MetricConfig {
+  x: string;
+  y: string;
+}
+
+export interface BubbleMetricConfig extends ScatterMetricConfig {
+  r: string;
+}
+
+export interface RadarMetricConfig extends MetricConfig {
+  fields: string[];
+  groupBy?: string;
+  groupByValue?: string;
 }
 
 export interface MetricLabelState {
@@ -24,15 +36,4 @@ export interface MetricUICollapseState {
   toggleCollapse: (idx: string | number) => void;
   setCollapsed: (collapsed: Record<string | number, boolean>) => void;
   reset: () => void;
-}
-
-export interface ScatterMetricConfig extends MetricConfig {
-  x: string;
-  y: string;
-}
-
-export interface BubbleMetricConfig extends MetricConfig {
-  x: string;
-  y: string;
-  r: string;
 }

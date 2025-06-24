@@ -6,12 +6,7 @@ import { permissionsQuery } from "@/data/repositories/roles";
 import { useState, useMemo, useEffect } from "react";
 import { useDashboardStore } from "../../store/dashboard";
 import { useQueryClient } from "@tanstack/react-query";
-
-export interface RoleCreateForm {
-  name: string;
-  description: string;
-  permissions: string[];
-}
+import type { RoleCreateForm } from "@/core/types/auth-types";
 
 export function useRoleCreate() {
   const navigate = useNavigate();
@@ -30,13 +25,14 @@ export function useRoleCreate() {
   useEffect(() => {
     setBreadcrumb([
       {
-        url: ROUTES.roles, label: "Rôles",
+        url: ROUTES.roles,
+        label: "Rôles",
       },
       {
-        url: ROUTES.createRole, label: "Créer un Rôle",
+        url: ROUTES.createRole,
+        label: "Créer un Rôle",
       },
     ]);
-
   }, [setBreadcrumb]);
 
   const mutation = useCreateRoleMutation({
@@ -109,12 +105,15 @@ export function useRoleCreate() {
   };
 
   const groupedPermissions = useMemo(() => {
-    return (permissions ?? []).reduce((acc: Record<string, typeof permissions>, perm) => {
-      const [model] = perm.name.split(":");
-      if (!acc[model]) acc[model] = [];
-      acc[model].push(perm);
-      return acc;
-    }, {} as Record<string, typeof permissions>);
+    return (permissions ?? []).reduce(
+      (acc: Record<string, typeof permissions>, perm) => {
+        const [model] = perm.name.split(":");
+        if (!acc[model]) acc[model] = [];
+        acc[model].push(perm);
+        return acc;
+      },
+      {} as Record<string, typeof permissions>
+    );
   }, [permissions]);
 
   return {

@@ -92,3 +92,20 @@ export interface RoleInfoProps {
   onChangeName: (v: string) => void;
   onChangeDescription: (v: string) => void;
 }
+
+export interface RoleCreateForm {
+  name: string;
+  description: string;
+  permissions: string[];
+}
+
+export interface UserStoreWithPerms extends UserState {
+  getPermissions: () => string[];
+  hasPermission: (permName: string) => boolean;
+  isOwner: (ownerId: string) => boolean;
+}
+
+export interface LoginRegisterResponse {
+  user: User;
+  token: string;
+}

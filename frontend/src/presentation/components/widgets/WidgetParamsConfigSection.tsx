@@ -16,21 +16,64 @@ export default function WidgetParamsConfigSection({
   config,
   handleConfigChange,
 }: WidgetParamsConfigSectionProps) {
+  // --- Fonctions utilitaires extraites ---
+  const getWidgetParamMeta = (field: string) =>
+    WIDGETS[type]?.configSchema?.widgetParams?.[field] || {};
+  const getLabel = (field: string) =>
+    getWidgetParamMeta(field).label ||
+    WIDGET_CONFIG_FIELDS[field]?.label ||
+    field;
+  const getDefaultValue = (field: string) =>
+    getWidgetParamMeta(field).default ?? WIDGET_CONFIG_FIELDS[field]?.default;
+  const getOptions = (field: string) =>
+    getWidgetParamMeta(field).options ||
+    WIDGET_CONFIG_FIELDS[field]?.options ||
+    [];
+  const getInputType = (field: string) =>
+    getWidgetParamMeta(field).inputType ||
+    WIDGET_CONFIG_FIELDS[field]?.inputType;
+
+  // Pour les champs color-array
+  const getColorArray = (field: string) => config.widgetParams?.[field] || [""];
+
+  // Pour les valeurs de select
+  const getSelectValue = (field: string) =>
+    config.widgetParams?.[field] || getDefaultValue(field) || "";
+
+  // Pour les valeurs d'input
+  const getInputValue = (field: string) =>
+    config.widgetParams?.[field] ?? getDefaultValue(field) ?? "";
+
+  // Pour les valeurs de checkbox
+  const getCheckboxValue = (field: string, fallback = false) =>
+    config.widgetParams?.[field] ?? getDefaultValue(field) ?? fallback;
+
+  // Pour l'icône
+  const getIconComponent = (field: string) => {
+    const iconName = config.widgetParams?.[field];
+    if (iconName && HeroIcons[iconName as keyof typeof HeroIcons]) {
+      return HeroIcons[iconName as keyof typeof HeroIcons]({
+        className: "w-6 h-6 text-indigo-500",
+      });
+    }
+    return null;
+  };
+
+  // --- Rendu ---
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 grid grid-cols-2 place-items-stretch items-end gap-2">
       {Object.entries(WIDGETS[type]?.configSchema.widgetParams || {}).map(
         ([field]) => {
-          const meta = WIDGET_CONFIG_FIELDS[field] || {};
-          const label = meta.label || field;
-          const defaultValue = meta.default;
-          if (meta.inputType === "color") {
+          const label = getLabel(field);
+          const options = getOptions(field);
+          const inputType = getInputType(field);
+
+          if (inputType === "color") {
             return (
               <ColorField
                 key={field}
                 label={label}
-                value={
-                  config.widgetParams?.[field] ?? defaultValue ?? "#2563eb"
-                }
+                value={getInputValue(field) || "#2563eb"}
                 onChange={(val) =>
                   handleConfigChange("widgetParams", {
                     ...config.widgetParams,
@@ -42,12 +85,12 @@ export default function WidgetParamsConfigSection({
               />
             );
           }
-          if (meta.inputType === "checkbox") {
+          if (inputType === "checkbox") {
             return (
               <CheckboxField
                 key={field}
                 label={label}
-                checked={config.widgetParams?.[field] ?? defaultValue ?? false}
+                checked={getCheckboxValue(field)}
                 onChange={(val) =>
                   handleConfigChange("widgetParams", {
                     ...config.widgetParams,
@@ -59,13 +102,13 @@ export default function WidgetParamsConfigSection({
               />
             );
           }
-          if (meta.inputType === "number") {
+          if (inputType === "number") {
             return (
               <InputField
                 key={field}
                 label={label}
                 type="number"
-                value={config.widgetParams?.[field] ?? defaultValue ?? ""}
+                value={getInputValue(field)}
                 onChange={(e) =>
                   handleConfigChange("widgetParams", {
                     ...config.widgetParams,
@@ -77,13 +120,13 @@ export default function WidgetParamsConfigSection({
               />
             );
           }
-          if (meta.inputType === "select" && field !== "title") {
-            if (meta.options) {
+          if (inputType === "select" && field !== "title") {
+            if (options) {
               return (
                 <SelectField
                   key={field}
                   label={label}
-                  value={config.widgetParams?.[field] || defaultValue || ""}
+                  value={getSelectValue(field)}
                   onChange={(e) =>
                     handleConfigChange("widgetParams", {
                       ...config.widgetParams,
@@ -92,23 +135,17 @@ export default function WidgetParamsConfigSection({
                   }
                   name={`widget-param-${field}`}
                   id={`widget-param-${field}`}
-                  options={meta.options}
+                  options={Array.isArray(options) ? options : []}
                 />
               );
             }
           }
-          if (meta.inputType === "select" && field === "icon" && meta.options) {
+          if (inputType === "select" && field === "icon" && options) {
             return (
               <div key={field} className="flex flex-col gap-1">
-                <label
-                  className="text-sm font-medium"
-                  htmlFor={`widget-param-${field}`}
-                >
-                  {label}
-                </label>
-                <select
-                  className="border rounded px-2 py-1 bg-white dark:bg-gray-900"
-                  value={config.widgetParams?.[field] || defaultValue || ""}
+                <SelectField
+                  label={label}
+                  value={getSelectValue(field)}
                   onChange={(e) =>
                     handleConfigChange("widgetParams", {
                       ...config.widgetParams,
@@ -117,35 +154,23 @@ export default function WidgetParamsConfigSection({
                   }
                   name={`widget-param-${field}`}
                   id={`widget-param-${field}`}
-                >
-                  {meta.options.map((opt: any) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  options={Array.isArray(options) ? options : []}
+                />
                 {/* Aperçu de l'icône sélectionnée */}
                 <div className="mt-1 flex items-center gap-2">
-                  {config.widgetParams?.[field] &&
-                    HeroIcons[
-                      config.widgetParams[field] as keyof typeof HeroIcons
-                    ] && (
-                      <>
-                        {HeroIcons[
-                          config.widgetParams[field] as keyof typeof HeroIcons
-                        ]({
-                          className: "w-6 h-6 text-indigo-500",
-                        })}
-                        <span className="text-xs text-gray-500">
-                          {config.widgetParams[field]}
-                        </span>
-                      </>
-                    )}
+                  {getSelectValue(field) && getIconComponent(field) && (
+                    <>
+                      {getIconComponent(field)}
+                      <span className="text-xs text-gray-500">
+                        {getSelectValue(field)}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             );
           }
-          if (meta.inputType === "color-array") {
+          if (inputType === "color-array") {
             // Champ pour sélectionner plusieurs couleurs (tableau)
             return (
               <div key={field} className="flex flex-col gap-1">
@@ -156,50 +181,44 @@ export default function WidgetParamsConfigSection({
                   {label}
                 </label>
                 <div className="flex flex-wrap items-end gap-2">
-                  {(config.widgetParams?.[field] || [""]).map(
-                    (color: string, i: number) => (
-                      <div key={i} className="flex items-center gap-1">
-                        <ColorField
-                          value={color || "#2563eb"}
-                          onChange={(val) => {
-                            const arr = [
-                              ...(config.widgetParams?.[field] || []),
-                            ];
-                            arr[i] = val;
-                            handleConfigChange("widgetParams", {
-                              ...config.widgetParams,
-                              [field]: arr,
-                            });
-                          }}
-                          name={`widget-param-${field}-${i}`}
-                          id={`widget-param-${field}-${i}`}
-                        />
-                        <button
-                          type="button"
-                          className="text-xs text-red-500 hover:underline"
-                          onClick={() => {
-                            const arr = [
-                              ...(config.widgetParams?.[field] || []),
-                            ];
-                            arr.splice(i, 1);
-                            handleConfigChange("widgetParams", {
-                              ...config.widgetParams,
-                              [field]: arr.length > 0 ? arr : undefined,
-                            });
-                          }}
-                          title="Supprimer cette couleur"
-                        >
-                          <XMarkIcon className="w-5 h-5 inline-block" />
-                        </button>
-                      </div>
-                    )
-                  )}
+                  {getColorArray(field).map((color: string, i: number) => (
+                    <div key={i} className="flex items-center gap-1">
+                      <ColorField
+                        value={color || "#2563eb"}
+                        onChange={(val) => {
+                          const arr = [...getColorArray(field)];
+                          arr[i] = val;
+                          handleConfigChange("widgetParams", {
+                            ...config.widgetParams,
+                            [field]: arr,
+                          });
+                        }}
+                        name={`widget-param-${field}-${i}`}
+                        id={`widget-param-${field}-${i}`}
+                      />
+                      <button
+                        type="button"
+                        className="text-xs text-red-500 hover:underline"
+                        onClick={() => {
+                          const arr = [...getColorArray(field)];
+                          arr.splice(i, 1);
+                          handleConfigChange("widgetParams", {
+                            ...config.widgetParams,
+                            [field]: arr.length > 0 ? arr : undefined,
+                          });
+                        }}
+                        title="Supprimer cette couleur"
+                      >
+                        <XMarkIcon className="w-5 h-5 inline-block" />
+                      </button>
+                    </div>
+                  ))}
                   <Button
                     variant="outline"
                     type="button"
                     className="w-max text-xs h-max text-indigo-600 border border-indigo-300 rounded px-2 py-1 hover:bg-indigo-50"
                     onClick={() => {
-                      const arr = [...(config.widgetParams?.[field] || [])];
+                      const arr = [...getColorArray(field)];
                       arr.push("#2563eb");
                       handleConfigChange("widgetParams", {
                         ...config.widgetParams,
@@ -217,8 +236,8 @@ export default function WidgetParamsConfigSection({
             return (
               <CheckboxField
                 key={field}
-                label={meta.label || "Afficher une icône"}
-                checked={config.widgetParams?.[field] ?? defaultValue ?? true}
+                label={label || "Afficher une icône"}
+                checked={getCheckboxValue(field, true)}
                 onChange={(val) =>
                   handleConfigChange("widgetParams", {
                     ...config.widgetParams,
@@ -234,7 +253,7 @@ export default function WidgetParamsConfigSection({
             <InputField
               key={field}
               label={label}
-              value={config.widgetParams?.[field] ?? defaultValue ?? ""}
+              value={getInputValue(field)}
               onChange={(e) =>
                 handleConfigChange("widgetParams", {
                   ...config.widgetParams,

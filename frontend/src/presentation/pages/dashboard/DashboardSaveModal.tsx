@@ -6,6 +6,7 @@ import type { SaveModalProps } from "@/core/types/dashboard-types";
 
 export function DashboardSaveModal(props: SaveModalProps) {
   const {
+    saving,
     saveModalOpen,
     setSaveModalOpen,
     pendingTitle,
@@ -43,16 +44,18 @@ export function DashboardSaveModal(props: SaveModalProps) {
           <Button
             color="gray"
             variant="outline"
+            disabled={saving}
             onClick={() => setSaveModalOpen(false)}
           >
             Annuler
           </Button>
           <Button
             color="green"
+            className=" "
             onClick={() => handleConfirmSave(visibility)}
-            disabled={!pendingTitle.trim()}
+            disabled={saving || !pendingTitle.trim()}
           >
-            Confirmer
+            {saving ? "Savegarde..." : "Confirmer"}
           </Button>
         </div>
       </div>

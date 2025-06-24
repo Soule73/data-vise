@@ -7,6 +7,7 @@ import {
   allSameDay,
   formatXTicksLabel,
 } from "@/core/utils/chartUtils";
+import type { ScatterChartParams } from "@/core/types/visualization";
 
 function isScatterMetricConfig(metric: unknown): metric is ScatterMetricConfig {
   return (
@@ -25,11 +26,11 @@ export function useScatterChartLogic(
   options: ChartOptions<"scatter">;
   validDatasets: ScatterMetricConfig[];
 } {
+  // Extraction stricte des params
+  const widgetParams: ScatterChartParams = config.widgetParams ?? {};
+
   const validDatasets = useMemo<ScatterMetricConfig[]>(
-    () =>
-      Array.isArray(config.metrics)
-        ? config.metrics.filter(isScatterMetricConfig)
-        : [],
+    () => config.metrics.filter(isScatterMetricConfig) as ScatterMetricConfig[],
     [config.metrics]
   );
   const datasets = useMemo<ChartDataset<"scatter">[]>(
@@ -54,7 +55,7 @@ export function useScatterChartLogic(
           })),
           backgroundColor: color,
           borderColor: config.metricStyles?.[i]?.borderColor || undefined,
-          borderWidth: config.metricStyles?.[i]?.borderWidth || 1,
+          borderWidth: config.metricStyles?.[i]?.borderWidth ?? 1,
         } as ChartDataset<"scatter">;
       }),
     [validDatasets, data, config.metricStyles]
@@ -85,11 +86,11 @@ export function useScatterChartLogic(
       responsive: true,
       animation: false,
       plugins: {
-        legend: { display: config.widgetParams?.legend !== false },
-        title: config.widgetParams?.title
+        legend: { display: widgetParams.legend !== false },
+        title: widgetParams.title
           ? {
               display: true,
-              text: config.widgetParams.title,
+              text: widgetParams.title,
             }
           : undefined,
         tooltip: {
@@ -105,8 +106,8 @@ export function useScatterChartLogic(
       scales: {
         x: {
           grid: { display: true },
-          title: config.widgetParams?.xLabel
-            ? { display: true, text: config.widgetParams.xLabel }
+          title: widgetParams.xLabel
+            ? { display: true, text: widgetParams.xLabel }
             : undefined,
           ticks: {
             callback: (_: any, idx: number) =>
@@ -120,14 +121,14 @@ export function useScatterChartLogic(
           },
         },
         y: {
-          title: config.widgetParams?.yLabel
-            ? { display: true, text: config.widgetParams.yLabel }
+          title: widgetParams.yLabel
+            ? { display: true, text: widgetParams.yLabel }
             : undefined,
           grid: { display: true },
         },
       },
     }),
-    [config.widgetParams, validDatasets, isXTimestamps, labels, xAllSameDay]
+    [widgetParams, isXTimestamps, labels, xAllSameDay]
   );
 
   return { chartData, options, validDatasets };

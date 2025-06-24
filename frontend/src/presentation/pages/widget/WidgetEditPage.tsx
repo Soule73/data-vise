@@ -8,7 +8,8 @@ import { WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
 import { useWidgetEditForm } from "@/core/hooks/widget/useWidgetEditForm";
 
 export default function WidgetEditPage() {
-  const { loading, error, widget, formReady, form, handleConfirmSave } = useWidgetEditForm();
+  const { loading, error, widget, formReady, form, handleConfirmSave } =
+    useWidgetEditForm();
 
   if (loading || !formReady) return <div>Chargement…</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -44,7 +45,9 @@ export default function WidgetEditPage() {
                   handleDragStart={form.handleDragStart}
                   handleDragOver={form.handleDragOver}
                   handleDrop={form.handleDrop}
-                  handleMetricAggOrFieldChange={form.handleMetricAggOrFieldChange}
+                  handleMetricAggOrFieldChange={
+                    form.handleMetricAggOrFieldChange
+                  }
                 />
               )}
               {form.tab === "metricsAxes" && (

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import type { ChartOptions, ChartData } from "chart.js";
 import type { BarChartConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
+import type { BarChartParams } from "@/core/types/visualization";
 import {
   aggregate,
   getLabels,
@@ -29,10 +30,18 @@ export function useBarChartLogic(
       return aggregate(rows, metric.agg, metric.field);
     });
   }
-  // Toutes les options doivent venir de widgetParams
-  const showValues = config.widgetParams?.showValues ?? false;
-  const stacked = config.widgetParams?.stacked ?? false;
-  const labelFormat = config.widgetParams?.labelFormat || "{label}: {value}";
+  // Extraction stricte des params
+  const widgetParams: BarChartParams = config.widgetParams ?? {};
+  const showValues = widgetParams.showValues ?? false;
+  const stacked = widgetParams.stacked ?? false;
+  const labelFormat = widgetParams.labelFormat || "{label}: {value}";
+  // const barThickness = widgetParams.barThickness;
+  // const borderRadius = widgetParams.borderRadius ?? 0;
+  // const borderColor = widgetParams.borderColor;
+  // const fillColor = widgetParams.backgroundColor;
+  const labelColor = widgetParams.labelColor;
+  const labelFontSize = widgetParams.labelFontSize;
+
   const datasets = useMemo(
     () =>
       config.metrics.map((metric: MetricConfig, idx: number) => {
@@ -42,13 +51,15 @@ export function useBarChartLogic(
           label: metric.label || metric.field,
           data: values,
           backgroundColor: style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-          borderWidth: style.borderWidth || 1,
+          borderWidth: style.borderWidth ?? 1,
           borderColor: style.borderColor || undefined,
           barThickness: style.barThickness || undefined,
           borderRadius: style.borderRadius || 0,
+          // Correction stack: si non empilé, chaque dataset a un stack différent
+          stack: stacked ? undefined : `stack${idx}`,
         };
       }),
-    [labels, config.metrics, config.metricStyles]
+    [labels, config.metrics, config.metricStyles, stacked]
   );
   const chartData: ChartData<"bar"> = useMemo(
     () => ({ labels, datasets }),
@@ -57,10 +68,10 @@ export function useBarChartLogic(
   const legendPosition = getLegendPosition(config);
   const title = getTitle(config);
   const titleAlign = getTitleAlign(config);
-  const xLabel = config.widgetParams?.xLabel;
-  const yLabel = config.widgetParams?.yLabel;
-  const showGrid = config.widgetParams?.showGrid ?? true;
-  const isHorizontal = config.widgetParams?.horizontal ?? false;
+  const xLabel = widgetParams.xLabel;
+  const yLabel = widgetParams.yLabel;
+  const showGrid = widgetParams.showGrid ?? true;
+  const isHorizontal = widgetParams.horizontal ?? false;
   const indexAxis: "x" | "y" = isHorizontal ? "y" : "x";
   // Correction : ne pas dupliquer la clé plugins dans l'objet options
   const pluginsOptions = showValues
@@ -72,22 +83,37 @@ export function useBarChartLogic(
             label: function (context: any) {
               const label = context.label;
               const value = context.parsed.y;
+              // Pas de percent pour bar, mais on laisse le placeholder pour compat future
               return labelFormat
                 .replace("{label}", label)
-                .replace("{value}", String(value));
+                .replace("{value}", String(value))
+                .replace("{percent}", "");
             },
           },
         },
       }
     : {};
+  const isXTimestamps = useMemo(() => {
+    if (!labels || labels.length === 0) return false;
+    return isIsoTimestamp(labels[0]);
+  }, [labels]);
+  const xAllSameDay = useMemo(() => {
+    if (!isXTimestamps || !labels || labels.length === 0) return false;
+    return allSameDay(labels);
+  }, [isXTimestamps, labels]);
+
   const options: ChartOptions<"bar"> = useMemo(
     () => ({
       responsive: true,
       animation: false,
       plugins: {
         legend: {
-          display: config.widgetParams?.legend !== false,
+          display: widgetParams.legend !== false,
           position: legendPosition as "top" | "left" | "right" | "bottom",
+          labels: {
+            color: labelColor,
+            font: labelFontSize ? { size: labelFontSize } : undefined,
+          },
         },
         title: title
           ? {
@@ -95,6 +121,8 @@ export function useBarChartLogic(
               text: title,
               position: "top",
               align: titleAlign as "start" | "center" | "end",
+              color: labelColor,
+              font: labelFontSize ? { size: labelFontSize } : undefined,
             }
           : undefined,
         tooltip: {
@@ -106,7 +134,8 @@ export function useBarChartLogic(
               if (showValues) {
                 return labelFormat
                   .replace("{label}", label)
-                  .replace("{value}", String(value));
+                  .replace("{value}", String(value))
+                  .replace("{percent}", "");
               }
               return `${label}: ${value}`;
             },
@@ -121,6 +150,8 @@ export function useBarChartLogic(
           title: xLabel ? { display: true, text: xLabel } : undefined,
           stacked,
           ticks: {
+            color: labelColor,
+            font: labelFontSize ? { size: labelFontSize } : undefined,
             callback: (_: any, idx: number) =>
               isXTimestamps
                 ? formatXTicksLabel(labels[idx], xAllSameDay)
@@ -135,6 +166,10 @@ export function useBarChartLogic(
           grid: { display: showGrid },
           stacked: stacked,
           title: yLabel ? { display: true, text: yLabel } : undefined,
+          ticks: {
+            color: labelColor,
+            font: labelFontSize ? { size: labelFontSize } : undefined,
+          },
         },
       },
     }),
@@ -150,17 +185,13 @@ export function useBarChartLogic(
       showValues,
       labelFormat,
       pluginsOptions,
+      labelColor,
+      labelFontSize,
+      labels,
+      isXTimestamps,
+      xAllSameDay,
     ]
   );
-  // Détection si les labels X sont des timestamps ISO
-  const isXTimestamps = useMemo(() => {
-    if (!labels || labels.length === 0) return false;
-    return isIsoTimestamp(labels[0]);
-  }, [labels]);
-  const xAllSameDay = useMemo(() => {
-    if (!isXTimestamps || !labels || labels.length === 0) return false;
-    return allSameDay(labels);
-  }, [isXTimestamps, labels]);
   return {
     chartData,
     options,

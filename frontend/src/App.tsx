@@ -3,9 +3,10 @@
 import React, { useEffect, useState, type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "@/presentation/pages/auth/LoginPage";
-// import Register from "@/presentation/pages/auth/RegisterPage";
+import Register from "@/presentation/pages/auth/RegisterPage";
 import SourcesPage from "@/presentation/pages/datasource/SourceListPage";
 import AddSourcePage from "@/presentation/pages/datasource/AddSourcePage";
+import EditSourcePage from "@/presentation/pages/datasource/EditSourcePage";
 import BaseLayout from "@/presentation/components/layouts/BaseLayout";
 import { useUserStore } from "@/core/store/user";
 import { ROUTES } from "@/core/constants/routes";
@@ -37,7 +38,7 @@ function RequireAuth({
         code={403}
         title="Accès refusé"
         message="Vous n'avez pas les permissions nécessaires pour accéder à cette page."
-        />
+      />
     );
   }
   return <BaseLayout>{children}</BaseLayout>;
@@ -56,7 +57,8 @@ const App: React.FC = () => {
   // Le loader ne s'affiche que sur les pages RequireAuth
   if (
     (user === undefined || user === null || showLoader) &&
-    window.location.pathname !== ROUTES.login
+    window.location.pathname !== ROUTES.login &&
+    window.location.pathname !== ROUTES.register
   ) {
     return <AppLoader />;
   }
@@ -64,7 +66,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path={ROUTES.login} element={<Login />} />
-        {/* <Route path={ROUTES.register} element={<Register />} /> */}
+        <Route path={ROUTES.register} element={<Register />} />
         <Route
           path={ROUTES.dashboards}
           element={
@@ -98,6 +100,14 @@ const App: React.FC = () => {
           element={
             <RequireAuth permission="datasource:canCreate">
               <AddSourcePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path={ROUTES.editSource}
+          element={
+            <RequireAuth permission="datasource:canUpdate">
+              <EditSourcePage />
             </RequireAuth>
           }
         />
@@ -149,10 +159,7 @@ const App: React.FC = () => {
             </RequireAuth>
           }
         />
-        <Route
-          path={ROUTES.dashboardShare}
-          element={<DashboardSharePage />}
-        />
+        <Route path={ROUTES.dashboardShare} element={<DashboardSharePage />} />
         <Route path="/" element={<Navigate to={ROUTES.dashboard} replace />} />
         <Route path="*" element={<Navigate to={ROUTES.dashboard} replace />} />
       </Routes>

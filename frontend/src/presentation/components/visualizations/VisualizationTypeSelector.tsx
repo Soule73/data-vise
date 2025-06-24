@@ -1,13 +1,11 @@
 import CheckboxField from "@/presentation/components/forms/CheckboxField";
 import InputField from "@/presentation/components/forms/InputField";
 import { WIDGETS } from "@/data/adapters/visualizations";
-import type { WidgetType } from "@/core/types/widget-types";
+import type {
+  VisualizationTypeSelectorProps,
+  WidgetType,
+} from "@/core/types/widget-types";
 import { useState } from "react";
-
-interface VisualizationTypeSelectorProps {
-  type: string;
-  setType: (type: WidgetType) => void;
-}
 
 export default function VisualizationTypeSelector({
   type,

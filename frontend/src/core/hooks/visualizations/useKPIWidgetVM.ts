@@ -1,26 +1,7 @@
 import { useMemo } from "react";
 import type { KPIWidgetConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
-
-interface KPIWidgetVM {
-  filteredData: Record<string, unknown>[];
-  value: number;
-  title: string;
-  valueColor: string;
-  showTrend: boolean;
-  showValue: boolean;
-  format: string;
-  currency: string;
-  decimals: number;
-  trendType: string;
-  showPercent: boolean;
-  threshold: number;
-  trend: "up" | "down" | null;
-  trendValue: number;
-  trendPercent: number;
-  formatValue: (val: number) => string;
-  getTrendColor: () => string;
-}
+import type { KPIWidgetVM } from "@/core/types/widget-types";
 
 export function useKPIWidgetVM(
   data: Record<string, unknown>[],

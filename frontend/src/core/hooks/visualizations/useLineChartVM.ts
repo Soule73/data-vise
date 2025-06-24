@@ -13,6 +13,7 @@ import type { LineChartConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 import type { ChartDataset, ChartOptions, ChartData } from "chart.js";
 import type { Chart as ChartJSInstance } from "chart.js";
+import type { LineChartParams } from "@/core/types/visualization";
 
 export function useLineChartLogic(
   data: Record<string, unknown>[],
@@ -36,80 +37,40 @@ export function useLineChartLogic(
       return aggregate(rows, metric.agg, metric.field);
     });
   }
-  // Gestion DRY des options showPoints, fill, stepped, showValues (hors du map)
-  const showPoints =
-    config.metricStyles &&
-    config.metricStyles[0] &&
-    config.metricStyles[0].showPoints !== undefined
-      ? config.metricStyles[0].showPoints
-      : config.widgetParams?.showPoints !== undefined
-      ? config.widgetParams.showPoints
-      : true;
-  const showValues =
-    config.metricStyles &&
-    config.metricStyles[0] &&
-    config.metricStyles[0].showValues !== undefined
-      ? config.metricStyles[0].showValues
-      : config.widgetParams?.showValues !== undefined
-      ? config.widgetParams.showValues
-      : false;
-  const fill =
-    config.metricStyles &&
-    config.metricStyles[0] &&
-    config.metricStyles[0].fill !== undefined
-      ? config.metricStyles[0].fill
-      : config.widgetParams?.fill !== undefined
-      ? config.widgetParams.fill
-      : false;
-  const stepped =
-    config.metricStyles &&
-    config.metricStyles[0] &&
-    config.metricStyles[0].stepped !== undefined
-      ? config.metricStyles[0].stepped
-      : config.widgetParams?.stepped !== undefined
-      ? config.widgetParams.stepped
-      : false;
+  // Extraction stricte des params globaux
+  const widgetParams: LineChartParams = config.widgetParams ?? {};
+  const tension = widgetParams.tension ?? 0;
+  const showPoints = widgetParams.showPoints ?? true;
+  const showValues = widgetParams.showValues ?? false;
+  const labelColor = widgetParams.labelColor;
+  const labelFontSize = widgetParams.labelFontSize;
+
+  // Les styles sont strictement par-métrique
   const datasets = useMemo<ChartDataset<"line">[]>(
     () =>
       config.metrics.map((metric: MetricConfig, idx: number) => {
         const values = getValues(metric);
         const style = (config.metricStyles && config.metricStyles[idx]) || {};
-        let borderDash: number[] | undefined = undefined;
-        const dashStr = style.borderDash || config.widgetParams?.borderDash;
-        if (dashStr && typeof dashStr === "string") {
-          borderDash = dashStr
-            .split(",")
-            .map((v: string) => parseInt(v.trim(), 10))
-            .filter((n: number) => !isNaN(n));
-        }
-        const fillColor =
-          style.fillColor ||
-          config.widgetParams?.fillColor ||
-          (style.color ||
-            config.widgetParams?.color ||
-            `hsl(${(idx * 60) % 360}, 70%, 60%)`) + "33";
         return {
           label: metric.label || metric.field,
           data: values,
           borderColor:
+            style.borderColor ||
             style.color ||
-            config.widgetParams?.color ||
             `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-          backgroundColor: fill ? fillColor : undefined,
-          borderWidth:
-            style.borderWidth || config.widgetParams?.borderWidth || 2,
-          borderRadius:
-            style.borderRadius || config.widgetParams?.borderRadius || 0,
-          pointStyle:
-            style.pointStyle || config.widgetParams?.pointStyle || undefined,
-          pointBorderColor:
-            style.borderColor || config.widgetParams?.borderColor || undefined,
-          borderDash,
-          stepped,
-          fill,
+          backgroundColor: style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
+          borderWidth: style.borderWidth ?? 1,
+          pointStyle: style.pointStyle || undefined,
+          fill: style.fill ?? false,
+          stepped: style.stepped ?? false,
+          borderRadius: style.borderRadius ?? 0,
+          borderDash: style.borderDash ?? undefined,
+          tension: tension,
+          pointRadius: showPoints ? 3 : 0,
+          pointHoverRadius: showPoints ? 5 : 0,
         } as ChartDataset<"line">;
       }),
-    [labels, config.metrics, config.metricStyles, fill, stepped, config]
+    [labels, config.metrics, config.metricStyles, tension, showPoints]
   );
   const chartData: ChartData<"line"> = useMemo(
     () => ({ labels, datasets }),
@@ -127,7 +88,6 @@ export function useLineChartLogic(
   const yLabel = config.widgetParams?.yLabel || "";
   const showGrid = config.widgetParams?.showGrid ?? true;
   const stacked = config.widgetParams?.stacked ?? false;
-  const tension = config.widgetParams?.tension ?? 0;
   // Détection si les labels X sont des timestamps ISO
   const isXTimestamps = useMemo(() => {
     if (!labels || labels.length === 0) return false;
@@ -146,6 +106,10 @@ export function useLineChartLogic(
         legend: {
           display: config.widgetParams?.legend !== false,
           position: legendPosition as "top" | "left" | "right" | "bottom",
+          labels: {
+            color: labelColor,
+            font: labelFontSize ? { size: labelFontSize } : undefined,
+          },
         },
         title: title
           ? {
@@ -153,10 +117,8 @@ export function useLineChartLogic(
               text: title,
               position: "top",
               align: titleAlign as "start" | "center" | "end",
-              color: config.widgetParams?.labelColor,
-              font: config.widgetParams?.labelFontSize
-                ? { size: config.widgetParams.labelFontSize }
-                : undefined,
+              color: labelColor,
+              font: labelFontSize ? { size: labelFontSize } : undefined,
             }
           : undefined,
         tooltip: {
@@ -189,6 +151,8 @@ export function useLineChartLogic(
           title: xLabel ? { display: true, text: xLabel } : undefined,
           stacked,
           ticks: {
+            color: labelColor,
+            font: labelFontSize ? { size: labelFontSize } : undefined,
             callback: (_: any, idx: number) =>
               isXTimestamps
                 ? formatXTicksLabel(labels[idx], xAllSameDay)
@@ -203,6 +167,10 @@ export function useLineChartLogic(
           grid: { display: showGrid },
           title: yLabel ? { display: true, text: yLabel } : undefined,
           stacked,
+          ticks: {
+            color: labelColor,
+            font: labelFontSize ? { size: labelFontSize } : undefined,
+          },
         },
       },
     }),
@@ -220,6 +188,8 @@ export function useLineChartLogic(
       isXTimestamps,
       labels,
       xAllSameDay,
+      labelColor,
+      labelFontSize,
     ]
   );
   const showNativeValues = showValues && hasData;

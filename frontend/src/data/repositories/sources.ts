@@ -1,9 +1,21 @@
-import { useQuery, useMutation, keepPreviousData, QueryClient } from "@tanstack/react-query";
-import { getSources, createSource, detectColumns, deleteSource, updateSource, fetchSourceData } from "@/data/services/datasource";
+import {
+  useQuery,
+  useMutation,
+  keepPreviousData,
+  QueryClient,
+} from "@tanstack/react-query";
+import {
+  getSources,
+  createSource,
+  detectColumns,
+  deleteSource,
+  updateSource,
+  fetchSourceData,
+  fetchUploadedFile,
+  getSourceById,
+} from "@/data/services/datasource";
 
-export function sourcesQuery(
-  { queryClient }: { queryClient: QueryClient}
-) {
+export function sourcesQuery({ queryClient }: { queryClient: QueryClient }) {
   const query = useQuery({
     queryKey: ["sources"],
     queryFn: async () => getSources(),
@@ -15,9 +27,11 @@ export function sourcesQuery(
   return { ...query, refetchSources };
 }
 
-export function invalidateSources(
-  { queryClient }: { queryClient: QueryClient }
-) {
+export function invalidateSources({
+  queryClient,
+}: {
+  queryClient: QueryClient;
+}) {
   return queryClient.invalidateQueries({ queryKey: ["sources"] });
 }
 
@@ -81,7 +95,8 @@ export function useUpdateSourceMutation({
   queryClient: QueryClient;
 }) {
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => updateSource(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      updateSource(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sources"] });
       onSuccess?.();
@@ -89,8 +104,6 @@ export function useUpdateSourceMutation({
     onError,
   });
 }
-
-
 
 // Utilitaire pour générer une clé de cache stable et fiable
 function buildSourceDataKey(
@@ -145,11 +158,11 @@ export function dataBySourceQuery(
     queryFn: () =>
       sourceId
         ? fetchSourceData(sourceId, {
-          page: options?.page ?? 1,
-          pageSize: options?.pageSize ?? 1000,
-          ...options,
-          forceRefresh: !!forceRefreshKey && forceRefreshKey > 0,
-        })
+            page: options?.page ?? 1,
+            pageSize: options?.pageSize ?? 1000,
+            ...options,
+            forceRefresh: !!forceRefreshKey && forceRefreshKey > 0,
+          })
         : Promise.resolve(initialData ?? null),
     enabled: !!sourceId,
     initialData,
@@ -180,4 +193,20 @@ export function dataBySourceQuery(
     loading,
     error: error ? "Erreur lors du chargement des données." : null,
   };
+}
+
+export async function getUploadedFile(filename: string): Promise<Blob> {
+  return await fetchUploadedFile(filename);
+}
+
+export function sourceByIdQuery({ id }: { id: string | undefined }) {
+  if (!id) {
+    throw new Error("Source ID is required for sourceByIdQuery");
+  }
+  return useQuery({
+    queryKey: ["source", id],
+    queryFn: () => getSourceById(id),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
 }
