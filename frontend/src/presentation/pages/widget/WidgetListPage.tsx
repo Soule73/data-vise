@@ -9,6 +9,9 @@ import type { Widget } from "@/core/types/widget-types";
 import { useMemo } from "react";
 import { WIDGETS } from "@/data/adapters/visualizations";
 import Badge from "@/presentation/components/Badge";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 export default function WidgetListPage() {
   const {
     tableData,
@@ -154,11 +157,15 @@ export default function WidgetListPage() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         title="Configuration du widget"
-        size="lg"
+        size="2xl"
       >
-        <pre className="text-xs bg-gray-100 dark:bg-gray-800 rounded p-2 overflow-x-auto max-h-80">
+        <SyntaxHighlighter
+          language="json"
+          style={okaidia}
+          className="text-x config-scrollbar rounded p-2 overflow-y-auto max-h-80"
+        >
           {selectedConfig ? JSON.stringify(selectedConfig, null, 2) : ""}
-        </pre>
+        </SyntaxHighlighter>
       </Modal>
       <DeleteWidgetModal
         open={deleteModalOpen}
