@@ -1,3 +1,4 @@
+import "@/core/chartjs-register";
 import { usePieChartLogic } from "@/core/hooks/visualizations/usePieChartVM";
 import { Pie } from "react-chartjs-2";
 import { ChartPieIcon } from "@heroicons/react/24/outline";

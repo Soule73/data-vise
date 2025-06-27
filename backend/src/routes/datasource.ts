@@ -6,18 +6,34 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// Définir le chemin absolu du dossier uploads à la racine du projet (data-vise/uploads)
-const uploadsDir = path.resolve(process.cwd(), "uploads");
+/**
+ * Crée le répertoire de stockage pour les fichiers uploadés s'il n'existe pas.
+ * Le répertoire est créé dans le répertoire courant du processus.
+ *
+ * @type {string}
+ * @description Ce répertoire est utilisé pour stocker les fichiers uploadés via l'API.
+ * Il est important de s'assurer que ce répertoire existe avant de tenter d'y stocker des fichiers.
+ *
+ * Si le répertoire n'existe pas, il est créé avec les permissions par défaut.
+ */
+const uploadsDir: string = path.resolve(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
+/**
+ * Configuration de multer pour le stockage des fichiers uploadés.
+ * Utilise le système de fichiers pour stocker les fichiers dans le répertoire spécifié.
+ * Le nom du fichier est généré de manière unique en utilisant un timestamp et un nombre aléatoire.
+ *
+ * @type {multer.StorageEngine}
+ *
+ */
+const storage: multer.StorageEngine = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadsDir);
   },
   filename: function (req, file, cb) {
-    // Ajoute l'extension d'origine au nom généré par multer
     const ext = path.extname(file.originalname) || ".csv";
     const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
     cb(null, uniqueName);
@@ -26,12 +42,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 Mo max
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
 const router = express.Router();
 
-// Lister toutes les sources de l'utilisateur (ou globales)
+/** * Endpoint pour lister toutes les sources de données.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "datasource:canView".
+ *
+ * ROUTE GET /sources
+ *
+ */
 router.get(
   "/",
   requireAuth,
@@ -39,16 +62,36 @@ router.get(
   dataSourceController.list
 );
 
-// Créer une nouvelle source
+/**
+ * Endpoint pour créer une nouvelle source.
+ * Ce point d'entrée accepte un fichier via multipart/form-data.
+ * Le fichier doit être envoyé avec le champ "file".
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "datasource:canCreate".
+ *
+ * ROUTE POST /sources
+ *
+ */
 router.post(
   "/",
   requireAuth,
   requirePermission("datasource:canCreate"),
-  upload.single("file"), // Ajout du middleware multer
+  upload.single("file"),
   dataSourceController.create
 );
 
-// Récupérer une source par ID
+/**
+ * Endpoint pour récupérer une source par ID.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "datasource:canView".
+ *
+ * @param {id} req - La requête HTTP contenant l'ID de la source.
+ *
+ * ROUTE GET sources/:id
+ *
+ */
 router.get(
   "/:id",
   requireAuth,
@@ -56,7 +99,16 @@ router.get(
   dataSourceController.getById
 );
 
-// Mettre à jour une source
+/**
+ * Endpoint pour mettre à jour une source.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "datasource:canUpdate".
+ *
+ * @param {id} req - La requête HTTP contenant l'ID de la source à mettre à jour.
+ *
+ * ROUTE PUT sources/:id
+ */
 router.put(
   "/:id",
   requireAuth,
@@ -64,7 +116,17 @@ router.put(
   dataSourceController.update
 );
 
-// Supprimer une source
+/**
+ * Endpoint pour supprimer une source.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "datasource:canDelete".
+ *
+ * @param {id} req - La requête HTTP contenant l'ID de la source à supprimer.
+ *
+ * ROUTE DELETE sources/:id
+ *
+ */
 router.delete(
   "/:id",
   requireAuth,
@@ -72,21 +134,52 @@ router.delete(
   dataSourceController.remove
 );
 
-// Endpoint pour détecter dynamiquement les colonnes d'une source (exemple : JSON ou endpoint externe)
+/**
+ * Endpoint pour détecter dynamiquement les colonnes d'une source.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "datasource:canView".
+ *
+ * Ce point d'entrée accepte un fichier via multipart/form-data.
+ * Le fichier doit être envoyé avec le champ "file".
+ *
+ * @route POST /sources/detect-columns
+ *
+ */
 router.post(
   "/detect-columns",
   requireAuth,
   requirePermission("datasource:canView"),
-  upload.single("file"), // Ajout du middleware multer
+  upload.single("file"),
   dataSourceController.detectColumns
 );
 
-// Endpoint pour servir un fichier JSON de test (pour la démo frontend)
+/**
+ * Endpoint pour récupérer un fichier JSON de test.
+ */
 router.get("/demo/ventes", dataSourceController.demoVentes);
 
-// Endpoint pour récupérer les données d'une source avec filtrage temporel
+/**
+ * Récupère les données d'une source avec filtrage temporel.
+ * L'utilisateur doit être authentifié et avoir
+ * la permission "datasource:canView".
+ * Ce point d'entrée accepte un paramètre `shareId` dans la requête.
+ * Si `shareId` est présent, l'authentification n'est pas requise
+ * et les données sont accessibles publiquement.
+ *
+ * @param {id} req - La requête HTTP contenant l'ID de la source
+ *
+ * ROUTE GET /sources/:id/data
+ *
+ */
 router.get(
   "/:id/data",
+  async (req, res, next) => {
+    if (req.query.shareId) {
+      return dataSourceController.fetchData(req, res, next);
+    }
+    next();
+  },
   requireAuth,
   requirePermission("datasource:canView"),
   dataSourceController.fetchData

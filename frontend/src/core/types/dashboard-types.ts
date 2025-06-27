@@ -66,6 +66,7 @@ export interface DashboardGridProps {
   forceRefreshKey?: number;
   page?: number;
   pageSize?: number;
+  shareId?: string; // Ajout du shareId pour la propagation
 }
 
 export interface DashboardGridItemProps {
@@ -93,6 +94,7 @@ export interface DashboardGridItemProps {
   forceRefreshKey?: number;
   page?: number;
   pageSize?: number;
+  shareId?: string; // Ajout du shareId pour la propagation
 }
 
 export interface DashboardHeaderProps {
@@ -199,6 +201,7 @@ export interface UseGridItemProps {
   forceRefreshKey?: number;
   page?: number;
   pageSize?: number;
+  shareId?: string; // Ajout du shareId pour la propagation
 }
 
 export interface UseDashboardGridProps {

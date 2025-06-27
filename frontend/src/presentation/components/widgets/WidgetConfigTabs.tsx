@@ -1,7 +1,6 @@
 import type { WidgetConfigTabsProps } from "@/core/types/widget-types";
 import React from "react";
 
-
 function TabButton({
   active,
   onClick,

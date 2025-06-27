@@ -226,9 +226,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     allowMultipleMetrics: false,
     configSchema: {
       ...PieChartConfig,
-      metricStyles: {
-        ...COMMON_METRIC_STYLES,
-      },
+      metricStyles: {}, // Pas de couleur par métrique pour le pie chart
       widgetParams: {
         ...COMMON_WIDGET_PARAMS,
         cutout: { default: "0%", inputType: "text", label: "Trous (doughnut)" },
@@ -241,6 +239,22 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
           default: "#000000",
           inputType: "color",
           label: "Couleur de bordure",
+        },
+        colors: {
+          default: [
+            "#6366f1",
+            "#f59e42",
+            "#10b981",
+            "#ef4444",
+            "#fbbf24",
+            "#3b82f6",
+            "#a21caf",
+            "#14b8a6",
+            "#eab308",
+            "#f472b6",
+          ],
+          inputType: "color-array",
+          label: "Couleurs des parts (pie)",
         },
       },
     },

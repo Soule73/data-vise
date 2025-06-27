@@ -1,47 +1,89 @@
-import express, { Request, Response, NextFunction } from 'express';
-import { requirePermission } from '@/middleware/requirePermission';
-import { requireAuth } from '../middleware/auth';
-import widgetController from '../controllers/widgetController';
+import express, { Request, Response, NextFunction } from "express";
+import { requirePermission } from "@/middleware/requirePermission";
+import { requireAuth } from "../middleware/auth";
+import widgetController from "../controllers/widgetController";
 
 const router = express.Router();
 
-// Lister tous les widgets d'un dashboard
+/**
+ * Route pour lister tous les widgets.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "widget:canView".
+ *
+ * ROUTE GET /widgets
+ */
 router.get(
-  '/',
+  "/",
   requireAuth,
-  requirePermission('widget:canView'),
+  requirePermission("widget:canView"),
   widgetController.list
 );
 
-// Créer un widget
+/**
+ * Route pour créer un widget.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "widget:canCreate".
+ *
+ * ROUTE POST /widgets
+ */
 router.post(
-  '/',
+  "/",
   requireAuth,
-  requirePermission('widget:canCreate'),
+  requirePermission("widget:canCreate"),
   widgetController.create
 );
 
-// Mettre à jour un widget
+/**
+ * Route pour mettre à jour un widget.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "widget:canUpdate".
+ *
+ * @param {string} id - L'ID du widget à mettre à jour.
+ *
+ * ROUTE PUT /widgets/:id
+ */
 router.put(
-  '/:id',
+  "/:id",
   requireAuth,
-  requirePermission('widget:canUpdate'),
+  requirePermission("widget:canUpdate"),
   widgetController.update
 );
 
-// Supprimer un widget
+/**
+ * Route pour supprimer un widget.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "widget:canDelete".
+ *
+ * @param {string} id - L'ID du widget à supprimer.
+ *
+ * ROUTE DELETE /widgets/:id
+ *
+ */
 router.delete(
-  '/:id',
+  "/:id",
   requireAuth,
-  requirePermission('widget:canDelete'),
+  requirePermission("widget:canDelete"),
   widgetController.remove
 );
 
-// Récupérer un widget par ID
+/**
+ * Route pour récupérer un widget par son ID.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "widget:canView".
+ *
+ * @param {string} id - L'ID du widget à récupérer.
+ *
+ * ROUTE GET /widgets/:id
+ */
 router.get(
-  '/:id',
+  "/:id",
   requireAuth,
-  requirePermission('widget:canView'),
+  requirePermission("widget:canView"),
   widgetController.getById
 );
 

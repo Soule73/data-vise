@@ -23,7 +23,14 @@ import type {
 } from "../types/authType";
 import mongoose from "mongoose";
 import { ApiResponse } from "@/types/api";
+import { toApiData, toApiError } from "@/utils/api";
 
+/**
+ * Retourne une version "sanitisée" d'un utilisateur, sans mot de passe.
+ * @param user L'utilisateur à sanitiser, peut être un objet IUser, null ou undefined.
+ * @returns Un objet utilisateur sans le mot de passe, ou l'utilisateur original si null/undefined.
+ *
+ */
 function sanitizeUser(user: IUser | null | undefined) {
   if (!user) return user;
   const obj = user.toObject ? user.toObject() : { ...user };
@@ -31,62 +38,90 @@ function sanitizeUser(user: IUser | null | undefined) {
   return obj;
 }
 
+/**
+ * Génère un token JWT pour l'utilisateur.
+ * @param payload Les données à inclure dans le token.
+ * @returns Le token JWT signé.
+ */
+function generateToken(payload: object): string {
+  const jwtSecret = process.env.JWT_SECRET || "secret";
+  let expiresIn = process.env.JWT_EXPIRATION as any;
+
+  return jwt.sign(
+    payload,
+    jwtSecret,
+    expiresIn !== undefined ? { expiresIn: expiresIn } : {}
+  );
+}
+
+/** * Service utilisateur pour gérer l'authentification, les rôles et les permissions.
+ * Fournit des méthodes pour l'enregistrement, la connexion,
+ * la création, la mise à jour et la suppression d'utilisateurs,
+ * ainsi que la gestion des rôles et des permissions.
+ * @module userService
+ *
+ * */
 const userService = {
+  /**
+   * Enregistre un nouvel utilisateur.
+   * @param {RegisterPayload} payload - Les données d'enregistrement de l'utilisateur.
+   * @returns {Promise<ApiResponse<{ user: UserResponse; token: string }>>} - La réponse contenant l'utilisateur et le token JWT.
+   */
   async register(
     payload: RegisterPayload
   ): Promise<ApiResponse<{ user: UserResponse; token: string }>> {
     const { username, email, password } = payload;
-    if (!username || username.length < 2)
-      return {
-        error: {
-          errors: {
-            username:
-              "Le nom d'utilisateur doit contenir au moins 2 caractères.",
-          },
-        },
-        status: 422,
-      };
-    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
-      return { error: { errors: { email: "Email invalide." } }, status: 422 };
-    if (!password || password.length < 6)
-      return {
-        error: {
-          errors: {
-            password: "Le mot de passe doit contenir au moins 6 caractères.",
-          },
-        },
-        status: 422,
-      };
-    const existing = await User.findOne({ email });
-    if (existing)
-      return {
-        error: { errors: { email: "Cet email est déjà utilisé." } },
-        status: 422,
-      };
+
+    if (!username || username.length < 2) {
+      return toApiError(
+        "Le nom d'utilisateur doit contenir au moins 2 caractères.",
+        422
+      );
+    }
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return toApiError("Email invalide.", 422);
+    }
+
+    if (!password || password.length < 6) {
+      return toApiError(
+        "Le mot de passe doit contenir au moins 6 caractères.",
+        422
+      );
+    }
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return toApiError("Cet email est déjà utilisé.", 422);
+    }
+
     const defaultRole = await Role.findOne({ name: "user" });
-    if (!defaultRole)
-      return {
-        error: {
-          errors: { roleId: "Le rôle par défaut 'user' est introuvable." },
-        },
-        status: 500,
-      };
-    const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({
+
+    if (!defaultRole) {
+      return toApiError("Rôle par défaut 'user' introuvable.", 500);
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const createdUser = await User.create({
       username,
       email,
-      password: hash,
+      password: passwordHash,
       roleId: defaultRole._id,
+      passwordChangedAt: new Date(),
     });
-    const userPopulated = await User.findById(user._id).populate({
+
+    const userPopulated = await User.findById(createdUser._id).populate({
       path: "roleId",
       populate: { path: "permissions" },
     });
-    // Correction du typage _id
+
     const userId = (
-      user._id as import("mongoose").Types.ObjectId | string
+      createdUser._id as import("mongoose").Types.ObjectId | string
     ).toString();
+
     let role: UserRoleResponse | null = null;
+
     if (
       userPopulated &&
       userPopulated.roleId &&
@@ -94,6 +129,7 @@ const userService = {
       "permissions" in userPopulated.roleId
     ) {
       const r = userPopulated.roleId as unknown as PopulatedRole;
+
       role = {
         id: r._id.toString(),
         name: r.name,
@@ -107,60 +143,79 @@ const userService = {
           : [],
       };
     }
-    const token = jwt.sign(
-      { id: userId, role: role?.name },
-      process.env.JWT_SECRET || "secret",
-      { expiresIn: "7d" }
-    );
+    const userSigned = {
+      id: userId,
+      role: role?.name,
+      passwordChangedAt: createdUser.passwordChangedAt
+        ? createdUser.passwordChangedAt.getTime()
+        : 0,
+    };
+
+    const token = generateToken(userSigned);
+
     return {
       data: {
         user: {
           id: userId,
-          username: user.username,
-          email: user.email,
+          username: createdUser.username,
+          email: createdUser.email,
           role,
         },
         token,
       },
     };
   },
+
+  /**
+   * Connecte un utilisateur existant.
+   * @param {LoginPayload} payload - Les données de connexion de l'utilisateur.
+   * @returns {Promise<ApiResponse<{ user: UserResponse; token: string }>>} - La réponse contenant l'utilisateur et le token JWT.
+   */
   async login(
     payload: LoginPayload
   ): Promise<ApiResponse<{ user: UserResponse; token: string }>> {
     const { email, password } = payload;
-    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
-      return { error: { errors: { email: "Email invalide." } }, status: 422 };
-    if (!password)
-      return {
-        error: { errors: { password: "Mot de passe requis." } },
-        status: 422,
-      };
+
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return toApiError("Email invalide.", 422);
+    }
+
+    if (!password) {
+      return toApiError("Mot de passe requis.", 422);
+    }
+
     const userPopulated = await User.findOne({ email }).populate({
       path: "roleId",
       populate: { path: "permissions" },
     });
-    // Correction du typage _id
+
     const userPopId = userPopulated
       ? (
           userPopulated._id as import("mongoose").Types.ObjectId | string
         ).toString()
       : "";
-    if (!userPopulated)
-      return { error: { message: "Identifiants invalides." }, status: 401 };
-    if (!userPopulated.roleId)
-      return {
-        error: { message: "Aucun rôle associé à ce compte." },
-        status: 403,
-      };
+
+    if (!userPopulated) {
+      return toApiError("Identifiants invalides.", 401);
+    }
+
+    if (!userPopulated.roleId) {
+      return toApiError("Aucun rôle associé à ce compte.", 403);
+    }
+
     const valid = await bcrypt.compare(password, userPopulated.password);
-    if (!valid)
-      return { error: { message: "Identifiants invalides." }, status: 401 };
+    if (!valid) {
+      return toApiError("Identifiants invalides.", 401);
+    }
+
     let role: UserRoleResponse | null = null;
+
     if (
       typeof userPopulated.roleId === "object" &&
       "permissions" in userPopulated.roleId
     ) {
       const r = userPopulated.roleId as unknown as PopulatedRole;
+
       role = {
         id: r._id.toString(),
         name: r.name,
@@ -174,11 +229,15 @@ const userService = {
           : [],
       };
     }
-    const token = jwt.sign(
-      { id: userPopId, role: role?.name },
-      process.env.JWT_SECRET || "secret",
-      { expiresIn: "7d" }
-    );
+
+    const token = generateToken({
+      id: userPopId,
+      role: role?.name,
+      passwordChangedAt: userPopulated.passwordChangedAt
+        ? userPopulated.passwordChangedAt.getTime()
+        : 0,
+    });
+
     return {
       data: {
         user: {
@@ -191,143 +250,233 @@ const userService = {
       },
     };
   },
+
+  /**
+   * Crée un nouvel utilisateur.
+   * @param {CreateUserPayload} payload - Les données de création de l'utilisateur.
+   * @returns {Promise<ApiResponse<{ user: IUser }>>} - La réponse contenant l'utilisateur créé.
+   */
   async createUser(
     payload: CreateUserPayload
   ): Promise<ApiResponse<{ user: IUser }>> {
     const { username, email, password, roleId } = payload;
-    if (!username || !email || !password || !roleId)
-      return { error: { message: "Champs requis manquants." }, status: 400 };
+    if (!username || !email || !password || !roleId) {
+      return toApiError("Champs requis manquants.", 400);
+    }
+
     const existing = await User.findOne({ email });
-    if (existing)
-      return { error: { message: "Cet email est déjà utilisé." }, status: 422 };
+
+    if (existing) {
+      return toApiError("Cet email est déjà utilisé.", 422);
+    }
+
     const hash = await bcrypt.hash(password, 10);
+
     const user = await User.create({ username, email, password: hash, roleId });
+
     const userPopulated = await User.findById(user._id).populate(
       "roleId",
       "name"
     );
-    return { data: { user: sanitizeUser(userPopulated) } };
+
+    return toApiData({ user: sanitizeUser(userPopulated) });
   },
+
+  /**
+   * Met à jour un utilisateur existant.
+   * @param {string} id - L'ID de l'utilisateur à mettre à jour.
+   * @param {UpdateUserPayload} payload - Les données de mise à jour de l'utilisateur.
+   * @returns {Promise<ApiResponse<{ user: IUser }>>} - La réponse contenant l'utilisateur mis à jour.
+   */
   async updateUser(
     id: string,
     payload: UpdateUserPayload
   ): Promise<ApiResponse<{ user: IUser }>> {
-    const update: Partial<
-      Pick<IUser, "username" | "email" | "password" | "roleId">
-    > = {};
+    const update: Partial<IUser> = {};
+
     if (payload.username) update.username = payload.username;
+
     if (payload.email) update.email = payload.email;
+
     if (payload.roleId)
       update.roleId = new mongoose.Types.ObjectId(payload.roleId);
-    if (payload.password && payload.password.length > 0)
+
+    if (payload.password && payload.password.length > 0) {
       update.password = await bcrypt.hash(payload.password, 10);
+      update.passwordChangedAt = new Date();
+    }
+
     const user = await User.findByIdAndUpdate(id, update, {
       new: true,
     }).populate("roleId", "name");
-    if (!user)
-      return { error: { message: "Utilisateur non trouvé." }, status: 404 };
+
+    if (!user) {
+      return toApiError("Utilisateur non trouvé.", 404);
+    }
+
     return { data: { user: sanitizeUser(user) } };
   },
+
+  /**
+   * Supprime un utilisateur et ses widgets et dashboards associés.
+   * @param {string} id - L'ID de l'utilisateur à supprimer.
+   * @returns {Promise<ApiResponse<{ message: string }>>} - La réponse contenant un message de confirmation.
+   */
   async deleteUser(id: string): Promise<ApiResponse<{ message: string }>> {
     await Widget.deleteMany({ ownerId: id, visibility: "private" });
+
     await Widget.updateMany(
       { ownerId: id, visibility: "public" },
       { $set: { ownerId: null } }
     );
+
     await Dashboard.deleteMany({ ownerId: id, visibility: "private" });
+
     await Dashboard.updateMany(
       { ownerId: id, visibility: "public" },
       { $set: { ownerId: null } }
     );
+
     const user = await User.findByIdAndDelete(id);
-    if (!user)
-      return { error: { message: "Utilisateur non trouvé." }, status: 404 };
-    return { data: { message: "Utilisateur supprimé." } };
+
+    if (!user) {
+      return toApiError("Utilisateur non trouvé.", 404);
+    }
+
+    return toApiData({ message: "Utilisateur supprimé." });
   },
-  async listRoles(): Promise<IRole[]> {
-    return await Role.find().populate("permissions");
-  },
-  async listRolesWithCanDelete(): Promise<LeanRoleWithCanDelete[]> {
+
+  /**
+   * Liste tous les rôles avec une indication de s'ils peuvent être supprimés.
+   * @returns {Promise<LeanRoleWithCanDelete[]>} - La liste des rôles avec la propriété canDelete.
+   */
+  async listRolesWithCanDelete(): Promise<
+    ApiResponse<LeanRoleWithCanDelete[]>
+  > {
     const roles = await Role.find().populate("permissions").lean();
+
     const users = await User.find({}, "roleId").lean();
+
     const roleUsage: Record<string, number> = {};
+
     users.forEach((u) => {
       if (u.roleId) {
         roleUsage[u.roleId.toString()] =
           (roleUsage[u.roleId.toString()] || 0) + 1;
       }
     });
-    return roles.map((r) => ({
+
+    const rolesMap = roles.map((r) => ({
       ...r,
       _id: r._id.toString(),
       canDelete: !roleUsage[r._id?.toString()],
     }));
+
+    return toApiData(rolesMap);
   },
+
+  /**
+   * Crée un nouveau rôle.
+   * @param {CreateRolePayload} payload - Les données de création du rôle.
+   * @returns {Promise<ApiResponse<IRole>>} - La réponse contenant le rôle créé.
+   */
   async createRole(payload: CreateRolePayload): Promise<ApiResponse<IRole>> {
     const { name, description, permissions } = payload;
-    if (!name || !Array.isArray(permissions) || permissions.length === 0)
-      return {
-        error: { message: "Nom et au moins une permission requise." },
-        status: 400,
-      };
+
+    if (!name || !Array.isArray(permissions) || permissions.length === 0) {
+      return toApiError("Nom et au moins une permission requise.", 400);
+    }
+
     const perms = await Permission.find({ _id: { $in: permissions } });
-    if (perms.length !== permissions.length)
-      return {
-        error: { message: "Une ou plusieurs permissions sont invalides." },
-        status: 400,
-      };
+
+    if (perms.length !== permissions.length) {
+      return toApiError("Une ou plusieurs permissions sont invalides.", 400);
+    }
+
     const role = await Role.create({ name, description, permissions });
-    return { data: role };
+
+    return toApiData(role);
   },
+
+  /**
+   * Met à jour un rôle existant.
+   * @param {string} id - L'ID du rôle à mettre à jour.
+   * @param {UpdateRolePayload} payload - Les données de mise à jour du rôle.
+   * @returns {Promise<ApiResponse<IRole>>} - La réponse contenant le rôle mis à jour.
+   */
   async updateRole(
     id: string,
     payload: UpdateRolePayload
   ): Promise<ApiResponse<IRole>> {
     const { name, description, permissions } = payload;
+
     if (
       permissions &&
       (!Array.isArray(permissions) || permissions.length === 0)
-    )
-      return {
-        error: { message: "Un rôle doit avoir au moins une permission." },
-        status: 400,
-      };
+    ) {
+      return toApiError("Un rôle doit avoir au moins une permission.", 400);
+    }
+
     if (permissions) {
       const perms = await Permission.find({ _id: { $in: permissions } });
       if (perms.length !== permissions.length)
-        return {
-          error: { message: "Une ou plusieurs permissions sont invalides." },
-          status: 400,
-        };
+        return toApiError("Une ou plusieurs permissions sont invalides.", 400);
     }
+
     const role = await Role.findByIdAndUpdate(
       id,
       { $set: { name, description, ...(permissions ? { permissions } : {}) } },
       { new: true }
     ).populate("permissions");
-    if (!role) return { error: { message: "Rôle non trouvé." }, status: 404 };
-    return { data: role };
+
+    if (!role) {
+      return toApiError("Rôle non trouvé.", 404);
+    }
+
+    return toApiData(role);
   },
+
+  /**
+   * Supprime un rôle existant.
+   * @param {string} id - L'ID du rôle à supprimer.
+   * @returns {Promise<ApiResponse<{ message: string }>>} - La réponse contenant un message de confirmation.
+   */
   async deleteRole(id: string): Promise<ApiResponse<{ message: string }>> {
     const usersWithRole = await User.countDocuments({ roleId: id });
-    if (usersWithRole > 0)
-      return {
-        error: {
-          message:
-            "Impossible de supprimer un rôle utilisé par des utilisateurs.",
-        },
-        status: 400,
-      };
+
+    if (usersWithRole > 0) {
+      return toApiError(
+        "Impossible de supprimer un rôle utilisé par des utilisateurs.",
+        400
+      );
+    }
+
     const role = await Role.findByIdAndDelete(id);
-    if (!role) return { error: { message: "Rôle non trouvé." }, status: 404 };
-    return { data: { message: "Rôle supprimé." } };
+    if (!role) {
+      return toApiError("Rôle non trouvé.", 404);
+    }
+
+    return toApiData({ message: "Rôle supprimé." });
   },
-  async listPermissions(): Promise<IPermission[]> {
-    return await Permission.find();
+
+  /**
+   * Liste toutes les permissions disponibles.
+   * @returns {Promise<IPermission[]>} - La liste des permissions.
+   */
+  async listPermissions(): Promise<ApiResponse<IPermission[]>> {
+    const permissions = await Permission.find();
+
+    return toApiData(permissions);
   },
-  async listUsers(): Promise<IUser[]> {
+
+  /**
+   * Liste tous les utilisateurs.
+   * @returns {Promise<IUser[]>} - La liste des utilisateurs sans mot de passe.
+   */
+  async listUsers(): Promise<ApiResponse<IUser[]>> {
     const users = await User.find().populate("roleId", "name");
-    return users.map(sanitizeUser);
+
+    return toApiData(users.map(sanitizeUser));
   },
 };
 

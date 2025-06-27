@@ -140,6 +140,7 @@ export function dataBySourceQuery(
     page?: number;
     pageSize?: number;
     fields?: string[] | string;
+    shareId?: string; // Ajout du shareId pour la propagation
   },
   initialData?: any[] | null,
   refreshMs?: number, // pour le polling

@@ -22,8 +22,8 @@ DataVise est une application moderne de visualisation de données, conçue pour 
 ## Démarrage rapide
 
 1. **Installer les dépendances** :
-   - `cd backend && npm install`
-   - `cd ../frontend && npm install`
+   - `cd backend && npm i`
+   - `cd /frontend && npm i`
 2. **Lancer le backend** :
    - `npm run dev` (depuis le dossier backend)
 3. **Lancer le frontend** :

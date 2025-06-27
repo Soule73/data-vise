@@ -1,12 +1,12 @@
 import { IDataSource } from "@/types/sourceType";
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const DataSourceSchema = new Schema<IDataSource>(
   {
     name: { type: String, required: true },
     type: { type: String, enum: ["json", "csv"], default: "json" },
-    endpoint: { type: String, required: false }, // endpoint devient optionnel
-    filePath: { type: String }, // nouveau champ pour stockage local CSV
+    endpoint: { type: String, required: false },
+    filePath: { type: String },
     config: { type: Schema.Types.Mixed, default: {} },
     ownerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     visibility: {

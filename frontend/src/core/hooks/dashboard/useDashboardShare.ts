@@ -1,11 +1,22 @@
 import { useEffect } from "react";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { ROUTES } from "@/core/constants/routes";
-import { sharedDashboardQuery, sharedDashboardSourcesQuery } from "@/data/repositories/dashboards";
+import {
+  sharedDashboardQuery,
+  sharedDashboardSourcesQuery,
+} from "@/data/repositories/dashboards";
 
 export function useDashboardShare(shareId?: string) {
-  const { data: dashboard, isLoading: loading, error: dashboardError } = sharedDashboardQuery(shareId);
-  const { data: sources = [], isLoading: loadingSources, error: sourcesError } = sharedDashboardSourcesQuery(shareId);
+  const {
+    data: dashboard,
+    isLoading: loading,
+    error: dashboardError,
+  } = sharedDashboardQuery(shareId);
+  const {
+    data: sources = [],
+    isLoading: loadingSources,
+    error: sourcesError,
+  } = sharedDashboardSourcesQuery(shareId);
 
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
   useEffect(() => {

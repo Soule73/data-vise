@@ -36,6 +36,9 @@ export default function DashboardGridItem(props: DashboardGridItemProps) {
     timeRangeTo,
     refreshMs,
     forceRefreshKey,
+    page,
+    pageSize,
+    shareId, // Ajout du shareId
   } = props;
 
   // --- Hook logique centralisé ---
@@ -66,8 +69,9 @@ export default function DashboardGridItem(props: DashboardGridItemProps) {
     timeRangeTo,
     refreshMs,
     forceRefreshKey,
-    page: props.page,
-    pageSize: props.pageSize,
+    page,
+    pageSize,
+    shareId, // Propagation du shareId au hook
   });
   const widgetRef = handleResize();
 

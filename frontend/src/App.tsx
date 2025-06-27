@@ -50,7 +50,25 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Affiche le loader au moins 3 secondes
-    const timer = setTimeout(() => setShowLoader(false), 3000);
+    const timer = setTimeout(() => {
+      setShowLoader(false);
+      // Vérifie via le store si l'utilisateur est bien connecté
+      const currentUser = useUserStore.getState().user;
+      const isDashboardShare = /^\/dashboard\/share\//.test(
+        window.location.pathname
+      );
+      if (
+        (currentUser === null || currentUser === undefined) &&
+        window.location.pathname !== ROUTES.login &&
+        window.location.pathname !== ROUTES.register &&
+        !isDashboardShare
+      ) {
+        console.log(
+          "Utilisateur non connecté, redirection vers la page de connexion"
+        );
+        window.location.replace(ROUTES.login);
+      }
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -58,7 +76,8 @@ const App: React.FC = () => {
   if (
     (user === undefined || user === null || showLoader) &&
     window.location.pathname !== ROUTES.login &&
-    window.location.pathname !== ROUTES.register
+    window.location.pathname !== ROUTES.register &&
+    !/^\/dashboard\/share\//.test(window.location.pathname)
   ) {
     return <AppLoader />;
   }

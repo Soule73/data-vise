@@ -3,8 +3,8 @@ import { IWidget } from "./widgetType";
 
 export interface DashboardLayoutItem {
   widgetId: string;
-  width: string; // ex: "48%"
-  height: number; // px
+  width: string;
+  height: number;
   x: number;
   y: number;
   widget?: IWidget;

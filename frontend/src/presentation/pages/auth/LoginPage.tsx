@@ -41,13 +41,13 @@ export default function Login() {
       )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <InputField
-          label="Email"
+          placeholder="Email"
           type="email"
           {...register("email")}
           error={errors.email?.message}
         />
         <InputField
-          label="Mot de passe"
+          placeholder="Mot de passe"
           type="password"
           {...register("password")}
           error={errors.password?.message}

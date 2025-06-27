@@ -37,6 +37,7 @@ export default function DashboardGrid({
   forceRefreshKey,
   page,
   pageSize,
+  shareId, // Propagation du shareId
 }: DashboardGridProps) {
   // --- Hook logique centralisé ---
   const {
@@ -103,6 +104,7 @@ export default function DashboardGrid({
             forceRefreshKey={forceRefreshKey}
             page={page}
             pageSize={pageSize}
+            shareId={shareId} // Propagation du shareId à chaque item
           />
         );
       })}

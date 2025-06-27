@@ -5,7 +5,15 @@ import { requireAuth } from "../middleware/auth";
 
 const router = express.Router();
 
-// Route sécurisée pour servir les fichiers du dossier uploads
+/**
+ * Route pour récupérer un fichier uploadé.
+ * L'utilisateur doit être authentifié.
+ *
+ * @param {string} filename - Le nom du fichier à récupérer.
+ *
+ * ROUTE GET /uploads/:filename
+ *
+ */
 router.get(
   "/:filename",
   requireAuth,
@@ -18,14 +26,12 @@ router.get(
       return res.status(404).json({ message: "Fichier non trouvé." });
     }
 
-    // Détecte le type MIME pour les CSV/texte
     if (filePath.endsWith(".csv")) {
       res.setHeader("Content-Type", "text/csv; charset=utf-8");
       res.setHeader(
         "Content-Disposition",
         `attachment; filename="${filename}"`
       );
-      // Ajoute le BOM UTF-8 pour forcer la détection correcte dans Excel/Windows
       const content = fs.readFileSync(filePath);
       const bom = Buffer.from([0xef, 0xbb, 0xbf]);
       res.send(Buffer.concat([bom, content]));

@@ -32,6 +32,7 @@ export function useGridItem({
   forceRefreshKey,
   page,
   pageSize,
+  shareId, // Ajout du shareId
 }: UseGridItemProps) {
   // --- Gestion du resize natif ---
   function handleResize() {
@@ -114,6 +115,7 @@ export function useGridItem({
       fields,
       page,
       pageSize,
+      shareId, // Passage du shareId à dataBySourceQuery
     },
     undefined,
     refreshMs,

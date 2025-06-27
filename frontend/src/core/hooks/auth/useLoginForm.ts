@@ -15,7 +15,6 @@ export function useLoginForm() {
 
   const mutation = useLoginMutation({
     onSuccess: (res) => {
-      console.log("Login successful:", res);
       setUser(res.user, res.token);
       setGlobalError("");
       navigate(ROUTES.dashboard);

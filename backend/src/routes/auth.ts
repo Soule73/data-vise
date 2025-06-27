@@ -1,65 +1,146 @@
-import express, { Request, Response, NextFunction } from 'express';
-import User from '@/models/User';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { requirePermission } from '../middleware/requirePermission';
-import Role from '@/models/Role';
-import Permission from '@/models/Permission';
-import userController from '../controllers/userController';
-import { requireAuth } from '../middleware/auth';
+import express from "express";
+import { requirePermission } from "../middleware/requirePermission";
+import userController from "../controllers/userController";
+import { requireAuth } from "../middleware/auth";
 
 const router = express.Router();
 
-// Inscription (ouverte à tous)
-router.post('/register', userController.register);
+/**
+ * Route pour l'inscription d'un nouvel utilisateur.
+ *
+ * ROUTE POST /register
+ */
+router.post("/register", userController.register);
 
-// Connexion (ouverte à tous)
-router.post('/login', userController.login);
+/**
+ * Route pour la connexion d'un utilisateur.
+ *
+ * ROUTE POST /login
+ *
+ */
+router.post("/login", userController.login);
 
-// Création d'un utilisateur (admin seulement)
+/**
+ * Route pour créer un nouvel utilisateur.
+ *
+ * permission requise : user:canCreate
+ *
+ * ROUTE POST /users
+ */
 router.post(
-  '/users',
+  "/users",
   requireAuth,
-  requirePermission('user:canCreate'),
+  requirePermission("user:canCreate"),
   userController.createUser
 );
 
-// Mise à jour d'un utilisateur (admin ou soi-même)
+/*
+ * Route pour mettre à jour un utilisateur.(admin ou l'utilisateur lui-même)
+ *
+ * permission requise : user:canUpdate
+ * ROUTE PUT /users/:id
+ */
 router.put(
-  '/users/:id',
+  "/users/:id",
   requireAuth,
-  requirePermission('user:canUpdate', true),
+  requirePermission("user:canUpdate", true),
   userController.updateUser
 );
 
-// Suppression d'un utilisateur (admin seulement)
+/**
+ * Route pour supprimer un utilisateur.
+ *
+ * permision requise : user:canDelete
+ * @param {string} id - L'ID de l'utilisateur à supprimer.
+ *
+ * ROUTE DELETE /users/:id
+ */
 router.delete(
-  '/users/:id',
+  "/users/:id",
   requireAuth,
-  requirePermission('user:canDelete'),
+  requirePermission("user:canDelete"),
   userController.deleteUser
 );
 
-// Lister tous les rôles (admin seulement)
-router.get('/roles', requireAuth, requirePermission('role:canView'), userController.listRoles);
-
-// Créer un rôle (admin seulement)
-router.post('/roles', requireAuth, requirePermission('role:canCreate'), userController.createRole);
-
-// Modifier un rôle (admin seulement)
-router.put('/roles/:id', requireAuth, requirePermission('role:canUpdate'), userController.updateRole);
-
-// Supprimer un rôle (admin seulement, si aucun utilisateur ne l'utilise)
-router.delete('/roles/:id', requireAuth, requirePermission('role:canDelete'), userController.deleteRole);
-
-// Lister toutes les permissions (admin seulement)
-router.get('/permissions', requireAuth, requirePermission('role:canView'), userController.listPermissions);
-
-// Lister tous les utilisateurs (admin seulement)
+/**
+ * Route pour lister tous les rôles.
+ * permission requise : role:canView
+ * ROUTE GET /roles
+ */
 router.get(
-  '/users',
+  "/roles",
   requireAuth,
-  requirePermission('user:canView'),
+  requirePermission("role:canView"),
+  userController.listRoles
+);
+
+/**
+ * Route pour créer un nouveau rôle.
+ * permission requise : role:canCreate
+ * ROUTE POST /roles
+ */
+router.post(
+  "/roles",
+  requireAuth,
+  requirePermission("role:canCreate"),
+  userController.createRole
+);
+
+/**
+ * Route pour mettre à jour un rôle.
+ * permission requise : role:canUpdate
+ * @param {string} id - L'ID du rôle à mettre à jour.
+ * ROUTE PUT /roles/:id
+ */
+router.put(
+  "/roles/:id",
+  requireAuth,
+  requirePermission("role:canUpdate"),
+  userController.updateRole
+);
+
+/**
+ * Route pour supprimer un rôle.
+ * permission requise : role:canDelete
+ * Note: Le rôle ne peut être supprimé que s'il n'est pas utilisé par des utilisateurs.
+ *
+ * @param {string} id - L'ID du rôle à supprimer.
+ *
+ * ROUTE DELETE /roles/:id
+ *
+ */
+router.delete(
+  "/roles/:id",
+  requireAuth,
+  requirePermission("role:canDelete"),
+  userController.deleteRole
+);
+
+/**
+ * Route pour lister toutes les permissions.
+ * permission requise : role:canView
+ *
+ * @route GET /permissions
+ *
+ */
+router.get(
+  "/permissions",
+  requireAuth,
+  requirePermission("role:canView"),
+  userController.listPermissions
+);
+
+/**
+ * Route pour lister tous les utilisateurs.
+ *
+ * permission requise : user:canView
+ *
+ * @route GET /users
+ */
+router.get(
+  "/users",
+  requireAuth,
+  requirePermission("user:canView"),
   userController.listUsers
 );
 

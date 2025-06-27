@@ -5,7 +5,15 @@ import dashboardController from "../controllers/dashboardController";
 
 const router = express.Router();
 
-// Créer un nouveau dashboard
+/**
+ * Endpoint pour créer un nouveau dashboard.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "dashboard:canCreate".
+ *
+ * ROUTE POST /dashboards
+ *
+ */
 router.post(
   "/",
   requireAuth,
@@ -13,7 +21,16 @@ router.post(
   dashboardController.createDashboard
 );
 
-// Récupérer un dashboard par ID
+/**
+ * Endpoint pour récupérer un dashboard par son ID.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "dashboard:canView".
+ *
+ * @param {id} req - La requête HTTP contenant l'ID du dashboard à récupérer.
+ *
+ * ROUTE GET dashboards/:id
+ */
 router.get(
   "/:id",
   requireAuth,
@@ -21,7 +38,16 @@ router.get(
   dashboardController.getDashboardById
 );
 
-// Mettre à jour le layout du dashboard
+/**
+ * Endpoint pour mettre à jour un dashboard.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "dashboard:canUpdate".
+ *
+ * @param {id} req - La requête HTTP contenant l'ID du dashboard à mettre à jour.
+ *
+ * ROUTE PUT dashboards/:id
+ */
 router.put(
   "/:id",
   requireAuth,
@@ -29,7 +55,17 @@ router.put(
   dashboardController.updateDashboard
 );
 
-// Supprimer un dashboard
+/**
+ * Endpoint pour supprimer un dashboard.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "dashboard:canDelete".
+ *
+ * @param {id} req - La requête HTTP contenant l'ID du dashboard à supprimer.
+ *
+ * ROUTE DELETE dashboards/:id
+ *
+ */
 router.delete(
   "/:id",
   requireAuth,
@@ -37,7 +73,15 @@ router.delete(
   dashboardController.deleteDashboard
 );
 
-// Lister tous les dashboards de l'utilisateur courant
+/**
+ * Endpoint pour lister les dashboards de l'utilisateur courant.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "dashboard:canView".
+ *
+ * ROUTE GET /dashboards
+ *
+ */
 router.get(
   "/",
   requireAuth,
@@ -45,28 +89,67 @@ router.get(
   dashboardController.listUserDashboards
 );
 
-// Activer le partage public d'un dashboard
+/**
+ * Endpoint pour activer le partage public d'un dashboard.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "dashboard:canUpdate".
+ *
+ * @param {id} req - La requête HTTP contenant l'ID du dashboard.
+ *
+ * ROUTE POST /:id/share/enable
+ *
+ */
 router.post(
   "/:id/share/enable",
   requireAuth,
   requirePermission("dashboard:canUpdate"),
   dashboardController.enableShare
 );
-// Désactiver le partage public d'un dashboard
+
+/**
+ * Endpoint pour désactiver le partage public d'un dashboard.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "dashboard:canUpdate".
+ *
+ * @param {id} req - La requête HTTP contenant l'ID du dashboard.
+ *
+ * ROUTE POST dashboards/:id/share/disable
+ *
+ */
 router.post(
   "/:id/share/disable",
   requireAuth,
   requirePermission("dashboard:canUpdate"),
   dashboardController.disableShare
 );
-// Route publique pour accéder à un dashboard partagé (pas d'auth)
-router.get(
-  "/share/:shareId",
-  dashboardController.getSharedDashboard
-);
-// Route publique pour accéder aux sources d'un dashboard partagé (pas d'auth)
+
+/**
+ * Endpoint pour récupérer un dashboard partagé par son shareId.
+ *
+ * @param {shareId} req - La requête HTTP contenant le shareId du dashboard partagé.
+ *
+ * Cette route est publique et ne nécessite pas d'authentification.
+ *
+ * ROUTE GET dashboards/share/:shareId
+ *
+ */
+router.get("/share/:shareId", dashboardController.getSharedDashboard);
+
+/**
+ * Endpoint pour récupérer les sources d'un dashboard partagé par son shareId.
+ *
+ * Cette route est publique et ne nécessite pas d'authentification.
+ *
+ * @param {shareId} req - La requête HTTP contenant le shareId du dashboard partagé.
+ *
+ * ROUTE GET dashboards/share/:shareId/sources
+ *
+ */
 router.get(
   "/share/:shareId/sources",
   dashboardController.getSharedDashboardSources
 );
+
 export default router;

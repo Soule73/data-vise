@@ -57,6 +57,10 @@ export interface PieChartParams extends BaseChartParams {
   tooltipFormat?: string;
   borderWidth?: number;
   borderColor?: string;
+  /**
+   * Liste de couleurs à utiliser pour chaque part du pie chart (indexées dans l'ordre des labels)
+   */
+  colors?: string[];
 }
 
 // Scatter chart : https://www.chartjs.org/docs/latest/charts/scatter.html

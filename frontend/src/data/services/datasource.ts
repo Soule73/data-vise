@@ -104,6 +104,7 @@ export async function fetchSourceData(
     pageSize?: number;
     fields?: string[] | string;
     forceRefresh?: boolean;
+    shareId?: string; // Ajout du shareId pour la propagation
   }
 ): Promise<any[]> {
   const params = new URLSearchParams();
@@ -120,6 +121,7 @@ export async function fetchSourceData(
   if (options?.forceRefresh) {
     params.append("forceRefresh", "1");
   }
+  if (options?.shareId) params.append("shareId", options.shareId); // Ajout du paramètre shareId
   const url = `/sources/${sourceId}/data${
     params.toString() ? `?${params}` : ""
   }`;

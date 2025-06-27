@@ -15,42 +15,45 @@ function EmptyDashboard() {
 
 export default function DashboardSharePage() {
   const { shareId } = useParams<{ shareId: string }>();
-  const { dashboard, sources, loading, error,errorCode } = useDashboardShare(shareId);
+  const { dashboard, sources, loading, error, errorCode } =
+    useDashboardShare(shareId);
 
   // --- Rendu ---
   if (loading) return <div className="p-8 text-center">Chargement…</div>;
-  if (error)
-  {
-  return  <ErrorPage
+  if (error) {
+    return (
+      <ErrorPage
         code={errorCode}
         title="Tableau de bord non trouvé"
         message={error}
-    />;
+      />
+    );
   }
-    //  return <div className="p-8 text-center text-red-500">{error}</div>;
+  //  return <div className="p-8 text-center text-red-500">{error}</div>;
   if (!dashboard) return null;
 
   const layout = dashboard.layout || [];
 
   return (
     <BaseLayout hideSidebar={true} hideUserInfo={true}>
-        {/* Grille ou placeholder */}
-        <div className="flex flex-col md:flex-row space-y-4 justify-start items-start md:items-center md:justify-between mb-2"></div>
-        {layout.length === 0 ? (
-          <EmptyDashboard />
-        ) : (
-          <DashboardGrid
-            layout={layout}
-            sources={sources}
-            editMode={false}
-            hasUnsavedChanges={false}
-            handleAddWidget={() => {}}
-            timeRangeFrom={dashboard.timeRange?.from}
-            timeRangeTo={dashboard.timeRange?.to}
-            refreshMs={dashboard.autoRefreshInterval}
-            forceRefreshKey={0}
-          />
-        )}
-      </BaseLayout>
+      {/* Grille ou placeholder */}
+      <div className="flex flex-col md:flex-row space-y-4 justify-start items-start md:items-center md:justify-between mb-2"></div>
+      {layout.length === 0 ? (
+        <EmptyDashboard />
+      ) : (
+        <DashboardGrid
+          layout={layout}
+          sources={sources}
+          editMode={false}
+          hasUnsavedChanges={false}
+          handleAddWidget={() => {}}
+          timeRangeFrom={dashboard.timeRange?.from}
+          timeRangeTo={dashboard.timeRange?.to}
+          refreshMs={dashboard.autoRefreshInterval}
+          forceRefreshKey={0}
+          shareId={shareId} // <-- Ajout du passage du shareId
+        />
+      )}
+    </BaseLayout>
   );
 }

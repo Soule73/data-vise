@@ -12,25 +12,56 @@ import fs from "fs/promises";
 import type {
   DataSourceCreatePayload,
   DataSourceUpdatePayload,
+  IDataSource,
 } from "@/types/sourceType";
+import type { ApiError, ApiResponse, ApiData } from "@/types/api";
 import { sourceCache, getSourceCacheKey } from "@/utils/sourceCache";
+import Dashboard from "@/models/Dashboard";
+import { IWidget } from "@/types/widgetType";
+import { ObjectId } from "mongoose";
+import { DashboardLayoutItem } from "@/types/dashboardType";
+import { toApiData, toApiError } from "@/utils/api";
 
 // Map pour suivre les chargements en cours (anti-stampede)
 const inflightLoads = new Map<string, Promise<any[]>>();
 
+/**
+ * Service de gestion des sources de données (DataSource).
+ * Fournit les opérations CRUD, la détection de colonnes et la récupération de données avec gestion du cache et accès public via shareId.
+ */
 const dataSourceService = {
-  async list() {
+  /**
+   * Liste toutes les sources de données avec indication d'utilisation par au moins un widget.
+   * Chaque source est enrichie d'un champ `isUsed` indiquant si elle est utilisée par au moins un widget.
+   * @return {Promise<ApiData<(DataSource & { isUsed: boolean })[]>>} - La liste des sources de données avec leur état d'utilisation.
+   * @throws {ApiError} - Si une erreur se produit lors de la récupération des sources de données.
+   * @description Cette méthode récupère toutes les sources de données depuis la base de données,
+   */
+  async list(): Promise<ApiData<(IDataSource & { isUsed: boolean })[]>> {
     const sources = await DataSource.find();
-    // Pour chaque source, vérifier si elle est utilisée par au moins un widget
+
     const sourcesWithUsage = await Promise.all(
       sources.map(async (ds) => {
         const count = await Widget.countDocuments({ dataSourceId: ds._id });
         return { ...ds.toObject(), isUsed: count > 0 };
       })
     );
-    return { data: sourcesWithUsage };
+
+    return toApiData(sourcesWithUsage);
   },
-  async create(payload: DataSourceCreatePayload) {
+
+  /**
+   * Crée une nouvelle source de données.
+   * @param {DataSourceCreatePayload} payload - Les données de la source à créer.
+   * @return {Promise<ApiResponse<object>>} - La réponse contenant la source créée ou
+   * une erreur si la création échoue.
+   * @throws {ApiError} - Si des champs requis sont manquants ou si
+   * la source ne peut pas être créée.
+   * @description Cette méthode crée une nouvelle source de données dans la base de données.
+   */
+  async create(
+    payload: DataSourceCreatePayload
+  ): Promise<ApiResponse<IDataSource>> {
     const {
       name,
       type,
@@ -43,13 +74,16 @@ const dataSourceService = {
       authType,
       authConfig,
     } = payload;
+
     if (!name || !type || !ownerId)
       return { error: { message: "Champs requis manquants." }, status: 400 };
+
     if (type === "csv" && !endpoint && !filePath)
       return {
         error: { message: "Un endpoint ou un fichier CSV est requis." },
         status: 400,
       };
+
     const source = await DataSource.create({
       name,
       type,
@@ -62,16 +96,45 @@ const dataSourceService = {
       ...(authType ? { authType } : {}),
       ...(authConfig ? { authConfig } : {}),
     });
-    return { data: source };
+
+    return toApiData(source);
   },
-  async getById(id: string) {
+
+  /**
+   * Récupère une source de données par son identifiant.
+   * @param {string} id - L'identifiant de la source à récupérer.
+   * @return {Promise<ApiResponse<IDataSource & { isUsed: boolean }>>} - La réponse contenant la source trouvée
+   * ou une erreur si la source n'existe pas.
+   * @throws {ApiError} - Si la source n'est pas trouvée.
+   */
+  async getById(
+    id: string
+  ): Promise<ApiResponse<IDataSource & { isUsed: boolean }>> {
     const source = await DataSource.findById(id);
-    if (!source)
+
+    if (!source) {
       return { error: { message: "Source non trouvée." }, status: 404 };
+    }
+
     const count = await Widget.countDocuments({ dataSourceId: source._id });
-    return { data: { ...source.toObject(), isUsed: count > 0 } };
+
+    return toApiData({ ...source.toObject(), isUsed: count > 0 });
   },
-  async update(id: string, payload: DataSourceUpdatePayload) {
+  /**
+   * Met à jour une source de données existante.
+   * @param {string} id - L'identifiant de la source à mettre à jour.
+   * @param {DataSourceUpdatePayload} payload - Les données de mise à jour de
+   * la source.
+   * @return {Promise<ApiResponse<DataSource>>} - La réponse contenant la source mise à jour
+   * ou une erreur si la mise à jour échoue.
+   * @throws {ApiError} - Si la source n'est pas trouvée ou si des champs requis sont manquants.
+   * @description Cette méthode met à jour une source de données existante dans la base de
+   * données. Elle prend en compte les champs suivants :
+   */
+  async update(
+    id: string,
+    payload: DataSourceUpdatePayload
+  ): Promise<ApiResponse<IDataSource>> {
     const {
       name,
       type,
@@ -82,9 +145,11 @@ const dataSourceService = {
       authType,
       authConfig,
     } = payload;
-    // Récupérer l'ancien fichier avant update
+
     const oldSource = await DataSource.findById(id);
+
     const oldFilePath = oldSource?.filePath;
+
     const source = await DataSource.findByIdAndUpdate(
       id,
       {
@@ -99,48 +164,77 @@ const dataSourceService = {
       },
       { new: true }
     );
-    if (!source)
-      return { error: { message: "Source non trouvée" }, status: 404 };
-    // Si le fichier a changé, supprimer l'ancien fichier
+
+    if (!source) {
+      return toApiError("Source non trouvée", 404);
+    }
+
     if (oldFilePath && filePath && oldFilePath !== filePath) {
       const fs = require("fs");
       fs.unlink(oldFilePath, (err: any) => {});
     }
-    return { data: source };
+
+    return toApiData(source);
   },
-  async remove(id: string) {
-    // Vérifier si la source est utilisée
+
+  /**
+   * Supprime une source de données si elle n'est pas utilisée par un widget.
+   * @param {string} id - L'identifiant de la source à supprimer.
+   * @return {Promise<ApiResponse<{ message: string }>>} - La réponse indiquant le succès de la suppression
+   * ou une erreur si la source est utilisée par un widget ou si elle n'existe pas.
+   * @throws {ApiError} - Si la source est utilisée par un widget ou si elle n'existe pas.
+   * @description Cette méthode supprime une source de données de la base de données.
+   */
+  async remove(id: string): Promise<ApiResponse<{ message: string }>> {
     const count = await Widget.countDocuments({ dataSourceId: id });
+
     if (count > 0) {
-      return {
-        error: {
-          message:
-            "Impossible de supprimer une source utilisée par au moins un widget.",
-        },
-        status: 400,
-      };
+      return toApiError(
+        "Impossible de supprimer une source utilisée par au moins un widget.",
+        400
+      );
     }
+
     const source = await DataSource.findByIdAndDelete(id);
-    if (!source)
-      return { error: { message: "Source non trouvée." }, status: 404 };
-    // Suppression du fichier CSV local si présent
+
+    if (!source) {
+      return toApiError("Source non trouvée.", 404);
+    }
+
     if (source.filePath) {
       try {
         const absPath = getAbsolutePath(source.filePath);
         await fs.unlink(absPath);
       } catch (e) {}
     }
-    return { data: { message: "Source supprimée." } };
+
+    return toApiData({ message: "Source supprimée." });
   },
-  async detectColumns({
-    sourceId,
-    type,
-    endpoint,
-    filePath,
-    httpMethod,
-    authType,
-    authConfig,
-  }: {
+
+  /**
+   * Détecte les colonnes d'une source de données (locale ou distante).
+   * Cette méthode peut être utilisée pour détecter les colonnes d'un fichier CSV local ou distant,
+   * ou d'une API JSON distante. Elle peut également être utilisée pour détecter les colon
+   * nes d'une source de données existante en fournissant son ID.
+   * @param {Object} params - Les paramètres de détection des colonnes.
+   * @param {string} [params.sourceId] - L'ID de la source de données existante.
+   * @param {string} [params.type] - Le type de la source (csv, json).
+   * @param {string} [params.endpoint] - L'URL de l'API distante pour les données JSON ou CSV.
+   * @param {string} [params.filePath] - Le chemin du fichier CSV local à analyser.
+   * @param {string} [params.httpMethod] - La méthode HTTP à utiliser pour
+   * récupérer les données (GET ou POST).
+   * @param {string} [params.authType] - Le type d'authentication à
+   * utiliser pour accéder aux données distantes (none, bearer, apiKey, basic).
+   * @param {any} [params.authConfig] - La configuration d'authentification
+   * pour les données distantes (par exemple, le token pour l'authentification
+   * bearer, la clé API pour l'authentification par clé API, etc.).
+   * @return {Promise<ApiResponse<{ columns: string[]; preview: object[]; types: Record<string, string> }>>} - La réponse contenant les colonnes détectées,
+   * un aperçu des données et les types de colonnes détectés.
+   * @throws {ApiError} - Si une erreur se produit lors de la détection des colonnes,
+   * si la source n'est pas trouvée ou si le type de source n'est pas supporté.
+   * @description Cette méthode lit un fichier CSV local ou distant, ou récupère des données
+   */
+  async detectColumns(params: {
     sourceId?: string;
     type?: string;
     endpoint?: string;
@@ -148,33 +242,50 @@ const dataSourceService = {
     httpMethod?: "GET" | "POST";
     authType?: "none" | "bearer" | "apiKey" | "basic";
     authConfig?: any;
-  }) {
+  }): Promise<
+    ApiResponse<{
+      columns: string[];
+      preview: object[];
+      types: Record<string, string>;
+    }>
+  > {
     try {
       let rows: Record<string, unknown>[] = [];
-      let finalType = type;
-      let finalEndpoint = endpoint;
-      let finalFilePath = filePath;
-      let finalHttpMethod = httpMethod;
-      let finalAuthType = authType;
-      let finalAuthConfig = authConfig;
-      // Si sourceId fourni et ni filePath ni endpoint, charger la datasource
-      if (sourceId && !filePath && !endpoint) {
-        const ds = await DataSource.findById(sourceId);
+
+      let finalType = params.type;
+
+      let finalEndpoint = params.endpoint;
+
+      let finalFilePath = params.filePath;
+
+      let finalHttpMethod = params.httpMethod;
+
+      let finalAuthType = params.authType;
+
+      let finalAuthConfig = params.authConfig;
+
+      if (params.sourceId && !params.filePath && !params.endpoint) {
+        const ds = await DataSource.findById(params.sourceId);
         if (!ds) {
-          return {
-            error: {
-              message: "Source non trouvée pour la détection de colonnes.",
-            },
-            status: 404,
-          };
+          return toApiError(
+            "Source non trouvée pour la détection de colonnes.",
+            404
+          );
         }
+
         finalType = ds.type;
+
         finalEndpoint = ds.endpoint;
+
         finalFilePath = ds.filePath;
+
         finalHttpMethod = ds.httpMethod;
+
         finalAuthType = ds.authType;
+
         finalAuthConfig = ds.authConfig;
       }
+
       if (finalType === "csv" && finalFilePath) {
         rows = await readCsvFile(finalFilePath);
       } else if (finalType === "csv" && finalEndpoint) {
@@ -192,30 +303,42 @@ const dataSourceService = {
           finalAuthConfig
         );
       } else {
-        return {
-          error: {
-            message:
-              "Type ou configuration de source non supportée pour la détection de colonnes.",
-          },
-          status: 400,
-        };
+        return toApiError(
+          "Type ou configuration de source non supportée pour la détection de colonnes.",
+          400
+        );
       }
+
       const columns = rows[0] ? Object.keys(rows[0]) : [];
+
       const preview = rows.slice(0, 5);
+
       const types = inferColumnTypes(preview, columns);
+
       return { data: { columns, preview, types } };
     } catch (e: unknown) {
-      return {
-        error: {
-          message:
-            e instanceof Error
-              ? e.message
-              : "Erreur lors de la détection des colonnes.",
-        },
-        status: 500,
-      };
+      return toApiError(
+        e instanceof Error
+          ? e.message
+          : "Erreur lors de la détection des colonnes.",
+        500
+      );
     }
   },
+  /**
+   * Récupère les données d'une source de données avec gestion du cache, pagination et sélection de champs.
+   * @param {string} sourceId - L'identifiant de la source de données.
+   * @param {Object} [options] - Les options de récupération des données.
+   * @param {string} [options.from] - La date de début pour filtrer les données (format ISO).
+   * @param {string} [options.to] - La date de fin pour filtrer les données (format ISO).
+   * @param {number} [options.page] - Le numéro de page pour la pagination.
+   * @param {number} [options.pageSize] - Le nombre d'éléments par page.
+   * @param {string} [options.fields] - Les champs à sélectionner dans les données (séparés par des virgules).
+   * @param {boolean} [options.forceRefresh] - Si true, force le rafraîchissement des données et ignore le cache.
+   * @param {string} [options.shareId] - L'ID de partage pour accéder aux dashboards partagés.
+   * @return {Promise<ApiResponse<Record<string,any>[] & { total?: number }>>} - La réponse contenant les données récupérées,
+   * ou une erreur si la source n'est pas trouvée ou si une erreur se produit lors de la récupération des données.
+   */
   async fetchData(
     sourceId: string,
     options?: {
@@ -225,47 +348,94 @@ const dataSourceService = {
       pageSize?: number;
       fields?: string;
       forceRefresh?: boolean;
+      shareId?: string;
     }
-  ) {
+  ): Promise<ApiResponse<Record<string, any>[] & { total?: number }>> {
+    if (options?.shareId) {
+      const dashboard = await Dashboard.findOne({
+        shareId: options.shareId,
+        shareEnabled: true,
+      });
+
+      if (!dashboard) {
+        return toApiError("Dashboard partagé non trouvé ou désactivé.", 404);
+      }
+
+      const widgetIds = dashboard.layout.map(
+        (item: DashboardLayoutItem) => item.widgetId
+      );
+
+      const widgets = (await Widget.find({
+        widgetId: { $in: widgetIds },
+      }).lean()) as IWidget[];
+
+      const dataSourceIds = [
+        ...new Set(
+          widgets.map((w: IWidget) => w.dataSourceId).filter((id) => !!id)
+        ),
+      ];
+
+      if (!dataSourceIds.map(String).includes(String(sourceId))) {
+        return toApiError(
+          "Source non autorisée pour ce dashboard partagé.",
+          403
+        );
+      }
+    }
+
     const source = await DataSource.findById(sourceId);
-    if (!source)
-      return { error: { message: "Source non trouvée." }, status: 404 };
+
+    if (!source) {
+      return toApiError("Source non trouvée.", 404);
+    }
+
     let data: Record<string, unknown>[] = [];
-    // Gestion du cache
+
     const hasTimestamp = !!source.timestampField;
-    // Normalisation des paramètres pour la clé de cache
+
     const normFrom =
       hasTimestamp && options?.from && options.from !== ""
         ? options.from
         : undefined;
+
     const normTo =
       hasTimestamp && options?.to && options.to !== "" ? options.to : undefined;
+
     const cacheKey = getSourceCacheKey(sourceId, normFrom, normTo);
+
     if (options?.forceRefresh) {
       sourceCache.del(cacheKey);
+
       inflightLoads.delete(cacheKey);
+
       console.log(`[CACHE] Suppression du cache pour ${cacheKey}`);
     }
-    let cacheTTL = 3600; // 1h par défaut
+
+    let cacheTTL = 3600;
+
     if (hasTimestamp && normFrom && normTo) {
-      cacheTTL = 60; // 1 min si requête temporelle précise
+      cacheTTL = 60;
     } else if (hasTimestamp && !normFrom && !normTo) {
-      cacheTTL = 1800; // 30 min si timestampField mais pas de filtre
+      cacheTTL = 1800;
     }
+
     const cached = sourceCache.get(cacheKey);
+
     if (cached) {
       data = cached as Record<string, unknown>[];
+
       console.log(`[CACHE] Hit pour ${cacheKey}`);
     } else {
-      // Anti-stampede : si un chargement est déjà en cours, on attend la promesse
       if (inflightLoads.has(cacheKey)) {
         const inflight = await inflightLoads.get(cacheKey);
+
         data = inflight ?? [];
+
         console.log(`[CACHE] Wait for in-flight load for ${cacheKey}`);
       } else {
-        // On lance le chargement et on stocke la promesse
         const loadPromise = (async () => {
           let loaded: any[] = [];
+
           try {
             if (source.type === "json" && source.endpoint) {
               loaded = await fetchRemoteJson(
@@ -286,6 +456,7 @@ const dataSourceService = {
             } else {
               return [];
             }
+
             if (
               hasTimestamp &&
               (options?.from || options?.to) &&
@@ -298,35 +469,39 @@ const dataSourceService = {
                 options?.to
               );
             }
+
             sourceCache.set(cacheKey, loaded, cacheTTL);
+
             inflightLoads.delete(cacheKey);
+
             return loaded;
           } catch (e: any) {
             inflightLoads.delete(cacheKey);
-            return Promise.reject({
-              error: {
-                message:
-                  e instanceof Error
-                    ? e.message
-                    : "Erreur lors de la récupération des données de la source.",
-              },
-              status: 500,
-            });
+
+            return Promise.reject(
+              toApiError(
+                e instanceof Error
+                  ? e.message
+                  : "Erreur lors de la récupération des données de la source",
+                500
+              )
+            );
           }
         })();
+
         inflightLoads.set(cacheKey, loadPromise);
+
         try {
           data = await loadPromise;
           console.log(
             `[CACHE] Nouvelle entrée pour ${cacheKey} (TTL=${cacheTTL}s)`
           );
         } catch (err: any) {
-          // Gestion de l'erreur levée par les utilitaires
           return err;
         }
       }
     }
-    // Sélection des colonnes si fields est défini
+
     if (options?.fields) {
       const fieldsArr = options.fields
         .split(",")
@@ -338,16 +513,24 @@ const dataSourceService = {
         )
       );
     }
-    // Pagination si demandée
+
     if (options?.page && options?.pageSize) {
       const total = data.length;
+
       const page = options.page;
+
       const pageSize = options.pageSize;
+
       const start = (page - 1) * pageSize;
+
       const pageData = data.slice(start, start + pageSize);
-      return { data: pageData, total };
+
+      return {
+        data: pageData,
+        ...(typeof total === "number" ? { total } : {}),
+      } as ApiData<object[]> & { total?: number };
     }
-    // Par défaut, tout renvoyer (attention à la volumétrie)
+
     return { data };
   },
 };

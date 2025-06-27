@@ -48,7 +48,17 @@ export function usePieChartLogic(
     [labels, data, config.bucket?.field, metric.agg, metric.field]
   );
   const backgroundColor = useMemo<string[]>(
-    () => getColors(labels, config, 0),
+    () =>
+      config.widgetParams &&
+      Array.isArray(config.widgetParams.colors) &&
+      config.widgetParams.colors.length > 0
+        ? labels.map(
+            (_, i) =>
+              config.widgetParams!.colors![
+                i % config.widgetParams!.colors!.length
+              ]
+          )
+        : getColors(labels, config, 0),
     [labels, config]
   );
   const legendPosition = getLegendPosition(config);
@@ -61,16 +71,19 @@ export function usePieChartLogic(
       datasets: [
         {
           data: values,
-          backgroundColor: Array.isArray(color)
-            ? color
-            : Array(labels.length).fill(color),
-          borderWidth: config.metricStyles?.[0]?.borderWidth ?? 1,
-          borderColor: config.metricStyles?.[0]?.borderColor || undefined,
-          borderRadius: config.metricStyles?.[0]?.borderRadius || 0,
+          backgroundColor,
+          borderWidth: widgetParams.borderWidth ?? 1,
+          borderColor: widgetParams.borderColor ?? "#000000",
         } as ChartDataset<"pie">,
       ],
     }),
-    [labels, values, color, config.metricStyles]
+    [
+      labels,
+      values,
+      backgroundColor,
+      widgetParams.borderWidth,
+      widgetParams.borderColor,
+    ]
   );
   // Tooltip, cutout, labelFormat, showValues
   const tooltipFormat =

@@ -6,8 +6,8 @@ const { Schema } = mongoose;
 const DashboardLayoutItemSchema = new Schema(
   {
     widgetId: { type: String, required: true },
-    width: { type: String, required: true }, // ex: "48%"
-    height: { type: Number, required: true }, // px
+    width: { type: String, required: true },
+    height: { type: Number, required: true },
     x: { type: Number, required: true },
     y: { type: Number, required: true },
   },
@@ -50,14 +50,11 @@ const DashboardSchema = new Schema(
       default: "private",
     },
     history: { type: [DashboardHistoryItemSchema], default: [] },
-    // Partage public
     shareEnabled: { type: Boolean, default: false },
     shareId: { type: String, default: null, unique: true, sparse: true },
-    // Auto-refresh config
-    autoRefreshInterval: { type: Number, default: 60000 }, // ms, 1min par défaut
-    autoRefreshIntervalValue: { type: Number }, // valeur personnalisée (ex: 5)
-    autoRefreshIntervalUnit: { type: String }, // unité (minute, heure, etc.)
-    // Plage temporelle globale (absolue ou relative)
+    autoRefreshInterval: { type: Number, default: 60000 },
+    autoRefreshIntervalValue: { type: Number },
+    autoRefreshIntervalUnit: { type: String },
     timeRange: { type: DashboardTimeRangeSchema, default: undefined },
   },
   { timestamps: true }
