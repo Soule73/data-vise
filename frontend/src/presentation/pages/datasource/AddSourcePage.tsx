@@ -1,12 +1,12 @@
-import { useDataSourceForm } from "@/core/hooks/datasource/useDataSourceForm";
 import SourceForm from "@/presentation/components/source/SourceForm";
+import { useCreateDataSourceForm } from "@/core/hooks/datasource/useCreateDataSourceForm";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { useEffect } from "react";
 import { ROUTES } from "@/core/constants/routes";
 
 export default function AddSourcePage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
-  const formProps = useDataSourceForm();
+  const formProps = useCreateDataSourceForm();
 
   useEffect(() => {
     setBreadcrumb([
@@ -19,7 +19,8 @@ export default function AddSourcePage() {
     <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow-sm">
       <h1 className="text-2xl font-bold mb-6">Ajouter une source de données</h1>
       <SourceForm
-        methods={formProps}
+        form={formProps.form}
+        setFormField={formProps.setFormField}
         step={formProps.step}
         setStep={formProps.setStep}
         csvOrigin={formProps.csvOrigin}

@@ -20,7 +20,6 @@ export interface Dashboard {
   title: string;
   layout: DashboardLayoutItem[];
   ownerId: string;
-  autoRefreshInterval: number; // ms
   autoRefreshIntervalValue?: number;
   autoRefreshIntervalUnit?: IntervalUnit;
   timeRange: DashboardTimeRange;
@@ -62,7 +61,6 @@ export interface DashboardGridProps {
   autoRefreshIntervalUnit?: string;
   timeRangeFrom?: string | null;
   timeRangeTo?: string | null;
-  refreshMs?: number;
   forceRefreshKey?: number;
   page?: number;
   pageSize?: number;
@@ -90,7 +88,6 @@ export interface DashboardGridItemProps {
   timeRangeTo?: string | null;
   sources: DataSource[];
   onRemove?: () => void;
-  refreshMs?: number;
   forceRefreshKey?: number;
   page?: number;
   pageSize?: number;
@@ -197,7 +194,6 @@ export interface UseGridItemProps {
   item?: DashboardLayoutItem;
   timeRangeFrom?: string | null;
   timeRangeTo?: string | null;
-  refreshMs?: number;
   forceRefreshKey?: number;
   page?: number;
   pageSize?: number;

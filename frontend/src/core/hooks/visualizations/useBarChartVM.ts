@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { ChartOptions, ChartData } from "chart.js";
+import type { ChartOptions, ChartData, TooltipItem } from "chart.js";
 import type { BarChartConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 import type { BarChartParams } from "@/core/types/visualization";
@@ -128,7 +128,7 @@ export function useBarChartLogic(
         tooltip: {
           enabled: true,
           callbacks: {
-            label: (context: import("chart.js").TooltipItem<"bar">) => {
+            label: (context: TooltipItem<"bar">) => {
               const label = context.label;
               const value = context.parsed.y;
               if (showValues) {

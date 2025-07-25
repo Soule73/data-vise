@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import type { UseFormReturn } from "react-hook-form";
+import type { SourceFormState } from "@/core/hooks/datasource/useSourceFormBase";
 import InputField from "@/presentation/components/forms/InputField";
 import SelectField from "@/presentation/components/SelectField";
 import FileField from "@/presentation/components/forms/FileField";
@@ -9,13 +9,13 @@ import Collapsible from "@/presentation/components/Collapsible";
 import Table from "@/presentation/components/Table";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
-import type { DataSourceFormType } from "@/core/hooks/datasource/useDataSourceForm";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { Radio, RadioGroup } from "@headlessui/react";
+import TextareaField from "@/presentation/components/forms/TextareaField";
 
 interface SourceFormProps {
-  // Méthodes react-hook-form
-  methods: UseFormReturn<DataSourceFormType>;
+  form: SourceFormState;
+  setFormField: (field: string, value: any) => void;
   step: number;
   setStep: (s: number) => void;
   csvOrigin: "url" | "upload";
@@ -30,7 +30,7 @@ interface SourceFormProps {
   setShowModal: (b: boolean) => void;
   globalError: string;
   handleNext: () => void;
-  onSubmit: (data: DataSourceFormType) => void;
+  onSubmit: (data: any) => void;
   isEdit?: boolean;
   filePath?: string | null;
   setFilePath?: (v: string | null) => void;
@@ -39,7 +39,8 @@ interface SourceFormProps {
 }
 
 const SourceForm: React.FC<SourceFormProps> = ({
-  methods,
+  form,
+  setFormField,
   step,
   setStep,
   csvOrigin,
@@ -48,7 +49,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
   setCsvFile,
   columns,
   columnsLoading,
-  columnsError,
+  // columnsError,
   dataPreview,
   showModal,
   setShowModal,
@@ -62,27 +63,66 @@ const SourceForm: React.FC<SourceFormProps> = ({
   setShowFileField,
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { register, handleSubmit, setValue, getValues, formState, watch } =
-    methods;
-  const { errors, isSubmitting } = formState;
-  const values = getValues();
-  const watchedType = watch("type");
+  const values = form;
+  const watchedType = values.type;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit(form);
+      }}
+    >
       {step === 1 && (
-        <div className="mb-4 max-w-xl">
-          <SelectField
-            label="Type de la source"
-            id="type"
-            options={[
-              { value: "json", label: "JSON" },
-              { value: "csv", label: "CSV" },
-            ]}
-            value={watchedType}
-            onChange={(e) => setValue("type", e.target.value as "json" | "csv")}
-            error={errors.type?.message}
-          />
+        <>
+          <div className="mb-4">
+            <InputField
+              label="Nom"
+              value={form.name}
+              onChange={(e) => setFormField("name", e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <SelectField
+              label="Type"
+              id="type"
+              options={[
+                { value: "json", label: "JSON distant" },
+                { value: "csv", label: "CSV distant ou upload" },
+                { value: "elasticsearch", label: "Elasticsearch" },
+              ]}
+              value={watchedType}
+              onChange={(e) => setFormField("type", e.target.value)}
+              required
+            />
+          </div>
+          {/* Section spécifique Elasticsearch */}
+          {watchedType === "elasticsearch" && (
+            <div className="space-y-4 border rounded-md p-4 bg-gray-50 dark:bg-gray-800 mt-4 border-gray-200 dark:border-gray-700">
+              <InputField
+                label="Endpoint Elasticsearch"
+                value={form.endpoint}
+                onChange={(e) => setFormField("endpoint", e.target.value)}
+                placeholder="https://mon-es:9200"
+                required
+              />
+              <InputField
+                label="Index Elasticsearch"
+                value={form.esIndex}
+                onChange={(e) => setFormField("esIndex", e.target.value)}
+                placeholder="nom-de-mon-index"
+                required
+              />
+              <TextareaField
+                label="Requête Elasticsearch (JSON)"
+                value={form.esQuery || ""}
+                onChange={(e) => setFormField("esQuery", e.target.value)}
+                placeholder={`{"query": { "match_all": {} }}`}
+                rows={4}
+              />
+            </div>
+          )}
           {/* Section fichier CSV (édition ou création) */}
           {watchedType === "csv" &&
             csvOrigin === "upload" &&
@@ -105,7 +145,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
                   onClick={() => {
                     setFilePath && setFilePath(null);
                     setCsvFile(null);
-                    setValue("endpoint", "");
+                    setFormField("endpoint", "");
                     setStep(1);
                     // Affiche FileField pour uploader un nouveau fichier
                     if (typeof setCsvOrigin === "function")
@@ -134,11 +174,10 @@ const SourceForm: React.FC<SourceFormProps> = ({
           {watchedType === "csv" && csvOrigin === "url" && (
             <InputField
               label="Endpoint (URL CSV)"
-              {...register("endpoint")}
-              error={errors.endpoint?.message}
+              value={form.endpoint}
+              onChange={(e) => setFormField("endpoint", e.target.value)}
             />
           )}
-          {/* Correction : si édition + fichier existant, on masque TOUT FileField même dans la section générique plus bas */}
           {watchedType === "csv" &&
             csvOrigin === "upload" &&
             isEdit &&
@@ -148,8 +187,8 @@ const SourceForm: React.FC<SourceFormProps> = ({
             <>
               <InputField
                 label="Endpoint (URL JSON)"
-                {...register("endpoint")}
-                error={columnsError || errors.endpoint?.message}
+                value={form.endpoint}
+                onChange={(e) => setFormField("endpoint", e.target.value)}
               />
               <span className="text-sm text-gray-500 mb-4">
                 Entrez l'URL d'un endpoint qui retourne des données au format
@@ -228,13 +267,12 @@ const SourceForm: React.FC<SourceFormProps> = ({
               {csvOrigin === "url" && (
                 <InputField
                   label="Endpoint (URL CSV)"
-                  {...register("endpoint")}
-                  error={errors.endpoint?.message}
+                  value={form.endpoint}
+                  onChange={(e) => setFormField("endpoint", e.target.value)}
                 />
               )}
               {csvOrigin === "upload" && (
                 <div className="mb-2">
-                  {/* SUPPRIMÉ : FileField ici pour éviter le doublon en mode édition */}
                   {csvFile && (
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-gray-500">
@@ -264,109 +302,90 @@ const SourceForm: React.FC<SourceFormProps> = ({
           {/* Méthode HTTP et Authentification pour endpoint */}
           {(watchedType === "json" ||
             (watchedType === "csv" && csvOrigin === "url")) && (
-            <>
-              <div className="mb-2">
-                <SelectField
-                  label="Méthode HTTP"
-                  id="httpMethod"
-                  options={[
-                    { value: "GET", label: "GET" },
-                    { value: "POST", label: "POST" },
-                  ]}
-                  {...register("httpMethod")}
-                  value={watch("httpMethod")}
-                  onChange={(e) =>
-                    setValue("httpMethod", e.target.value as "GET" | "POST")
-                  }
-                  error={errors.httpMethod?.message}
-                />
-              </div>
-              <div className="mb-2">
-                <SelectField
-                  label="Authentification"
-                  id="authType"
-                  options={[
-                    { value: "none", label: "Aucune" },
-                    { value: "bearer", label: "Bearer Token" },
-                    { value: "apiKey", label: "API Key" },
-                    { value: "basic", label: "Basic Auth" },
-                  ]}
-                  {...register("authType")}
-                  value={watch("authType")}
-                  onChange={(e) =>
-                    setValue(
-                      "authType",
-                      e.target.value as "none" | "bearer" | "apiKey" | "basic"
-                    )
-                  }
-                  error={errors.authType?.message}
-                />
-              </div>
-              {/* Champs dynamiques selon authType */}
-              {watch("authType") === "bearer" && (
-                <InputField
-                  label="Token Bearer"
-                  value={values.authConfig.token || ""}
-                  onChange={(e) =>
-                    setValue("authConfig", {
-                      ...values.authConfig,
-                      token: e.target.value,
-                    })
-                  }
-                />
-              )}
-              {watch("authType") === "apiKey" && (
-                <>
-                  <InputField
-                    label="Clé API"
-                    value={values.authConfig.apiKey || ""}
+              <>
+                <div className="mb-2">
+                  <SelectField
+                    label="Méthode HTTP"
+                    id="httpMethod"
+                    options={[
+                      { value: "GET", label: "GET" },
+                      { value: "POST", label: "POST" },
+                    ]}
+                    value={values.httpMethod}
                     onChange={(e) =>
-                      setValue("authConfig", {
-                        ...values.authConfig,
-                        apiKey: e.target.value,
-                      })
+                      setFormField("httpMethod", e.target.value as "GET" | "POST")
                     }
                   />
-                  <InputField
-                    label="Nom du header (optionnel)"
-                    value={values.authConfig.headerName || ""}
+                </div>
+                <div className="mb-2">
+                  <SelectField
+                    label="Authentification"
+                    id="authType"
+                    options={[
+                      { value: "none", label: "Aucune" },
+                      { value: "bearer", label: "Bearer Token" },
+                      { value: "apiKey", label: "API Key" },
+                      { value: "basic", label: "Basic Auth" },
+                    ]}
+                    value={values.authType}
                     onChange={(e) =>
-                      setValue("authConfig", {
-                        ...values.authConfig,
-                        headerName: e.target.value,
-                      })
-                    }
-                    placeholder="x-api-key"
-                  />
-                </>
-              )}
-              {watch("authType") === "basic" && (
-                <>
-                  <InputField
-                    label="Nom d'utilisateur"
-                    value={values.authConfig.username || ""}
-                    onChange={(e) =>
-                      setValue("authConfig", {
-                        ...values.authConfig,
-                        username: e.target.value,
-                      })
+                      setFormField(
+                        "authType",
+                        e.target.value as "none" | "bearer" | "apiKey" | "basic"
+                      )
                     }
                   />
+                </div>
+                {/* Champs selon authType */}
+                {values.authType === "bearer" && (
                   <InputField
-                    label="Mot de passe"
-                    type="password"
-                    value={values.authConfig.password || ""}
+                    label="Token Bearer"
+                    value={values.authConfig.token}
                     onChange={(e) =>
-                      setValue("authConfig", {
-                        ...values.authConfig,
-                        password: e.target.value,
-                      })
+                      setFormField("authConfig.token", e.target.value)
                     }
                   />
-                </>
-              )}
-            </>
-          )}
+                )}
+                {values.authType === "apiKey" && (
+                  <>
+                    <InputField
+                      label="Clé API"
+                      value={values.authConfig.apiKey}
+                      onChange={(e) =>
+                        setFormField("authConfig.apiKey", e.target.value)
+                      }
+                    />
+                    <InputField
+                      label="Nom du header (optionnel)"
+                      value={values.authConfig.headerName}
+                      onChange={(e) =>
+                        setFormField("authConfig.headerName", e.target.value)
+                      }
+                      placeholder="x-api-key"
+                    />
+                  </>
+                )}
+                {values.authType === "basic" && (
+                  <>
+                    <InputField
+                      label="Nom d'utilisateur"
+                      value={values.authConfig.username}
+                      onChange={(e) =>
+                        setFormField("authConfig.username", e.target.value)
+                      }
+                    />
+                    <InputField
+                      label="Mot de passe"
+                      type="password"
+                      value={values.authConfig.password}
+                      onChange={(e) =>
+                        setFormField("authConfig.password", e.target.value)
+                      }
+                    />
+                  </>
+                )}
+              </>
+            )}
           {/* BOUTON SUIVANT */}
           <div className="mt-6 flex">
             <Button
@@ -375,20 +394,22 @@ const SourceForm: React.FC<SourceFormProps> = ({
               className=" w-max flex items-center"
               onClick={handleNext}
               disabled={
-                isSubmitting ||
-                (!formState.isValid &&
-                  !(
-                    isEdit &&
-                    watchedType === "csv" &&
-                    csvOrigin === "upload" &&
-                    filePath
-                  ) &&
-                  !(
-                    isEdit &&
-                    watchedType === "csv" &&
-                    csvOrigin === "url" &&
-                    values.endpoint
-                  ))
+                !form.name ||
+                (watchedType === "csv" &&
+                  csvOrigin === "upload" &&
+                  !isEdit &&
+                  !csvFile) ||
+                (watchedType === "csv" &&
+                  csvOrigin === "upload" &&
+                  isEdit &&
+                  !filePath &&
+                  !csvFile) ||
+                (watchedType === "csv" &&
+                  csvOrigin === "url" &&
+                  !form.endpoint) ||
+                (watchedType === "json" && !form.endpoint) ||
+                (watchedType === "elasticsearch" &&
+                  (!form.endpoint || !form.esIndex))
               }
             >
               {columnsLoading && (
@@ -397,7 +418,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
               Suivant
             </Button>
           </div>
-        </div>
+        </>
       )}
       {step === 2 && (
         <>
@@ -424,16 +445,15 @@ const SourceForm: React.FC<SourceFormProps> = ({
               <SelectField
                 label="Champ temporel pour le filtrage (optionnel)"
                 id="timestampField"
-                {...register("timestampField")}
-                value={watch("timestampField")}
-                onChange={(e) => setValue("timestampField", e.target.value)}
+                value={values.timestampField}
+                onChange={(e) => setFormField("timestampField", e.target.value)}
                 options={[
                   { value: "", label: "Aucun (pas de filtrage temporel)" },
                   ...columns
                     .filter((col) => col.type === "datetime")
                     .map((col) => ({ value: col.name, label: col.name })),
                 ]}
-                error={errors.timestampField?.message}
+              // error={form.errors.timestampField?.message}
               />
               <span className="text-xs text-gray-500">
                 Seules les colonnes de type datetime sont proposées.
@@ -484,74 +504,75 @@ const SourceForm: React.FC<SourceFormProps> = ({
         <div className="space-y-4">
           <InputField
             label="Nom de la source"
-            {...register("name")}
-            error={errors.name?.message}
+            value={form.name}
+            onChange={(e) => setFormField("name", e.target.value)}
+            // error={form.errors.name?.message}
             autoFocus
           />
           <div>
-            <div className="font-semibold">Type :</div>
-            <div className="capitalize">{values.type}</div>
+            <div className="font-semibold dark:text-gray-300">Type :</div>
+            <div className="capitalize dark:text-gray-300">{values.type}</div>
           </div>
           {/* Récapitulatif HTTP/Auth si endpoint */}
           {(values.type === "json" ||
             (values.type === "csv" && csvOrigin === "url")) && (
-            <div className="space-y-1">
-              <div>
-                <span className="font-semibold">Méthode HTTP :</span>{" "}
-                {values.httpMethod}
-              </div>
-              <div>
-                <span className="font-semibold">Authentification :</span>{" "}
-                {values.authType === "none" ? "Aucune" : values.authType}
-              </div>
-              {values.authType === "bearer" && (
+              <div className="space-y-1 dark:text-gray-300">
                 <div>
-                  <span className="font-semibold">Token :</span>{" "}
-                  {values.authConfig.token ? "•••••" : "non renseigné"}
+                  <span className="font-semibold dark:text-gray-300">Méthode HTTP :</span>{" "}
+                  {values.httpMethod}
                 </div>
-              )}
-              {values.authType === "apiKey" && (
-                <>
+                <div>
+                  <span className="font-semibold dark:text-gray-300">Authentification :</span>{" "}
+                  {values.authType === "none" ? "Aucune" : values.authType}
+                </div>
+                {values.authType === "bearer" && (
                   <div>
-                    <span className="font-semibold">Clé API :</span>{" "}
-                    {values.authConfig.apiKey ? "•••••" : "non renseigné"}
+                    <span className="font-semibold dark:text-gray-300">Token :</span>{" "}
+                    {values.authConfig.token ? "•••••" : "non renseigné"}
                   </div>
-                  <div>
-                    <span className="font-semibold">Header :</span>{" "}
-                    {values.authConfig.headerName || "x-api-key"}
-                  </div>
-                </>
-              )}
-              {values.authType === "basic" && (
-                <>
-                  <div>
-                    <span className="font-semibold">Utilisateur :</span>{" "}
-                    {values.authConfig.username || "non renseigné"}
-                  </div>
-                  <div>
-                    <span className="font-semibold">Mot de passe :</span>{" "}
-                    {values.authConfig.password ? "•••••" : "non renseigné"}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
+                )}
+                {values.authType === "apiKey" && (
+                  <>
+                    <div>
+                      <span className="font-semibold dark:text-gray-300">Clé API :</span>{" "}
+                      {values.authConfig.apiKey ? "•••••" : "non renseigné"}
+                    </div>
+                    <div>
+                      <span className="font-semibold dark:text-gray-300">Header :</span>{" "}
+                      {values.authConfig.headerName || "x-api-key"}
+                    </div>
+                  </>
+                )}
+                {values.authType === "basic" && (
+                  <>
+                    <div>
+                      <span className="font-semibold dark:text-gray-300">Utilisateur :</span>{" "}
+                      {values.authConfig.username || "non renseigné"}
+                    </div>
+                    <div>
+                      <span className="font-semibold dark:text-gray-300">Mot de passe :</span>{" "}
+                      {values.authConfig.password ? "•••••" : "non renseigné"}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           {values.type === "json" && (
             <div>
-              <div className="font-semibold">Endpoint JSON :</div>
-              <div>
+              <div className="font-semibold dark:text-gray-300">Endpoint JSON :</div>
+              <div className="text-gray-800 dark:text-gray-300">
                 {values.endpoint || (
-                  <span className="text-gray-400">(non renseigné)</span>
+                  <span className="text-gray-400 ">(non renseigné)</span>
                 )}
               </div>
             </div>
           )}
           {values.type === "csv" && csvOrigin === "url" && (
             <div>
-              <div className="font-semibold">Endpoint CSV :</div>
+              <div className="font-semibold dark:text-gray-300">Endpoint CSV :</div>
               <div>
                 {values.endpoint || (
-                  <span className="text-gray-400">(non renseigné)</span>
+                  <span className="text-gray-400 dark:text-gray-300">(non renseigné)</span>
                 )}
               </div>
             </div>
@@ -561,7 +582,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
               <div className="font-semibold">Fichier CSV :</div>
               <div>
                 {csvFile?.name || (
-                  <span className="text-gray-400">(aucun fichier)</span>
+                  <span className="text-gray-400 dark:text-gray-300">(aucun fichier)</span>
                 )}
               </div>
             </div>
@@ -578,12 +599,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
           >
             Annuler
           </Button>
-          <Button
-            color="indigo"
-            onClick={handleSubmit(onSubmit)}
-            disabled={!formState.isValid || isSubmitting}
-            loading={isSubmitting}
-          >
+          <Button color="indigo" onClick={() => onSubmit(form)}>
             {isEdit ? "Enregistrer" : "Ajouter"}
           </Button>
         </div>

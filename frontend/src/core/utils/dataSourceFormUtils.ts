@@ -11,8 +11,8 @@ export function mapDetectedColumns(
       detectData.types && detectData.types[col]
         ? detectData.types[col]
         : Array.isArray(data) && data.length > 0 && data[0][col] !== undefined
-        ? typeof data[0][col]
-        : "inconnu",
+          ? typeof data[0][col]
+          : "inconnu",
   }));
 }
 
@@ -41,17 +41,35 @@ export function buildDetectParams({
   httpMethod,
   authType,
   authConfig,
+  esIndex,
+  esQuery,
 }: {
-  type: "json" | "csv";
-  csvOrigin: "url" | "upload";
-  csvFile: File | null;
-  endpoint: string;
+  type: "json" | "csv" | "elasticsearch";
+  csvOrigin?: "url" | "upload";
+  csvFile?: File | null;
+  endpoint?: string;
   httpMethod?: "GET" | "POST";
   authType?: "none" | "bearer" | "apiKey" | "basic";
-  authConfig?: any;
+  authConfig?: {
+    token?: string;
+    apiKey?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  };
+  esIndex?: string;
+  esQuery?: any;
 }): any {
   if (type === "csv" && csvOrigin === "upload" && csvFile) {
     return { type, file: csvFile };
+  } else if (type === "elasticsearch") {
+    const params: any = { type };
+    if (endpoint) params.endpoint = endpoint;
+    if (esIndex) params.esIndex = esIndex;
+    if (esQuery) params.esQuery = esQuery;
+    if (authType) params.authType = authType;
+    if (authConfig) params.authConfig = authConfig;
+    return params;
   } else {
     const params: any = { type };
     if (type === "csv" && csvOrigin === "url") {

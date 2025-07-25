@@ -17,13 +17,14 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
   const [step, setStep] = useState(1);
   const [type, setType] = useState<WidgetType>(initialValues?.type || "bar");
   const [sourceId, setSourceId] = useState(initialValues?.sourceId || "");
+
   const [columns, setColumns] = useState<string[]>(
     initialValues?.columns || []
   );
   const [dataPreview, setDataPreview] = useState<any[]>(
     initialValues?.dataPreview || []
   );
-  const [config, setConfig] = useState<any>(initialValues?.config || {});
+  const [config, setConfig] = useState<Record<string, any>>(initialValues?.config || {});
   const [title, setTitle] = useState(initialValues?.title || "");
   const [visibility, setVisibility] = useState<"public" | "private">(
     initialValues?.visibility || "private"
@@ -45,7 +46,7 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
   const queryClient = useQueryClient();
   const { data: sources = [] } = sourcesQuery({ queryClient });
   const src = sources?.find((s: DataSource) => s._id === sourceId);
-  const { data: sourceData = [] } = dataBySourceQuery(src?._id);
+  const { refetch } = dataBySourceQuery(src?._id);
 
   // --- Logique de config par défaut ---
   function getDefaultConfig(type: WidgetType, columns: string[]): any {
@@ -210,9 +211,8 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
             const metric = config.metrics[idx];
             const aggLabel = metric?.agg || "";
             const fieldLabel = metric?.field || "";
-            const autoLabel = `${aggLabel}${
-              fieldLabel ? " · " + fieldLabel : ""
-            }`;
+            const autoLabel = `${aggLabel}${fieldLabel ? " · " + fieldLabel : ""
+              }`;
             if (style && style.customLabel) {
               return style;
             }
@@ -279,8 +279,12 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
     try {
       let data: any[] = [];
       if (src && src._id) {
-        data = sourceData || [];
+        const result = await refetch();
+        data = result.data || [];
+
+        console.log("[useWidgetForm] Source data loaded:", data);
       }
+
       setDataPreview(data.slice(0, 10));
       setColumns(data[0] ? Object.keys(data[0]) : []);
       setConfig(getDefaultConfig(type, data[0] ? Object.keys(data[0]) : []));

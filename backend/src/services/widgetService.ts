@@ -7,6 +7,7 @@ import type {
 } from "@/types/widgetType";
 import type { ApiResponse } from "@/types/api";
 import { toApiData, toApiError } from "@/utils/api";
+import { generateUUID } from "@/utils/uuid_generator";
 
 /**
  * Service pour gérer les opérations liées aux widgets.
@@ -45,11 +46,12 @@ const widgetService = {
    * @returns {Promise<ApiResponse<IWidget>>} - La réponse contenant le widget créé.
    */
   async create(payload: WidgetCreatePayload): Promise<ApiResponse<IWidget>> {
-    const { widgetId, title, type, dataSourceId, config, userId } = payload;
+    const { title, type, dataSourceId, config, userId } = payload;
 
-    if (!widgetId || !title || !type || !dataSourceId || !userId) {
+    if (!title || !type || !dataSourceId || !userId) {
       return toApiError("Champs requis manquants.", 400);
     }
+    const widgetId = generateUUID(true, 8, true, "widget-");
 
     const widget = await Widget.create({
       widgetId,

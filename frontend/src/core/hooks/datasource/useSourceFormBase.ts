@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { detectColumnsQuery } from "@/data/repositories/sources";
 import {
   mapDetectedColumns,
@@ -8,12 +8,20 @@ import {
 
 export interface SourceFormState {
   name: string;
-  type: "json" | "csv";
+  type: "json" | "csv" | "elasticsearch";
   endpoint: string;
   httpMethod: "GET" | "POST";
   authType: "none" | "bearer" | "apiKey" | "basic";
-  authConfig: any;
+  authConfig: {
+    token?: string;
+    apiKey?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  };
   timestampField: string;
+  esIndex?: string;
+  esQuery?: any;
   file?: File | null;
 }
 
@@ -26,8 +34,27 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
     authType: initial?.authType || "none",
     authConfig: initial?.authConfig || {},
     timestampField: initial?.timestampField || "",
+    esIndex: initial?.esIndex || "",
+    esQuery: initial?.esQuery || "",
     file: initial?.file || null,
   });
+  // Ajout : synchronisation du formulaire si initial change
+  useEffect(() => {
+    if (initial) {
+      setForm({
+        name: initial.name || "",
+        type: initial.type || "json",
+        endpoint: initial.endpoint || "",
+        httpMethod: initial.httpMethod || "GET",
+        authType: initial.authType || "none",
+        authConfig: initial.authConfig || {},
+        timestampField: initial.timestampField || "",
+        esIndex: initial.esIndex || "",
+        esQuery: initial.esQuery || "",
+        file: initial.file || null,
+      });
+    }
+  }, [initial]);
   const [step, setStep] = useState(1);
   const [csvOrigin, setCsvOrigin] = useState<"url" | "upload">("url");
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -42,12 +69,11 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
 
   // Détection colonnes
   const [detectParams, setDetectParams] = useState<any | null>(null);
-  const {
-    data: detectData,
-    isLoading: columnsLoading,
-    error: detectError,
-    isFetching,
-  } = detectColumnsQuery(detectParams, !!detectParams);
+  const detectColumnsQueryResult = detectColumnsQuery(detectParams, Boolean(detectParams));
+  const detectData = detectColumnsQueryResult.data;
+  const columnsLoading = detectColumnsQueryResult.isLoading;
+  const detectError = detectColumnsQueryResult.error;
+  const isFetching = detectColumnsQueryResult.isFetching;
 
   // Handler pour changer un champ du form
   const setFormField = (field: string, value: any) => {
@@ -68,32 +94,36 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
       httpMethod: form.httpMethod,
       authType: form.authType,
       authConfig: form.authConfig,
+      esIndex: form.esIndex,
+      esQuery: form.esQuery,
     });
     setDetectParams(params);
   };
 
   // Effet pour traiter le résultat de la détection
-  if (detectParams && !columnsLoading && !isFetching) {
-    if (detectError) {
-      if (!columnsError)
-        setColumnsError(
-          (detectError as any)?.response?.data?.message ||
+  useEffect(() => {
+    if (detectParams && !columnsLoading && !isFetching) {
+      if (detectError) {
+        if (!columnsError)
+          setColumnsError(
+            (detectError as any)?.response?.data?.message ||
             (detectError as Error)?.message ||
             "Impossible de détecter les colonnes"
-        );
-    } else if (detectData) {
-      if (!detectData.columns || detectData.columns.length === 0) {
-        setColumnsError("Aucune colonne détectée.");
-      } else {
-        let data: Record<string, unknown>[] = detectData.preview || [];
-        setDataPreview(data);
-        setColumns(mapDetectedColumns(detectData, data));
-        const autoTimestamp = autoDetectTimestampField(detectData.columns);
-        setTimestampField(autoTimestamp || "");
-        setStep(2);
+          );
+      } else if (detectData) {
+        if (!detectData.columns || detectData.columns.length === 0) {
+          setColumnsError("Aucune colonne détectée.");
+        } else {
+          let data: Record<string, unknown>[] = detectData.preview || [];
+          setDataPreview(data);
+          setColumns(mapDetectedColumns(detectData, data));
+          const autoTimestamp = autoDetectTimestampField(detectData.columns);
+          setTimestampField(autoTimestamp || "");
+          setStep(2);
+        }
       }
     }
-  }
+  }, [detectParams, columnsLoading, isFetching, detectError, detectData]);
 
   return {
     form,

@@ -19,10 +19,6 @@ import type {
   ScatterMetricConfig,
 } from "./metric-bucket-types";
 
-// ======================================================
-// 1. Widgets & Configuration
-// ======================================================
-
 export interface Widget {
   _id?: string;
   widgetId: string;
@@ -35,7 +31,7 @@ export interface Widget {
   history?: WidgetHistoryItem[];
   createdAt?: string;
   updatedAt?: string;
-  isUsed?: boolean; // Ajouté pour indiquer si le widget est utilisé dans un dashboard
+  isUsed?: boolean;
 }
 
 export interface WidgetHistoryItem {
@@ -57,56 +53,41 @@ export type WidgetType =
   | "kpi_group"
   | "card";
 
+type BaseVisualizationWidgetPropsMap = {
+  data: Record<string, any>[];
+  editMode?: boolean;
+};
 export type VisualizationWidgetPropsMap = {
-  bar: {
-    data: Record<string, any>[];
+  bar: BaseVisualizationWidgetPropsMap & {
     config: BarChartConfig;
-    editMode?: boolean;
   };
-  line: {
-    data: Record<string, any>[];
+  line: BaseVisualizationWidgetPropsMap & {
     config: LineChartConfig;
-    editMode?: boolean;
   };
-  pie: {
-    data: Record<string, any>[];
+  pie: BaseVisualizationWidgetPropsMap & {
     config: PieChartConfig;
-    editMode?: boolean;
   };
-  table: {
-    data: Record<string, any>[];
+  table: BaseVisualizationWidgetPropsMap & {
     config: TableWidgetConfig;
-    editMode?: boolean;
   };
-  scatter: {
-    data: Record<string, any>[];
+  scatter: BaseVisualizationWidgetPropsMap & {
     config: ScatterChartConfig;
-    editMode?: boolean;
   };
-  bubble: {
-    data: Record<string, any>[];
+  bubble: BaseVisualizationWidgetPropsMap & {
+
     config: BubbleChartConfig;
-    editMode?: boolean;
   };
-  radar: {
-    data: Record<string, any>[];
+  radar: BaseVisualizationWidgetPropsMap & {
     config: RadarChartConfig;
-    editMode?: boolean;
   };
-  kpi: {
-    data: Record<string, any>[];
+  kpi: BaseVisualizationWidgetPropsMap & {
     config: KPIWidgetConfig;
-    editMode?: boolean;
   };
-  kpi_group: {
-    data: Record<string, any>[];
+  kpi_group: BaseVisualizationWidgetPropsMap & {
     config: KPIGroupWidgetConfig;
-    editMode?: boolean;
   };
-  card: {
-    data: Record<string, any>[];
+  card: BaseVisualizationWidgetPropsMap & {
     config: CardWidgetConfig;
-    editMode?: boolean;
   };
 };
 
@@ -129,21 +110,20 @@ export interface WidgetDefinition<
 
 export interface WidgetConfig {
   metrics:
-    | MetricConfig[]
-    | ScatterMetricConfig[]
-    | BubbleMetricConfig[]
-    | RadarMetricConfig[];
+  | MetricConfig[]
+  | ScatterMetricConfig[]
+  | BubbleMetricConfig[]
+  | RadarMetricConfig[];
   filter?: Filter;
   bucket: BucketConfig;
 }
-// --- Widget Configuration Sections
 
 export interface WidgetMetricStyleConfigSectionProps<
   TMetric =
-    | MetricConfig
-    | ScatterMetricConfig
-    | BubbleMetricConfig
-    | RadarMetricConfig,
+  | MetricConfig
+  | ScatterMetricConfig
+  | BubbleMetricConfig
+  | RadarMetricConfig,
   TMetricStyle = any
 > {
   type: WidgetType;
@@ -168,8 +148,6 @@ export interface WidgetStyleConfigSectionProps<TConfig = any> {
   columns: string[];
   handleConfigChange: (field: string, value: any) => void;
 }
-
-// --- Widget Modals & Selecteurs
 
 export interface WidgetConfigTabsProps {
   tab: "data" | "metricsAxes" | "params";
@@ -234,7 +212,6 @@ export interface WidgetScatterDataConfigSectionProps {
   ) => void;
 }
 
-// Correction 1 : Typage pour WidgetRadarDataConfigSectionProps
 export interface WidgetRadarDataConfigSectionProps {
   metrics: RadarMetricConfig[];
   columns: string[];
@@ -294,7 +271,6 @@ export interface KPIWidgetVM {
   getTrendColor: () => string;
 }
 
-// Typage strict pour dataConfig utilisé dans les sections de configuration des widgets
 export interface WidgetMetricConfigSchema {
   label: string;
   allowMultiple?: boolean;
@@ -307,13 +283,11 @@ export interface WidgetBucketConfigSchema {
   allow?: boolean;
   allowedAggs?: Array<{ value: string; label: string }>;
   defaultAgg?: string;
-  // Pas de typeLabel ici
 }
 
 export interface WidgetDataConfig {
   metrics: WidgetMetricConfigSchema;
   bucket?: WidgetBucketConfigSchema;
-  // Pour radar, possibilité d'ajouter groupByFields et axisFields
   groupByFields?: string[];
   axisFields?: string[];
 }
@@ -337,20 +311,3 @@ export interface WidgetDataConfigSectionProps<
   ) => void;
 }
 
-// export interface WidgetDataConfigSectionProps<
-//   TDataConfig = WidgetDataConfig,
-//   TConfig = WidgetConfigField
-// > {
-//   dataConfig: TDataConfig;
-//   config: TConfig;
-//   columns: string[];
-//   handleConfigChange: (field: string, value: any) => void;
-//   handleDragStart: (idx: number) => void;
-//   handleDragOver: (idx: number, e: React.DragEvent) => void;
-//   handleDrop: (idx: number) => void;
-//   handleMetricAggOrFieldChange?: (
-//     idx: number,
-//     field: "agg" | "field",
-//     value: string
-//   ) => void;
-// }

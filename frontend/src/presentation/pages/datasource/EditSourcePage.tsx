@@ -16,15 +16,14 @@ export default function EditSourcePage() {
     <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow-sm">
       <h1 className="text-2xl font-bold mb-6">Modifier la source</h1>
       <SourceForm
-        methods={formProps.methods}
+        form={formProps.form}
+        setFormField={formProps.setFormField}
         step={formProps.step}
         setStep={formProps.setStep}
         csvOrigin={formProps.csvOrigin}
         setCsvOrigin={formProps.setCsvOrigin}
         csvFile={formProps.csvFile}
         setCsvFile={formProps.setCsvFile}
-        filePath={formProps.filePath}
-        setFilePath={formProps.setFilePath}
         columns={formProps.columns}
         columnsLoading={formProps.columnsLoading}
         columnsError={formProps.columnsError}

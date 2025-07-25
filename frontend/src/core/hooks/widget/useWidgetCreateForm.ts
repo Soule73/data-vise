@@ -7,7 +7,6 @@ import { useDashboardStore } from "@/core/store/dashboard";
 import { ROUTES } from "@/core/constants/routes";
 import type { WidgetFormInitialValues } from "@/core/types/widget-types";
 import { useWidgetForm } from "./useWidgetForm";
-import { v4 as uuidv4 } from "uuid";
 
 export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
   const navigate = useNavigate();
@@ -49,13 +48,7 @@ export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
       { url: ROUTES.widgets, label: "Visualisations" },
       { url: ROUTES.createWidget, label: form.widgetTitle || "Créer" },
     ]);
-    // eslint-disable-next-line
   }, [form.widgetTitle, setBreadcrumb]);
-
-  // Génère un widgetId unique au format UUID
-  function generateWidgetId() {
-    return uuidv4();
-  }
 
   // Handler de création (validation + mutation)
   function handleCreate() {
@@ -66,10 +59,9 @@ export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
     form.setTitle(form.widgetTitle);
     form.setShowSaveModal(false);
     const payload = {
-      widgetId: generateWidgetId(),
       title: form.widgetTitle.trim(),
       type: form.type,
-      dataSourceId: form.sourceId, // correspondance backend
+      dataSourceId: form.sourceId,
       config: form.config,
       visibility: form.visibility,
     };

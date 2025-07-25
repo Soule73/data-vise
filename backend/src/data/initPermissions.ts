@@ -1,5 +1,7 @@
+import User from "@/models/User";
 import Permission from "../models/Permission";
 import Role from "../models/Role";
+import bcrypt from "bcryptjs";
 
 const permissions = [
   // User
@@ -53,9 +55,7 @@ export async function initPermissionsAndRoles() {
   await initPermissions();
 
   const allPerms = await Permission.find({});
-
   const adminPerms = allPerms.map((p) => p._id);
-
   const userPerms = allPerms
     .filter((p) => !p.name.startsWith("user:") && !p.name.startsWith("role:"))
     .map((p) => p._id);
@@ -83,4 +83,21 @@ export async function initPermissionsAndRoles() {
     },
     { upsert: true }
   );
+
+  // Création d'un utilisateur admin par défaut en développement
+  if (process.env.ENV_MODE === "development") {
+    const adminUser = await User.findOne({ $or: [{ username: "admin" }, { email: "admin@example.com" }] });
+    if (!adminUser) {
+      const adminRole = await Role.findOne({ name: "admin" });
+      const passwordHash = await bcrypt.hash("password", 10);
+      await User.create({
+        username: "admin",
+        password: passwordHash,
+        roleId: adminRole ? adminRole._id : undefined,
+        email: "admin@example.com"
+      });
+      // eslint-disable-next-line no-console
+      console.log("[initPermissions] Utilisateur admin créé (admin/admin)");
+    }
+  }
 }

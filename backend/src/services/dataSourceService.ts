@@ -21,6 +21,7 @@ import { IWidget } from "@/types/widgetType";
 import { ObjectId } from "mongoose";
 import { DashboardLayoutItem } from "@/types/dashboardType";
 import { toApiData, toApiError } from "@/utils/api";
+import { Client, Client as ESClient } from "@elastic/elasticsearch";
 
 // Map pour suivre les chargements en cours (anti-stampede)
 const inflightLoads = new Map<string, Promise<any[]>>();
@@ -170,8 +171,7 @@ const dataSourceService = {
     }
 
     if (oldFilePath && filePath && oldFilePath !== filePath) {
-      const fs = require("fs");
-      fs.unlink(oldFilePath, (err: any) => {});
+      await fs.unlink(oldFilePath);
     }
 
     return toApiData(source);
@@ -205,7 +205,7 @@ const dataSourceService = {
       try {
         const absPath = getAbsolutePath(source.filePath);
         await fs.unlink(absPath);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     return toApiData({ message: "Source supprimée." });
@@ -242,6 +242,8 @@ const dataSourceService = {
     httpMethod?: "GET" | "POST";
     authType?: "none" | "bearer" | "apiKey" | "basic";
     authConfig?: any;
+    esIndex?: string;
+    esQuery?: any;
   }): Promise<
     ApiResponse<{
       columns: string[];
@@ -302,6 +304,71 @@ const dataSourceService = {
           finalAuthType,
           finalAuthConfig
         );
+      } else if (
+        finalType === "elasticsearch" &&
+        finalEndpoint &&
+        params.esIndex
+      ) {
+        // Détection colonnes Elasticsearch
+        let esClientOptions: any = { node: finalEndpoint };
+        // Auth support
+        if (
+          finalAuthType === "basic" &&
+          finalAuthConfig?.username &&
+          finalAuthConfig?.password
+        ) {
+          esClientOptions.auth = {
+            username: finalAuthConfig.username,
+            password: finalAuthConfig.password,
+          };
+        } else if (finalAuthType === "bearer" && finalAuthConfig?.token) {
+          esClientOptions.headers = {
+            Authorization: `Bearer ${finalAuthConfig.token}`,
+          };
+        }
+        // Correction : ne pas forcer Content-Type ici, le client l’ajoute déjà
+        // esClientOptions.headers = {
+        //   ...(esClientOptions.headers || {}),
+        //   'Content-Type': 'application/json',
+        // };
+        const esClient = new Client(esClientOptions);
+        let esQuery = params.esQuery || { match_all: {} };
+        try {
+          // Requête ES compatible v7 (sans gestion de fields ici)
+          const searchParams: any = {
+            index: params.esIndex,
+            body: { query: esQuery },
+            size: 5,
+          };
+          const result = await esClient.search(searchParams);
+          // Typage explicite pour TypeScript v7
+          const hits = (result as any).body?.hits?.hits || [];
+          rows = hits.map((hit: any) => hit._source || {});
+        } catch (esErr: any) {
+          console.error(
+            "[Elasticsearch DetectColumns] Erreur:",
+            esErr?.message || esErr,
+            {
+              endpoint: finalEndpoint,
+              esIndex: params.esIndex,
+              esQuery: params.esQuery,
+              authType: finalAuthType,
+              authConfig: finalAuthConfig,
+            }
+          );
+          if (
+            esErr &&
+            esErr.message &&
+            esErr.message.includes("not Elasticsearch")
+          ) {
+            return toApiError(
+              "L’URL ne pointe pas vers un cluster Elasticsearch valide.",
+              400
+            );
+          }
+          // Relancer l’erreur pour le catch global
+          throw esErr;
+        }
       } else {
         return toApiError(
           "Type ou configuration de source non supportée pour la détection de colonnes.",
@@ -384,13 +451,69 @@ const dataSourceService = {
     }
 
     const source = await DataSource.findById(sourceId);
-
-    if (!source) {
-      return toApiError("Source non trouvée.", 404);
-    }
-
+    if (!source)
+      return { error: { message: "Source non trouvée." }, status: 404 };
     let data: Record<string, unknown>[] = [];
+    // --- Ajout Elasticsearch ---
+    if (source.type === "elasticsearch" && source.endpoint && source.esIndex) {
+      try {
+        const es = new ESClient({ node: source.endpoint });
+        const esQuery = source.esQuery || { match_all: {} };
+        const page = options?.page || 1;
+        const pageSize = options?.pageSize || 5000;
+        const from = (page - 1) * pageSize;
+        const searchParams: any = {
+          index: source.esIndex,
+          body: {
+            query: esQuery,
+          },
 
+          from,
+          size: pageSize,
+        };
+        if (options?.fields) {
+          const fieldsArr = options.fields
+            .split(",")
+            .map((f) => f.trim())
+            .filter(Boolean);
+          if (fieldsArr.length > 0) {
+            searchParams._source = fieldsArr;
+          }
+        }
+        const result = await es.search(searchParams);
+        const hits = (result as any).body?.hits?.hits || [];
+        data = hits.map((hit: any) => hit._source);
+        const total = (result as any).body?.hits?.total;
+        console.log(
+          `[Elasticsearch fetchData] Succès: index=${source.esIndex
+          }, endpoint=${source.endpoint
+          }, page=${page}, pageSize=${pageSize}, count=${data.length}, total=${total && typeof total === "object" ? total.value : total
+          }`
+        );
+        return {
+          data,
+          total: total && typeof total === "object" ? total.value : total,
+        } as ApiResponse<Record<string, any>[]> & { total?: number };
+      } catch (e: any) {
+        console.error("[Elasticsearch fetchData] Erreur:", e?.message || e, {
+          endpoint: source.endpoint,
+          esIndex: source.esIndex,
+          esQuery: source.esQuery,
+          page: options?.page,
+          pageSize: options?.pageSize,
+          fields: options?.fields,
+        });
+        return {
+          error: {
+            message:
+              e instanceof Error
+                ? e.message
+                : "Erreur lors de la récupération des données Elasticsearch.",
+          },
+          status: 500,
+        };
+      }
+    }
     const hasTimestamp = !!source.timestampField;
 
     const normFrom =

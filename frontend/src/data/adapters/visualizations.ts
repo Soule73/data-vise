@@ -226,9 +226,11 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     allowMultipleMetrics: false,
     configSchema: {
       ...PieChartConfig,
-      metricStyles: {}, // Pas de couleur par métrique pour le pie chart
+      metricStyles: {
+      },
       widgetParams: {
-        ...COMMON_WIDGET_PARAMS,
+        // On retire xLabel et yLabel du pie chart
+        ...Object.fromEntries(Object.entries(COMMON_WIDGET_PARAMS).filter(([k]) => k !== "xLabel" && k !== "yLabel")),
         cutout: { default: "0%", inputType: "text", label: "Trous (doughnut)" },
         borderWidth: {
           default: 1,
@@ -266,7 +268,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     icon: TableCellsIcon,
     configSchema: {
       ...TableWidgetConfig,
-      metricStyles: {}, // Pas de styles spécifiques pour les métriques de table
+      metricStyles: {},
       widgetParams: {
         pageSize: { default: 10, inputType: "number", label: "Taille de page" },
         title: { default: "", inputType: "text", label: "Titre du tableau" },
@@ -423,7 +425,6 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
         },
       },
       filters: {
-        // Schéma de filtre par KPI (tableau d'objets)
         type: "array",
         label: "Filtres par KPI",
         itemSchema: {
@@ -678,18 +679,18 @@ export const WIDGET_DATA_CONFIG: Record<
   WidgetType,
   {
     metrics:
-      | typeof COMMON_METRICS
-      | (typeof COMMON_METRICS & { allowMultiple: false; label: string });
+    | typeof COMMON_METRICS
+    | (typeof COMMON_METRICS & { allowMultiple: false; label: string });
     bucket: typeof COMMON_BUCKET & { label?: string; typeLabel?: string };
   }
 > = {
   bar: {
     metrics: COMMON_METRICS,
-    bucket: { ...COMMON_BUCKET }, // label supprimé
+    bucket: { ...COMMON_BUCKET },
   },
   line: {
     metrics: COMMON_METRICS,
-    bucket: { ...COMMON_BUCKET }, // label supprimé
+    bucket: { ...COMMON_BUCKET },
   },
   pie: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
@@ -720,7 +721,7 @@ export const WIDGET_DATA_CONFIG: Record<
   },
   kpi_group: {
     metrics: { ...COMMON_METRICS, allowMultiple: true, label: "KPIs" },
-    bucket: { ...COMMON_BUCKET, allow: false }, // label supprimé
+    bucket: { ...COMMON_BUCKET, allow: false },
   },
   card: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },

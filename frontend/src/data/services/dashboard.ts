@@ -14,7 +14,6 @@ export async function saveDashboardLayout(
   layout: DashboardLayoutItem[],
   title?: string,
   config?: {
-    autoRefreshInterval?: number;
     autoRefreshIntervalValue?: number;
     autoRefreshIntervalUnit?: string;
     timeRange?: any;

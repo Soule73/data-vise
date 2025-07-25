@@ -1,8 +1,7 @@
 import path from "path";
 import fs from "fs/promises";
 import csv from "csvtojson";
-import fetch from "node-fetch";
-
+import fetch, { RequestInit } from "node-fetch";
 export function inferColumnTypes(
   rows: any[],
   columns: string[]
@@ -90,9 +89,15 @@ export async function readCsvFile(filePath: string): Promise<any[]> {
 export function buildFetchOptionsFromConfig(
   httpMethod: "GET" | "POST" = "GET",
   authType: "none" | "bearer" | "apiKey" | "basic" = "none",
-  authConfig: any = {},
+  authConfig: {
+    token?: string;
+    apiKey?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  },
   body?: any
-): import("node-fetch").RequestInit {
+): RequestInit {
   const headers: Record<string, string> = {};
 
   let finalBody: any = undefined;
@@ -136,7 +141,13 @@ export async function fetchRemoteCsv(
   endpoint: string,
   httpMethod: "GET" | "POST" = "GET",
   authType: "none" | "bearer" | "apiKey" | "basic" = "none",
-  authConfig: any = {},
+  authConfig: {
+    token?: string;
+    apiKey?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  } = {},
   body?: any
 ): Promise<any[]> {
   try {
@@ -167,7 +178,13 @@ export async function fetchRemoteJson(
   endpoint: string,
   httpMethod: "GET" | "POST" = "GET",
   authType: "none" | "bearer" | "apiKey" | "basic" = "none",
-  authConfig: any = {},
+  authConfig: {
+    token?: string;
+    apiKey?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  } = {},
   body?: any
 ): Promise<any[]> {
   try {

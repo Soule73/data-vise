@@ -146,24 +146,32 @@ export function dataBySourceQuery(
   refreshMs?: number, // pour le polling
   forceRefreshKey?: number // clé pour forcer le refetch
 ) {
+  // Log de debug pour traquer les appels (diagnostic Elasticsearch)
+  if (sourceId) {
+    // eslint-disable-next-line no-console
+    console.log(
+      "[dataBySourceQuery] Appel avec sourceId:",
+      sourceId,
+      "options:",
+      options
+    );
+  }
   const queryKey = buildSourceDataKey(sourceId, options, forceRefreshKey);
   const {
     data = null,
     isLoading: loading,
     error,
-    // isFetching,
-    // isStale,
-    // isPlaceholderData,
+    refetch,
   } = useQuery({
     queryKey,
     queryFn: () =>
       sourceId
         ? fetchSourceData(sourceId, {
-            page: options?.page ?? 1,
-            pageSize: options?.pageSize ?? 1000,
-            ...options,
-            forceRefresh: !!forceRefreshKey && forceRefreshKey > 0,
-          })
+          page: options?.page ?? 1,
+          pageSize: options?.pageSize ?? 1000,
+          ...options,
+          forceRefresh: !!forceRefreshKey && forceRefreshKey > 0,
+        })
         : Promise.resolve(initialData ?? null),
     enabled: !!sourceId,
     initialData,
@@ -172,27 +180,16 @@ export function dataBySourceQuery(
     placeholderData: keepPreviousData, // pour garder le comportement précédent
   });
 
-  // // Log pour savoir si la donnée vient du cache ou d'un refetch
-  // useEffect(() => {
-  //   // eslint-disable-next-line no-console
-  //   console.debug(
-  //     `[dataBySourceQuery] sourceId=${sourceId} | cache:`,
-  //     !isFetching && !isStale && !isPlaceholderData,
-  //     "| isFetching:",
-  //     isFetching,
-  //     "| isStale:",
-  //     isStale,
-  //     "| isPlaceholderData:",
-  //     isPlaceholderData,
-  //     "| queryKey:",
-  //     queryKey
-  //   );
-  // }, [isFetching, isStale, isPlaceholderData, queryKey, sourceId]);
+  // On expose data (toujours un tableau) et total si présent
+  const total = (data && (data as any).total) || undefined;
+  const rows = Array.isArray(data) ? data : [];
 
   return {
-    data,
+    data: rows,
+    total,
     loading,
     error: error ? "Erreur lors du chargement des données." : null,
+    refetch,
   };
 }
 

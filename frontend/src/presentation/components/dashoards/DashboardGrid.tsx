@@ -33,7 +33,6 @@ export default function DashboardGrid({
   handleAddWidget,
   timeRangeFrom,
   timeRangeTo,
-  refreshMs,
   forceRefreshKey,
   page,
   pageSize,
@@ -61,10 +60,9 @@ export default function DashboardGrid({
   // --- Rendu ---
   return (
     <div
-      className={`dashboard-grid w-full flex flex-wrap min-w-full gap-2 ${
-        editMode &&
+      className={`dashboard-grid w-full flex flex-wrap min-w-full gap-2 ${editMode &&
         "border-2 border-dashed border-gray-300 dark:border-gray-700"
-      }`}
+        }`}
     >
       {slots.map((item, idx) => {
         // Slot d'ajout de widget
@@ -100,7 +98,6 @@ export default function DashboardGrid({
             onSwapLayout={onSwapLayout}
             timeRangeFrom={timeRangeFrom}
             timeRangeTo={timeRangeTo}
-            refreshMs={refreshMs}
             forceRefreshKey={forceRefreshKey}
             page={page}
             pageSize={pageSize}

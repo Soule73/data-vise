@@ -16,19 +16,19 @@ export default function Login() {
 
   return (
     <AuthLayout
-      title="Connexion à votre compte"
+      title="Conecter vous à Data-Vise"
       logoUrl={logoDataVise}
-      // bottomText={
-      //   <>
-      //     Pas encore de compte ?{" "}
-      //     <a
-      //       href="/register"
-      //       className="font-semibold text-indigo-600 hover:text-indigo-500"
-      //     >
-      //       Créer un compte
-      //     </a>
-      //   </>
-      // }
+    // bottomText={
+    //   <>
+    //     Pas encore de compte ?{" "}
+    //     <a
+    //       href="/register"
+    //       className="font-semibold text-indigo-600 hover:text-indigo-500"
+    //     >
+    //       Créer un compte
+    //     </a>
+    //   </>
+    // }
     >
       {globalError && (
         <div
@@ -45,12 +45,14 @@ export default function Login() {
           type="email"
           {...register("email")}
           error={errors.email?.message}
+          className="!py-4"
         />
         <InputField
           placeholder="Mot de passe"
           type="password"
           {...register("password")}
           error={errors.password?.message}
+          className="!py-4"
         />
         <Button
           type="submit"
@@ -59,6 +61,7 @@ export default function Login() {
           variant="solid"
           loading={loading}
           disabled={loading}
+
         >
           Se connecter
         </Button>

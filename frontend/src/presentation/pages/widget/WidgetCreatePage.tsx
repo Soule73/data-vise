@@ -47,6 +47,7 @@ export default function WidgetCreatePage() {
     metricsWithLabels,
     handleMetricStyleChange,
     sourceOptions,
+    setError
   } = useWidgetCreateForm();
 
   return (
@@ -58,7 +59,11 @@ export default function WidgetCreatePage() {
             {isPreviewReady ? (
               <WidgetComponent
                 data={dataPreview}
-                config={{ ...config, title: config.title }}
+                config={{
+                  ...config,
+                  metrics: metricsWithLabels,
+                  bucket: config.bucket,
+                }}
               />
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-400 italic text-sm">
@@ -77,7 +82,9 @@ export default function WidgetCreatePage() {
                   <SelectField
                     label="Source de données"
                     value={sourceId}
-                    onChange={(e) => setSourceId(e.target.value)}
+                    onChange={(e) => {
+                      setSourceId(e.target.value);
+                    }}
                     name="sourceId"
                     id="widget-source"
                     options={sourceOptions}
@@ -100,6 +107,7 @@ export default function WidgetCreatePage() {
                       config={{
                         ...config,
                         metrics: metricsWithLabels,
+                        bucket: config.bucket,
                       }}
                       columns={columns}
                       data={dataPreview}
@@ -136,7 +144,14 @@ export default function WidgetCreatePage() {
               step={step}
               loading={loading}
               onPrev={() => setStep(1)}
-              onNext={loadSourceColumns}
+              onNext={() => {
+                if (!sourceId) {
+                  setError("Veuillez sélectionner une source de données.");
+                  return;
+                }
+                setError("");
+                loadSourceColumns();
+              }}
               onSave={() => setShowSaveModal(true)}
               isSaving={createMutation.isPending}
             />

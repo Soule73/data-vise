@@ -1,47 +1,39 @@
 import mongoose from "mongoose";
 
-export interface IDataSource extends Document {
+export interface AuthConfig {
+  token?: string;
+  apiKey?: string;
+  username?: string;
+  password?: string;
+  headerName?: string;
+}
+export interface DataSourceBasePayload {
   name: string;
-  type: "json" | "csv";
+  type: "json" | "csv" | "elasticsearch";
   endpoint?: string;
-  filePath?: string;
   config?: Record<string, unknown>;
-  ownerId: mongoose.Types.ObjectId;
   visibility: "public" | "private";
   timestampField?: string;
   httpMethod?: "GET" | "POST";
   authType?: "none" | "bearer" | "apiKey" | "basic";
-  authConfig?: {
-    token?: string;
-    apiKey?: string;
-    username?: string;
-    password?: string;
-    headerName?: string;
-  };
+  authConfig?: AuthConfig;
+  esIndex?: string;
+  esQuery?: any;
 }
 
-export interface DataSourceBasePayload {
-  name?: string;
-  type?: "json" | "csv";
-  endpoint?: string;
+export interface IDataSource extends Document, DataSourceBasePayload {
+  _id: mongoose.Types.ObjectId;
   filePath?: string;
-  config?: Record<string, unknown>;
-  httpMethod?: "GET" | "POST";
-  authType?: "none" | "bearer" | "apiKey" | "basic";
-  authConfig?: {
-    token?: string;
-    apiKey?: string;
-    username?: string;
-    password?: string;
-    headerName?: string;
-  };
+  ownerId: mongoose.Types.ObjectId;
+  createdAt?: Date;
+  updatedAt?: Date;
+  isUsed?: boolean;
 }
 
 export interface DataSourceCreatePayload extends DataSourceBasePayload {
-  name: string;
-  type: "json" | "csv";
-  ownerId: mongoose.Types.ObjectId;
-  timestampField?: string;
+  file?: File | null;
+  filePath?: string;
+  ownerId?: mongoose.Types.ObjectId;
 }
 
-export type DataSourceUpdatePayload = Partial<DataSourceBasePayload>;
+export type DataSourceUpdatePayload = Partial<DataSourceCreatePayload>;

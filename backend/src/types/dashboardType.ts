@@ -33,7 +33,6 @@ export interface IDashboard extends mongoose.Document {
 export interface DashboardBasePayload {
   title?: string;
   layout?: DashboardLayoutItem[];
-  autoRefreshInterval?: number;
   autoRefreshIntervalValue?: number;
   autoRefreshIntervalUnit?: string;
   timeRange?: unknown;

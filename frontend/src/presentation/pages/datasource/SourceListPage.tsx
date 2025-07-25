@@ -40,13 +40,14 @@ export default function SourcesPage() {
               </span>
             );
           }
-          if (row.type === "json") {
+          if (row.type === "json" || row.type === "elasticsearch") {
             return (
               <span className="flex items-center justify-center w-8 h-8">
                 <DocumentTextIcon className="w-6 h-6 text-indigo-500" />
               </span>
             );
           }
+
           return <span className="w-8 h-8" />;
         },
       },

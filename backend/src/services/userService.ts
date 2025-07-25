@@ -21,7 +21,7 @@ import type {
   UserRoleResponse,
   LeanRoleWithCanDelete,
 } from "../types/authType";
-import mongoose from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 import { ApiResponse } from "@/types/api";
 import { toApiData, toApiError } from "@/utils/api";
 
@@ -116,9 +116,7 @@ const userService = {
       populate: { path: "permissions" },
     });
 
-    const userId = (
-      createdUser._id as import("mongoose").Types.ObjectId | string
-    ).toString();
+    const userId = (createdUser._id as ObjectId | string).toString();
 
     let role: UserRoleResponse | null = null;
 
@@ -190,9 +188,7 @@ const userService = {
     });
 
     const userPopId = userPopulated
-      ? (
-          userPopulated._id as import("mongoose").Types.ObjectId | string
-        ).toString()
+      ? (userPopulated._id as ObjectId | string).toString()
       : "";
 
     if (!userPopulated) {
