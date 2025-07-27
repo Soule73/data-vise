@@ -12,6 +12,7 @@ import {
   isIsoTimestamp,
   allSameDay,
   formatXTicksLabel,
+  formatTooltipValue,
 } from "@/core/utils/chartUtils";
 
 export function useBarChartLogic(
@@ -76,22 +77,22 @@ export function useBarChartLogic(
   // Correction : ne pas dupliquer la clé plugins dans l'objet options
   const pluginsOptions = showValues
     ? {
-        datalabels: undefined,
-        tooltip: {
-          enabled: true,
-          callbacks: {
-            label: function (context: any) {
-              const label = context.label;
-              const value = context.parsed.y;
-              // Pas de percent pour bar, mais on laisse le placeholder pour compat future
-              return labelFormat
-                .replace("{label}", label)
-                .replace("{value}", String(value))
-                .replace("{percent}", "");
-            },
+      datalabels: undefined,
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function (context: any) {
+            const label = formatTooltipValue(context.label);
+            const value = context.parsed.y;
+            // Pas de percent pour bar, mais on laisse le placeholder pour compat future
+            return labelFormat
+              .replace("{label}", label)
+              .replace("{value}", String(value))
+              .replace("{percent}", "");
           },
         },
-      }
+      },
+    }
     : {};
   const isXTimestamps = useMemo(() => {
     if (!labels || labels.length === 0) return false;
@@ -117,13 +118,13 @@ export function useBarChartLogic(
         },
         title: title
           ? {
-              display: true,
-              text: title,
-              position: "top",
-              align: titleAlign as "start" | "center" | "end",
-              color: labelColor,
-              font: labelFontSize ? { size: labelFontSize } : undefined,
-            }
+            display: true,
+            text: title,
+            position: "top",
+            align: titleAlign as "start" | "center" | "end",
+            color: labelColor,
+            font: labelFontSize ? { size: labelFontSize } : undefined,
+          }
           : undefined,
         tooltip: {
           enabled: true,

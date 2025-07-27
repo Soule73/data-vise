@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+export type AuthType = "none" | "basic" | "bearer" | "apiKey"
+export type HttpMethod = "GET" | "POST"
+export type DataSourceType = "json" | "csv" | "elasticsearch"
+export type DataSourceVisibility = "public" | "private"
+export type CacheParams = { key: string, ttl: number }
+
 export interface AuthConfig {
   token?: string;
   apiKey?: string;
@@ -7,15 +13,16 @@ export interface AuthConfig {
   password?: string;
   headerName?: string;
 }
+
 export interface DataSourceBasePayload {
   name: string;
-  type: "json" | "csv" | "elasticsearch";
+  type: DataSourceType;
   endpoint?: string;
   config?: Record<string, unknown>;
-  visibility: "public" | "private";
+  visibility: DataSourceVisibility;
   timestampField?: string;
-  httpMethod?: "GET" | "POST";
-  authType?: "none" | "bearer" | "apiKey" | "basic";
+  httpMethod?: HttpMethod;
+  authType?: AuthType;
   authConfig?: AuthConfig;
   esIndex?: string;
   esQuery?: any;
@@ -35,5 +42,26 @@ export interface DataSourceCreatePayload extends DataSourceBasePayload {
   filePath?: string;
   ownerId?: mongoose.Types.ObjectId;
 }
+
+export interface FetchOptions {
+  from?: string;
+  to?: string;
+  page?: number;
+  pageSize?: number;
+  fields?: string;
+  forceRefresh?: boolean;
+  shareId?: string;
+}
+
+export interface DetectParams extends Omit<DataSourceCreatePayload, "name" | "visibility" | "ownerId"> {
+  sourceId?: string
+}
+
+export interface EsConfig {
+  endpoint: string | undefined;
+  authType?: AuthType;
+  authConfig?: AuthConfig;
+}
+
 
 export type DataSourceUpdatePayload = Partial<DataSourceCreatePayload>;

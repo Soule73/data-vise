@@ -1,4 +1,10 @@
-// Déclaration locale du type IntervalUnit
+
+import DashboardConfigFields from "@/presentation/components/dashoards/DashboardConfigFields";
+import DashboardSharePopover from "@/presentation/components/dashoards/DashboardSharePopover";
+import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import Button from "../forms/Button";
+import type { DashboardHeaderProps } from "@/core/types/dashboard-types";
+
 export type IntervalUnit =
   | "second"
   | "minute"
@@ -7,12 +13,6 @@ export type IntervalUnit =
   | "week"
   | "month"
   | "year";
-
-import DashboardConfigFields from "@/presentation/components/dashoards/DashboardConfigFields";
-import DashboardSharePopover from "@/presentation/components/dashoards/DashboardSharePopover";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
-import Button from "../forms/Button";
-import type { DashboardHeaderProps } from "@/core/types/dashboard-types";
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   editMode,
@@ -124,14 +124,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               handleCopyShareLink={handleCopyShareLink}
             />
           )}
-          {/* Bouton d'export PDF */}
           <Button
             variant="outline"
             type="button"
             size="sm"
             color="gray"
             className="w-max !border-none"
-            // className="flex items-center gap-1 text-xs text-indigo-600 hover:underline bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded px-2 py-1"
             onClick={handleExportPDF}
             title="Exporter le dashboard en PDF"
           >
@@ -139,7 +137,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </Button>
         </div>
       ) : null}
-      {/* Bloc UI avancé de configuration déplacé dans DashboardConfigFields */}
       <DashboardConfigFields
         autoRefreshIntervalValue={autoRefreshIntervalValue}
         autoRefreshIntervalUnit={autoRefreshIntervalUnit}

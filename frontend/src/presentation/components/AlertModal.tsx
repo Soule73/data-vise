@@ -28,7 +28,7 @@ const COLORS = {
 
 const BUTTON_COLORS: Record<string, 'indigo' | 'red' | 'green' | 'gray'> = {
   error: 'red',
-  warning: 'indigo', // Button ne supporte pas yellow, on met indigo
+  warning: 'indigo',
   success: 'green',
   info: 'indigo',
   default: 'gray',

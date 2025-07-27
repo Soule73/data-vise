@@ -6,6 +6,7 @@ import {
   isIsoTimestamp,
   allSameDay,
   formatXTicksLabel,
+  formatTooltipValue,
 } from "@/core/utils/chartUtils";
 import type { BubbleChartParams } from "@/core/types/visualization";
 
@@ -24,8 +25,8 @@ export function useBubbleChartLogic(
     () =>
       Array.isArray(config.metrics)
         ? (config.metrics.filter(
-            (ds: any) => ds.x && ds.y && ds.r
-          ) as BubbleMetricConfig[])
+          (ds: any) => ds.x && ds.y && ds.r
+        ) as BubbleMetricConfig[])
         : [],
     [config.metrics]
   );
@@ -99,16 +100,18 @@ export function useBubbleChartLogic(
         legend: { display: showLegend },
         title: chartTitle
           ? {
-              display: true,
-              text: chartTitle,
-            }
+            display: true,
+            text: chartTitle,
+          }
           : undefined,
         tooltip: {
           enabled: true,
           callbacks: {
             label: function (context: any) {
               const d = context.raw;
-              return `x: ${d.x}, y: ${d.y}, r: ${d.r}`;
+              const x = formatTooltipValue(d.x);
+              const y = formatTooltipValue(d.y);
+              return `x: ${x}, y: ${y}, r: ${d.r}`;
             },
           },
         },

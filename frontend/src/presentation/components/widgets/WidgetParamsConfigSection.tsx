@@ -16,39 +16,38 @@ export default function WidgetParamsConfigSection({
   config,
   handleConfigChange,
 }: WidgetParamsConfigSectionProps) {
-  // --- Fonctions utilitaires extraites ---
+
   const getWidgetParamMeta = (field: string) =>
     WIDGETS[type]?.configSchema?.widgetParams?.[field] || {};
+
   const getLabel = (field: string) =>
     getWidgetParamMeta(field).label ||
     WIDGET_CONFIG_FIELDS[field]?.label ||
     field;
+
   const getDefaultValue = (field: string) =>
     getWidgetParamMeta(field).default ?? WIDGET_CONFIG_FIELDS[field]?.default;
+
   const getOptions = (field: string) =>
     getWidgetParamMeta(field).options ||
     WIDGET_CONFIG_FIELDS[field]?.options ||
     [];
+
   const getInputType = (field: string) =>
     getWidgetParamMeta(field).inputType ||
     WIDGET_CONFIG_FIELDS[field]?.inputType;
 
-  // Pour les champs color-array
   const getColorArray = (field: string) => config.widgetParams?.[field] || [""];
 
-  // Pour les valeurs de select
   const getSelectValue = (field: string) =>
     config.widgetParams?.[field] || getDefaultValue(field) || "";
 
-  // Pour les valeurs d'input
   const getInputValue = (field: string) =>
     config.widgetParams?.[field] ?? getDefaultValue(field) ?? "";
 
-  // Pour les valeurs de checkbox
   const getCheckboxValue = (field: string, fallback = false) =>
     config.widgetParams?.[field] ?? getDefaultValue(field) ?? fallback;
 
-  // Pour l'icône
   const getIconComponent = (field: string) => {
     const iconName = config.widgetParams?.[field];
     if (iconName && HeroIcons[iconName as keyof typeof HeroIcons]) {
@@ -59,7 +58,6 @@ export default function WidgetParamsConfigSection({
     return null;
   };
 
-  // --- Rendu ---
   return (
     <div className="space-y-2 grid grid-cols-2 place-items-stretch items-end gap-2">
       {Object.entries(WIDGETS[type]?.configSchema.widgetParams || {}).map(
@@ -171,7 +169,6 @@ export default function WidgetParamsConfigSection({
             );
           }
           if (inputType === "color-array") {
-            // Champ pour sélectionner plusieurs couleurs (tableau)
             return (
               <div key={field} className="flex flex-col gap-1">
                 <label

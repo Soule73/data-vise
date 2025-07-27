@@ -24,16 +24,18 @@ export default function WidgetKPIGroupDataConfigSection({
   data = [],
 }: WidgetKPIGroupDataConfigSectionProps) {
   const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
+
   const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
 
   const kpiConfig = config as KPIGroupWidgetConfig;
+
   const kpiDataConfig = dataConfig as { metrics: any };
+
   const filters = (kpiConfig.filters ?? []) as {
     field: string;
     value: string;
   }[];
 
-  // --- Handlers extraits ---
   const handleFilterFieldChange = (idx: number, value: string) => {
     const newFilters = [...filters];
     newFilters[idx] = {
@@ -117,7 +119,6 @@ export default function WidgetKPIGroupDataConfigSection({
     ]);
   };
 
-  // --- Logique options et disabled extraites ---
   const getFilterFieldOptions = (idx: number) => [
     { value: "", label: "-- Aucun --" },
     ...columns.map((col) => ({ value: String(col), label: col })),
@@ -133,23 +134,22 @@ export default function WidgetKPIGroupDataConfigSection({
   const getFilterValueOptions = (idx: number) =>
     filters[idx]?.field
       ? [
-          { value: "", label: "-- Toutes --" },
-          ...Array.from(
-            new Set(
-              (data || [])
-                .map(
-                  (row: Record<string, unknown>) =>
-                    row[filters[idx]?.field ?? ""]
-                )
-                .filter((v) => v !== undefined && v !== null && v !== "")
-            )
-          ).map((v) => ({ value: String(v), label: String(v) })),
-        ]
+        { value: "", label: "-- Toutes --" },
+        ...Array.from(
+          new Set(
+            (data || [])
+              .map(
+                (row: Record<string, unknown>) =>
+                  row[filters[idx]?.field ?? ""]
+              )
+              .filter((v) => v !== undefined && v !== null && v !== "")
+          )
+        ).map((v) => ({ value: String(v), label: String(v) })),
+      ]
       : [{ value: "", label: "-- Choisir --" }];
 
   const isFilterValueDisabled = (idx: number) => !filters[idx]?.field;
 
-  // --- Logique d'affichage des labels extraite ---
   const getAggLabel = (metric: MetricConfig) =>
     kpiDataConfig.metrics?.allowedAggs.find((a: any) => a.value === metric.agg)
       ?.label ||
@@ -164,7 +164,6 @@ export default function WidgetKPIGroupDataConfigSection({
     return `${aggLabel}${fieldLabel ? " · " + fieldLabel : ""}`;
   };
 
-  // --- Rendu ---
   return (
     <div className="space-y-4">
       {/* Filtres par KPI (centralisé dans config.filters) */}
@@ -240,9 +239,8 @@ export default function WidgetKPIGroupDataConfigSection({
                         !isOnlyMetric && (
                           <>
                             <button
-                              className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
-                                idx === 0 ? "opacity-50 cursor-not-allowed" : ""
-                              }`}
+                              className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${idx === 0 ? "opacity-50 cursor-not-allowed" : ""
+                                }`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleMetricMoveUp(idx);
@@ -254,11 +252,10 @@ export default function WidgetKPIGroupDataConfigSection({
                               <ChevronUpIcon className="w-4 h-4" />
                             </button>
                             <button
-                              className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
-                                idx === kpiConfig.metrics.length - 1
+                              className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${idx === kpiConfig.metrics.length - 1
                                   ? "opacity-50 cursor-not-allowed"
                                   : ""
-                              }`}
+                                }`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleMetricMoveDown(idx);

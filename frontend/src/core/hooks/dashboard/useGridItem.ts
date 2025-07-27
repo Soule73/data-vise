@@ -32,7 +32,7 @@ export function useGridItem({
   forceRefreshKey,
   page,
   pageSize,
-  shareId, // Ajout du shareId
+  shareId,
 }: UseGridItemProps) {
   // --- Gestion du resize natif ---
   function handleResize() {
@@ -115,7 +115,7 @@ export function useGridItem({
       fields,
       page,
       pageSize,
-      shareId, // Passage du shareId à dataBySourceQuery
+      shareId,
     },
     undefined,
     refreshMs,
@@ -133,9 +133,6 @@ export function useGridItem({
   const isRefreshing = loading && !!lastValidData;
 
   // --- Détermination du composant de visualisation ---
-  // const widgetDef = widget
-  //   ? WIDGETS[widget.type as keyof typeof WIDGETS]
-  //   : null;
   const WidgetComponent = getWidgetComponent(widget, WIDGETS);
 
   // --- Gestion des erreurs de données ---

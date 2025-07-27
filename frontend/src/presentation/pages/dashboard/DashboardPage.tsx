@@ -7,7 +7,7 @@ import { DashboardSaveModal } from "./DashboardSaveModal";
 import ExportPDFModal from "@/presentation/components/ExportPDFModal";
 
 export default function DashboardPage() {
-  // --- Hooks et stores ---
+
   const {
     sources,
     saving,
@@ -62,7 +62,6 @@ export default function DashboardPage() {
     setExportPDFModalOpen,
   } = useDashboard();
 
-  // --- Rendu ---
   return (
     <>
       {/* Sélecteur de widget */}

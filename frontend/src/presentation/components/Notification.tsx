@@ -49,7 +49,7 @@ export default function Notification({
       if (barRef.current) {
         barRef.current.style.width = "100%";
         barRef.current.style.transition = "none";
-        // Force reflow
+
         void barRef.current.offsetWidth;
         barRef.current.style.transition = `width ${duration}ms linear`;
         barRef.current.style.width = "0%";

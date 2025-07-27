@@ -11,9 +11,9 @@ export default function ModalSidebarRight({
     footer,
     hideCloseButton = false,
     className = '',
-    size = 'md', // Optionnel, pour largeur personnalisable
+    size = 'md',
 }: ModalProps) {
-    // Largeur du panneau latéral
+
     const widthMap = {
         sm: 'w-80',
         md: 'w-[28rem]',

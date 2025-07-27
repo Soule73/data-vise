@@ -16,14 +16,12 @@ export default function ColorField({
       <input
         type="color"
         className="block w-full outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-700 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 transition-colors duration-300"
-        // className="p-1 h-10 w-14 block cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none"
         id={id}
         name={name}
         value={value || "#2563eb"}
         onChange={(e) => onChange(e.target.value)}
         title="Choisissez votre couleur"
         disabled={disabled}
-        // style={{ backgroundColor: value || "#2563eb" }}
       />
     </div>
   );

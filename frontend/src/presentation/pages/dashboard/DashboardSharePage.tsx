@@ -18,7 +18,6 @@ export default function DashboardSharePage() {
   const { dashboard, sources, loading, error, errorCode } =
     useDashboardShare(shareId);
 
-  // --- Rendu ---
   if (loading) return <div className="p-8 text-center">Chargement…</div>;
   if (error) {
     return (
@@ -29,7 +28,6 @@ export default function DashboardSharePage() {
       />
     );
   }
-  //  return <div className="p-8 text-center text-red-500">{error}</div>;
   if (!dashboard) return null;
 
   const layout = dashboard.layout || [];

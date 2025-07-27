@@ -71,8 +71,8 @@ export function useEditDataSourceForm() {
     onError: (e: any) => {
       base.setGlobalError(
         e?.response?.data?.message ||
-          e?.message ||
-          "Erreur lors de la modification de la source"
+        e?.message ||
+        "Erreur lors de la modification de la source"
       );
     },
   });

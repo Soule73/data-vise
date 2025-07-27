@@ -6,6 +6,7 @@ import {
   getLegendPosition,
   getTitle,
   getTitleAlign,
+  formatTooltipValue,
 } from "@/core/utils/chartUtils";
 import type { PieChartConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
@@ -50,14 +51,14 @@ export function usePieChartLogic(
   const backgroundColor = useMemo<string[]>(
     () =>
       config.widgetParams &&
-      Array.isArray(config.widgetParams.colors) &&
-      config.widgetParams.colors.length > 0
+        Array.isArray(config.widgetParams.colors) &&
+        config.widgetParams.colors.length > 0
         ? labels.map(
-            (_, i) =>
-              config.widgetParams!.colors![
-                i % config.widgetParams!.colors!.length
-              ]
-          )
+          (_, i) =>
+            config.widgetParams!.colors![
+            i % config.widgetParams!.colors!.length
+            ]
+        )
         : getColors(labels, config, 0),
     [labels, config]
   );
@@ -142,23 +143,21 @@ export function usePieChartLogic(
         },
         title: title
           ? {
-              display: true,
-              text: title,
-              position: "top",
-              align: titleAlign as "start" | "center" | "end",
-            }
+            display: true,
+            text: title,
+            position: "top",
+            align: titleAlign as "start" | "center" | "end",
+          }
           : undefined,
         tooltip: {
           enabled: true,
           callbacks: {
             label: function (context) {
-              const label = context.label;
+              const label = formatTooltipValue(context.label);
               const value = context.parsed;
               const percent =
                 values.reduce((a, b) => a + b, 0) > 0
-                  ? ((value / values.reduce((a, b) => a + b, 0)) * 100).toFixed(
-                      1
-                    )
+                  ? ((value / values.reduce((a, b) => a + b, 0)) * 100).toFixed(1)
                   : "0.0";
               return tooltipFormat
                 .replace("{label}", label)

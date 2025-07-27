@@ -32,7 +32,6 @@ export default function SourcesPage() {
         key: "icon",
         label: " ",
         render: (row: DataSource) => {
-          // Affiche une icône différente selon le type de source (CSV ou JSON)
           if (row.type === "csv") {
             return (
               <span className="flex items-center justify-center w-8 h-8">

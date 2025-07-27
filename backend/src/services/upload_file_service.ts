@@ -34,7 +34,7 @@ const uploadFileService
                 cb(null, uniqueName);
             },
         }),
-        limits: { fileSize: 10 * 1024 * 1024 }, // Limite de taille de fichier à 10 Mo
+        limits: { fileSize: 10 * 1024 * 1024 },
         fileFilter: function (req, file, cb) {
             const allowedTypes = [".csv", ".json"];
             const ext = path.extname(file.originalname);

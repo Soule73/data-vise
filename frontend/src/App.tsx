@@ -1,5 +1,3 @@
-// src/App.tsx
-
 import React, { useEffect, useState, type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "@/presentation/pages/auth/LoginPage";
@@ -49,10 +47,8 @@ const App: React.FC = () => {
   const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
-    // Affiche le loader au moins 3 secondes
     const timer = setTimeout(() => {
       setShowLoader(false);
-      // Vérifie via le store si l'utilisateur est bien connecté
       const currentUser = useUserStore.getState().user;
       const isDashboardShare = /^\/dashboard\/share\//.test(
         window.location.pathname
@@ -68,11 +64,10 @@ const App: React.FC = () => {
         );
         window.location.replace(ROUTES.login);
       }
-    }, 3000);
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Le loader ne s'affiche que sur les pages RequireAuth
   if (
     (user === undefined || user === null || showLoader) &&
     window.location.pathname !== ROUTES.login &&

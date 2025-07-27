@@ -89,10 +89,7 @@ export function allSameDay(labels: string[]): boolean {
 }
 
 // Utilitaire : formate un label timestamp pour l'axe X
-export function formatXTicksLabel(
-  raw: string,
-  onlyTimeIfSameDay = false
-): string {
+export function formatXTicksLabel(raw: string, onlyTimeIfSameDay = false): string {
   if (!isIsoTimestamp(raw)) return raw;
   const d = new Date(raw);
   if (isNaN(d.getTime())) return raw;
@@ -110,4 +107,23 @@ export function formatXTicksLabel(
       minute: "2-digit",
     });
   }
+}
+
+// Formate une valeur pour affichage dans un tooltip (date/datetime ou autre)
+export function formatTooltipValue(val: any): string {
+  if (isIsoTimestamp(val)) {
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) {
+      // Affichage date+heure lisible
+      return d.toLocaleString("fr-FR", {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    }
+  }
+  return String(val);
 }

@@ -1,3 +1,13 @@
+import {
+  createRoleSchema,
+  updateRoleSchema
+} from "../validation/role";
+import {
+  registerSchema,
+  loginSchema,
+  createUserSchema,
+  updateUserSchema
+} from "../validation/user";
 import User from "../models/User";
 import Role from "../models/Role";
 import Permission from "../models/Permission";
@@ -19,8 +29,10 @@ import type {
   UpdateRolePayload,
   UserResponse,
   UserRoleResponse,
-  LeanRoleWithCanDelete,
+  LeanRoleWithCanDelete
 } from "../types/authType";
+import { z } from "zod";
+import { buildErrorObject } from "@/utils/validationUtils";
 import mongoose, { ObjectId } from "mongoose";
 import { ApiResponse } from "@/types/api";
 import { toApiData, toApiError } from "@/utils/api";
@@ -70,39 +82,22 @@ const userService = {
   async register(
     payload: RegisterPayload
   ): Promise<ApiResponse<{ user: UserResponse; token: string }>> {
-    const { username, email, password } = payload;
-
-    if (!username || username.length < 2) {
-      return toApiError(
-        "Le nom d'utilisateur doit contenir au moins 2 caractères.",
-        422
-      );
+    // Validation via schéma importé
+    const parseResult = registerSchema.safeParse(payload);
+    if (!parseResult.success) {
+      const errorObj = buildErrorObject(parseResult.error.issues);
+      return toApiError("Erreur de validation", 422, errorObj);
     }
-    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      return toApiError("Email invalide.", 422);
-    }
-
-    if (!password || password.length < 6) {
-      return toApiError(
-        "Le mot de passe doit contenir au moins 6 caractères.",
-        422
-      );
-    }
-
+    const { username, email, password } = parseResult.data;
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       return toApiError("Cet email est déjà utilisé.", 422);
     }
-
     const defaultRole = await Role.findOne({ name: "user" });
-
     if (!defaultRole) {
       return toApiError("Rôle par défaut 'user' introuvable.", 500);
     }
-
     const passwordHash = await bcrypt.hash(password, 10);
-
     const createdUser = await User.create({
       username,
       email,
@@ -110,16 +105,12 @@ const userService = {
       roleId: defaultRole._id,
       passwordChangedAt: new Date(),
     });
-
     const userPopulated = await User.findById(createdUser._id).populate({
       path: "roleId",
       populate: { path: "permissions" },
     });
-
     const userId = (createdUser._id as ObjectId | string).toString();
-
     let role: UserRoleResponse | null = null;
-
     if (
       userPopulated &&
       userPopulated.roleId &&
@@ -127,17 +118,16 @@ const userService = {
       "permissions" in userPopulated.roleId
     ) {
       const r = userPopulated.roleId as unknown as PopulatedRole;
-
       role = {
         id: r._id.toString(),
         name: r.name,
         description: r.description,
         permissions: Array.isArray(r.permissions)
           ? r.permissions.map((p: PopulatedPermission) => ({
-              id: p._id.toString(),
-              name: p.name,
-              description: p.description,
-            }))
+            id: p._id.toString(),
+            name: p.name,
+            description: p.description,
+          }))
           : [],
       };
     }
@@ -148,9 +138,7 @@ const userService = {
         ? createdUser.passwordChangedAt.getTime()
         : 0,
     };
-
     const token = generateToken(userSigned);
-
     return {
       data: {
         user: {
@@ -172,60 +160,49 @@ const userService = {
   async login(
     payload: LoginPayload
   ): Promise<ApiResponse<{ user: UserResponse; token: string }>> {
-    const { email, password } = payload;
-
-    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      return toApiError("Email invalide.", 422);
+    // Validation via schéma importé
+    const parseResult = loginSchema.safeParse(payload);
+    if (!parseResult.success) {
+      const errorObj = buildErrorObject(parseResult.error.issues);
+      return toApiError("Erreur de validation", 422, errorObj);
     }
-
-    if (!password) {
-      return toApiError("Mot de passe requis.", 422);
-    }
-
+    const { email, password } = parseResult.data;
     const userPopulated = await User.findOne({ email }).populate({
       path: "roleId",
       populate: { path: "permissions" },
     });
-
     const userPopId = userPopulated
       ? (userPopulated._id as ObjectId | string).toString()
       : "";
-
     if (!userPopulated) {
       return toApiError("Identifiants invalides.", 401);
     }
-
     if (!userPopulated.roleId) {
       return toApiError("Aucun rôle associé à ce compte.", 403);
     }
-
     const valid = await bcrypt.compare(password, userPopulated.password);
     if (!valid) {
       return toApiError("Identifiants invalides.", 401);
     }
-
     let role: UserRoleResponse | null = null;
-
     if (
       typeof userPopulated.roleId === "object" &&
       "permissions" in userPopulated.roleId
     ) {
       const r = userPopulated.roleId as unknown as PopulatedRole;
-
       role = {
         id: r._id.toString(),
         name: r.name,
         description: r.description,
         permissions: Array.isArray(r.permissions)
           ? r.permissions.map((p: PopulatedPermission) => ({
-              id: p._id.toString(),
-              name: p.name,
-              description: p.description,
-            }))
+            id: p._id.toString(),
+            name: p.name,
+            description: p.description,
+          }))
           : [],
       };
     }
-
     const token = generateToken({
       id: userPopId,
       role: role?.name,
@@ -233,7 +210,6 @@ const userService = {
         ? userPopulated.passwordChangedAt.getTime()
         : 0,
     });
-
     return {
       data: {
         user: {
@@ -255,26 +231,23 @@ const userService = {
   async createUser(
     payload: CreateUserPayload
   ): Promise<ApiResponse<{ user: IUser }>> {
-    const { username, email, password, roleId } = payload;
-    if (!username || !email || !password || !roleId) {
-      return toApiError("Champs requis manquants.", 400);
+    // Validation via schéma importé
+    const parseResult = createUserSchema.safeParse(payload);
+    if (!parseResult.success) {
+      const errorObj = buildErrorObject(parseResult.error.issues);
+      return toApiError("Erreur de validation", 400, errorObj);
     }
-
+    const { username, email, password, roleId } = parseResult.data;
     const existing = await User.findOne({ email });
-
     if (existing) {
       return toApiError("Cet email est déjà utilisé.", 422);
     }
-
     const hash = await bcrypt.hash(password, 10);
-
     const user = await User.create({ username, email, password: hash, roleId });
-
     const userPopulated = await User.findById(user._id).populate(
       "roleId",
       "name"
     );
-
     return toApiData({ user: sanitizeUser(userPopulated) });
   },
 
@@ -288,28 +261,27 @@ const userService = {
     id: string,
     payload: UpdateUserPayload
   ): Promise<ApiResponse<{ user: IUser }>> {
+    // Validation via schéma importé
+    const parseResult = updateUserSchema.safeParse(payload);
+    if (!parseResult.success) {
+      const errorObj = buildErrorObject(parseResult.error.issues);
+      return toApiError("Erreur de validation", 400, errorObj);
+    }
     const update: Partial<IUser> = {};
-
-    if (payload.username) update.username = payload.username;
-
-    if (payload.email) update.email = payload.email;
-
-    if (payload.roleId)
-      update.roleId = new mongoose.Types.ObjectId(payload.roleId);
-
-    if (payload.password && payload.password.length > 0) {
-      update.password = await bcrypt.hash(payload.password, 10);
+    if (parseResult.data.username) update.username = parseResult.data.username;
+    if (parseResult.data.email) update.email = parseResult.data.email;
+    if (parseResult.data.roleId)
+      update.roleId = new mongoose.Types.ObjectId(parseResult.data.roleId);
+    if (parseResult.data.password && parseResult.data.password.length > 0) {
+      update.password = await bcrypt.hash(parseResult.data.password, 10);
       update.passwordChangedAt = new Date();
     }
-
     const user = await User.findByIdAndUpdate(id, update, {
       new: true,
     }).populate("roleId", "name");
-
     if (!user) {
       return toApiError("Utilisateur non trouvé.", 404);
     }
-
     return { data: { user: sanitizeUser(user) } };
   },
 
@@ -377,20 +349,17 @@ const userService = {
    * @returns {Promise<ApiResponse<IRole>>} - La réponse contenant le rôle créé.
    */
   async createRole(payload: CreateRolePayload): Promise<ApiResponse<IRole>> {
-    const { name, description, permissions } = payload;
-
-    if (!name || !Array.isArray(permissions) || permissions.length === 0) {
-      return toApiError("Nom et au moins une permission requise.", 400);
+    const parseResult = createRoleSchema.safeParse(payload);
+    if (!parseResult.success) {
+      const errorObj = buildErrorObject(parseResult.error.issues);
+      return toApiError("Erreur de validation", 400, errorObj);
     }
-
+    const { name, description, permissions } = parseResult.data;
     const perms = await Permission.find({ _id: { $in: permissions } });
-
     if (perms.length !== permissions.length) {
       return toApiError("Une ou plusieurs permissions sont invalides.", 400);
     }
-
     const role = await Role.create({ name, description, permissions });
-
     return toApiData(role);
   },
 
@@ -404,31 +373,25 @@ const userService = {
     id: string,
     payload: UpdateRolePayload
   ): Promise<ApiResponse<IRole>> {
-    const { name, description, permissions } = payload;
-
-    if (
-      permissions &&
-      (!Array.isArray(permissions) || permissions.length === 0)
-    ) {
-      return toApiError("Un rôle doit avoir au moins une permission.", 400);
+    const parseResult = updateRoleSchema.safeParse(payload);
+    if (!parseResult.success) {
+      const errorObj = buildErrorObject(parseResult.error.issues);
+      return toApiError("Erreur de validation", 400, errorObj);
     }
-
+    const { name, description, permissions } = parseResult.data;
     if (permissions) {
       const perms = await Permission.find({ _id: { $in: permissions } });
       if (perms.length !== permissions.length)
         return toApiError("Une ou plusieurs permissions sont invalides.", 400);
     }
-
     const role = await Role.findByIdAndUpdate(
       id,
       { $set: { name, description, ...(permissions ? { permissions } : {}) } },
       { new: true }
     ).populate("permissions");
-
     if (!role) {
       return toApiError("Rôle non trouvé.", 404);
     }
-
     return toApiData(role);
   },
 

@@ -131,7 +131,6 @@ function buildSourceDataKey(
   ];
 }
 
-// Nouveau : hook qui utilise react-query pour le cache par id de source et options
 export function dataBySourceQuery(
   sourceId?: string,
   options?: {
@@ -140,22 +139,13 @@ export function dataBySourceQuery(
     page?: number;
     pageSize?: number;
     fields?: string[] | string;
-    shareId?: string; // Ajout du shareId pour la propagation
+    shareId?: string;
   },
   initialData?: any[] | null,
-  refreshMs?: number, // pour le polling
-  forceRefreshKey?: number // clé pour forcer le refetch
+  refreshMs?: number,
+  forceRefreshKey?: number
 ) {
-  // Log de debug pour traquer les appels (diagnostic Elasticsearch)
-  if (sourceId) {
-    // eslint-disable-next-line no-console
-    console.log(
-      "[dataBySourceQuery] Appel avec sourceId:",
-      sourceId,
-      "options:",
-      options
-    );
-  }
+
   const queryKey = buildSourceDataKey(sourceId, options, forceRefreshKey);
   const {
     data = null,
@@ -176,11 +166,10 @@ export function dataBySourceQuery(
     enabled: !!sourceId,
     initialData,
     staleTime: 1000 * 60 * 5, // 5 min de cache
-    refetchInterval: refreshMs && refreshMs > 0 ? refreshMs : false, // active le polling si défini
-    placeholderData: keepPreviousData, // pour garder le comportement précédent
+    refetchInterval: refreshMs && refreshMs > 0 ? refreshMs : false,
+    placeholderData: keepPreviousData,
   });
 
-  // On expose data (toujours un tableau) et total si présent
   const total = (data && (data as any).total) || undefined;
   const rows = Array.isArray(data) ? data : [];
 

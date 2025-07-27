@@ -35,8 +35,9 @@ export function toApiData<T>(data: T): ApiData<T> {
  * Convertit un message d'erreur en format API.
  * @param {string} message - Le message d'erreur à convertir.
  * @param {number} [status=400] - Le statut HTTP de l'erreur (par défaut 400).
- * @return {ApiResponse} - La réponse d'erreur au format API.
+ * @param {Record<string, string>} [errors] - Un objet d'erreurs clé/valeur.
+ * @return {ApiError} - L'erreur convertie au format API.
  */
-export function toApiError<T>(message: string, status: number = 400): ApiError {
-  return { error: { message: message }, status: status };
+export function toApiError<T>(message: string, status: number = 400, errors?: Record<string, string>): ApiError {
+  return { error: { message: message, errors: errors }, status: status };
 }

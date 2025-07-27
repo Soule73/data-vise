@@ -3,6 +3,7 @@ import type { RadarChartConfig } from "@/core/types/visualization";
 import type { ChartOptions, ChartData, ChartDataset } from "chart.js";
 import type { RadarMetricConfig } from "@/core/types/metric-bucket-types";
 import type { RadarChartParams } from "@/core/types/visualization";
+import { formatTooltipValue } from "@/core/utils/chartUtils";
 
 function isRadarMetricConfig(metric: unknown): metric is RadarMetricConfig {
   return (
@@ -120,11 +121,21 @@ export function useRadarChartLogic(
         legend: { display: widgetParams.legend !== false },
         title: widgetParams.title
           ? {
-              display: true,
-              text: widgetParams.title,
-            }
+            display: true,
+            text: widgetParams.title,
+          }
           : undefined,
-        tooltip: { enabled: true },
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            label: function (context: any) {
+              // context.label = label de l'axe, context.parsed = valeur
+              const label = formatTooltipValue(context.label);
+              const value = context.parsed;
+              return `${label}: ${value}`;
+            },
+          },
+        },
       },
       scales: {
         r: {

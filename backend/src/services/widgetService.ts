@@ -16,29 +16,6 @@ import { generateUUID } from "@/utils/uuid_generator";
  * @module widgetService
  */
 const widgetService = {
-  /**
-   * Liste les widgets d'un utilisateur ou tous les widgets publics.
-   * Vérifie également si chaque widget est utilisé dans au moins un dashboard.
-   * @param {string} [userId] - L'ID de l'utilisateur pour filtrer les widgets.
-   * @returns {Promise<ApiResponse<IWidget[]>>} - La réponse contenant la liste des widgets.
-   */
-  async list(userId?: string): Promise<ApiResponse<IWidget[]>> {
-    const widgets = await Widget.find({
-      $or: [{ ownerId: userId }, { visibility: "public" }],
-    });
-
-    const widgetsWithUsage = await Promise.all(
-      widgets.map(async (w) => {
-        const count = await Dashboard.countDocuments({
-          layout: { $elemMatch: { widgetId: w.widgetId } },
-        });
-
-        return { ...w.toObject(), isUsed: count > 0 };
-      })
-    );
-
-    return toApiData(widgetsWithUsage);
-  },
 
   /**
    * Crée un nouveau widget avec les données fournies.
@@ -72,6 +49,48 @@ const widgetService = {
 
     return toApiData(widget);
   },
+
+
+  /**
+   * Liste les widgets d'un utilisateur ou tous les widgets publics.
+   * Vérifie également si chaque widget est utilisé dans au moins un dashboard.
+   * @param {string} [userId] - L'ID de l'utilisateur pour filtrer les widgets.
+   * @returns {Promise<ApiResponse<IWidget[]>>} - La réponse contenant la liste des widgets.
+   */
+  async list(userId?: string): Promise<ApiResponse<IWidget[]>> {
+    const widgets = await Widget.find({
+      $or: [{ ownerId: userId }, { visibility: "public" }],
+    });
+
+    const widgetsWithUsage = await Promise.all(
+      widgets.map(async (w) => {
+        const count = await Dashboard.countDocuments({
+          layout: { $elemMatch: { widgetId: w.widgetId } },
+        });
+
+        return { ...w.toObject(), isUsed: count > 0 };
+      })
+    );
+
+    return toApiData(widgetsWithUsage);
+  },
+
+
+  /**
+   * Récupère un widget par son ID.
+   * @param {string} id - L'ID du widget à récupérer.
+   * @returns {Promise<ApiResponse<IWidget>>} - La réponse contenant le widget trouvé.
+  */
+  async getById(id: string): Promise<ApiResponse<IWidget>> {
+    const widget = await Widget.findById(id);
+
+    if (!widget) {
+      return toApiError("Widget non trouvé.", 404);
+    }
+
+    return toApiData(widget);
+  },
+
 
   /**
    * Met à jour un widget existant avec les données fournies.
@@ -124,6 +143,7 @@ const widgetService = {
     return toApiData(widget);
   },
 
+
   /**
    * Supprime un widget par son ID.
    * Vérifie d'abord s'il est utilisé dans un dashboard.
@@ -153,20 +173,7 @@ const widgetService = {
     return toApiData({ success: true });
   },
 
-  /**
-   * Récupère un widget par son ID.
-   * @param {string} id - L'ID du widget à récupérer.
-   * @returns {Promise<ApiResponse<IWidget>>} - La réponse contenant le widget trouvé.
-   */
-  async getById(id: string): Promise<ApiResponse<IWidget>> {
-    const widget = await Widget.findById(id);
 
-    if (!widget) {
-      return toApiError("Widget non trouvé.", 404);
-    }
-
-    return toApiData(widget);
-  },
 };
 
 export default widgetService;

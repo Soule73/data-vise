@@ -32,7 +32,6 @@ export default function WidgetMetricStyleConfigSection({
   const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
   const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
 
-  // Cas spécial pour Card (et potentiellement KPI/KPIGroup) : styles globaux
   if (type === "card") {
     return (
       <div className="space-y-4">
@@ -125,8 +124,8 @@ export default function WidgetMetricStyleConfigSection({
                       label={label}
                       value={String(
                         safeMetricStyles[idx]?.[field] ??
-                          defaultValue ??
-                          (field === "borderColor" ? "#000000" : "#2563eb")
+                        defaultValue ??
+                        (field === "borderColor" ? "#000000" : "#2563eb")
                       )}
                       onChange={(val) =>
                         handleMetricStyleChange(idx, field, val)
@@ -157,7 +156,6 @@ export default function WidgetMetricStyleConfigSection({
                     />
                   );
                 }
-                // Ajoute d'autres types si besoin
                 return null;
               })}
             </div>

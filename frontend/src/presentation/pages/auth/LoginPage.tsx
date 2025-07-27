@@ -18,17 +18,7 @@ export default function Login() {
     <AuthLayout
       title="Conecter vous à Data-Vise"
       logoUrl={logoDataVise}
-    // bottomText={
-    //   <>
-    //     Pas encore de compte ?{" "}
-    //     <a
-    //       href="/register"
-    //       className="font-semibold text-indigo-600 hover:text-indigo-500"
-    //     >
-    //       Créer un compte
-    //     </a>
-    //   </>
-    // }
+
     >
       {globalError && (
         <div

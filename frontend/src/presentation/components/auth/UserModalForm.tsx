@@ -46,7 +46,6 @@ export default function UserModalForm({
     formHook.setValue(e.target.name, value);
   }
 
-  // Cast pour permettre password optionnel
   const formWithPassword = form as User & { password?: string };
 
   return (

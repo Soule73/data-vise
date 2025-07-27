@@ -10,24 +10,26 @@ import {
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 
-// Correction du typage du ref : HTMLInputElement (input), ou suppression si inutilisé
+
 const SelectField = forwardRef<HTMLInputElement, SelectFieldProps>(
   (
     { label, options, error, id, className, value, onChange, ...props },
     ref
   ) => {
     const [query, setQuery] = useState("");
-    // options: [{ value, label }]
+
     const selected = options.find((opt) => opt.value === value) || null;
+
     const filteredOptions = useMemo(
       () =>
         query === ""
           ? options
           : options.filter((opt) =>
-              opt.label.toLowerCase().includes(query.toLowerCase())
-            ),
+            opt.label.toLowerCase().includes(query.toLowerCase())
+          ),
       [query, options]
     );
+
     return (
       <div>
         <label
@@ -40,7 +42,6 @@ const SelectField = forwardRef<HTMLInputElement, SelectFieldProps>(
           value={selected}
           onChange={(opt) => {
             if (onChange && opt) {
-              // Simule un event natif pour compatibilité
               onChange({ target: { value: opt.value, name: id } } as any);
             }
           }}
@@ -51,7 +52,6 @@ const SelectField = forwardRef<HTMLInputElement, SelectFieldProps>(
               className={clsx(
                 "block w-full rounded-md bg-white dark:bg-gray-800 px-3 py-1.5 text-base text-gray-900 dark:text-gray-100 outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 transition-colors duration-300",
 
-                // "w-full rounded-md bg-white dark:bg-gray-800 px-3 py-2.5 text-base text-gray-900 dark:text-gray-100 outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 transition-colors duration-300",
                 className
               )}
               displayValue={(item) => {
@@ -59,7 +59,6 @@ const SelectField = forwardRef<HTMLInputElement, SelectFieldProps>(
                 if (typeof item === "string" || typeof item === "number")
                   return String(item);
                 if (Array.isArray(item)) return item.join(", ");
-                // Pour nos objets option { label }
                 if (
                   typeof item === "object" &&
                   "label" in item &&

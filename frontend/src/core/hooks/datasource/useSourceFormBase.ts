@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { dataSourceSchema } from "@/core/validation/datasource";
+import { ZodError } from "zod";
 import { detectColumnsQuery } from "@/data/repositories/sources";
 import {
   mapDetectedColumns,
@@ -56,6 +58,7 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
     }
   }, [initial]);
   const [step, setStep] = useState(1);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [csvOrigin, setCsvOrigin] = useState<"url" | "upload">("url");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [columns, setColumns] = useState<{ name: string; type: string }[]>([]);
@@ -77,7 +80,23 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
 
   // Handler pour changer un champ du form
   const setFormField = (field: string, value: any) => {
-    setForm((f) => ({ ...f, [field]: value }));
+    setForm((f) => {
+      const updated = { ...f, [field]: value };
+      // Validation Zod à chaque changement de champ
+      try {
+        dataSourceSchema.parse(updated);
+        setFieldErrors({});
+      } catch (err) {
+        if (err instanceof ZodError) {
+          const errors: Record<string, string> = {};
+          err.errors.forEach((e) => {
+            if (e.path && e.path[0]) errors[e.path[0]] = e.message;
+          });
+          setFieldErrors(errors);
+        }
+      }
+      return updated;
+    });
   };
 
   // Étape 1 : détection colonnes + preview
@@ -146,5 +165,6 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
     globalError,
     setGlobalError,
     setFormField,
+    fieldErrors,
   };
 }

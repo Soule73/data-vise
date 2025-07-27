@@ -28,13 +28,11 @@ export default function WidgetListPage() {
     hasPermission,
   } = useWidgetListPage();
 
-  // Définition des colonnes avec useMemo pour éviter le recalcul à chaque rendu
-  // Correction : la Table filtre les colonnes sans label, donc il faut mettre un label non vide pour la colonne icône
   const columns = useMemo(
     () => [
       {
         key: "icon",
-        label: " ", // espace pour que la colonne soit considérée comme valide
+        label: " ",
         render: (row: Widget) => {
           const widgetDef = WIDGETS[row.type as keyof typeof WIDGETS];
           const Icon = widgetDef?.icon;

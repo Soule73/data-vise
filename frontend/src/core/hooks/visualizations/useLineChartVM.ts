@@ -8,6 +8,7 @@ import {
   isIsoTimestamp,
   allSameDay,
   formatXTicksLabel,
+  formatTooltipValue,
 } from "@/core/utils/chartUtils";
 import type { LineChartConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
@@ -113,29 +114,25 @@ export function useLineChartLogic(
         },
         title: title
           ? {
-              display: true,
-              text: title,
-              position: "top",
-              align: titleAlign as "start" | "center" | "end",
-              color: labelColor,
-              font: labelFontSize ? { size: labelFontSize } : undefined,
-            }
+            display: true,
+            text: title,
+            position: "top",
+            align: titleAlign as "start" | "center" | "end",
+            color: labelColor,
+            font: labelFontSize ? { size: labelFontSize } : undefined,
+          }
           : undefined,
         tooltip: {
           enabled: true,
-          callbacks: config.widgetParams?.tooltipFormat
-            ? {
-                label: function (context) {
-                  const label = context.label;
-                  const value = context.parsed.y;
-                  return (
-                    config.widgetParams?.tooltipFormat || "{label}: {value}"
-                  )
-                    .replace("{label}", label)
-                    .replace("{value}", String(value));
-                },
-              }
-            : undefined,
+          callbacks: {
+            label: function (context) {
+              // context.label = valeur de l'axe X, context.parsed.y = valeur Y
+              const xVal = context.label;
+              const yVal = context.parsed.y;
+              const xFormatted = formatTooltipValue(xVal);
+              return `${xFormatted}: ${yVal}`;
+            },
+          },
         },
       },
       elements: {

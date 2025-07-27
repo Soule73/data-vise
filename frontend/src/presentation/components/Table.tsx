@@ -18,25 +18,25 @@ export default function Table<T extends { [key: string]: any }>({
   rowPerPage = 10,
   totalRows,
   searchValue = "",
-  name, // Ajout du paramètre name dans la destructuration
+  name,
 }: TableProps<T>) {
   React.useEffect(() => {
-    // Suppression des logs de debug
-    return () => {};
+    return () => { };
   }, []);
 
-  // Filtrer les colonnes invalides (doivent avoir à la fois key ET label)
   const validColumns = columns.filter((col) => col.key && col.label);
+
   const hasActions = !!actionsColumn;
 
-  // Recherche locale si pas de onSearch fourni
-  // Utilisation de Zustand pour la recherche avec typage explicite
+
   const zustandSearch = useTableSearchStore<string>(
     (state: any) => state.search
   );
+
   const setZustandSearch = useTableSearchStore<(search: string) => void>(
     (state: any) => state.setSearch
   );
+
   const resetZustandSearch = useTableSearchStore<() => void>(
     (state: any) => state.reset
   );
@@ -45,11 +45,9 @@ export default function Table<T extends { [key: string]: any }>({
     if (onSearch && searchValue !== zustandSearch) {
       setZustandSearch(searchValue || "");
     }
-    // eslint-disable-next-line
   }, [searchValue]);
 
   React.useEffect(() => {
-    // Nettoyage du store à l'unmount
     return () => {
       resetZustandSearch();
     };
@@ -60,60 +58,65 @@ export default function Table<T extends { [key: string]: any }>({
       ? searchValue
       : zustandSearch
     : "";
+
   const filteredData =
     searchable && effectiveSearch
       ? data.filter((row) =>
-          validColumns.some((col) => {
-            const value = row[col.key as keyof T];
-            return (
-              value &&
-              String(value)
-                .toLowerCase()
-                .includes(effectiveSearch.toLowerCase())
-            );
-          })
-        )
+        validColumns.some((col) => {
+          const value = row[col.key as keyof T];
+          return (
+            value &&
+            String(value)
+              .toLowerCase()
+              .includes(effectiveSearch.toLowerCase())
+          );
+        })
+      )
       : data;
 
-  // Pagination locale si pas de onPageChange fourni
   const [localPage, setLocalPage] = React.useState(1);
+
   const [localRowPerPage, setLocalRowPerPage] = React.useState(
     () => rowPerPage
   );
   React.useEffect(() => {
-    // Ne pas réinitialiser localRowPerPage à chaque render, seulement si rowPerPage change vraiment
+
     setLocalRowPerPage(rowPerPage);
-    // eslint-disable-next-line
   }, [rowPerPage]);
+
   const effectivePage = paginable ? (onPageChange ? page : localPage) : 1;
+
   const effectiveRowPerPage = paginable
     ? onPageChange
       ? rowPerPage
       : localRowPerPage
     : filteredData.length;
+
   const total = typeof totalRows === "number" ? totalRows : filteredData.length;
+
   const pageCount = paginable ? Math.ceil(total / effectiveRowPerPage) : 1;
+
   const paginatedData = paginable
     ? filteredData.slice(
-        (effectivePage - 1) * effectiveRowPerPage,
-        effectivePage * effectiveRowPerPage
-      )
+      (effectivePage - 1) * effectiveRowPerPage,
+      effectivePage * effectiveRowPerPage
+    )
     : filteredData;
 
-  // Handlers
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (onSearch) onSearch(e.target.value);
     else setZustandSearch(e.target.value);
     if (!onPageChange) setLocalPage(1);
   };
+
   const handlePageChange = (newPage: number) => {
     if (onPageChange) onPageChange(newPage);
     else setLocalPage(newPage);
   };
+
   const handleRowPerPageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     if (onPageChange) {
-      // Si pagination contrôlée, on notifie le parent
       if (onPageChange) onPageChange(1);
     } else {
       setLocalPage(1);
@@ -121,7 +124,6 @@ export default function Table<T extends { [key: string]: any }>({
     }
   };
 
-  // Déplacer le ref en dehors du composant TableSearch
   const searchMountCount = React.useRef(0);
 
   return (

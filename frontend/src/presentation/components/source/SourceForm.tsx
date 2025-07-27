@@ -36,6 +36,7 @@ interface SourceFormProps {
   setFilePath?: (v: string | null) => void;
   showFileField?: boolean;
   setShowFileField?: (v: boolean) => void;
+  fieldErrors?: Record<string, string>;
 }
 
 const SourceForm: React.FC<SourceFormProps> = ({
@@ -49,7 +50,6 @@ const SourceForm: React.FC<SourceFormProps> = ({
   setCsvFile,
   columns,
   columnsLoading,
-  // columnsError,
   dataPreview,
   showModal,
   setShowModal,
@@ -61,6 +61,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
   setFilePath,
   showFileField = false,
   setShowFileField,
+  fieldErrors = {},
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const values = form;
@@ -82,6 +83,9 @@ const SourceForm: React.FC<SourceFormProps> = ({
               onChange={(e) => setFormField("name", e.target.value)}
               required
             />
+            {fieldErrors.name && (
+              <div className="text-red-500 text-xs mt-1">{fieldErrors.name}</div>
+            )}
           </div>
           <div className="mb-4">
             <SelectField
@@ -96,6 +100,9 @@ const SourceForm: React.FC<SourceFormProps> = ({
               onChange={(e) => setFormField("type", e.target.value)}
               required
             />
+            {fieldErrors.type && (
+              <div className="text-red-500 text-xs mt-1">{fieldErrors.type}</div>
+            )}
           </div>
           {/* Section spécifique Elasticsearch */}
           {watchedType === "elasticsearch" && (
@@ -107,6 +114,9 @@ const SourceForm: React.FC<SourceFormProps> = ({
                 placeholder="https://mon-es:9200"
                 required
               />
+              {fieldErrors.endpoint && (
+                <div className="text-red-500 text-xs mt-1">{fieldErrors.endpoint}</div>
+              )}
               <InputField
                 label="Index Elasticsearch"
                 value={form.esIndex}
@@ -114,6 +124,9 @@ const SourceForm: React.FC<SourceFormProps> = ({
                 placeholder="nom-de-mon-index"
                 required
               />
+              {fieldErrors.esIndex && (
+                <div className="text-red-500 text-xs mt-1">{fieldErrors.esIndex}</div>
+              )}
               <TextareaField
                 label="Requête Elasticsearch (JSON)"
                 value={form.esQuery || ""}
@@ -147,7 +160,6 @@ const SourceForm: React.FC<SourceFormProps> = ({
                     setCsvFile(null);
                     setFormField("endpoint", "");
                     setStep(1);
-                    // Affiche FileField pour uploader un nouveau fichier
                     if (typeof setCsvOrigin === "function")
                       setCsvOrigin("upload");
                     if (typeof setShowFileField === "function")
@@ -172,11 +184,16 @@ const SourceForm: React.FC<SourceFormProps> = ({
           )}
           {/* Affichage du champ endpoint si CSV url */}
           {watchedType === "csv" && csvOrigin === "url" && (
-            <InputField
-              label="Endpoint (URL CSV)"
-              value={form.endpoint}
-              onChange={(e) => setFormField("endpoint", e.target.value)}
-            />
+            <>
+              <InputField
+                label="Endpoint (URL CSV)"
+                value={form.endpoint}
+                onChange={(e) => setFormField("endpoint", e.target.value)}
+              />
+              {fieldErrors.endpoint && (
+                <div className="text-red-500 text-xs mt-1">{fieldErrors.endpoint}</div>
+              )}
+            </>
           )}
           {watchedType === "csv" &&
             csvOrigin === "upload" &&
@@ -190,6 +207,9 @@ const SourceForm: React.FC<SourceFormProps> = ({
                 value={form.endpoint}
                 onChange={(e) => setFormField("endpoint", e.target.value)}
               />
+              {fieldErrors.endpoint && (
+                <div className="text-red-500 text-xs mt-1">{fieldErrors.endpoint}</div>
+              )}
               <span className="text-sm text-gray-500 mb-4">
                 Entrez l'URL d'un endpoint qui retourne des données au format
                 JSON.
@@ -338,13 +358,18 @@ const SourceForm: React.FC<SourceFormProps> = ({
                 </div>
                 {/* Champs selon authType */}
                 {values.authType === "bearer" && (
-                  <InputField
-                    label="Token Bearer"
-                    value={values.authConfig.token}
-                    onChange={(e) =>
-                      setFormField("authConfig.token", e.target.value)
-                    }
-                  />
+                  <>
+                    <InputField
+                      label="Token Bearer"
+                      value={values.authConfig.token}
+                      onChange={(e) =>
+                        setFormField("authConfig.token", e.target.value)
+                      }
+                    />
+                    {fieldErrors["authConfig.token"] && (
+                      <div className="text-red-500 text-xs mt-1">{fieldErrors["authConfig.token"]}</div>
+                    )}
+                  </>
                 )}
                 {values.authType === "apiKey" && (
                   <>
@@ -355,6 +380,9 @@ const SourceForm: React.FC<SourceFormProps> = ({
                         setFormField("authConfig.apiKey", e.target.value)
                       }
                     />
+                    {fieldErrors["authConfig.apiKey"] && (
+                      <div className="text-red-500 text-xs mt-1">{fieldErrors["authConfig.apiKey"]}</div>
+                    )}
                     <InputField
                       label="Nom du header (optionnel)"
                       value={values.authConfig.headerName}
@@ -374,6 +402,9 @@ const SourceForm: React.FC<SourceFormProps> = ({
                         setFormField("authConfig.username", e.target.value)
                       }
                     />
+                    {fieldErrors["authConfig.username"] && (
+                      <div className="text-red-500 text-xs mt-1">{fieldErrors["authConfig.username"]}</div>
+                    )}
                     <InputField
                       label="Mot de passe"
                       type="password"
@@ -382,6 +413,9 @@ const SourceForm: React.FC<SourceFormProps> = ({
                         setFormField("authConfig.password", e.target.value)
                       }
                     />
+                    {fieldErrors["authConfig.password"] && (
+                      <div className="text-red-500 text-xs mt-1">{fieldErrors["authConfig.password"]}</div>
+                    )}
                   </>
                 )}
               </>
@@ -453,7 +487,6 @@ const SourceForm: React.FC<SourceFormProps> = ({
                     .filter((col) => col.type === "datetime")
                     .map((col) => ({ value: col.name, label: col.name })),
                 ]}
-              // error={form.errors.timestampField?.message}
               />
               <span className="text-xs text-gray-500">
                 Seules les colonnes de type datetime sont proposées.
@@ -506,7 +539,6 @@ const SourceForm: React.FC<SourceFormProps> = ({
             label="Nom de la source"
             value={form.name}
             onChange={(e) => setFormField("name", e.target.value)}
-            // error={form.errors.name?.message}
             autoFocus
           />
           <div>

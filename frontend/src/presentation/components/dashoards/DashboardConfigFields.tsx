@@ -32,15 +32,17 @@ type Props = {
   relativeValue: number | undefined;
   relativeUnit: IntervalUnit | undefined;
   timeRangeMode: "absolute" | "relative";
-  // Handlers centralisés
+
   handleChangeAutoRefresh: (
     value: number | undefined,
     unit: IntervalUnit | undefined
   ) => void;
+
   handleChangeTimeRangeAbsolute: (
     from: string | null,
     to: string | null
   ) => void;
+
   handleChangeTimeRangeRelative: (
     value: number | undefined,
     unit: IntervalUnit | undefined
@@ -67,11 +69,11 @@ const DashboardConfigFields: React.FC<Props> = ({
   saving,
   onForceRefresh,
 }) => {
-  // Tab state synchronisé avec timeRangeMode global
+
   const tab = timeRangeMode;
 
-  // Texte dynamique pour le bouton Popover auto-refresh
   let autoRefreshLabel = "Activer l'auto-refresh";
+
   if (autoRefreshIntervalValue && autoRefreshIntervalValue > 0) {
     const unitLabel = formatUnitFr(
       autoRefreshIntervalUnit,
@@ -80,15 +82,18 @@ const DashboardConfigFields: React.FC<Props> = ({
     autoRefreshLabel = `Actualise toutes les ${autoRefreshIntervalValue} ${unitLabel}`;
   }
 
-  // Texte dynamique pour le bouton Popover plage temporelle
   let timeRangeLabel = "Configurer la plage";
+
   if (timeRangeMode === "relative" && relativeValue && relativeUnit) {
     const unitLabel = formatUnitFr(relativeUnit, relativeValue);
     timeRangeLabel = `Il y a ${relativeValue} ${unitLabel}`;
+
   } else if (timeRangeMode === "absolute" && timeRangeFrom && timeRangeTo) {
-    // Formatage court (date/heure)
+
     const from = new Date(timeRangeFrom);
+
     const to = new Date(timeRangeTo);
+
     timeRangeLabel = `du ${formatShortDateTime(from)} au ${formatShortDateTime(
       to
     )}`;
@@ -96,7 +101,6 @@ const DashboardConfigFields: React.FC<Props> = ({
 
   return (
     <div className="flex flex-wrap items-center mb-2 gap-2 md:gap-0">
-      {/* Popover pour le refresh automatique */}
       <Popover className="relative inline-block text-left">
         <PopoverButton
           as={Button}
@@ -157,7 +161,7 @@ const DashboardConfigFields: React.FC<Props> = ({
           </div>
         </PopoverPanel>
       </Popover>
-      {/* Popover pour la plage temporelle */}
+
       <Popover className="relative inline-block text-left">
         <PopoverButton
           as={Button}

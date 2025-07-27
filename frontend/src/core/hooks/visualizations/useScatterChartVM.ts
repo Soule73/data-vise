@@ -6,6 +6,7 @@ import {
   isIsoTimestamp,
   allSameDay,
   formatXTicksLabel,
+  formatTooltipValue,
 } from "@/core/utils/chartUtils";
 import type { ScatterChartParams } from "@/core/types/visualization";
 
@@ -89,16 +90,18 @@ export function useScatterChartLogic(
         legend: { display: widgetParams.legend !== false },
         title: widgetParams.title
           ? {
-              display: true,
-              text: widgetParams.title,
-            }
+            display: true,
+            text: widgetParams.title,
+          }
           : undefined,
         tooltip: {
           enabled: true,
           callbacks: {
             label: function (context: any) {
               const d = context.raw;
-              return `x: ${d.x}, y: ${d.y}`;
+              const x = formatTooltipValue(d.x);
+              const y = formatTooltipValue(d.y);
+              return `x: ${x}, y: ${y}`;
             },
           },
         },

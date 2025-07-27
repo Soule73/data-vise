@@ -29,13 +29,12 @@ export default function WidgetDataConfigSection({
   handleDragOver,
   handleDrop,
   handleMetricAggOrFieldChange,
-  data = [], // Ajout de la prop data avec valeur par défaut
+  data = [],
 }: WidgetDataConfigSectionFixedProps) {
   const widgetDef = WIDGETS[type];
   const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
   const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
 
-  // --- UX spécifique Bubble Chart ---
   if (type === "bubble") {
     return (
       <WidgetBubbleDataConfigSection
@@ -92,7 +91,7 @@ export default function WidgetDataConfigSection({
       />
     );
   }
-  // Section filtre simple pour KPI (champ + valeur)
+  {/* Section filtre simple pour KPI (champ + valeur) */ }
   const showFilter = widgetDef?.enableFilter;
   return (
     <div className="space-y-4">
@@ -130,21 +129,21 @@ export default function WidgetDataConfigSection({
               options={
                 config.filter?.field
                   ? [
-                      { value: "", label: "-- Toutes --" },
-                      ...Array.from(
-                        new Set(
-                          (data || [])
-                            .map((row) =>
-                              config?.filter?.field !== undefined
-                                ? row[config.filter.field]
-                                : undefined
-                            )
-                            .filter(
-                              (v) => v !== undefined && v !== null && v !== ""
-                            )
-                        )
-                      ).map((v) => ({ value: v, label: String(v) })),
-                    ]
+                    { value: "", label: "-- Toutes --" },
+                    ...Array.from(
+                      new Set(
+                        (data || [])
+                          .map((row) =>
+                            config?.filter?.field !== undefined
+                              ? row[config.filter.field]
+                              : undefined
+                          )
+                          .filter(
+                            (v) => v !== undefined && v !== null && v !== ""
+                          )
+                      )
+                    ).map((v) => ({ value: v, label: String(v) })),
+                  ]
                   : [{ value: "", label: "-- Choisir --" }]
               }
               name="filter-value"
@@ -167,9 +166,8 @@ export default function WidgetDataConfigSection({
                 metric.agg ||
                 "";
               const fieldLabel = metric.field || "";
-              const headerLabel = `${aggLabel}${
-                fieldLabel ? " · " + fieldLabel : ""
-              }`;
+              const headerLabel = `${aggLabel}${fieldLabel ? " · " + fieldLabel : ""
+                }`;
               const isOnlyMetric = config.metrics.length === 1;
               return (
                 <div
@@ -192,9 +190,8 @@ export default function WidgetDataConfigSection({
                       {dataConfig.metrics.allowMultiple && !isOnlyMetric && (
                         <>
                           <button
-                            className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
-                              idx === 0 ? "opacity-50 cursor-not-allowed" : ""
-                            }`}
+                            className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${idx === 0 ? "opacity-50 cursor-not-allowed" : ""
+                              }`}
                             onClick={(e) => {
                               e.stopPropagation();
                               if (idx === 0) return;
@@ -212,11 +209,10 @@ export default function WidgetDataConfigSection({
                             <ChevronUpIcon className="w-4 h-4" />
                           </button>
                           <button
-                            className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
-                              idx === config.metrics.length - 1
+                            className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${idx === config.metrics.length - 1
                                 ? "opacity-50 cursor-not-allowed"
                                 : ""
-                            }`}
+                              }`}
                             onClick={(e) => {
                               e.stopPropagation();
                               if (idx === config.metrics.length - 1) return;

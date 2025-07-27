@@ -36,9 +36,10 @@ export default function DashboardGrid({
   forceRefreshKey,
   page,
   pageSize,
-  shareId, // Propagation du shareId
+  shareId,
+  refreshMs
 }: DashboardGridProps) {
-  // --- Hook logique centralisé ---
+
   const {
     draggedIdx,
     hoveredIdx,
@@ -57,7 +58,6 @@ export default function DashboardGrid({
     onSwapLayout,
   });
 
-  // --- Rendu ---
   return (
     <div
       className={`dashboard-grid w-full flex flex-wrap min-w-full gap-2 ${editMode &&
@@ -65,7 +65,7 @@ export default function DashboardGrid({
         }`}
     >
       {slots.map((item, idx) => {
-        // Slot d'ajout de widget
+
         if (idx === slots.length - 1) {
           if (!editMode) return null;
           return (
@@ -76,8 +76,11 @@ export default function DashboardGrid({
             />
           );
         }
+
         const widget = item?.widget;
+
         if (!widget) return null;
+
         return (
           <DashboardGridItem
             key={widget.widgetId || idx}
@@ -101,7 +104,8 @@ export default function DashboardGrid({
             forceRefreshKey={forceRefreshKey}
             page={page}
             pageSize={pageSize}
-            shareId={shareId} // Propagation du shareId à chaque item
+            shareId={shareId}
+            refreshMs={refreshMs}
           />
         );
       })}

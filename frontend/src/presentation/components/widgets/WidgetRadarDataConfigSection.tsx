@@ -17,15 +17,17 @@ export default function WidgetRadarDataConfigSection({
   columns,
   handleConfigChange,
   configSchema,
-  data = [], // Ajout de la prop data
+  data = [],
 }: WidgetRadarDataConfigSectionProps) {
+
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
+
   const toggleCollapse = (idx: number) =>
     setCollapsed((prev) => ({ ...prev, [idx]: !prev[idx] }));
 
-  // Champs groupBy et axes depuis la config centralisée
   const groupByFields: string[] =
     configSchema?.dataConfig?.groupByFields || columns;
+
   const axisFields: string[] = configSchema?.dataConfig?.axisFields || columns;
 
   return (

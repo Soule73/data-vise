@@ -78,7 +78,6 @@ export default function WidgetStyleConfigSection({
             );
           }
           if (meta.inputType === "table-columns") {
-            // Table columns UI gérée ailleurs
             return null;
           }
           if (typeStr === "string[]" || meta.inputType === "multiselect") {
