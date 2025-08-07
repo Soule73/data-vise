@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { DashboardLayoutItem } from "@/core/types/dashboard-types";
 import type { Dashboard } from "@/core/types/dashboard-types";
 import type { ApiResponse } from "@/core/types/api";

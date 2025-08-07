@@ -14,8 +14,9 @@ import {
   fetchUploadedFile,
   getSourceById,
 } from "@/data/services/datasource";
+import type { DetectParams } from "@/core/types/data-source";
 
-export function sourcesQuery({ queryClient }: { queryClient: QueryClient }) {
+export function useSourcesQuery({ queryClient }: { queryClient: QueryClient }) {
   const query = useQuery({
     queryKey: ["sources"],
     queryFn: async () => getSources(),
@@ -54,7 +55,7 @@ export function useCreateSourceMutation({
   });
 }
 
-export function detectColumnsQuery(params: any, enabled: boolean = true) {
+export function useDetectColumnsQuery(params: DetectParams, enabled: boolean = true) {
   return useQuery({
     queryKey: ["detectColumns", params],
     queryFn: () => detectColumns(params),
@@ -95,6 +96,7 @@ export function useUpdateSourceMutation({
   queryClient: QueryClient;
 }) {
   return useMutation({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       updateSource(id, data),
     onSuccess: () => {
@@ -131,7 +133,7 @@ function buildSourceDataKey(
   ];
 }
 
-export function dataBySourceQuery(
+export function useDataBySourceQuery(
   sourceId?: string,
   options?: {
     from?: string;
@@ -141,6 +143,7 @@ export function dataBySourceQuery(
     fields?: string[] | string;
     shareId?: string;
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialData?: any[] | null,
   refreshMs?: number,
   forceRefreshKey?: number
@@ -170,6 +173,7 @@ export function dataBySourceQuery(
     placeholderData: keepPreviousData,
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const total = (data && (data as any).total) || undefined;
   const rows = Array.isArray(data) ? data : [];
 
@@ -186,9 +190,9 @@ export async function getUploadedFile(filename: string): Promise<Blob> {
   return await fetchUploadedFile(filename);
 }
 
-export function sourceByIdQuery({ id }: { id: string | undefined }) {
+export function useSourceByIdQuery({ id }: { id: string | undefined }) {
   if (!id) {
-    throw new Error("Source ID is required for sourceByIdQuery");
+    throw new Error("Source ID is required for useSourceByIdQuery");
   }
   return useQuery({
     queryKey: ["source", id],

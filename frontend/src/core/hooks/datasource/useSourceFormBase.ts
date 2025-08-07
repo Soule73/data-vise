@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { dataSourceSchema } from "@/core/validation/datasource";
 import { ZodError } from "zod";
-import { detectColumnsQuery } from "@/data/repositories/sources";
+import { useDetectColumnsQuery } from "@/data/repositories/sources";
 import {
   mapDetectedColumns,
   autoDetectTimestampField,
@@ -23,7 +23,7 @@ export interface SourceFormState {
   };
   timestampField: string;
   esIndex?: string;
-  esQuery?: any;
+  esQuery?: string;
   file?: File | null;
 }
 
@@ -71,14 +71,16 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
   const [showModal, setShowModal] = useState(false);
 
   // Détection colonnes
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [detectParams, setDetectParams] = useState<any | null>(null);
-  const detectColumnsQueryResult = detectColumnsQuery(detectParams, Boolean(detectParams));
+  const detectColumnsQueryResult = useDetectColumnsQuery(detectParams, Boolean(detectParams));
   const detectData = detectColumnsQueryResult.data;
   const columnsLoading = detectColumnsQueryResult.isLoading;
   const detectError = detectColumnsQueryResult.error;
   const isFetching = detectColumnsQueryResult.isFetching;
 
   // Handler pour changer un champ du form
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setFormField = (field: string, value: any) => {
     setForm((f) => {
       const updated = { ...f, [field]: value };
@@ -125,6 +127,7 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
       if (detectError) {
         if (!columnsError)
           setColumnsError(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (detectError as any)?.response?.data?.message ||
             (detectError as Error)?.message ||
             "Impossible de détecter les colonnes"
@@ -133,7 +136,8 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
         if (!detectData.columns || detectData.columns.length === 0) {
           setColumnsError("Aucune colonne détectée.");
         } else {
-          let data: Record<string, unknown>[] = detectData.preview || [];
+
+          const data: Record<string, unknown>[] = detectData.preview || [];
           setDataPreview(data);
           setColumns(mapDetectedColumns(detectData, data));
           const autoTimestamp = autoDetectTimestampField(detectData.columns);
@@ -142,7 +146,7 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
         }
       }
     }
-  }, [detectParams, columnsLoading, isFetching, detectError, detectData]);
+  }, [detectParams, columnsLoading, isFetching, detectError, detectData, columnsError]);
 
   return {
     form,

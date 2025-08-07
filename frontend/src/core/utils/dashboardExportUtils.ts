@@ -12,7 +12,6 @@ export async function exportDashboardToPDF({
   orientation = "landscape",
 } = {}) {
   // Log pour debug : vérifier que la fonction est bien appelée
-  // eslint-disable-next-line no-console
   console.log(
     "[exportDashboardToPDF] Début export PDF (html-to-image, mode grille)"
   );
@@ -71,7 +70,7 @@ export async function exportDashboardToPDF({
     await new Promise((resolve) => {
       img.onload = resolve;
     });
-    // Correction : passer orientation en premier argument (signature jsPDF)
+    // Correction: passer orientation en premier argument (signature jsPDF)
     // Cast explicite pour satisfaire TypeScript
     const pdf = new jsPDF(orientation as "landscape" | "portrait", "pt", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -86,11 +85,9 @@ export async function exportDashboardToPDF({
     const imgHeight = img.height * ratio;
     pdf.addImage(dataUrl, "PNG", 20, 20, imgWidth, imgHeight);
     pdf.save(filename);
-    // eslint-disable-next-line no-console
     console.log(`[exportDashboardToPDF] PDF généré (layout fidèle à l'écran).`);
   } catch (err) {
     alert("Erreur lors de la génération du PDF.");
-    // eslint-disable-next-line no-console
     console.error("Erreur lors de la sauvegarde du PDF:", err);
   }
 }

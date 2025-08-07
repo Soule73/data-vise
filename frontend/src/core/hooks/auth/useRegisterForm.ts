@@ -20,6 +20,7 @@ export function useRegisterForm() {
       // Redirige l'utilisateur après inscription
       navigate(ROUTES.dashboard, { replace: true });
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (e: any) => {
       if (e.response?.data?.errors) {
         Object.entries(e.response.data.errors).forEach(([field, message]) => {

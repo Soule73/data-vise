@@ -25,6 +25,7 @@ export function useCreateDataSourceForm() {
       });
       setTimeout(() => navigate(ROUTES.sources), 1200);
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (e: any) => {
       base.setGlobalError(
         e?.response?.data?.message ||
@@ -34,6 +35,7 @@ export function useCreateDataSourceForm() {
     },
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
     // On envoie tous les champs centralisés
     mutation.mutate({

@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useUpdateRoleMutation, useDeleteRoleMutation } from "@/data/repositories/roles";
 import { useState, useEffect } from "react";
 import { useNotificationStore } from "@/core/store/notification";
-import { permissionsQuery } from "@/data/repositories/roles";
-import { rolesQuery } from "@/data/repositories/roles";
+import { useRolesQuery, usePermissionsQuery } from "@/data/repositories/roles";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,8 +13,8 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export function useRoleManagement() {
   const showNotification = useNotificationStore((s) => s.showNotification);
-  const { data: permissions } = permissionsQuery();
-  const { roles, isLoading } = rolesQuery();
+  const { data: permissions } = usePermissionsQuery();
+  const { roles, isLoading } = useRolesQuery();
   const [showPerms, setShowPerms] = useState<string | null>(null);
   const [editRoleId, setEditRoleId] = useState<string | null>(null);
   const [editRole, setEditRole] = useState<any>(null);
@@ -135,6 +136,6 @@ export function useRoleManagement() {
     groupedPermissions,
     updateLoading: updateMutation.isPending,
     deleteLoading: deleteMutation.isPending,
-    formHook, 
+    formHook,
   };
 }

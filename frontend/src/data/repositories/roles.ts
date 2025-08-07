@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import type { Permission, Role } from "../../core/types/auth-types";
 import {
@@ -8,7 +9,7 @@ import {
   fetchPermissions,
 } from "@/data/services/role";
 
-export function rolesQuery() {
+export function useRolesQuery() {
   const {
     data = [],
     isLoading,
@@ -24,7 +25,7 @@ export function rolesQuery() {
   return { roles: data, isLoading, error };
 }
 
-export function permissionsQuery() {
+export function usePermissionsQuery() {
   return useQuery<Permission[]>({
     queryKey: ["permissions"],
     queryFn: fetchPermissions,

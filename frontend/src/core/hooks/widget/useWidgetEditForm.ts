@@ -5,8 +5,8 @@ import { useDashboardStore } from "@/core/store/dashboard";
 import { ROUTES } from "@/core/constants/routes";
 import { fetchWidgetById, updateWidget } from "@/data/services/widget";
 import type { DataSource } from "@/core/types/data-source";
-import type { WidgetType,Widget } from "@/core/types/widget-types";
-import { dataBySourceQuery, sourcesQuery } from "@/data/repositories/sources";
+import type { WidgetType, Widget } from "@/core/types/widget-types";
+import { useDataBySourceQuery, useSourcesQuery } from "@/data/repositories/sources";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWidgetForm } from "./useWidgetForm";
 
@@ -27,9 +27,9 @@ export function useWidgetEditForm() {
   const [formReady, setFormReady] = useState(false);
 
   // Liste Data source
-  const { data: sources = [] } = sourcesQuery({ queryClient });
+  const { data: sources = [] } = useSourcesQuery({ queryClient });
   // Charge les données de la source via id
-  const { data: realSourceData } = dataBySourceQuery(source?._id ?? "");
+  const { data: realSourceData } = useDataBySourceQuery(source?._id ?? "");
 
   // Initialise les colonnes à partir des données de la source (comme en création)
   useEffect(() => {
@@ -73,7 +73,7 @@ export function useWidgetEditForm() {
         } else {
           setSource(null);
         }
-      } catch (e) {
+      } catch {
         setError("Impossible de charger le widget");
       } finally {
         setLoading(false);
@@ -93,17 +93,17 @@ export function useWidgetEditForm() {
   const form = useWidgetForm(
     formReady
       ? {
-          type: (widget?.type as WidgetType) || "bar",
-          config: config,
-          title: widgetTitle,
-          sourceId: widget?.dataSourceId,
-          columns: columns,
-          dataPreview: Array.isArray(realSourceData)
-            ? (realSourceData as Record<string, unknown>[])
-            : [],
-          visibility: visibility,
-          disableAutoConfig: true,
-        }
+        type: (widget?.type as WidgetType) || "bar",
+        config: config,
+        title: widgetTitle,
+        sourceId: widget?.dataSourceId,
+        columns: columns,
+        dataPreview: Array.isArray(realSourceData)
+          ? (realSourceData as Record<string, unknown>[])
+          : [],
+        visibility: visibility,
+        disableAutoConfig: true,
+      }
       : undefined
   );
 
@@ -122,7 +122,7 @@ export function useWidgetEditForm() {
         form.setDataPreview(realSourceData);
       }
     }
-  }, [formReady, widget, config, widgetTitle, columns, visibility, realSourceData]);
+  }, [formReady, widget, config, widgetTitle, columns, visibility, realSourceData, form]);
 
   // Gestion de la sauvegarde spécifique à l'édition
   async function handleSave() {

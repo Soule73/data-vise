@@ -1,8 +1,11 @@
+import type { DetectParams } from "../types/data-source";
+
 /**
  * Mappe les colonnes détectées avec leur type.
  */
 export function mapDetectedColumns(
-  detectData: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  detectData: { columns: string[]; preview?: any[] | undefined; types?: Record<string, string> | undefined; },
   data: Record<string, unknown>[]
 ): { name: string; type: string }[] {
   return (detectData.columns || []).map((col: string) => ({
@@ -43,27 +46,11 @@ export function buildDetectParams({
   authConfig,
   esIndex,
   esQuery,
-}: {
-  type: "json" | "csv" | "elasticsearch";
-  csvOrigin?: "url" | "upload";
-  csvFile?: File | null;
-  endpoint?: string;
-  httpMethod?: "GET" | "POST";
-  authType?: "none" | "bearer" | "apiKey" | "basic";
-  authConfig?: {
-    token?: string;
-    apiKey?: string;
-    username?: string;
-    password?: string;
-    headerName?: string;
-  };
-  esIndex?: string;
-  esQuery?: any;
-}): any {
+}: DetectParams): DetectParams {
   if (type === "csv" && csvOrigin === "upload" && csvFile) {
     return { type, file: csvFile };
   } else if (type === "elasticsearch") {
-    const params: any = { type };
+    const params: DetectParams = { type };
     if (endpoint) params.endpoint = endpoint;
     if (esIndex) params.esIndex = esIndex;
     if (esQuery) params.esQuery = esQuery;
@@ -71,7 +58,7 @@ export function buildDetectParams({
     if (authConfig) params.authConfig = authConfig;
     return params;
   } else {
-    const params: any = { type };
+    const params: DetectParams = { type };
     if (type === "csv" && csvOrigin === "url") {
       params.endpoint = endpoint;
     } else if (type === "json") {

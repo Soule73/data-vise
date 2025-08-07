@@ -103,6 +103,7 @@ export function usePieChartLogic(
         if (!showNativeValues) return;
         const { ctx } = chart;
         const meta = chart.getDatasetMeta(0);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         meta.data.forEach((arc: any, i: number) => {
           const value = values[i];
           if (value == null || isNaN(value)) return;

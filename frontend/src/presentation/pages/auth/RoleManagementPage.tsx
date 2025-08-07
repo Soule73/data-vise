@@ -8,7 +8,7 @@ import AlertModal from "../../components/AlertModal";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/core/constants/routes";
 import CheckboxField from "@/presentation/components/forms/CheckboxField";
-import { permissionsQuery } from "@/data/repositories/roles";
+import { usePermissionsQuery } from "@/data/repositories/roles";
 import { useRoleManagement } from "@/core/hooks/auth/useRoleManagement";
 import { useUserStore } from "@/core/store/user";
 
@@ -35,7 +35,7 @@ export default function RoleManagementPage() {
     formHook,
   } = useRoleManagement();
 
-  const { data: permissions } = permissionsQuery();
+  const { data: permissions } = usePermissionsQuery();
   const hasPermission = useUserStore((s) => s.hasPermission);
 
   return (
@@ -66,7 +66,7 @@ export default function RoleManagementPage() {
                 onEdit={
                   hasPermission("role:canUpdate")
                     ? () => startEdit(role)
-                    : () => {}
+                    : () => { }
                 }
                 onCancel={cancelEdit}
                 onSave={saveEdit}
@@ -175,7 +175,7 @@ export default function RoleManagementPage() {
         title="Confirmer la suppression"
         description={
           roleToDelete
-            ? `Êtes-vous sûr de vouloir supprimer le rôle « ${roleToDelete.name} » ? Cette action est irréversible.`
+            ? `Êtes-vous sûr de vouloir supprimer le rôle « ${roleToDelete.name}» ? Cette action est irréversible.`
             : ""
         }
         confirmLabel="Supprimer"

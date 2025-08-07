@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Fonctions utilitaires pour widgets ChartJS (Pie, Bar, Line)
 
 export function aggregate(rows: any[], agg: string, field: string) {

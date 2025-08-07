@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useMemo, useCallback } from "react";
 import type { ChartOptions, ChartData, TooltipItem } from "chart.js";
 import type { BarChartConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
@@ -23,14 +24,17 @@ export function useBarChartLogic(
     () => getLabels(data, config.bucket?.field),
     [data, config.bucket?.field]
   );
-  function getValues(metric: MetricConfig) {
-    return labels.map((labelVal: string) => {
-      const rows = data.filter(
-        (row: any) => row[config.bucket.field] === labelVal
-      );
-      return aggregate(rows, metric.agg, metric.field);
-    });
-  }
+  const getValues = useCallback(
+    (metric: MetricConfig) => {
+      return labels.map((labelVal: string) => {
+        const rows = data.filter(
+          (row: any) => row[config.bucket.field] === labelVal
+        );
+        return aggregate(rows, metric.agg, metric.field);
+      });
+    },
+    [labels, data, config.bucket.field]
+  );
   // Extraction stricte des params
   const widgetParams: BarChartParams = config.widgetParams ?? {};
   const showValues = widgetParams.showValues ?? false;
@@ -60,7 +64,7 @@ export function useBarChartLogic(
           stack: stacked ? undefined : `stack${idx}`,
         };
       }),
-    [labels, config.metrics, config.metricStyles, stacked]
+    [config.metrics, config.metricStyles, getValues, stacked]
   );
   const chartData: ChartData<"bar"> = useMemo(
     () => ({ labels, datasets }),
@@ -75,25 +79,27 @@ export function useBarChartLogic(
   const isHorizontal = widgetParams.horizontal ?? false;
   const indexAxis: "x" | "y" = isHorizontal ? "y" : "x";
   // Correction : ne pas dupliquer la clé plugins dans l'objet options
-  const pluginsOptions = showValues
-    ? {
-      datalabels: undefined,
-      tooltip: {
-        enabled: true,
-        callbacks: {
-          label: function (context: any) {
-            const label = formatTooltipValue(context.label);
-            const value = context.parsed.y;
-            // Pas de percent pour bar, mais on laisse le placeholder pour compat future
-            return labelFormat
-              .replace("{label}", label)
-              .replace("{value}", String(value))
-              .replace("{percent}", "");
+  const pluginsOptions = useMemo(() => (
+    showValues
+      ? {
+        datalabels: undefined,
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            label: function (context: any) {
+              const label = formatTooltipValue(context.label);
+              const value = context.parsed.y;
+              // Pas de percent pour bar, mais on laisse le placeholder pour compat future
+              return labelFormat
+                .replace("{label}", label)
+                .replace("{value}", String(value))
+                .replace("{percent}", "");
+            },
           },
         },
-      },
-    }
-    : {};
+      }
+      : {}
+  ), [showValues, labelFormat]);
   const isXTimestamps = useMemo(() => {
     if (!labels || labels.length === 0) return false;
     return isIsoTimestamp(labels[0]);
@@ -174,24 +180,7 @@ export function useBarChartLogic(
         },
       },
     }),
-    [
-      legendPosition,
-      title,
-      titleAlign,
-      xLabel,
-      yLabel,
-      showGrid,
-      stacked,
-      indexAxis,
-      showValues,
-      labelFormat,
-      pluginsOptions,
-      labelColor,
-      labelFontSize,
-      labels,
-      isXTimestamps,
-      xAllSameDay,
-    ]
+    [widgetParams.legend, legendPosition, labelColor, labelFontSize, title, titleAlign, pluginsOptions, indexAxis, showGrid, xLabel, stacked, yLabel, showValues, labelFormat, isXTimestamps, labels, xAllSameDay]
   );
   return {
     chartData,

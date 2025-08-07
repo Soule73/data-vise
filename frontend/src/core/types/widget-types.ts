@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   BarChartConfig,
   LineChartConfig,
@@ -292,7 +293,7 @@ export interface WidgetDataConfig {
   axisFields?: string[];
 }
 
-// Utilisation dans les props :
+// Utilisation dans les props:
 export interface WidgetDataConfigSectionProps<
   TDataConfig = WidgetDataConfig,
   TConfig = WidgetConfig

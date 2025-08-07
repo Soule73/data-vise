@@ -1,6 +1,6 @@
 import {
   useDeleteSourceMutation,
-  sourcesQuery,
+  useSourcesQuery,
   getUploadedFile,
 } from "@/data/repositories/sources";
 import { useNotificationStore } from "@/core/store/notification";
@@ -19,7 +19,7 @@ export function useSourcesPage() {
     isLoading,
     refetch,
     refetchSources,
-  } = sourcesQuery({ queryClient });
+  } = useSourcesQuery({ queryClient });
   const sources: DataSource[] = sourcesRaw || [];
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
@@ -95,6 +95,7 @@ export function useSourcesPage() {
       setSelectedSource(null);
       handleDeleteSuccess();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (e: any) => {
       setModalOpen(false);
       setSelectedSource(null);

@@ -9,8 +9,28 @@ interface DataSourceBase {
   authType?: "none" | "bearer" | "apiKey" | "basic";
   authConfig?: AuthConfig;
   esIndex?: string;
-  esQuery?: any;
+  esQuery?: string;
 }
+
+export interface DetectParams {
+  type: "json" | "csv" | "elasticsearch";
+  csvOrigin?: "url" | "upload";
+  csvFile?: File | null;
+  endpoint?: string;
+  httpMethod?: "GET" | "POST";
+  authType?: "none" | "bearer" | "apiKey" | "basic";
+  file?: File;
+  authConfig?: {
+    token?: string;
+    apiKey?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  };
+  esIndex?: string;
+  esQuery?: string;
+}
+
 
 export interface DataSource extends DataSourceBase {
   _id: string;

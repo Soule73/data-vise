@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { sourcesQuery, dataBySourceQuery } from "@/data/repositories/sources";
+import { useSourcesQuery, useDataBySourceQuery } from "@/data/repositories/sources";
 import type { DataSource } from "@/core/types/data-source";
 import type {
   WidgetFormInitialValues,
@@ -44,9 +45,9 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
   const metricLabelStore = useMetricLabelStore();
   const WidgetComponent = WIDGETS[type]?.component;
   const queryClient = useQueryClient();
-  const { data: sources = [] } = sourcesQuery({ queryClient });
+  const { data: sources = [] } = useSourcesQuery({ queryClient });
   const src = sources?.find((s: DataSource) => s._id === sourceId);
-  const { refetch } = dataBySourceQuery(src?._id);
+  const { refetch } = useDataBySourceQuery(src?._id);
 
   // --- Logique de config par défaut ---
   function getDefaultConfig(type: WidgetType, columns: string[]): any {
@@ -289,7 +290,7 @@ export function useWidgetForm(initialValues?: WidgetFormInitialValues) {
       setColumns(data[0] ? Object.keys(data[0]) : []);
       setConfig(getDefaultConfig(type, data[0] ? Object.keys(data[0]) : []));
       setStep(2);
-    } catch (e: any) {
+    } catch {
       setError("Impossible de charger les données de la source");
     } finally {
       setLoading(false);

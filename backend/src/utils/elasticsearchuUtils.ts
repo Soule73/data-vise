@@ -130,7 +130,7 @@ export function buildSearchParams(options: {
  * @param {DetectParams} params - Paramètres de détection
  * @returns {Promise<{ columns: string[]; preview: object[] }>} - Colonnes détectées et un aperçu des données
  */
-export async function detectColumnsElasticsearch(params: IDataSource): Promise<{ columns: string[]; preview: object[] }> {
+export async function detectColumnsElasticsearch(params: DetectParams): Promise<{ columns: string[]; preview: object[] }> {
     const client = buildEsClient({
         endpoint: params.endpoint,
         authType: params.authType,

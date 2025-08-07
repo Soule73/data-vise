@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { QueryClient, useMutation } from "@tanstack/react-query";
 import {
   login as loginService,

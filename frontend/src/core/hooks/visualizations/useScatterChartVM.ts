@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useMemo } from "react";
 import type { ScatterChartConfig } from "@/core/types/visualization";
 import type { ScatterMetricConfig } from "@/core/types/metric-bucket-types";
@@ -28,7 +30,10 @@ export function useScatterChartLogic(
   validDatasets: ScatterMetricConfig[];
 } {
   // Extraction stricte des params
-  const widgetParams: ScatterChartParams = config.widgetParams ?? {};
+  const widgetParams: ScatterChartParams = useMemo(
+    () => config.widgetParams ?? {},
+    [config.widgetParams]
+  );
 
   const validDatasets = useMemo<ScatterMetricConfig[]>(
     () => config.metrics.filter(isScatterMetricConfig) as ScatterMetricConfig[],
@@ -39,7 +44,7 @@ export function useScatterChartLogic(
       validDatasets.map((ds, i) => {
         let color =
           config.metricStyles?.[i]?.color || `hsl(${(i * 60) % 360}, 70%, 60%)`;
-        let opacity = config.metricStyles?.[i]?.opacity ?? 0.7;
+        const opacity = config.metricStyles?.[i]?.opacity ?? 0.7;
         if (typeof color === "string" && color.startsWith("#") && opacity < 1) {
           const hex = color.replace("#", "");
           const bigint = parseInt(hex, 16);

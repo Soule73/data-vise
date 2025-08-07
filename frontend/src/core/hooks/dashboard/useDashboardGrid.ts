@@ -49,7 +49,7 @@ export function useDashboardGrid({
     const temp = { ...newLayout[draggedIdx] };
     newLayout[draggedIdx] = { ...newLayout[slotIdx] };
     newLayout[slotIdx] = temp;
-    onSwapLayout && onSwapLayout(newLayout);
+    if (onSwapLayout) onSwapLayout(newLayout);
     setDraggedIdx(null);
     setHoveredIdx(null);
   };
@@ -59,7 +59,7 @@ export function useDashboardGrid({
     const newLayout = layout
       .filter((_, lidx) => lidx !== idx)
       .map((item) => ({ ...item }));
-    onSwapLayout && onSwapLayout(newLayout);
+    if (onSwapLayout) onSwapLayout(newLayout);
   };
 
   // --- Alerte navigation/fermeture si édition non sauvegardée ---

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { DashboardLayoutItem } from "@/core/types/dashboard-types";
 
 /**
@@ -29,11 +30,11 @@ export function buildNewLayoutOnResize({
   return hydratedLayout.map((it: any, i: number) =>
     i === idx
       ? {
-          ...it,
-          width: `${newWidthPercent}%`,
-          height: newHeightPx,
-          widget: it.widget,
-        }
+        ...it,
+        width: `${newWidthPercent}%`,
+        height: newHeightPx,
+        widget: it.widget,
+      }
       : { ...it, widget: it.widget }
   );
 }

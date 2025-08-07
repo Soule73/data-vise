@@ -15,6 +15,7 @@ import TextareaField from "@/presentation/components/forms/TextareaField";
 
 interface SourceFormProps {
   form: SourceFormState;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFormField: (field: string, value: any) => void;
   step: number;
   setStep: (s: number) => void;
@@ -30,7 +31,8 @@ interface SourceFormProps {
   setShowModal: (b: boolean) => void;
   globalError: string;
   handleNext: () => void;
-  onSubmit: (data: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSubmit: (data: Record<string, any>) => void;
   isEdit?: boolean;
   filePath?: string | null;
   setFilePath?: (v: string | null) => void;
@@ -156,7 +158,8 @@ const SourceForm: React.FC<SourceFormProps> = ({
                   type="button"
                   className="ml-4 w-max border-none !bg-transparent text-red-600 hover:underline text-sm"
                   onClick={() => {
-                    setFilePath && setFilePath(null);
+
+                    if (setFilePath) setFilePath(null);
                     setCsvFile(null);
                     setFormField("endpoint", "");
                     setStep(1);

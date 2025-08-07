@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Dashboard, IntervalUnit } from "@/core/types/dashboard-types";
 
 /**
@@ -18,7 +19,7 @@ export function getEffectiveTimeRange({
 }) {
   if (timeRangeMode === "relative" && relativeValue && relativeUnit) {
     const now = new Date();
-    let from = new Date(now);
+    const from = new Date(now);
     switch (relativeUnit) {
       case "second":
         from.setSeconds(now.getSeconds() - relativeValue);
@@ -155,4 +156,23 @@ export function initDashboardTimeConfig(dashboard: Dashboard | undefined) {
         ? "relative"
         : "absolute",
   };
+}
+
+
+/**
+ * Utilitaire pour générer un nom de fichier PDF propre à partir du titre du dashboard
+ * @param title - Titre du dashboard
+ * @returns - Nom de fichier formaté pour l'export PDF
+ */
+export function getDashboardPDFFileName(title?: string) {
+  if (!title) return "dashboard.pdf";
+
+  return (
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") + ".pdf"
+  );
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   useCreateUserMutation,
   useUpdateUserMutation,
@@ -5,8 +6,8 @@ import {
 } from "@/data/repositories/auth";
 import { useState, useMemo } from "react";
 import { useNotificationStore } from "@/core/store/notification";
-import { rolesQuery } from "@/data/repositories/roles";
-import { usersQuery } from "@/data/repositories/users";
+import { useRolesQuery } from "@/data/repositories/roles";
+import { useUsersQuery } from "@/data/repositories/users";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,8 +25,8 @@ export function useUserManagement() {
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const queryClient = useQueryClient();
 
-  const { data: users, isLoading } = usersQuery();
-  const { roles } = rolesQuery();
+  const { data: users, isLoading } = useUsersQuery();
+  const { roles } = useRolesQuery();
 
   const createMutation = useCreateUserMutation({
     queryClient,

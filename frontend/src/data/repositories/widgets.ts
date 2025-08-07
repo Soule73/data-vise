@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import {
   fetchWidgets,
@@ -5,7 +6,7 @@ import {
   deleteWidget,
 } from "@/data/services/widget";
 
-export function widgetsQuery() {
+export function useWidgetsQuery() {
   return useQuery({
     queryKey: ["widgets"],
     queryFn: fetchWidgets,

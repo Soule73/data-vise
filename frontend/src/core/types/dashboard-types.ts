@@ -105,29 +105,6 @@ export interface DashboardHeaderProps {
   handleCancelEdit: () => void;
   setEditMode: (v: boolean) => void;
   saving: boolean;
-  handleSaveConfig: () => void;
-  autoRefreshIntervalValue: number | undefined;
-  autoRefreshIntervalUnit: IntervalUnit | undefined;
-  timeRangeFrom: string | null;
-  timeRangeTo: string | null;
-  relativeValue: number | undefined;
-  relativeUnit: IntervalUnit | undefined;
-  timeRangeMode: "absolute" | "relative";
-  handleChangeAutoRefresh: (
-    value: number | undefined,
-    unit: IntervalUnit | undefined
-  ) => void;
-  handleChangeTimeRangeAbsolute: (
-    from: string | null,
-    to: string | null
-  ) => void;
-  handleChangeTimeRangeRelative: (
-    value: number | undefined,
-    unit: IntervalUnit | undefined
-  ) => void;
-  handleChangeTimeRangeMode: (mode: "absolute" | "relative") => void;
-  savingConfig?: boolean;
-  onForceRefresh?: () => void;
   shareLoading?: boolean;
   shareError?: string | null;
   shareLink?: string | null;
@@ -137,6 +114,8 @@ export interface DashboardHeaderProps {
   handleDisableShare?: () => void;
   handleCopyShareLink?: () => void;
   handleExportPDF: () => void;
+
+  children?: ReactNode;
 }
 
 export interface SaveModalProps {

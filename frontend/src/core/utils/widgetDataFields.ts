@@ -1,4 +1,5 @@
-import type { WidgetType } from "@/core/types/widget-types";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// import type { WidgetType } from "@/core/types/widget-types";
 import type { Filter } from "../types/visualization";
 import type {
   MetricConfig,
@@ -111,17 +112,16 @@ function extractAllFilterFields(filters: Filter[] = []): string[] {
 export function getWidgetDataFields(
   config: {
     metrics?:
-      | MetricConfig[]
-      | ScatterMetricConfig[]
-      | BubbleMetricConfig[]
-      | RadarMetricConfig[];
+    | MetricConfig[]
+    | ScatterMetricConfig[]
+    | BubbleMetricConfig[]
+    | RadarMetricConfig[];
     bucket?: BucketConfig;
     columns?: Array<string | { key: string; label: string }>;
     filters?: Filter[];
     [key: string]: any;
   },
-  //@ts-ignore
-  type?: WidgetType
+  // type?: WidgetType
 ): string[] {
   if (!config) return [];
   let fields: string[] = [];

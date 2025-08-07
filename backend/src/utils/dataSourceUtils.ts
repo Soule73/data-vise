@@ -470,21 +470,23 @@ export function paginateRows(
  */
 export async function resolveDetectConfig(
   params: DetectParams
-): Promise<IDataSource | { error: ReturnType<typeof toApiError> }> {
+): Promise<DetectParams | { error: ReturnType<typeof toApiError> }> {
   let {
-    sourceId,
+    // sourceId,
     endpoint,
     filePath } = params
 
-  if (sourceId && !endpoint && !filePath) {
+  if (
+    // sourceId && 
+    !endpoint && !filePath) {
     return { error: toApiError("Source ID fourni sans endpoint ni filePath.", 400) }
   }
-  const dataSource = await DataSource.findById(sourceId)
-  if (!dataSource) {
-    return { error: toApiError("Source non trouvée pour la détection de colonnes.", 404) }
-  }
+  // const dataSource = await DataSource.findById(sourceId)
+  // if (!dataSource) {
+  //   return { error: toApiError("Source non trouvée pour la détection de colonnes.", 404) }
+  // }
 
-  return dataSource;
+  return params;
 }
 
 
@@ -494,7 +496,7 @@ export async function resolveDetectConfig(
  * @param {IDataSource} dataSource - La source de données à lire
  * @returns {Promise<Record<string, unknown>[]>} - Un tableau d'objets
  */
-export async function fetchRowsFromSource(dataSource: IDataSource): Promise<Record<string, unknown>[]> {
+export async function fetchRowsFromSource(dataSource: DetectParams): Promise<Record<string, unknown>[]> {
   const {
     type,
     endpoint,

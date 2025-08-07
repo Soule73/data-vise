@@ -551,6 +551,7 @@ const COMMON_FIELDS = {
 // Nettoyage des doublons dans WIDGET_CONFIG_FIELDS
 export const WIDGET_CONFIG_FIELDS: Record<
   string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   { label: string; default?: any; inputType?: string; options?: any[] }
 > = {
   xField: { label: "Champ X", inputType: "select" },

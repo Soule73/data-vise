@@ -35,6 +35,7 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
     () => (Array.isArray(config.metrics) ? config.metrics : []),
     [config.metrics]
   );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const metricStyles = useMemo<any[]>(
     () => (Array.isArray(config.metricStyles) ? config.metricStyles : []),
     [config.metricStyles]

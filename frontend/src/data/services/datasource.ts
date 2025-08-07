@@ -1,5 +1,5 @@
 import api from "./api";
-import type { CreateSourcePayload, DataSource } from "@/core/types/data-source";
+import type { AuthConfig, CreateSourcePayload, DataSource } from "@/core/types/data-source";
 import type { ApiResponse } from "@/core/types/api";
 import { extractApiData } from "../../core/utils/api-utils";
 
@@ -64,10 +64,10 @@ export async function updateSource(
     config?: Record<string, unknown>;
     httpMethod?: "GET" | "POST";
     authType?: "none" | "bearer" | "apiKey" | "basic";
-    authConfig?: any;
+    authConfig?: AuthConfig;
     timestampField?: string;
     esIndex?: string;
-    esQuery?: any;
+    esQuery?: string;
   }
 ): Promise<DataSource> {
   const res = await api.put<ApiResponse<DataSource>>(`/sources/${id}`, data);
@@ -88,6 +88,7 @@ export async function detectColumns(params: {
   file?: File;
 }): Promise<{
   columns: string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   preview?: any[];
   types?: Record<string, string>;
 }> {
@@ -98,6 +99,7 @@ export async function detectColumns(params: {
     const res = await api.post<
       ApiResponse<{
         columns: string[];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         preview?: any[];
         types?: Record<string, string>;
       }>
@@ -109,6 +111,7 @@ export async function detectColumns(params: {
     const res = await api.post<
       ApiResponse<{
         columns: string[];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         preview?: any[];
         types?: Record<string, string>;
       }>
@@ -128,6 +131,7 @@ export async function fetchSourceData(
     forceRefresh?: boolean;
     shareId?: string;
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const params = new URLSearchParams();
   if (options?.from) params.append("from", options.from);
@@ -147,6 +151,8 @@ export async function fetchSourceData(
 
   const url = `/sources/${sourceId}/data${params.toString() ? `?${params}` : ""
     }`;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res = await api.get<ApiResponse<any>>(url);
   const apiData = extractApiData(res);
   // Si la réponse contient { data, total }, on retourne data et total

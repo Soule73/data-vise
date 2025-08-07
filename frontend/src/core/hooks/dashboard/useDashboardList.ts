@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  dashboardsQuery,
+  useDashboardsQuery,
   deleteDashboardQuery,
 } from "@/data/repositories/dashboards";
 import { useNotificationStore } from "@/core/store/notification";
@@ -11,7 +11,7 @@ import { useUserStore } from "@/core/store/user";
 import type { Dashboard } from "@/core/types/dashboard-types";
 
 export function useDashboardList() {
-  const { data: dashboards = [], isLoading } = dashboardsQuery();
+  const { data: dashboards = [], isLoading } = useDashboardsQuery();
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<Dashboard | null>(

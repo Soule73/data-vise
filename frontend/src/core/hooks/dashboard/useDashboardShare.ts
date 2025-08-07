@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { ROUTES } from "@/core/constants/routes";
 import {
-  sharedDashboardQuery,
-  sharedDashboardSourcesQuery,
+  useSharedDashboardQuery,
+  useSharedDashboardSourcesQuery,
 } from "@/data/repositories/dashboards";
 
 export function useDashboardShare(shareId?: string) {
@@ -11,12 +12,12 @@ export function useDashboardShare(shareId?: string) {
     data: dashboard,
     isLoading: loading,
     error: dashboardError,
-  } = sharedDashboardQuery(shareId);
+  } = useSharedDashboardQuery(shareId);
   const {
     data: sources = [],
     isLoading: loadingSources,
     error: sourcesError,
-  } = sharedDashboardSourcesQuery(shareId);
+  } = useSharedDashboardSourcesQuery(shareId);
 
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
   useEffect(() => {

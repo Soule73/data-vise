@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import {
   aggregate,
@@ -5,11 +6,11 @@ import {
 } from "@/core/utils/chartUtils";
 
 export function useTableWidgetLogic(data: any[], config: any) {
-  const safeData = Array.isArray(data) ? data : [];
   const hasMetrics = Array.isArray(config.metrics) && config.metrics.length > 0;
   const hasBucket = config.bucket && config.bucket.field;
 
   const { columns, displayData } = useMemo(() => {
+    const safeData = Array.isArray(data) ? data : [];
     let columns: { key: string; label: string }[] = [];
     let displayData: any[] = [];
     if (hasMetrics && hasBucket && config.bucket && config.metrics) {
@@ -71,7 +72,7 @@ export function useTableWidgetLogic(data: any[], config: any) {
       }
     }
     return { columns, displayData };
-  }, [safeData, config.metrics, config.bucket, config.columns, config.groupBy]);
+  }, [hasMetrics, hasBucket, config.bucket, config.metrics, config.columns, config.groupBy, data]);
 
   // Détermination du titre à afficher
   let tableTitle = "Tableau";
@@ -82,8 +83,8 @@ export function useTableWidgetLogic(data: any[], config: any) {
       config.bucket && config.bucket.label
         ? config.bucket.label
         : config.bucket
-        ? config.bucket.field
-        : "";
+          ? config.bucket.field
+          : "";
     tableTitle = `Tableau groupé par ${bucketLabel}`;
   } else if (config.groupBy) {
     tableTitle = `Tableau groupé par ${config.groupBy}`;

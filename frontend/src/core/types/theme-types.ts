@@ -11,7 +11,9 @@ export interface SidebarStore {
 }
 
 export interface SourcesStore {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sources: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setSources: (s: any[]) => void;
 }
 

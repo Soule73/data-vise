@@ -68,6 +68,7 @@ export interface RoleCreateFormProps {
 
 export interface PermissionGroupProps {
   model: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   perms: any[];
   checkedPerms: string[];
   onToggle: (permId: string) => void;

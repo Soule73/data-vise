@@ -11,7 +11,7 @@ import { cleanTimeRange } from "@/utils/dataSourceUtils";
 import DataSource from "@/models/DataSource";
 import { IDataSource } from "@/types/sourceType";
 import { toApiData, toApiError } from "@/utils/api";
-import { generateUUID } from "@/utils/uuid_generator";
+import { generateUUID } from "@/utils/uuidGenerator";
 
 /**
  * Service pour gérer les opérations liées aux dashboards.

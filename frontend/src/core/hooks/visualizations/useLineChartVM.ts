@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useCallback, useMemo } from "react";
 import {
   aggregate,
   getLabels,
@@ -32,12 +33,15 @@ export function useLineChartLogic(
     () => getLabels(data, config.bucket?.field),
     [data, config.bucket?.field]
   );
-  function getValues(metric: MetricConfig): number[] {
-    return labels.map((labelVal: string) => {
-      const rows = data.filter((row) => row[config.bucket.field] === labelVal);
-      return aggregate(rows, metric.agg, metric.field);
-    });
-  }
+  const getValues = useCallback(
+    (metric: MetricConfig): number[] => {
+      return labels.map((labelVal: string) => {
+        const rows = data.filter((row) => row[config.bucket.field] === labelVal);
+        return aggregate(rows, metric.agg, metric.field);
+      });
+    },
+    [labels, data, config.bucket.field]
+  );
   // Extraction stricte des params globaux
   const widgetParams: LineChartParams = config.widgetParams ?? {};
   const tension = widgetParams.tension ?? 0;
@@ -71,7 +75,7 @@ export function useLineChartLogic(
           pointHoverRadius: showPoints ? 5 : 0,
         } as ChartDataset<"line">;
       }),
-    [labels, config.metrics, config.metricStyles, tension, showPoints]
+    [config.metrics, config.metricStyles, getValues, tension, showPoints]
   );
   const chartData: ChartData<"line"> = useMemo(
     () => ({ labels, datasets }),
@@ -85,7 +89,7 @@ export function useLineChartLogic(
   const title = getTitle(config);
   const titleAlign = getTitleAlign(config);
   // xLabel dynamique : si non renseigné, utiliser le label du champ de regroupement
-  let xLabel = config.widgetParams?.xLabel || config.bucket?.field || "";
+  const xLabel = config.widgetParams?.xLabel || config.bucket?.field || "";
   const yLabel = config.widgetParams?.yLabel || "";
   const showGrid = config.widgetParams?.showGrid ?? true;
   const stacked = config.widgetParams?.stacked ?? false;
@@ -216,7 +220,7 @@ export function useLineChartLogic(
         });
       },
     }),
-    [showNativeValues, config, datasets]
+    [showNativeValues, config]
   );
   return {
     chartData,

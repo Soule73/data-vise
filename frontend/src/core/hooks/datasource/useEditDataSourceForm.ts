@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useUpdateSourceMutation,
-  sourceByIdQuery,
+  useSourceByIdQuery,
 } from "@/data/repositories/sources";
 import { useNotificationStore } from "@/core/store/notification";
 import { useDashboardStore } from "@/core/store/dashboard";
@@ -17,7 +17,7 @@ export function useEditDataSourceForm() {
     data: initial,
     isLoading,
     error: queryError,
-  } = sourceByIdQuery({ id });
+  } = useSourceByIdQuery({ id });
   const navigate = useNavigate();
   const showNotification = useNotificationStore((s) => s.showNotification);
   const queryClient = useQueryClient();
@@ -38,6 +38,7 @@ export function useEditDataSourceForm() {
   }, [initial, setBreadcrumb, id]);
 
   // Soumission finale (édition)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
     base.setGlobalError("");
     // Pour CSV uploadé, garder filePath, pour CSV distant ou JSON, garder endpoint
@@ -68,6 +69,7 @@ export function useEditDataSourceForm() {
       });
       navigate("/sources");
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (e: any) => {
       base.setGlobalError(
         e?.response?.data?.message ||

@@ -19,6 +19,7 @@ export function useLoginForm() {
       setGlobalError("");
       navigate(ROUTES.dashboard);
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (e: any) => {
       if (e.response?.data?.errors) {
         Object.entries(e.response.data.errors).forEach(([field, message]) => {
