@@ -15,7 +15,6 @@ export default function WidgetCreatePage() {
     sourceId,
     setSourceId,
     columns,
-    columnInfos,
     dataPreview,
     config,
     loadSourceColumns,
@@ -82,7 +81,6 @@ export default function WidgetCreatePage() {
       tab={tab}
       setTab={setTab}
       columns={columns}
-      columnInfos={columnInfos}
       handleConfigChange={handleConfigChange}
       handleDragStart={handleDragStart}
       handleDragOver={handleDragOver}

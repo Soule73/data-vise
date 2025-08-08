@@ -3,21 +3,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSourcesQuery, useDataBySourceQuery } from "@/data/repositories/sources";
 import type { DataSource } from "@/core/types/data-source";
 import type { WidgetType, WidgetFormInitialValues, WidgetConfig, CommonWidgetFormState } from "@/core/types/widget-types";
-import type { ColumnInfo } from "@/core/types/metric-bucket-types";
-import { WIDGETS, WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
-import { useMetricLabelStore } from "@/core/store/metricLabels";
 import {
-    getDefaultConfig,
-    syncMetricStyles,
-    reorderMetrics,
-    updateMetricAggOrField,
-    updateMetricStyle,
-    enrichMetricsWithLabels,
-    extractMetricLabels,
-    generateSourceOptions,
-    isPreviewDataReady,
-    analyzeColumns,
-} from "@/core/utils/widget";
+    WIDGETS,
+    WIDGET_DATA_CONFIG,
+} from "@/data/adapters/visualizations";
+import { useMetricLabelStore } from "@/core/store/metricLabels";
+import { createDragDropHandlers, enrichMetricsWithLabels, ensureMetricStylesForChangedMetrics, extractColumnsFromData, extractMetricLabels, generateDefaultWidgetConfig, generateSourceOptions, isWidgetPreviewReady, reorderMetrics, syncMetricStyles, updateMetricWithAutoLabel } from "@/core/utils";
 
 export function useCommonWidgetForm(
     initialValues?: WidgetFormInitialValues
@@ -30,7 +21,6 @@ export function useCommonWidgetForm(
 
     // Data state
     const [columns, setColumns] = useState<string[]>(initialValues?.columns || []);
-    const [columnInfos, setColumnInfos] = useState<ColumnInfo[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [dataPreview, setDataPreview] = useState<any[]>(initialValues?.dataPreview || []);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,12 +61,12 @@ export function useCommonWidgetForm(
         if (!initialValues?.disableAutoConfig && columns.length > 0) {
             if (widgetConfig && widgetConfig.metrics.allowMultiple) {
                 if (!config.metrics || config.metrics.length === 0) {
-                    const newConfig = getDefaultConfig(type, columns);
+                    const newConfig = generateDefaultWidgetConfig(type, columns);
                     setConfig(newConfig);
                 }
             } else if (widgetConfig) {
                 if (!config.metrics || config.metrics.length === 0) {
-                    const newConfig = getDefaultConfig(type, columns);
+                    const newConfig = generateDefaultWidgetConfig(type, columns);
                     setConfig(newConfig);
                 }
             }
@@ -93,21 +83,14 @@ export function useCommonWidgetForm(
     }, [type, columns, widgetConfig, config, initialValues?.disableAutoConfig]);
 
     // --- Drag & drop métriques ---
-    function handleDragStart(idx: number) {
-        setDraggedMetric(idx);
-    }
-
-    function handleDragOver(_idx: number, e: React.DragEvent) {
-        e.preventDefault();
-    }
-
-    function handleDrop(idx: number) {
-        if (draggedMetric === null || draggedMetric === idx) return;
-
-        const newMetrics = reorderMetrics(config.metrics, draggedMetric, idx);
-        handleConfigChange("metrics", newMetrics);
-        setDraggedMetric(null);
-    }
+    const { handleDragStart, handleDragOver, handleDrop } = createDragDropHandlers(
+        draggedMetric,
+        setDraggedMetric,
+        (fromIndex, toIndex) => {
+            const newMetrics = reorderMetrics(config.metrics, fromIndex, toIndex);
+            handleConfigChange("metrics", newMetrics);
+        }
+    );
 
     // --- Synchronisation metrics/metricStyles ---
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,30 +100,26 @@ export function useCommonWidgetForm(
 
     useEffect(() => {
         const metrics = config.metrics || [];
-        const currentStyles = config.metricStyles || [];
+        const metricStyles = config.metricStyles || [];
 
-        const updatedStyles = syncMetricStyles(metrics, currentStyles);
+        // Synchronise les styles avec les métriques
+        const syncedStyles = syncMetricStyles(metrics, metricStyles);
+        if (syncedStyles !== metricStyles) {
+            setConfig((c: WidgetConfig) => ({ ...c, metricStyles: syncedStyles }));
+        }
 
-        if (JSON.stringify(updatedStyles) !== JSON.stringify(currentStyles)) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            setConfig((c: any) => ({ ...c, metricStyles: updatedStyles }));
+        // Met à jour les styles pour les métriques modifiées
+        const updatedStyles = ensureMetricStylesForChangedMetrics(
+            metrics,
+            syncedStyles,
+            prevMetricsRef.current
+        );
+        if (updatedStyles !== syncedStyles) {
+            setConfig((c: WidgetConfig) => ({ ...c, metricStyles: updatedStyles }));
         }
 
         prevMetricsRef.current = [...metrics];
     }, [config.metrics, config.metricStyles, type]);
-
-    // --- Analyse des colonnes ---
-    useEffect(() => {
-        if (dataPreview && Array.isArray(dataPreview) && dataPreview.length > 0) {
-            const analyzedColumns = analyzeColumns(dataPreview);
-            setColumnInfos(analyzedColumns);
-            
-            // Met à jour les colonnes simples si elles ne sont pas définies
-            if (columns.length === 0) {
-                setColumns(analyzedColumns.map(col => col.name));
-            }
-        }
-    }, [dataPreview, columns.length]);
 
     // --- Handlers génériques ---
     function handleConfigChange(field: string, value: unknown) {
@@ -160,24 +139,23 @@ export function useCommonWidgetForm(
     function handleMetricAggOrFieldChange(
         idx: number,
         field: "agg" | "field",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        value: any
+        value: string
     ) {
-        const { updatedMetrics, autoLabel } = updateMetricAggOrField(
+        const newMetrics = updateMetricWithAutoLabel(
             config.metrics,
             idx,
             field,
             value,
             type
         );
-
-        handleConfigChange("metrics", updatedMetrics);
-        metricLabelStore.setMetricLabel(idx, autoLabel);
+        handleConfigChange("metrics", newMetrics);
+        metricLabelStore.setMetricLabel(idx, newMetrics[idx].label || "");
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function handleMetricStyleChange(idx: number, field: string, value: any) {
-        const newStyles = updateMetricStyle(config.metricStyles || [], idx, field, value);
+        const newStyles = [...(config.metricStyles || [])];
+        newStyles[idx] = { ...newStyles[idx], [field]: value };
         handleConfigChange("metricStyles", newStyles);
     }
 
@@ -188,7 +166,7 @@ export function useCommonWidgetForm(
     );
 
     // --- Preview ready ---
-    const isPreviewReady = isPreviewDataReady(WidgetComponent, dataPreview, config);
+    const isPreviewReady = isWidgetPreviewReady(WidgetComponent, dataPreview, config);
 
     // Étape 1 : charger les colonnes et preview
     const loadSourceColumns = async () => {
@@ -199,7 +177,7 @@ export function useCommonWidgetForm(
                 setStep(2);
                 const result = await refetch();
                 if (result.data && Array.isArray(result.data) && result.data.length > 0) {
-                    const cols = Object.keys(result.data[0]);
+                    const cols = extractColumnsFromData(result.data);
                     setColumns(cols);
                     setDataPreview(result.data);
                 }
@@ -226,7 +204,6 @@ export function useCommonWidgetForm(
         // Data state
         columns,
         setColumns,
-        columnInfos,
         dataPreview,
         setDataPreview,
 

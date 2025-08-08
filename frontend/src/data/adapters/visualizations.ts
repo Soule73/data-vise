@@ -680,104 +680,62 @@ const COMMON_METRICS = {
   label: "Métriques",
 };
 
-// Configuration des buckets avec support multi-types comme Kibana
-export const BUCKET_TYPES = {
-  terms: { label: "Grouper par valeurs", icon: "Squares2X2Icon" },
-  date_histogram: { label: "Intervalles de dates", icon: "CalendarIcon" },
-  histogram: { label: "Intervalles numériques", icon: "ChartBarIcon" },
-  range: { label: "Plages personnalisées", icon: "AdjustmentsHorizontalIcon" },
-  split_series: { label: "Diviser en séries", icon: "PresentationChartLineIcon" },
-  split_chart: { label: "Graphiques séparés", icon: "RectangleGroupIcon" },
-};
-
-// Configuration des buckets par visualisation
-const BASIC_BUCKET_CONFIG = {
+const COMMON_BUCKET = {
   allow: true,
-  label: "Axe X",
+  label: "Champ de groupement",
   typeLabel: "x",
-  supportedTypes: ["terms", "date_histogram", "histogram", "range"],
-  allowMultiple: false,
-};
-
-const ADVANCED_BUCKET_CONFIG = {
-  ...BASIC_BUCKET_CONFIG,
-  allowMultiple: true,
-  supportSplitSeries: true,
-  supportSplitRows: true,
-  buckets: {
-    xAxis: {
-      label: "Axe X",
-      required: true,
-      supportedTypes: ["terms", "date_histogram", "histogram", "range"],
-    },
-    splitSeries: {
-      label: "Diviser en séries",
-      required: false,
-      supportedTypes: ["terms"],
-      description: "Crée des séries différentes (couleurs)",
-    },
-    splitRows: {
-      label: "Diviser en lignes", 
-      required: false,
-      supportedTypes: ["terms"],
-      description: "Empile les données verticalement",
-    },
-  },
-};
-
-const SIMPLE_BUCKET_CONFIG = {
-  ...BASIC_BUCKET_CONFIG,
-  label: "Groupement",
-  supportedTypes: ["terms"],
 };
 
 export const WIDGET_DATA_CONFIG: Record<
   WidgetType,
   {
     metrics:
-      | typeof COMMON_METRICS
-      | (typeof COMMON_METRICS & { allowMultiple: false; label: string });
-    bucket: typeof BASIC_BUCKET_CONFIG | typeof ADVANCED_BUCKET_CONFIG | typeof SIMPLE_BUCKET_CONFIG;
+    | typeof COMMON_METRICS
+    | (typeof COMMON_METRICS & { allowMultiple: false; label: string });
+    bucket: typeof COMMON_BUCKET & { label?: string; typeLabel?: string };
   }
 > = {
   bar: {
     metrics: COMMON_METRICS,
-    bucket: { ...ADVANCED_BUCKET_CONFIG, label: "Axe X" },
+    bucket: { ...COMMON_BUCKET },
   },
   line: {
-    metrics: COMMON_METRICS, 
-    bucket: { ...ADVANCED_BUCKET_CONFIG, label: "Axe X" },
+    metrics: COMMON_METRICS,
+    bucket: { ...COMMON_BUCKET },
   },
   pie: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
-    bucket: { ...SIMPLE_BUCKET_CONFIG, label: "Segments" },
+    bucket: {
+      ...COMMON_BUCKET,
+      typeLabel: "part",
+    },
   },
   table: {
     metrics: COMMON_METRICS,
-    bucket: { ...BASIC_BUCKET_CONFIG, label: "Colonnes", allowMultiple: true },
+    bucket: COMMON_BUCKET,
   },
   scatter: {
     metrics: COMMON_METRICS,
-    bucket: { ...BASIC_BUCKET_CONFIG, label: "Axe X" },
+    bucket: COMMON_BUCKET,
   },
   bubble: {
     metrics: COMMON_METRICS,
-    bucket: { ...BASIC_BUCKET_CONFIG, label: "Axe X" },
+    bucket: COMMON_BUCKET,
   },
   radar: {
     metrics: COMMON_METRICS,
-    bucket: { ...SIMPLE_BUCKET_CONFIG, label: "Axes" },
+    bucket: COMMON_BUCKET,
   },
   kpi: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
-    bucket: { ...BASIC_BUCKET_CONFIG, allow: false },
+    bucket: COMMON_BUCKET,
   },
   kpi_group: {
     metrics: { ...COMMON_METRICS, allowMultiple: true, label: "KPIs" },
-    bucket: { ...BASIC_BUCKET_CONFIG, allow: false },
+    bucket: { ...COMMON_BUCKET, allow: false },
   },
   card: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
-    bucket: { ...BASIC_BUCKET_CONFIG, allow: false },
+    bucket: COMMON_BUCKET,
   },
 };

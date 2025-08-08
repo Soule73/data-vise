@@ -34,7 +34,6 @@ export default function WidgetEditPage() {
       tab={form.tab}
       setTab={form.setTab}
       columns={form.columns}
-      columnInfos={form.columnInfos}
       handleConfigChange={form.handleConfigChange}
       handleDragStart={form.handleDragStart}
       handleDragOver={form.handleDragOver}

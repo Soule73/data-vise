@@ -15,7 +15,6 @@ import type {
 import type {
   BubbleMetricConfig,
   BucketConfig,
-  ColumnInfo,
   MetricConfig,
   RadarMetricConfig,
   ScatterMetricConfig,
@@ -304,7 +303,6 @@ export interface WidgetDataConfigSectionProps<
   dataConfig: TDataConfig;
   config: TConfig;
   columns: string[];
-  columnInfos?: ColumnInfo[];
   handleConfigChange: (field: string, value: any) => void;
   handleDragStart: (idx: number) => void;
   handleDragOver: (idx: number, e: React.DragEvent) => void;
@@ -331,8 +329,9 @@ export interface CommonWidgetFormState {
   // Data state
   columns: string[];
   setColumns: (columns: string[]) => void;
-  columnInfos: import("@/core/types/metric-bucket-types").ColumnInfo[];
+
   dataPreview: any[];
+
   setDataPreview: (data: any[]) => void;
 
   // UI state
