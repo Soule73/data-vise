@@ -38,10 +38,11 @@ export default function Modal({
           leave="ease-in duration-150"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
+
         >
           <div className="fixed inset-0 bg-black/30 transition-opacity" />
         </TransitionChild>
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-200"
@@ -52,7 +53,7 @@ export default function Modal({
             leaveTo="opacity-0 scale-95"
           >
             <DialogPanel
-              className={`relative w-full ${sizeMap[size]} p-4 max-h-full ${className} rounded-lg shadow-sm bg-white dark:bg-gray-800`}
+              className={`relative w-full overflow-hidden ${sizeMap[size]} px-4 pb-10 max-h-full ${className} rounded-lg shadow-sm bg-white dark:bg-gray-800`}
             >
               {/* Header */}
               {(title || !hideCloseButton) && (
@@ -73,10 +74,16 @@ export default function Modal({
                 </div>
               )}
               {/* Body */}
-              <div className="p-4 md:p-5 space-y-4">{children}</div>
-              {/* Footer */}
+              <div className="p-4 md:p-5 space-y-4 config-scrollbar
+                overflow-y-auto max-h-[calc(100vh-12rem)] scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800
+              ">{children}</div>
+
+
+              {/* Footer: fix to bottom */}
               {footer && (
-                <div className="flex items-center p-4 md:p-5">{footer}</div>
+                <div className="flex items-center px-4 md:px-5 pb-2 bg-inherit absolute bottom-0 left-0 right-0 z-10 flex-wrap gap-2 justify-end">
+                  {footer}
+                </div>
               )}
             </DialogPanel>
           </TransitionChild>

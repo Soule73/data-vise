@@ -100,6 +100,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   bar: {
     type: "bar",
     label: "Bar Chart",
+    description: "Un graphique à barres montrant les données",
     component: BarChartWidget,
     icon: ChartBarIcon,
     configSchema: {
@@ -145,6 +146,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   line: {
     type: "line",
     label: "Line Chart",
+    description: "Un graphique linéaire montrant les tendances dans les données",
     component: LineChartWidget,
     icon: ArrowTrendingUpIcon,
     configSchema: {
@@ -221,6 +223,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   pie: {
     type: "pie",
     label: "Pie Chart",
+    description: "Un graphique circulaire montrant la répartition des données",
     component: PieChartWidget,
     icon: ChartPieIcon,
     allowMultipleMetrics: false,
@@ -264,6 +267,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   table: {
     type: "table",
     label: "Table",
+    description: "Un tableau montrant les données sous forme de grille",
     component: TableWidget,
     icon: TableCellsIcon,
     configSchema: {
@@ -278,6 +282,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   scatter: {
     type: "scatter",
     label: "Scatter Chart",
+    description: "Un graphique de dispersion montrant la relation entre deux variables",
     component: ScatterChartWidget,
     icon: ArrowTrendingUpIcon,
     configSchema: {
@@ -319,6 +324,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   bubble: {
     type: "bubble",
     label: "Bubble Chart",
+    description: "Un graphique à bulles montrant la relation entre trois variables",
     component: BubbleChartWidget,
     icon: ChatBubbleLeftIcon,
     configSchema: {
@@ -360,6 +366,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   radar: {
     type: "radar",
     label: "Radar Chart",
+    description: "Un graphique radar montrant la répartition des données",
     component: RadarChartWidget,
     icon: ArrowTrendingUpIcon,
     configSchema: {
@@ -380,6 +387,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   kpi: {
     type: "kpi",
     label: "KPI (Valeur clé)",
+    description: "Un indicateur clé de performance affichant une valeur unique",
     component: KPIWidget,
     icon: PresentationChartLineIcon,
     allowMultipleMetrics: false,
@@ -411,6 +419,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   kpi_group: {
     type: "kpi_group",
     label: "KPI Group (Groupe de KPIs)",
+    description: "Un groupe d'indicateurs clés de performance",
     component: KPIGroupWidget,
     icon: Squares2X2Icon,
     allowMultipleMetrics: true,
@@ -451,6 +460,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
   card: {
     type: "card",
     label: "Card (Carte synthèse)",
+    description: "Une carte synthèse affichant des informations clés",
     component: CardWidget,
     icon: RectangleGroupIcon,
     allowMultipleMetrics: false,

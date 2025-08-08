@@ -21,7 +21,7 @@ export function useCreateDataSourceForm() {
         open: true,
         type: "success",
         title: "Source ajoutée",
-        description: "La source a bien été créée.",
+        description: "La source a bien été ajoutée.",
       });
       setTimeout(() => navigate(ROUTES.sources), 1200);
     },

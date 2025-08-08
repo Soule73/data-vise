@@ -101,6 +101,7 @@ export interface WidgetDefinition<
 > {
   type: T;
   label: string;
+  description: string;
   component: React.ComponentType<VisualizationWidgetProps<T>>;
   configSchema: TConfig;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -116,7 +117,7 @@ export interface WidgetConfig {
   | BubbleMetricConfig[]
   | RadarMetricConfig[];
   filter?: Filter;
-  bucket: BucketConfig;
+  bucket?: BucketConfig;
 }
 
 export interface WidgetMetricStyleConfigSectionProps<
@@ -153,6 +154,7 @@ export interface WidgetStyleConfigSectionProps<TConfig = any> {
 export interface WidgetConfigTabsProps {
   tab: "data" | "metricsAxes" | "params";
   setTab: (tab: "data" | "metricsAxes" | "params") => void;
+  availableTabs?: { key: string; label: string }[];
 }
 
 export interface WidgetConfigFooterProps {
@@ -244,7 +246,7 @@ export interface WidgetKPIGroupDataConfigSectionProps
 export interface WidgetDataConfigSectionFixedProps
   extends WidgetDataConfigSectionProps {
   type: WidgetType;
-  data?: Record<string, any>[]; // Ajout de la prop data
+  data?: Record<string, any>[];
 }
 
 export interface VisualizationTypeSelectorProps {
@@ -312,3 +314,68 @@ export interface WidgetDataConfigSectionProps<
   ) => void;
 }
 
+
+export interface CommonWidgetFormState {
+  // Core state
+  type: WidgetType;
+  setType: (type: WidgetType) => void;
+  sourceId: string;
+  setSourceId: (sourceId: string) => void;
+
+  config: any;
+
+  setConfig: (config: any) => void;
+
+  // Data state
+  columns: string[];
+  setColumns: (columns: string[]) => void;
+
+  dataPreview: any[];
+
+  setDataPreview: (data: any[]) => void;
+
+  // UI state
+  step: number;
+  setStep: (step: number) => void;
+  tab: "data" | "metricsAxes" | "params";
+  setTab: (tab: "data" | "metricsAxes" | "params") => void;
+  showSaveModal: boolean;
+  setShowSaveModal: (show: boolean) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+
+  // Widget properties
+  title: string;
+  setTitle: (title: string) => void;
+  widgetTitle: string;
+  setWidgetTitle: (title: string) => void;
+  visibility: "public" | "private";
+  setVisibility: (visibility: "public" | "private") => void;
+  widgetTitleError: string;
+  setWidgetTitleError: (error: string) => void;
+
+  // Error handling
+  error: string;
+  setError: (error: string) => void;
+
+  // Advanced features
+
+  WidgetComponent: any;
+
+  metricsWithLabels: any[];
+  isPreviewReady: boolean;
+  sourceOptions: { value: string; label: string }[];
+
+  // Handlers
+
+  handleConfigChange: (field: string, value: any) => void;
+  handleDragStart: (idx: number) => void;
+  handleDragOver: (idx: number, e: React.DragEvent) => void;
+  handleDrop: (idx: number) => void;
+
+  handleMetricAggOrFieldChange: (idx: number, field: "agg" | "field", value: any) => void;
+
+  handleMetricStyleChange: (idx: number, field: string, value: any) => void;
+  syncMetricLabelsToStore: () => void;
+  loadSourceColumns: () => Promise<void>;
+}

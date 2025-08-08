@@ -8,7 +8,7 @@ import type { DataSource } from "@/core/types/data-source";
 import type { WidgetType, Widget } from "@/core/types/widget-types";
 import { useDataBySourceQuery, useSourcesQuery } from "@/data/repositories/sources";
 import { useQueryClient } from "@tanstack/react-query";
-import { useWidgetForm } from "./useWidgetForm";
+import { useCommonWidgetForm } from "./useCommonWidgetForm";
 
 export function useWidgetEditForm() {
   const queryClient = useQueryClient();
@@ -89,8 +89,8 @@ export function useWidgetEditForm() {
     }
   }, [widget, source, columns]);
 
-  // Utilisation du hook formulaire avec initialValues (comme en création)
-  const form = useWidgetForm(
+  // Utilisation du hook centralisé avec initialValues (comme en création)
+  const form = useCommonWidgetForm(
     formReady
       ? {
         type: (widget?.type as WidgetType) || "bar",

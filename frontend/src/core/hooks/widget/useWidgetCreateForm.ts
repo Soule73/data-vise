@@ -6,7 +6,7 @@ import { useNotificationStore } from "@/core/store/notification";
 import { useDashboardStore } from "@/core/store/dashboard";
 import { ROUTES } from "@/core/constants/routes";
 import type { WidgetFormInitialValues } from "@/core/types/widget-types";
-import { useWidgetForm } from "./useWidgetForm";
+import { useCommonWidgetForm } from "./useCommonWidgetForm";
 
 export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
   const navigate = useNavigate();
@@ -14,8 +14,8 @@ export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
   const showNotification = useNotificationStore((s) => s.showNotification);
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
 
-  // Centralise toute la logique de formulaire dans le hook partagé
-  const form = useWidgetForm(initialValues);
+  // Utilise le hook centralisé pour toute la logique de formulaire
+  const form = useCommonWidgetForm(initialValues);
 
   // Mutation de création
   const createMutation = useCreateWidgetMutation({
