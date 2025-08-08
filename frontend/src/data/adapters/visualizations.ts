@@ -715,12 +715,12 @@ export const WIDGET_DATA_CONFIG: Record<
   bar: {
     metrics: COMMON_METRICS,
     bucket: { ...COMMON_BUCKET },
-    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets X/Y" },
+    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets" },
   },
   line: {
     metrics: COMMON_METRICS,
     bucket: { ...COMMON_BUCKET },
-    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets X/Y" },
+    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets" },
   },
   pie: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },

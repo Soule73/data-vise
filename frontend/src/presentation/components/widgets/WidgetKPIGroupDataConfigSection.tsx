@@ -166,18 +166,18 @@ export default function WidgetKPIGroupDataConfigSection({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Filtres par KPI (centralisé dans config.filters) */}
       {Array.isArray(kpiConfig.metrics) &&
         kpiConfig.metrics.map((metric: MetricConfig, idx: number) => (
           <div
             key={idx}
-            className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow mb-2"
+            className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
           >
-            <div className="font-semibold mb-1">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
               Filtrer KPI {metric.label || metric.field || idx + 1}
-            </div>
-            <div className="flex flex-col gap-2">
+            </h3>
+            <div className="space-y-3">
               <SelectField
                 label="Champ"
                 value={filters[idx]?.field || ""}
@@ -208,18 +208,18 @@ export default function WidgetKPIGroupDataConfigSection({
         ))}
       {/* Métriques (metrics) */}
       {kpiDataConfig.metrics?.label && (
-        <div className="font-semibold mb-1">{kpiDataConfig.metrics.label}</div>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">{kpiDataConfig.metrics.label}</h3>
       )}
       {Array.isArray(kpiConfig.metrics) && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
-          <div className="space-y-1 divide-y divide-gray-300 dark:divide-gray-700 ">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <div className="space-y-3">
             {kpiConfig.metrics.map((metric: MetricConfig, idx: number) => {
               const headerLabel = getHeaderLabel(metric);
               const isOnlyMetric = kpiConfig.metrics.length === 1;
               return (
                 <div
                   key={idx}
-                  className="px-2 pb-2 flex flex-col relative group"
+                  className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3"
                   draggable={
                     kpiDataConfig.metrics?.allowMultiple && !isOnlyMetric
                   }
@@ -231,11 +231,11 @@ export default function WidgetKPIGroupDataConfigSection({
                     className="flex items-center justify-between cursor-pointer"
                     onClick={() => toggleCollapse(idx)}
                   >
-                    <span className="font-medium text-sm text-gray-700 dark:text-gray-300">
-                      <ChevronDownIcon className="w-4 h-4 mr-1 inline-block" />
+                    <span className="font-medium text-sm text-gray-900 dark:text-white flex items-center">
+                      <ChevronDownIcon className="w-4 h-4 mr-2" />
                       {headerLabel}
                     </span>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       {kpiDataConfig.metrics?.allowMultiple &&
                         !isOnlyMetric && (
                           <>

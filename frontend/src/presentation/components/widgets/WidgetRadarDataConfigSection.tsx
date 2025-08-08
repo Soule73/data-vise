@@ -1,6 +1,5 @@
 import SelectField from "@/presentation/components/SelectField";
 import InputField from "@/presentation/components/forms/InputField";
-import Button from "@/presentation/components/forms/Button";
 import CheckboxField from "@/presentation/components/forms/CheckboxField";
 import MultiBucketSection from "@/presentation/components/widgets/MultiBucketSection";
 import {
@@ -34,7 +33,7 @@ export default function WidgetRadarDataConfigSection({
   const axisFields: string[] = configSchema?.dataConfig?.axisFields || columns;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Section Multi-Buckets */}
       <MultiBucketSection
         buckets={config?.buckets || []}
@@ -44,21 +43,21 @@ export default function WidgetRadarDataConfigSection({
         onBucketsChange={(buckets) => handleConfigChange("buckets", buckets)}
       />
 
-      <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
-        <div className="font-semibold mb-1">Datasets (axes multiples)</div>
-        <div className="space-y-2">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Datasets (axes multiples)</h3>
+        <div className="space-y-3">
           {metrics.map((dataset: RadarMetricConfig, idx: number) => (
             <div
               key={idx}
-              className="flex flex-col border-b pb-2 mb-2 relative group bg-white/60 dark:bg-gray-900/60 p-2 border-gray-200 dark:border-gray-700 "
+              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3"
             >
               <div
-                className="flex gap-2 items-center cursor-pointer"
+                className="flex gap-2 items-center cursor-pointer mb-3"
                 onClick={() => toggleCollapse(idx)}
               >
                 <button
                   type="button"
-                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                  className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
                   tabIndex={-1}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -67,19 +66,19 @@ export default function WidgetRadarDataConfigSection({
                   aria-label={collapsed[idx] ? "Déplier" : "Replier"}
                 >
                   {collapsed[idx] ? (
-                    <ChevronDownIcon className="w-5 h-5 cursor-pointer" />
+                    <ChevronDownIcon className="w-4 h-4" />
                   ) : (
-                    <ChevronUpIcon className="w-5 h-5 cursor-pointer" />
+                    <ChevronUpIcon className="w-4 h-4" />
                   )}
                 </button>
-                <span className="font-medium text-sm text-gray-700 dark:text-gray-300">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                   {dataset.label && dataset.label.trim() !== ""
                     ? dataset.label
                     : `Dataset ${idx + 1}`}
-                </span>
+                </h4>
                 {metrics.length > 1 && (
                   <button
-                    className="ml-auto p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
+                    className="ml-auto p-1.5 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-md transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
                       const newMetrics = metrics.filter(
@@ -89,12 +88,12 @@ export default function WidgetRadarDataConfigSection({
                     }}
                     title="Supprimer ce dataset"
                   >
-                    <XMarkIcon className="w-5 h-5 text-red-500" />
+                    <XMarkIcon className="w-4 h-4 text-red-500" />
                   </button>
                 )}
               </div>
               {!collapsed[idx] && (
-                <div className="grid gap-2 mt-2">
+                <div className="space-y-3">
                   <InputField
                     label="Label du dataset"
                     value={dataset.label || ""}
@@ -203,10 +202,8 @@ export default function WidgetRadarDataConfigSection({
             </div>
           ))}
         </div>
-        <Button
-          color="indigo"
-          className="mt-2 w-max mx-auto !bg-gray-300 dark:!bg-gray-700 hover:!bg-gray-200 dark:hover:!bg-gray-600 !border-none"
-          variant="outline"
+        <button
+          className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/40 transition-colors inline-flex items-center mx-auto mt-3"
           onClick={() => {
             handleConfigChange("metrics", [
               ...metrics,
@@ -219,9 +216,9 @@ export default function WidgetRadarDataConfigSection({
             ]);
           }}
         >
-          <PlusCircleIcon className="w-5 h-5 mr-1" />
+          <PlusCircleIcon className="w-4 h-4 mr-2" />
           Ajouter un dataset
-        </Button>
+        </button>
       </div>
     </div>
   );

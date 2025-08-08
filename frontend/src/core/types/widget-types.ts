@@ -159,14 +159,6 @@ export interface WidgetConfigTabsProps {
   availableTabs?: { key: string; label: string }[];
 }
 
-export interface WidgetConfigFooterProps {
-  step: number;
-  loading: boolean;
-  onPrev: () => void;
-  onNext: () => void;
-  onSave: () => void;
-  isSaving: boolean;
-}
 
 export interface WidgetSelectModalProps {
   open: boolean;

@@ -109,12 +109,12 @@ export default function WidgetDataConfigSection({
   {/* Section filtre simple pour KPI (champ + valeur) */ }
   const showFilter = widgetDef?.enableFilter;
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Section filtre pour KPI */}
       {showFilter && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
-          <div className="font-semibold mb-1">Filtrer</div>
-          <div className="flex flex-col gap-2">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Filtrer</h3>
+          <div className="space-y-3">
             <SelectField
               label="Champ"
               value={config.filter?.field || ""}
@@ -168,11 +168,12 @@ export default function WidgetDataConfigSection({
           </div>
         </div>
       )}
+
       {/* Métriques (metrics) */}
       {dataConfig.metrics.label && (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2">
-          <div className="font-semibold mb-1">{dataConfig.metrics.label}</div>
-          <div className="space-y-1 divide-y divide-gray-300 dark:divide-gray-700 ">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">{dataConfig.metrics.label}</h3>
+          <div className="space-y-3">
             {config.metrics.map((metric: any, idx: number) => {
               const aggLabel =
                 dataConfig.metrics.allowedAggs?.find(
@@ -187,7 +188,7 @@ export default function WidgetDataConfigSection({
               return (
                 <div
                   key={idx}
-                  className="px-2 pb-2 flex flex-col relative group"
+                  className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3"
                   draggable={dataConfig.metrics.allowMultiple && !isOnlyMetric}
                   onDragStart={() => handleDragStart(idx)}
                   onDragOver={(e) => handleDragOver(idx, e)}
@@ -197,15 +198,15 @@ export default function WidgetDataConfigSection({
                     className="flex items-center justify-between cursor-pointer"
                     onClick={() => toggleCollapse(idx)}
                   >
-                    <span className="font-medium text-sm text-gray-700 dark:text-gray-300">
-                      <ChevronDownIcon className="w-4 h-4 mr-1 inline-block" />
+                    <span className="font-medium text-sm text-gray-900 dark:text-white flex items-center">
+                      <ChevronDownIcon className="w-4 h-4 mr-2" />
                       {headerLabel}
                     </span>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       {dataConfig.metrics.allowMultiple && !isOnlyMetric && (
                         <>
                           <button
-                            className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${idx === 0 ? "opacity-50 cursor-not-allowed" : ""
+                            className={`p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors ${idx === 0 ? "opacity-50 cursor-not-allowed" : ""
                               }`}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -224,7 +225,7 @@ export default function WidgetDataConfigSection({
                             <ChevronUpIcon className="w-4 h-4" />
                           </button>
                           <button
-                            className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${idx === config.metrics.length - 1
+                            className={`p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors ${idx === config.metrics.length - 1
                               ? "opacity-50 cursor-not-allowed"
                               : ""
                               }`}
@@ -373,14 +374,14 @@ export default function WidgetDataConfigSection({
           // Fallback vers l'ancien système de buckets
           if (dataConfig.bucket && dataConfig.bucket.allow) {
             return (
-              <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 flex flex-col relative group">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <div
                   className="flex items-center justify-between cursor-pointer"
                   onClick={() => toggleCollapse("bucket")}
                 >
-                  <span className="font-medium">Champ de groupement</span>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Champ de groupement</h3>
                   <button
-                    className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
+                    className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-md transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleConfigChange("bucket", {
@@ -389,11 +390,11 @@ export default function WidgetDataConfigSection({
                     }}
                     title="Réinitialiser"
                   >
-                    <XMarkIcon className="w-5 h-5 text-red-500" />
+                    <XMarkIcon className="w-4 h-4 text-red-500" />
                   </button>
                 </div>
                 {!collapsedMetrics["bucket"] && (
-                  <div className="flex flex-col gap-2 mt-2">
+                  <div className="space-y-3 mt-3">
                     <SelectField
                       label="Champ"
                       value={config.bucket?.field}

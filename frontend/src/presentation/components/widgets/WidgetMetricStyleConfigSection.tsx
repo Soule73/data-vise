@@ -34,10 +34,10 @@ export default function WidgetMetricStyleConfigSection({
 
   if (type === "card") {
     return (
-      <div className="space-y-4">
-        <div className="rounded p-3 bg-gray-50">
-          <div className="font-semibold mb-2">Style de la carte</div>
-          <div className="grid grid-cols-2 gap-2">
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Style de la carte</h3>
+          <div className="grid grid-cols-1 gap-4">
             {Object.entries(metricStyleSchema).map(([field, metaRaw]) => {
               const meta = metaRaw as MetricStyleFieldSchema;
               const label = meta.label || field;
@@ -84,14 +84,14 @@ export default function WidgetMetricStyleConfigSection({
   return (
     <div className="space-y-4">
       {safeMetrics.map((metric, idx) => (
-        <div key={idx} className="rounded p-3 bg-gray-50">
+        <div key={idx} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
           <div
-            className="flex items-center justify-start cursor-pointer mb-2"
+            className="flex items-center justify-start cursor-pointer mb-3"
             onClick={() => toggleCollapse(idx)}
           >
             <button
               type="button"
-              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+              className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors mr-2"
               tabIndex={-1}
               onClick={(e) => {
                 e.stopPropagation();
@@ -100,15 +100,15 @@ export default function WidgetMetricStyleConfigSection({
               aria-label={collapsedMetrics[idx] ? "Déplier" : "Replier"}
             >
               {collapsedMetrics[idx] ? (
-                <ChevronDownIcon className="w-5 h-5 cursor-pointer" />
+                <ChevronDownIcon className="w-4 h-4" />
               ) : (
-                <ChevronUpIcon className="w-5 h-5 cursor-pointer" />
+                <ChevronUpIcon className="w-4 h-4" />
               )}
             </button>
-            <span className="font-semibold">{metric.label}</span>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white">{metric.label}</h4>
           </div>
           {!collapsedMetrics[idx] && (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-4">
               {Object.entries(metricStyleSchema).map(([field]) => {
                 const meta = WIDGET_CONFIG_FIELDS[field] || {};
                 const label = meta.label || field;

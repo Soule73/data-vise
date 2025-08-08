@@ -1,6 +1,5 @@
 import SelectField from "@/presentation/components/SelectField";
 import InputField from "@/presentation/components/forms/InputField";
-import Button from "@/presentation/components/forms/Button";
 import { XMarkIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
 import MultiBucketSection from "@/presentation/components/widgets/MultiBucketSection";
 import type { BubbleMetricConfig } from "@/core/types/metric-bucket-types";
@@ -14,7 +13,7 @@ export default function WidgetBubbleDataConfigSection({
   availableFields,
 }: WidgetBubbleDataConfigSectionProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Section Multi-Buckets */}
       <MultiBucketSection
         buckets={config?.buckets || []}
@@ -24,21 +23,21 @@ export default function WidgetBubbleDataConfigSection({
         onBucketsChange={(buckets) => handleConfigChange("buckets", buckets)}
       />
 
-      <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
-        <div className="font-semibold mb-1">Datasets (x, y, r)</div>
-        <div className="space-y-2">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Datasets (x, y, r)</h3>
+        <div className="space-y-3">
           {metrics.map((dataset: BubbleMetricConfig, idx: number) => (
             <div
               key={idx}
-              className="flex flex-col gap-2 border-b pb-2 mb-2 relative group bg-white/60 dark:bg-gray-900/60 rounded p-2"
+              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3"
             >
-              <div className="flex gap-2 items-center">
-                <span className="font-medium text-sm text-gray-700 dark:text-gray-300">
+              <div className="flex gap-2 items-center mb-3">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                   Dataset {idx + 1}
-                </span>
+                </h4>
                 {metrics.length > 1 && (
                   <button
-                    className="ml-auto p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
+                    className="ml-auto p-1.5 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-md transition-colors"
                     onClick={() => {
                       const newMetrics = metrics.filter(
                         (_: BubbleMetricConfig, i: number) => i !== idx
@@ -47,7 +46,7 @@ export default function WidgetBubbleDataConfigSection({
                     }}
                     title="Supprimer ce dataset"
                   >
-                    <XMarkIcon className="w-5 h-5 text-red-500" />
+                    <XMarkIcon className="w-4 h-4 text-red-500" />
                   </button>
                 )}
               </div>
@@ -116,10 +115,8 @@ export default function WidgetBubbleDataConfigSection({
             </div>
           ))}
         </div>
-        <Button
-          color="indigo"
-          className="mt-2 w-max mx-auto !bg-gray-300 dark:!bg-gray-700 hover:!bg-gray-200 dark:hover:!bg-gray-600 !border-none"
-          variant="outline"
+        <button
+          className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/40 transition-colors inline-flex items-center mx-auto mt-3"
           onClick={() => {
             handleConfigChange("metrics", [
               ...metrics,
@@ -134,9 +131,9 @@ export default function WidgetBubbleDataConfigSection({
             ]);
           }}
         >
-          <PlusCircleIcon className="w-5 h-5 mr-1" />
+          <PlusCircleIcon className="w-4 h-4 mr-2" />
           Ajouter un dataset
-        </Button>
+        </button>
       </div>
     </div>
   );

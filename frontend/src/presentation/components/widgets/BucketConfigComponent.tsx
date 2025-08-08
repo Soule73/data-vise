@@ -94,7 +94,9 @@ export default function BucketConfigComponent({
     const availableColumns = getAvailableColumns(columns, bucket.type, data);
 
     return (
-        <div className="px-2 pb-2 flex flex-col relative group bg-gray-50 dark:bg-gray-800 rounded">
+        <div className="px-2 pb-2 flex flex-col relative group border border-gray-200 rounded-2xl
+        dark:border-gray-700
+        bg-gray-50 dark:bg-gray-800 ">
             <div
                 className="flex items-center justify-between cursor-pointer py-2"
                 onClick={onToggleCollapse}
