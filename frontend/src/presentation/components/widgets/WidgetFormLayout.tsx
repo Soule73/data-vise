@@ -7,6 +7,7 @@ import WidgetParamsConfigSection from "@/presentation/components/widgets/WidgetP
 import { WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
 import Button from "@/presentation/components/forms/Button";
 import type { WidgetType } from "@/core/types/widget-types";
+import type { ColumnInfo } from "@/core/types/metric-bucket-types";
 import { useWidgetTabs } from "@/core/hooks/widget/useWidgetTabs";
 
 interface WidgetFormLayoutProps {
@@ -34,6 +35,7 @@ interface WidgetFormLayoutProps {
     tab: "data" | "metricsAxes" | "params";
     setTab: (tab: "data" | "metricsAxes" | "params") => void;
     columns: string[];
+    columnInfos?: ColumnInfo[];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleConfigChange: (field: string, value: any) => void;
     handleDragStart: (idx: number) => void;
@@ -78,6 +80,7 @@ export default function WidgetFormLayout({
     tab,
     setTab,
     columns,
+    columnInfos = [],
     handleConfigChange,
     handleDragStart,
     handleDragOver,
@@ -186,6 +189,7 @@ export default function WidgetFormLayout({
                                         bucket: config.bucket,
                                     }}
                                     columns={columns}
+                                    columnInfos={columnInfos}
                                     data={dataPreview}
                                     handleConfigChange={handleConfigChange}
                                     handleDragStart={handleDragStart}

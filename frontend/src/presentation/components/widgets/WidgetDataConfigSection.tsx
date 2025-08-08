@@ -14,6 +14,8 @@ import WidgetBubbleDataConfigSection from "@/presentation/components/widgets/Wid
 import WidgetScatterDataConfigSection from "@/presentation/components/widgets/WidgetScatterDataConfigSection";
 import WidgetRadarDataConfigSection from "@/presentation/components/widgets/WidgetRadarDataConfigSection";
 import WidgetKPIGroupDataConfigSection from "@/presentation/components/widgets/WidgetKPIGroupDataConfigSection";
+import ColumnDisplay from "@/presentation/components/widgets/ColumnDisplay";
+import BucketConfigEditor from "@/presentation/components/widgets/BucketConfigEditor";
 import { WIDGETS } from "@/data/adapters/visualizations";
 import type {
   BubbleMetricConfig,
@@ -25,6 +27,7 @@ export default function WidgetDataConfigSection({
   dataConfig,
   config,
   columns,
+  columnInfos = [],
   handleConfigChange,
   handleDragStart,
   handleDragOver,
@@ -96,6 +99,14 @@ export default function WidgetDataConfigSection({
   const showFilter = widgetDef?.enableFilter;
   return (
     <div className="space-y-4">
+      {/* Affichage des colonnes avec types */}
+      {columnInfos.length > 0 && (
+        <ColumnDisplay
+          columns={columnInfos}
+          className="mb-4"
+        />
+      )}
+      
       {/* Section filtre pour KPI */}
       {showFilter && (
         <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
@@ -339,49 +350,18 @@ export default function WidgetDataConfigSection({
           )}
         </div>
       )}
-      {/* Buckets (x-axis/groupBy) */}
+      {/* Buckets (x-axis/groupBy) - Configuration avancée comme Kibana */}
       {widgetDef &&
         !widgetDef.hideBucket &&
         dataConfig.bucket &&
         dataConfig.bucket.allow && (
-          <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow flex flex-col relative group">
-            <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => toggleCollapse("bucket")}
-            >
-              <span className="font-medium">Champ de groupement</span>
-              <button
-                className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleConfigChange("bucket", {
-                    field: "",
-                  });
-                }}
-                title="Réinitialiser"
-              >
-                <XMarkIcon className="w-5 h-5 text-red-500" />
-              </button>
-            </div>
-            {!collapsedMetrics["bucket"] && (
-              <div className="flex flex-col gap-2 mt-2">
-                <SelectField
-                  label="Champ"
-                  value={config.bucket?.field}
-                  onChange={(e) =>
-                    handleConfigChange("bucket", {
-                      ...config.bucket,
-                      field: e.target.value,
-                    })
-                  }
-                  options={columns.map((col) => ({ value: col, label: col }))}
-                  name="bucket-field"
-                  id="bucket-field"
-                />
-                {/* Suppression du champ label du groupement */}
-              </div>
-            )}
-          </div>
+          <BucketConfigEditor
+            config={config.bucket || { field: "", type: "terms" }}
+            onChange={(bucketConfig) => handleConfigChange("bucket", bucketConfig)}
+            availableColumns={columnInfos}
+            label="Groupement des données"
+            description="Configurez comment grouper vos données (comme dans Kibana)"
+          />
         )}
     </div>
   );

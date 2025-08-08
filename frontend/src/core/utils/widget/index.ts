@@ -21,3 +21,12 @@ export {
     isPreviewDataReady,
     isConfigComplete,
 } from "./dataUtils";
+
+// Column analysis utilities
+export {
+    detectColumnType,
+    analyzeColumns,
+    getRecommendedBucketTypes,
+    getDateIntervalOptions,
+    validateBucketConfig,
+} from "./columnAnalysis";

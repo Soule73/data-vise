@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSourcesQuery, useDataBySourceQuery } from "@/data/repositories/sources";
 import type { DataSource } from "@/core/types/data-source";
 import type { WidgetType, WidgetFormInitialValues, WidgetConfig, CommonWidgetFormState } from "@/core/types/widget-types";
+import type { ColumnInfo } from "@/core/types/metric-bucket-types";
 import { WIDGETS, WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
 import { useMetricLabelStore } from "@/core/store/metricLabels";
 import {
@@ -15,6 +16,7 @@ import {
     extractMetricLabels,
     generateSourceOptions,
     isPreviewDataReady,
+    analyzeColumns,
 } from "@/core/utils/widget";
 
 export function useCommonWidgetForm(
@@ -28,6 +30,7 @@ export function useCommonWidgetForm(
 
     // Data state
     const [columns, setColumns] = useState<string[]>(initialValues?.columns || []);
+    const [columnInfos, setColumnInfos] = useState<ColumnInfo[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [dataPreview, setDataPreview] = useState<any[]>(initialValues?.dataPreview || []);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -126,6 +129,19 @@ export function useCommonWidgetForm(
         prevMetricsRef.current = [...metrics];
     }, [config.metrics, config.metricStyles, type]);
 
+    // --- Analyse des colonnes ---
+    useEffect(() => {
+        if (dataPreview && Array.isArray(dataPreview) && dataPreview.length > 0) {
+            const analyzedColumns = analyzeColumns(dataPreview);
+            setColumnInfos(analyzedColumns);
+            
+            // Met à jour les colonnes simples si elles ne sont pas définies
+            if (columns.length === 0) {
+                setColumns(analyzedColumns.map(col => col.name));
+            }
+        }
+    }, [dataPreview, columns.length]);
+
     // --- Handlers génériques ---
     function handleConfigChange(field: string, value: unknown) {
         setConfig((c: WidgetConfig) => ({ ...c, [field]: value }));
@@ -210,6 +226,7 @@ export function useCommonWidgetForm(
         // Data state
         columns,
         setColumns,
+        columnInfos,
         dataPreview,
         setDataPreview,
 
