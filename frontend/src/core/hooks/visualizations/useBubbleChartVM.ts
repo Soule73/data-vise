@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useMemo } from "react";
+import { useMultiBucketProcessor, type ProcessedBucketItem } from "@/core/hooks/common/useMultiBucketProcessor";
 import type { ChartOptions, ChartData } from "chart.js";
 import type { BubbleChartConfig } from "@/core/types/visualization";
 import type { BubbleMetricConfig } from "@/core/types/metric-bucket-types";
@@ -13,7 +14,6 @@ import {
 import type { BubbleChartParams } from "@/core/types/visualization";
 
 export function useBubbleChartLogic(
-
   data: Record<string, any>[],
   config: BubbleChartConfig
 ): {
@@ -21,6 +21,9 @@ export function useBubbleChartLogic(
   options: ChartOptions<"bubble">;
   validDatasets: BubbleMetricConfig[];
 } {
+  // Process data with multi-bucket system
+  const processedData = useMultiBucketProcessor(data, config);
+
   // Extraction stricte des params
   const widgetParams: BubbleChartParams = config.widgetParams ?? {};
 
@@ -48,19 +51,37 @@ export function useBubbleChartLogic(
           const b = bigint & 255;
           color = `rgba(${r},${g},${b},${opacity})`;
         }
-        return {
-          label: ds.label || `Dataset ${i + 1}`,
-          data: data.map((row: any) => ({
+
+        // Support multi-bucket ou fallback legacy
+        let bubbleData: Array<{ x: number; y: number; r: number }> = [];
+
+        if (processedData && processedData.length > 0) {
+          // Pour bubble chart avec multi-bucket, utiliser les métriques traitées
+          bubbleData = processedData.map((item: ProcessedBucketItem) => {
+            // Première métrique pour X, deuxième pour Y, troisième pour R
+            const xMetric = item.metrics[0]?.value || 0;
+            const yMetric = item.metrics[1]?.value || 0;
+            const rMetric = item.metrics[2]?.value || 8; // Taille par défaut
+            return { x: xMetric, y: yMetric, r: rMetric };
+          });
+        } else {
+          // Fallback legacy
+          bubbleData = data.map((row: any) => ({
             x: Number(row[ds.x]),
             y: Number(row[ds.y]),
             r: Number(row[ds.r]) || 8,
-          })),
+          }));
+        }
+
+        return {
+          label: ds.label || `Dataset ${i + 1}`,
+          data: bubbleData,
           backgroundColor: color,
           borderColor: config.metricStyles?.[i]?.borderColor || undefined,
           borderWidth: config.metricStyles?.[i]?.borderWidth ?? 1,
         };
       }),
-    [validDatasets, data, config.metricStyles]
+    [validDatasets, data, config.metricStyles, processedData]
   );
 
   const chartTitle = widgetParams.title || "";

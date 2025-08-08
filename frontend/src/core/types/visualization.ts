@@ -4,6 +4,7 @@ import type {
   MetricConfig,
   RadarMetricConfig,
   ScatterMetricConfig,
+  MultiBucketConfig,
 } from "./metric-bucket-types";
 
 // --- Base params communs à la plupart des visualisations ---
@@ -172,40 +173,44 @@ export abstract class WidgetConfigBase<
     | ScatterMetricConfig[]
     | BubbleMetricConfig[]
     | RadarMetricConfig[];
-  bucket: BucketConfig;
+  bucket?: BucketConfig; // Bucket legacy pour compatibilité
+  buckets?: MultiBucketConfig[]; // Nouveaux buckets multiples
   widgetParams?: TParams;
   metricStyles?: TStyles;
   filters?: TFilters;
   constructor({
     metrics,
     bucket,
+    buckets,
     widgetParams,
     metricStyles,
     filters,
   }: {
     metrics: MetricConfig[];
-    bucket: BucketConfig;
+    bucket?: BucketConfig;
+    buckets?: MultiBucketConfig[];
     widgetParams?: TParams;
     metricStyles?: TStyles;
     filters?: TFilters;
   }) {
     this.metrics = metrics;
     this.bucket = bucket;
+    this.buckets = buckets;
     this.widgetParams = widgetParams;
     this.metricStyles = metricStyles;
     this.filters = filters;
   }
 }
 
-export class BarChartConfig extends WidgetConfigBase<BarChartParams> {}
-export class LineChartConfig extends WidgetConfigBase<LineChartParams> {}
-export class PieChartConfig extends WidgetConfigBase<PieChartParams> {}
-export class ScatterChartConfig extends WidgetConfigBase<ScatterChartParams> {}
-export class BubbleChartConfig extends WidgetConfigBase<BubbleChartParams> {}
-export class RadarChartConfig extends WidgetConfigBase<RadarChartParams> {}
-export class KPIWidgetConfig extends WidgetConfigBase<KPIWidgetParams> {}
-export class KPIGroupWidgetConfig extends WidgetConfigBase<KPIGroupWidgetParams> {}
-export class CardWidgetConfig extends WidgetConfigBase<CardWidgetParams> {}
+export class BarChartConfig extends WidgetConfigBase<BarChartParams> { }
+export class LineChartConfig extends WidgetConfigBase<LineChartParams> { }
+export class PieChartConfig extends WidgetConfigBase<PieChartParams> { }
+export class ScatterChartConfig extends WidgetConfigBase<ScatterChartParams> { }
+export class BubbleChartConfig extends WidgetConfigBase<BubbleChartParams> { }
+export class RadarChartConfig extends WidgetConfigBase<RadarChartParams> { }
+export class KPIWidgetConfig extends WidgetConfigBase<KPIWidgetParams> { }
+export class KPIGroupWidgetConfig extends WidgetConfigBase<KPIGroupWidgetParams> { }
+export class CardWidgetConfig extends WidgetConfigBase<CardWidgetParams> { }
 export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
   columns?: { key: string; label: string }[];
   pageSize?: number;
@@ -218,7 +223,8 @@ export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
   maxHeight?: string | number;
   constructor(params: {
     metrics: MetricConfig[];
-    bucket: BucketConfig;
+    bucket?: BucketConfig;
+    buckets?: MultiBucketConfig[];
     columns?: { key: string; label: string }[];
     pageSize?: number;
     groupBy?: string;

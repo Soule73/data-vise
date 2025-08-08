@@ -6,6 +6,11 @@ import type {
 } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 
+/**
+ * Hook pour gérer un groupe de KPI avec support multi-bucket
+ * Note: Ce hook gère la configuration UI, le traitement des données
+ * se fait dans les KPI individuels via useKPIWidgetVM
+ */
 export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
   gridColumns: number;
   metrics: MetricConfig[];
@@ -13,6 +18,9 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
   filters: Filter[] | undefined;
   groupTitle: string;
   widgetParamsList: Array<Record<string, unknown>>;
+  hasMultiBuckets: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  bucketsConfig: any;
 } {
   const [gridColumns, setGridColumns] = useState(1);
   const columns = config.widgetParams?.columns || 2;
@@ -45,14 +53,25 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
     [config.filters]
   );
 
+  // Support multi-bucket
+  const hasMultiBuckets = useMemo(() => {
+    return Array.isArray(config.buckets) && config.buckets.length > 0;
+  }, [config.buckets]);
+
+  const bucketsConfig = useMemo(() => {
+    return config.buckets || [];
+  }, [config.buckets]);
+
   const widgetParamsList = useMemo<Array<Record<string, unknown>>>(
     () =>
       metrics.map((metric, idx) => ({
         ...config.widgetParams,
         title: metric.label || metric.field || `KPI ${idx + 1}`,
         description: "",
+        // Transmettre la config buckets à chaque KPI individuel
+        buckets: hasMultiBuckets ? bucketsConfig : undefined,
       })),
-    [metrics, config.widgetParams]
+    [metrics, config.widgetParams, hasMultiBuckets, bucketsConfig]
   );
 
   return {
@@ -62,5 +81,7 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
     filters,
     groupTitle,
     widgetParamsList,
+    hasMultiBuckets,
+    bucketsConfig,
   };
 }

@@ -15,25 +15,41 @@ import {
   formatXTicksLabel,
   formatTooltipValue,
 } from "@/core/utils/chartUtils";
+import { useMultiBucketProcessor } from "@/core/utils/multiBucketProcessor";
 
 export function useBarChartLogic(
   data: Record<string, any>[],
   config: BarChartConfig
 ): { chartData: ChartData<"bar">; options: ChartOptions<"bar"> } {
+
+  // Utiliser le processeur de buckets multiples
+  const processedData = useMultiBucketProcessor(data, config);
+
+  // Fallback vers l'ancien système pour compatibilité
   const labels = useMemo(
-    () => getLabels(data, config.bucket?.field),
-    [data, config.bucket?.field]
+    () => {
+      if (processedData.labels.length > 0) {
+        return processedData.labels;
+      }
+      return getLabels(data, config.bucket?.field || '');
+    },
+    [processedData.labels, data, config.bucket?.field]
   );
+
   const getValues = useCallback(
     (metric: MetricConfig) => {
-      return labels.map((labelVal: string) => {
-        const rows = data.filter(
-          (row: any) => row[config.bucket.field] === labelVal
-        );
-        return aggregate(rows, metric.agg, metric.field);
+      if (processedData.bucketHierarchy.length === 0) {
+        // Pas de buckets, agréger toutes les données
+        return [aggregate(data, metric.agg, metric.field)];
+      }
+
+      // Utiliser le premier niveau de buckets
+      const firstLevel = processedData.bucketHierarchy[0];
+      return firstLevel.buckets.map(bucket => {
+        return aggregate(bucket.data, metric.agg, metric.field);
       });
     },
-    [labels, data, config.bucket.field]
+    [processedData, data]
   );
   // Extraction stricte des params
   const widgetParams: BarChartParams = config.widgetParams ?? {};
@@ -48,8 +64,35 @@ export function useBarChartLogic(
   const labelFontSize = widgetParams.labelFontSize;
 
   const datasets = useMemo(
-    () =>
-      config.metrics.map((metric: MetricConfig, idx: number) => {
+    () => {
+      // Gérer les split series (séries multiples)
+      if (processedData.splitData.series.length > 0) {
+        return processedData.splitData.series.map((splitItem, idx) => {
+          const metric = config.metrics[0] as MetricConfig; // Utiliser la première métrique
+          const values = labels.map(label => {
+            const bucketData = splitItem.data.filter(row =>
+              row[processedData.bucketHierarchy[0]?.bucket.field] === label
+            );
+            return aggregate(bucketData, metric.agg, metric.field);
+          });
+
+          const style = (config.metricStyles && config.metricStyles[idx]) || {};
+
+          return {
+            label: splitItem.key,
+            data: values,
+            backgroundColor: style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
+            borderWidth: style.borderWidth ?? 1,
+            borderColor: style.borderColor || undefined,
+            barThickness: style.barThickness || undefined,
+            borderRadius: style.borderRadius || 0,
+            stack: stacked ? 'stack0' : `stack${idx}`,
+          };
+        });
+      }
+
+      // Mode normal : un dataset par métrique
+      return config.metrics.map((metric: MetricConfig, idx: number) => {
         const values = getValues(metric);
         const style = (config.metricStyles && config.metricStyles[idx]) || {};
         return {
@@ -63,8 +106,9 @@ export function useBarChartLogic(
           // Correction stack: si non empilé, chaque dataset a un stack différent
           stack: stacked ? undefined : `stack${idx}`,
         };
-      }),
-    [config.metrics, config.metricStyles, getValues, stacked]
+      });
+    },
+    [config.metrics, config.metricStyles, getValues, stacked, processedData, labels]
   );
   const chartData: ChartData<"bar"> = useMemo(
     () => ({ labels, datasets }),

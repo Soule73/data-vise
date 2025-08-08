@@ -8,6 +8,7 @@ import {
   getTitleAlign,
   formatTooltipValue,
 } from "@/core/utils/chartUtils";
+import { useMultiBucketProcessor, type ProcessedBucketItem } from "@/core/hooks/common/useMultiBucketProcessor";
 import type { PieChartConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 import type { ChartOptions, ChartData, ChartDataset } from "chart.js";
@@ -26,28 +27,44 @@ export function usePieChartLogic(
     afterDraw: (chart: ChartJSInstance) => void;
   };
 } {
+  // Process data with multi-bucket system
+  const processedData = useMultiBucketProcessor(data, config);
+
   // Extraction stricte des params
   const widgetParams: PieChartParams = config.widgetParams ?? {};
+
   // On ne prend que la première métrique pour le pie (classique)
   const metric: MetricConfig = config.metrics?.[0] || {
     agg: "sum",
     field: "",
     label: "",
   };
-  const labels = useMemo(
-    () => getLabels(data, config.bucket?.field),
-    [data, config.bucket?.field]
-  );
-  const values = useMemo<number[]>(
-    () =>
-      labels.map((labelVal: string) => {
-        const rows = data.filter(
-          (row) => row[config.bucket.field] === labelVal
-        );
-        return aggregate(rows, metric.agg, metric.field);
-      }),
-    [labels, data, config.bucket?.field, metric.agg, metric.field]
-  );
+
+  // Support multi-bucket ou fallback legacy
+  const labels = useMemo(() => {
+    if (processedData && processedData.length > 0) {
+      return processedData.map((item: ProcessedBucketItem) => item.key as string);
+    }
+    // Fallback legacy
+    return getLabels(data, config.bucket?.field || "");
+  }, [processedData, data, config.bucket?.field]);
+
+  const values = useMemo<number[]>(() => {
+    if (processedData && processedData.length > 0) {
+      return processedData.map((item: ProcessedBucketItem) => {
+        const metricData = item.metrics[0]; // Première métrique pour pie chart
+        return metricData?.value || 0;
+      });
+    }
+
+    // Fallback legacy
+    return labels.map((labelVal: string) => {
+      const rows = data.filter(
+        (row) => row[config.bucket?.field || ""] === labelVal
+      );
+      return aggregate(rows, metric.agg, metric.field);
+    });
+  }, [processedData, labels, data, config.bucket?.field, metric.agg, metric.field]);
   const backgroundColor = useMemo<string[]>(
     () =>
       config.widgetParams &&

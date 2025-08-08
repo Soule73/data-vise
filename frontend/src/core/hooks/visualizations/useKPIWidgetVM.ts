@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useMultiBucketProcessor, type ProcessedBucketItem } from "@/core/hooks/common/useMultiBucketProcessor";
 import type { KPIWidgetConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 import type { KPIWidgetVM } from "@/core/types/widget-types";
@@ -7,8 +8,17 @@ export function useKPIWidgetVM(
   data: Record<string, unknown>[],
   config: KPIWidgetConfig
 ): KPIWidgetVM {
+  // Process data with multi-bucket system
+  const processedData = useMultiBucketProcessor(data, config);
+
   // Filtrage des données si un filtre est défini
   const filteredData = useMemo(() => {
+    // Si on utilise le système multi-bucket, utiliser les données traitées
+    if (processedData && processedData.length > 0) {
+      // Pour KPI, on agrège toutes les données traitées
+      return data; // On garde les données originales pour les KPI
+    }
+
     if (Array.isArray(config.filters) && config.filters.length > 0) {
       return config.filters.reduce((acc: Record<string, unknown>[], filter) => {
         if (!filter.field || filter.value === undefined || filter.value === "")
@@ -20,10 +30,30 @@ export function useKPIWidgetVM(
       }, data);
     }
     return data;
-  }, [data, config.filters]);
+  }, [data, config.filters, processedData]);
   const metric: MetricConfig | undefined = config.metrics?.[0];
+
   const value = useMemo(() => {
-    if (!metric || !filteredData || filteredData.length === 0) return 0;
+    if (!metric) return 0;
+
+    // Support multi-bucket system
+    if (processedData && processedData.length > 0) {
+      // Pour KPI, on agrège toutes les valeurs des buckets
+      const values = processedData.map((item: ProcessedBucketItem) => {
+        const metricData = item.metrics[0]; // Première métrique
+        return metricData?.value || 0;
+      });
+
+      if (metric.agg === "sum") return values.reduce((a: number, b: number) => a + b, 0);
+      if (metric.agg === "avg") return values.reduce((a: number, b: number) => a + b, 0) / values.length;
+      if (metric.agg === "min") return Math.min(...values);
+      if (metric.agg === "max") return Math.max(...values);
+      if (metric.agg === "count") return values.length;
+      return values[0] || 0;
+    }
+
+    // Fallback legacy
+    if (!filteredData || filteredData.length === 0) return 0;
     const field = metric.field;
     const agg = metric.agg;
     const values = filteredData.map(
@@ -36,7 +66,7 @@ export function useKPIWidgetVM(
     if (agg === "max") return Math.max(...values);
     if (agg === "count") return values.length;
     return values[0];
-  }, [filteredData, metric]);
+  }, [filteredData, metric, processedData]);
   const title =
     config.widgetParams?.title || metric?.label || metric?.field || "KPI";
   const valueColor =

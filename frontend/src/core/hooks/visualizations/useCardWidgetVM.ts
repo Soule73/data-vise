@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import * as HeroIcons from "@heroicons/react/24/outline";
+import { useMultiBucketProcessor, type ProcessedBucketItem } from "@/core/hooks/common/useMultiBucketProcessor";
 import type { CardWidgetConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 
@@ -16,10 +17,34 @@ export function useCardWidgetVM(
   showIcon: boolean;
   IconComponent: React.ElementType;
 } {
+  // Process data with multi-bucket system
+  const processedData = useMultiBucketProcessor(data, config);
+
   // On prend la première métrique configurée
   const metric: MetricConfig | undefined = config.metrics?.[0];
+
   const value = useMemo(() => {
-    if (!metric || !data || data.length === 0) return 0;
+    if (!metric) return 0;
+
+    // Support multi-bucket system
+    if (processedData && processedData.length > 0) {
+      // Pour Card, on agrège toutes les valeurs des buckets
+      const values = processedData.map((item: ProcessedBucketItem) => {
+        const metricData = item.metrics[0]; // Première métrique
+        return metricData?.value || 0;
+      });
+
+      const agg = metric.agg;
+      if (agg === "sum") return values.reduce((a, b) => a + b, 0);
+      if (agg === "avg") return values.reduce((a, b) => a + b, 0) / values.length;
+      if (agg === "min") return Math.min(...values);
+      if (agg === "max") return Math.max(...values);
+      if (agg === "count") return values.length;
+      return values[0] || 0;
+    }
+
+    // Fallback legacy
+    if (!data || data.length === 0) return 0;
     const field = metric.field;
     const agg = metric.agg;
     const values = data.map((row) => Number(row[field]) || 0);
@@ -29,7 +54,7 @@ export function useCardWidgetVM(
     if (agg === "max") return Math.max(...values);
     if (agg === "count") return values.length;
     return values[0];
-  }, [data, metric]);
+  }, [data, metric, processedData]);
   const title =
     config.widgetParams?.title || metric?.label || metric?.field || "Synthèse";
   const description = config.widgetParams?.description || "";

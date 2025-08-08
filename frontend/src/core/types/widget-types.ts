@@ -18,6 +18,7 @@ import type {
   MetricConfig,
   RadarMetricConfig,
   ScatterMetricConfig,
+  MultiBucketConfig,
 } from "./metric-bucket-types";
 
 export interface Widget {
@@ -117,7 +118,8 @@ export interface WidgetConfig {
   | BubbleMetricConfig[]
   | RadarMetricConfig[];
   filter?: Filter;
-  bucket?: BucketConfig;
+  bucket?: BucketConfig; // Legacy pour compatibilité
+  buckets?: MultiBucketConfig[]; // Nouveaux buckets multiples
 }
 
 export interface WidgetMetricStyleConfigSectionProps<
@@ -284,13 +286,16 @@ export interface WidgetMetricConfigSchema {
 export interface WidgetBucketConfigSchema {
   label: string;
   allow?: boolean;
+  allowMultiple?: boolean;
+  allowedTypes?: Array<{ value: string; label: string }>;
   allowedAggs?: Array<{ value: string; label: string }>;
   defaultAgg?: string;
 }
 
 export interface WidgetDataConfig {
   metrics: WidgetMetricConfigSchema;
-  bucket?: WidgetBucketConfigSchema;
+  bucket?: WidgetBucketConfigSchema; // Legacy pour compatibilité
+  buckets?: WidgetBucketConfigSchema; // Nouveaux buckets multiples
   groupByFields?: string[];
   axisFields?: string[];
 }

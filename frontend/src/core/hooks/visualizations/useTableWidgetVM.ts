@@ -4,16 +4,61 @@ import {
   aggregate,
   // getLabels, getLegendPosition, getTitle, getTitleAlign
 } from "@/core/utils/chartUtils";
+import { useMultiBucketProcessor } from "@/core/hooks/common/useMultiBucketProcessor";
 
 export function useTableWidgetLogic(data: any[], config: any) {
+  // Process data with multi-bucket system
+  const processedData = useMultiBucketProcessor(data, config);
+
   const hasMetrics = Array.isArray(config.metrics) && config.metrics.length > 0;
   const hasBucket = config.bucket && config.bucket.field;
+  const hasMultiBuckets = Array.isArray(config.buckets) && config.buckets.length > 0;
 
   const { columns, displayData } = useMemo(() => {
     const safeData = Array.isArray(data) ? data : [];
     let columns: { key: string; label: string }[] = [];
     let displayData: any[] = [];
-    if (hasMetrics && hasBucket && config.bucket && config.metrics) {
+
+    // Support multi-bucket system
+    if (hasMultiBuckets && hasMetrics && processedData && processedData.length > 0) {
+      // Colonnes pour buckets
+      const bucketColumns = config.buckets.map((bucket: any) => ({
+        key: bucket.field,
+        label: bucket.label || bucket.field,
+      }));
+
+      // Colonnes pour métriques
+      const metricColumns = config.metrics.map((m: any) => ({
+        key: m.field,
+        label: m.label || m.field,
+      }));
+
+      columns = [...bucketColumns, ...metricColumns];
+
+      displayData = processedData.map((item: any) => {
+        const row: any = {};
+
+        // Ajouter les valeurs de buckets
+        if (typeof item.key === 'object') {
+          Object.assign(row, item.key);
+        } else {
+          // Single bucket key
+          row[config.buckets[0].field] = item.key;
+        }
+
+        // Ajouter les valeurs de métriques
+        item.metrics.forEach((metric: any, index: number) => {
+          const metricConfig = config.metrics[index];
+          if (metricConfig) {
+            row[metricConfig.field] = metric.value;
+          }
+        });
+
+        return row;
+      });
+    }
+    // Legacy support
+    else if (hasMetrics && hasBucket && config.bucket && config.metrics) {
       const bucketLabel = config.bucket.label || config.bucket.field;
       columns = [
         { key: config.bucket.field, label: bucketLabel },
@@ -72,12 +117,17 @@ export function useTableWidgetLogic(data: any[], config: any) {
       }
     }
     return { columns, displayData };
-  }, [hasMetrics, hasBucket, config.bucket, config.metrics, config.columns, config.groupBy, data]);
+  }, [hasMetrics, hasBucket, hasMultiBuckets, config.bucket, config.buckets, config.metrics, config.columns, config.groupBy, data, processedData]);
 
   // Détermination du titre à afficher
   let tableTitle = "Tableau";
   if (config.widgetParams && config.widgetParams.title) {
     tableTitle = config.widgetParams.title;
+  } else if (hasMultiBuckets && hasMetrics) {
+    const bucketLabels = config.buckets
+      .map((bucket: any) => bucket.label || bucket.field)
+      .join(", ");
+    tableTitle = `Tableau groupé par ${bucketLabels}`;
   } else if (hasBucket && hasMetrics) {
     const bucketLabel =
       config.bucket && config.bucket.label

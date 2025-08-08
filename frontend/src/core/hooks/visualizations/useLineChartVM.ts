@@ -11,6 +11,7 @@ import {
   formatXTicksLabel,
   formatTooltipValue,
 } from "@/core/utils/chartUtils";
+import { useMultiBucketProcessor } from "@/core/utils/multiBucketProcessor";
 import type { LineChartConfig } from "@/core/types/visualization";
 import type { MetricConfig } from "@/core/types/metric-bucket-types";
 import type { ChartDataset, ChartOptions, ChartData } from "chart.js";
@@ -29,19 +30,33 @@ export function useLineChartLogic(
     afterDatasetsDraw: (chart: ChartJSInstance) => void;
   };
 } {
-  const labels = useMemo(
-    () => getLabels(data, config.bucket?.field),
-    [data, config.bucket?.field]
-  );
+  // Utiliser le processeur de buckets multiples
+  const processedData = useMultiBucketProcessor(data, config);
+
+  // Fallback vers l'ancien système pour compatibilité
+  const labels = useMemo(() => {
+    if (processedData.labels.length > 0) {
+      return processedData.labels;
+    }
+    return getLabels(data, config.bucket?.field || '');
+  }, [processedData.labels, data, config.bucket?.field]);
+
   const getValues = useCallback(
     (metric: MetricConfig): number[] => {
-      return labels.map((labelVal: string) => {
-        const rows = data.filter((row) => row[config.bucket.field] === labelVal);
-        return aggregate(rows, metric.agg, metric.field);
+      if (processedData.bucketHierarchy.length === 0) {
+        // Pas de buckets, agréger toutes les données
+        return [aggregate(data, metric.agg, metric.field)];
+      }
+
+      // Utiliser le premier niveau de buckets
+      const firstLevel = processedData.bucketHierarchy[0];
+      return firstLevel.buckets.map(bucket => {
+        return aggregate(bucket.data, metric.agg, metric.field);
       });
     },
-    [labels, data, config.bucket.field]
+    [processedData, data]
   );
+
   // Extraction stricte des params globaux
   const widgetParams: LineChartParams = config.widgetParams ?? {};
   const tension = widgetParams.tension ?? 0;
@@ -52,8 +67,43 @@ export function useLineChartLogic(
 
   // Les styles sont strictement par-métrique
   const datasets = useMemo<ChartDataset<"line">[]>(
-    () =>
-      config.metrics.map((metric: MetricConfig, idx: number) => {
+    () => {
+      // Gérer les split series (séries multiples)
+      if (processedData.splitData.series.length > 0) {
+        return processedData.splitData.series.map((splitItem, idx) => {
+          const metric = config.metrics[0] as MetricConfig; // Utiliser la première métrique
+          const values = labels.map(label => {
+            const bucketData = splitItem.data.filter(row =>
+              row[processedData.bucketHierarchy[0]?.bucket.field] === label
+            );
+            return aggregate(bucketData, metric.agg, metric.field);
+          });
+
+          const style = (config.metricStyles && config.metricStyles[idx]) || {};
+
+          return {
+            label: splitItem.key,
+            data: values,
+            borderColor:
+              style.borderColor ||
+              style.color ||
+              `hsl(${(idx * 60) % 360}, 70%, 60%)`,
+            backgroundColor: style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
+            borderWidth: style.borderWidth ?? 1,
+            pointStyle: style.pointStyle || undefined,
+            fill: style.fill ?? false,
+            stepped: style.stepped ?? false,
+            borderRadius: style.borderRadius ?? 0,
+            borderDash: style.borderDash ?? undefined,
+            tension: tension,
+            pointRadius: showPoints ? 3 : 0,
+            pointHoverRadius: showPoints ? 5 : 0,
+          };
+        });
+      }
+
+      // Mode normal : un dataset par métrique
+      return config.metrics.map((metric: MetricConfig, idx: number) => {
         const values = getValues(metric);
         const style = (config.metricStyles && config.metricStyles[idx]) || {};
         return {
@@ -73,9 +123,10 @@ export function useLineChartLogic(
           tension: tension,
           pointRadius: showPoints ? 3 : 0,
           pointHoverRadius: showPoints ? 5 : 0,
-        } as ChartDataset<"line">;
-      }),
-    [config.metrics, config.metricStyles, getValues, tension, showPoints]
+        };
+      });
+    },
+    [config.metrics, config.metricStyles, getValues, tension, showPoints, processedData, labels]
   );
   const chartData: ChartData<"line"> = useMemo(
     () => ({ labels, datasets }),

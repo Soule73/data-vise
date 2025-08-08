@@ -391,8 +391,8 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     component: KPIWidget,
     icon: PresentationChartLineIcon,
     allowMultipleMetrics: false,
-    hideBucket: true, // cache la section bucket
-    enableFilter: true, // active la section filtre
+    hideBucket: true,
+    enableFilter: true,
     configSchema: {
       metricStyles: {
         valueColor: {
@@ -686,6 +686,22 @@ const COMMON_BUCKET = {
   typeLabel: "x",
 };
 
+// Configuration commune pour les buckets multiples
+const COMMON_MULTI_BUCKETS = {
+  allow: true,
+  allowMultiple: true,
+  label: "Buckets",
+  allowedTypes: [
+    { value: 'terms', label: 'Termes' },
+    { value: 'histogram', label: 'Histogramme' },
+    { value: 'date_histogram', label: 'Histogramme de dates' },
+    { value: 'range', label: 'Plages' },
+    { value: 'split_series', label: 'Diviser en séries' },
+    { value: 'split_rows', label: 'Diviser en lignes' },
+    { value: 'split_chart', label: 'Diviser en graphiques' },
+  ],
+};
+
 export const WIDGET_DATA_CONFIG: Record<
   WidgetType,
   {
@@ -693,15 +709,18 @@ export const WIDGET_DATA_CONFIG: Record<
     | typeof COMMON_METRICS
     | (typeof COMMON_METRICS & { allowMultiple: false; label: string });
     bucket: typeof COMMON_BUCKET & { label?: string; typeLabel?: string };
+    buckets?: typeof COMMON_MULTI_BUCKETS & { label?: string };
   }
 > = {
   bar: {
     metrics: COMMON_METRICS,
     bucket: { ...COMMON_BUCKET },
+    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets X/Y" },
   },
   line: {
     metrics: COMMON_METRICS,
     bucket: { ...COMMON_BUCKET },
+    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets X/Y" },
   },
   pie: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
@@ -709,33 +728,49 @@ export const WIDGET_DATA_CONFIG: Record<
       ...COMMON_BUCKET,
       typeLabel: "part",
     },
+    buckets: {
+      ...COMMON_MULTI_BUCKETS,
+      allowMultiple: false,
+      label: "Groupement",
+      allowedTypes: [
+        { value: 'terms', label: 'Termes' },
+        { value: 'range', label: 'Plages' },
+      ]
+    },
   },
   table: {
     metrics: COMMON_METRICS,
     bucket: COMMON_BUCKET,
+    buckets: { ...COMMON_MULTI_BUCKETS, label: "Groupements" },
   },
   scatter: {
     metrics: COMMON_METRICS,
     bucket: COMMON_BUCKET,
+    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets" },
   },
   bubble: {
     metrics: COMMON_METRICS,
     bucket: COMMON_BUCKET,
+    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets" },
   },
   radar: {
     metrics: COMMON_METRICS,
     bucket: COMMON_BUCKET,
+    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets" },
   },
   kpi: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
     bucket: COMMON_BUCKET,
+    buckets: { ...COMMON_MULTI_BUCKETS, allow: false },
   },
   kpi_group: {
     metrics: { ...COMMON_METRICS, allowMultiple: true, label: "KPIs" },
     bucket: { ...COMMON_BUCKET, allow: false },
+    buckets: { ...COMMON_MULTI_BUCKETS, allow: false },
   },
   card: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },
     bucket: COMMON_BUCKET,
+    buckets: { ...COMMON_MULTI_BUCKETS, allowMultiple: false, label: "Groupement" },
   },
 };

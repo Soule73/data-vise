@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
+import { useMultiBucketProcessor, type ProcessedBucketItem } from "@/core/hooks/common/useMultiBucketProcessor";
 import type { RadarChartConfig } from "@/core/types/visualization";
 import type { ChartOptions, ChartData, ChartDataset } from "chart.js";
 import type { RadarMetricConfig } from "@/core/types/metric-bucket-types";
@@ -24,6 +25,9 @@ export function useRadarChartLogic(
   validDatasets: RadarMetricConfig[];
   axisLabels: string[];
 } {
+  // Process data with multi-bucket system
+  const processedData = useMultiBucketProcessor(data, config);
+
   // Extraction stricte des params
   const widgetParams: RadarChartParams = config.widgetParams ?? {};
 
@@ -57,13 +61,34 @@ export function useRadarChartLogic(
           const b = bigint & 255;
           color = `rgba(${r},${g},${b},${opacity})`;
         }
-        // Filtrage par groupBy si défini
+
+        // Support multi-bucket ou fallback legacy
         let filteredData = data;
-        if (ds.groupBy && ds.groupByValue) {
-          filteredData = data.filter(
-            (row) => row[ds.groupBy!] === ds.groupByValue
-          );
+
+        // Multi-bucket processing
+        if (processedData && processedData.length > 0) {
+          // Pour radar chart avec multi-bucket, on agrège les données par bucket
+          const bucketData: Record<string, unknown>[] = [];
+          processedData.forEach((item: ProcessedBucketItem) => {
+            const row: Record<string, unknown> = {};
+            // Ajouter les métriques aux champs correspondants
+            item.metrics.forEach((metric, metricIndex) => {
+              if (axisLabels[metricIndex]) {
+                row[axisLabels[metricIndex]] = metric.value;
+              }
+            });
+            bucketData.push(row);
+          });
+          filteredData = bucketData;
+        } else {
+          // Filtrage par groupBy si défini (legacy)
+          if (ds.groupBy && ds.groupByValue) {
+            filteredData = data.filter(
+              (row) => row[ds.groupBy!] === ds.groupByValue
+            );
+          }
         }
+
         // Pour chaque axe, on agrège la valeur selon l'agg choisie (sum, avg, ...)
         return {
           label: ds.label || `Dataset ${i + 1}`,
@@ -103,7 +128,7 @@ export function useRadarChartLogic(
           pointBackgroundColor: config.metricStyles?.[i]?.color || color,
         } as ChartDataset<"radar">;
       }),
-    [validDatasets, data, config.metricStyles, axisLabels]
+    [validDatasets, data, config.metricStyles, axisLabels, processedData]
   );
 
   const chartData: ChartData<"radar"> = useMemo(

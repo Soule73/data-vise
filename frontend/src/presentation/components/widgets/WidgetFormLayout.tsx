@@ -107,7 +107,6 @@ export default function WidgetFormLayout({
     return (
         <>
             <div className="lg:h-[90vh] h-full flex flex-col min-h-0 overflow-hidden">
-                {/* Header avec titre et bouton de sauvegarde */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -158,7 +157,7 @@ export default function WidgetFormLayout({
                     </div>
 
                     {/* Colonne config (droite): scrollable indépendamment */}
-                    <div className="order-2 md:w-1/2 lg:w-1/3 flex flex-col h-full bg-gray-50 dark:bg-gray-900 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                    <div className="order-2 md:w-1/2 lg:w-1/3 flex flex-col h-full bg-white dark:bg-gray-900">
                         {/* Tabs conditionnels */}
                         {availableTabs.length > 1 && (
                             <WidgetConfigTabs

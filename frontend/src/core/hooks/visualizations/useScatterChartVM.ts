@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useMemo } from "react";
+import { useMultiBucketProcessor, type ProcessedBucketItem } from "@/core/hooks/common/useMultiBucketProcessor";
 import type { ScatterChartConfig } from "@/core/types/visualization";
 import type { ScatterMetricConfig } from "@/core/types/metric-bucket-types";
 import type { ChartOptions, ChartData, ChartDataset } from "chart.js";
@@ -29,6 +30,9 @@ export function useScatterChartLogic(
   options: ChartOptions<"scatter">;
   validDatasets: ScatterMetricConfig[];
 } {
+  // Process data with multi-bucket system
+  const processedData = useMultiBucketProcessor(data, config);
+
   // Extraction stricte des params
   const widgetParams: ScatterChartParams = useMemo(
     () => config.widgetParams ?? {},
@@ -39,6 +43,7 @@ export function useScatterChartLogic(
     () => config.metrics.filter(isScatterMetricConfig) as ScatterMetricConfig[],
     [config.metrics]
   );
+
   const datasets = useMemo<ChartDataset<"scatter">[]>(
     () =>
       validDatasets.map((ds, i) => {
@@ -53,18 +58,35 @@ export function useScatterChartLogic(
           const b = bigint & 255;
           color = `rgba(${r},${g},${b},${opacity})`;
         }
-        return {
-          label: ds.label || `Dataset ${i + 1}`,
-          data: data.map((row) => ({
+
+        // Support multi-bucket ou fallback legacy
+        let dataPoints: Array<{ x: number; y: number }> = [];
+
+        if (processedData && processedData.length > 0) {
+          // Pour scatter chart avec multi-bucket, utiliser les métriques traitées
+          dataPoints = processedData.map((item: ProcessedBucketItem) => {
+            // Première métrique pour X, deuxième pour Y
+            const xMetric = item.metrics[0]?.value || 0;
+            const yMetric = item.metrics[1]?.value || 0;
+            return { x: xMetric, y: yMetric };
+          });
+        } else {
+          // Fallback legacy
+          dataPoints = data.map((row) => ({
             x: Number(row[ds.x]),
             y: Number(row[ds.y]),
-          })),
+          }));
+        }
+
+        return {
+          label: ds.label || `Dataset ${i + 1}`,
+          data: dataPoints,
           backgroundColor: color,
           borderColor: config.metricStyles?.[i]?.borderColor || undefined,
           borderWidth: config.metricStyles?.[i]?.borderWidth ?? 1,
         } as ChartDataset<"scatter">;
       }),
-    [validDatasets, data, config.metricStyles]
+    [validDatasets, data, config.metricStyles, processedData]
   );
 
   // Récupération des labels X (valeurs de la première série de données)

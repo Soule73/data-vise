@@ -14,11 +14,13 @@ import WidgetBubbleDataConfigSection from "@/presentation/components/widgets/Wid
 import WidgetScatterDataConfigSection from "@/presentation/components/widgets/WidgetScatterDataConfigSection";
 import WidgetRadarDataConfigSection from "@/presentation/components/widgets/WidgetRadarDataConfigSection";
 import WidgetKPIGroupDataConfigSection from "@/presentation/components/widgets/WidgetKPIGroupDataConfigSection";
-import { WIDGETS } from "@/data/adapters/visualizations";
+import MultiBucketSection from "@/presentation/components/widgets/MultiBucketSection";
+import { WIDGETS, WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
 import type {
   BubbleMetricConfig,
   RadarMetricConfig,
 } from "@/core/types/metric-bucket-types";
+import { useMultiBuckets } from "@/core/hooks/useMultiBuckets";
 
 export default function WidgetDataConfigSection({
   type,
@@ -35,6 +37,18 @@ export default function WidgetDataConfigSection({
   const widgetDef = WIDGETS[type];
   const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
   const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
+
+  // Hook pour gérer les buckets multiples
+  const dataConfigForWidget = WIDGET_DATA_CONFIG[type];
+  const {
+    buckets: currentBuckets,
+    handleBucketsChange,
+  } = useMultiBuckets({
+    config,
+    columns,
+    allowMultiple: dataConfigForWidget.buckets?.allowMultiple,
+    onConfigChange: handleConfigChange,
+  });
 
   if (type === "bubble") {
     return (
@@ -156,7 +170,7 @@ export default function WidgetDataConfigSection({
       )}
       {/* Métriques (metrics) */}
       {dataConfig.metrics.label && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded p-2">
           <div className="font-semibold mb-1">{dataConfig.metrics.label}</div>
           <div className="space-y-1 divide-y divide-gray-300 dark:divide-gray-700 ">
             {config.metrics.map((metric: any, idx: number) => {
@@ -339,50 +353,69 @@ export default function WidgetDataConfigSection({
           )}
         </div>
       )}
-      {/* Buckets (x-axis/groupBy) */}
-      {widgetDef &&
-        !widgetDef.hideBucket &&
-        dataConfig.bucket &&
-        dataConfig.bucket.allow && (
-          <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow flex flex-col relative group">
-            <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => toggleCollapse("bucket")}
-            >
-              <span className="font-medium">Champ de groupement</span>
-              <button
-                className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleConfigChange("bucket", {
-                    field: "",
-                  });
-                }}
-                title="Réinitialiser"
-              >
-                <XMarkIcon className="w-5 h-5 text-red-500" />
-              </button>
-            </div>
-            {!collapsedMetrics["bucket"] && (
-              <div className="flex flex-col gap-2 mt-2">
-                <SelectField
-                  label="Champ"
-                  value={config.bucket?.field}
-                  onChange={(e) =>
-                    handleConfigChange("bucket", {
-                      ...config.bucket,
-                      field: e.target.value,
-                    })
-                  }
-                  options={columns.map((col) => ({ value: col, label: col }))}
-                  name="bucket-field"
-                  id="bucket-field"
-                />
-                {/* Suppression du champ label du groupement */}
+      {/* Buckets multiples (nouveaux) ou bucket legacy */}
+      {widgetDef && !widgetDef.hideBucket && (
+        (() => {
+          // Prioriser les buckets multiples si supportés
+          if (dataConfigForWidget.buckets?.allow) {
+            return (
+              <MultiBucketSection
+                buckets={currentBuckets}
+                columns={columns}
+                data={data}
+                allowMultiple={dataConfigForWidget.buckets.allowMultiple}
+                sectionLabel={dataConfigForWidget.buckets.label || "Buckets"}
+                onBucketsChange={handleBucketsChange}
+              />
+            );
+          }
+
+          // Fallback vers l'ancien système de buckets
+          if (dataConfig.bucket && dataConfig.bucket.allow) {
+            return (
+              <div className="bg-gray-100 dark:bg-gray-800 rounded p-2 flex flex-col relative group">
+                <div
+                  className="flex items-center justify-between cursor-pointer"
+                  onClick={() => toggleCollapse("bucket")}
+                >
+                  <span className="font-medium">Champ de groupement</span>
+                  <button
+                    className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleConfigChange("bucket", {
+                        field: "",
+                      });
+                    }}
+                    title="Réinitialiser"
+                  >
+                    <XMarkIcon className="w-5 h-5 text-red-500" />
+                  </button>
+                </div>
+                {!collapsedMetrics["bucket"] && (
+                  <div className="flex flex-col gap-2 mt-2">
+                    <SelectField
+                      label="Champ"
+                      value={config.bucket?.field}
+                      onChange={(e) =>
+                        handleConfigChange("bucket", {
+                          ...config.bucket,
+                          field: e.target.value,
+                        })
+                      }
+                      options={columns.map((col) => ({ value: col, label: col }))}
+                      name="bucket-field"
+                      id="bucket-field"
+                    />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        )}
+            );
+          }
+
+          return null;
+        })()
+      )}
     </div>
   );
 }

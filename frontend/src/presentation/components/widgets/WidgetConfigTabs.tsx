@@ -13,8 +13,8 @@ function TabButton({
   return (
     <button
       className={`px-4 py-2 -mb-px border-b-2 font-medium transition-colors text-sm cursor-pointer ${active
-          ? "border-indigo-500 text-indigo-600"
-          : "border-transparent text-gray-500 hover:text-indigo-500"
+        ? "border-indigo-500 text-indigo-600"
+        : "border-transparent text-gray-500 hover:text-indigo-500"
         }`}
       onClick={onClick}
     >
