@@ -2,6 +2,7 @@ import type { ScatterMetricConfig } from "@/core/types/metric-bucket-types";
 import SelectField from "@/presentation/components/SelectField";
 import InputField from "@/presentation/components/forms/InputField";
 import Button from "@/presentation/components/forms/Button";
+import MultiBucketSection from "@/presentation/components/widgets/MultiBucketSection";
 import { XMarkIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
@@ -11,6 +12,8 @@ export default function WidgetScatterDataConfigSection({
   metrics,
   columns,
   handleConfigChange,
+  config,
+  availableFields,
 }: WidgetScatterDataConfigSectionProps) {
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
   const toggleCollapse = (idx: number) =>
@@ -18,6 +21,15 @@ export default function WidgetScatterDataConfigSection({
 
   return (
     <div className="space-y-4">
+      {/* Section Multi-Buckets */}
+      <MultiBucketSection
+        buckets={config?.buckets || []}
+        columns={availableFields || columns}
+        allowMultiple={true}
+        sectionLabel="Buckets"
+        onBucketsChange={(buckets) => handleConfigChange("buckets", buckets)}
+      />
+
       <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
         <div className="font-semibold mb-1">Datasets (x, y)</div>
         <div className="space-y-2">

@@ -123,11 +123,13 @@ export function generateDefaultMetricStyle(): Record<string, any> {
  * Synchronise les styles des métriques avec la configuration
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function syncMetricStyles(metrics: any[], metricStyles: any[]): any[] {
-    const newStyles = [...metricStyles];
+export function syncMetricStyles(metrics: any[], metricStyles: any[] | undefined | null): any[] {
+    // S'assurer que metricStyles est un tableau
+    const safeMetricStyles = Array.isArray(metricStyles) ? metricStyles : [];
+    const newStyles = [...safeMetricStyles];
 
     // Ajouter des styles pour les nouvelles métriques
-    for (let i = metricStyles.length; i < metrics.length; i++) {
+    for (let i = safeMetricStyles.length; i < metrics.length; i++) {
         newStyles.push(generateDefaultMetricStyle());
     }
 

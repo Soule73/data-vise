@@ -2,6 +2,7 @@ import SelectField from "@/presentation/components/SelectField";
 import InputField from "@/presentation/components/forms/InputField";
 import Button from "@/presentation/components/forms/Button";
 import CheckboxField from "@/presentation/components/forms/CheckboxField";
+import MultiBucketSection from "@/presentation/components/widgets/MultiBucketSection";
 import {
   XMarkIcon,
   PlusCircleIcon,
@@ -18,6 +19,8 @@ export default function WidgetRadarDataConfigSection({
   handleConfigChange,
   configSchema,
   data = [],
+  config,
+  availableFields,
 }: WidgetRadarDataConfigSectionProps) {
 
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
@@ -32,6 +35,15 @@ export default function WidgetRadarDataConfigSection({
 
   return (
     <div className="space-y-4">
+      {/* Section Multi-Buckets */}
+      <MultiBucketSection
+        buckets={config?.buckets || []}
+        columns={availableFields || columns}
+        allowMultiple={true}
+        sectionLabel="Buckets"
+        onBucketsChange={(buckets) => handleConfigChange("buckets", buckets)}
+      />
+
       <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
         <div className="font-semibold mb-1">Datasets (axes multiples)</div>
         <div className="space-y-2">

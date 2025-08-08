@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import SelectField from "@/presentation/components/SelectField";
 import InputField from "@/presentation/components/forms/InputField";
 import Button from "@/presentation/components/forms/Button";
@@ -253,8 +254,8 @@ export default function WidgetKPIGroupDataConfigSection({
                             </button>
                             <button
                               className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${idx === kpiConfig.metrics.length - 1
-                                  ? "opacity-50 cursor-not-allowed"
-                                  : ""
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
                                 }`}
                               onClick={(e) => {
                                 e.stopPropagation();

@@ -214,7 +214,10 @@ export interface WidgetScatterDataConfigSectionProps {
       | boolean
       | ScatterMetricConfig
       | ScatterMetricConfig[]
+      | any
   ) => void;
+  config?: any;
+  availableFields?: string[];
 }
 
 export interface WidgetRadarDataConfigSectionProps {
@@ -223,6 +226,8 @@ export interface WidgetRadarDataConfigSectionProps {
   handleConfigChange: (field: string, value: any) => void;
   configSchema: { dataConfig: WidgetDataConfig };
   data?: Record<string, any>[];
+  config?: any;
+  availableFields?: string[];
 }
 
 export interface WidgetBubbleDataConfigSectionProps {
@@ -230,8 +235,10 @@ export interface WidgetBubbleDataConfigSectionProps {
   columns: string[];
   handleConfigChange: (
     field: string,
-    value: BubbleMetricConfig[] | BubbleMetricConfig
+    value: BubbleMetricConfig[] | BubbleMetricConfig | any
   ) => void;
+  config?: any;
+  availableFields?: string[];
 }
 
 export interface MetricStyleFieldSchema {

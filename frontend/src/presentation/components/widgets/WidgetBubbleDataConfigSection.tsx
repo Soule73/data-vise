@@ -2,6 +2,7 @@ import SelectField from "@/presentation/components/SelectField";
 import InputField from "@/presentation/components/forms/InputField";
 import Button from "@/presentation/components/forms/Button";
 import { XMarkIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
+import MultiBucketSection from "@/presentation/components/widgets/MultiBucketSection";
 import type { BubbleMetricConfig } from "@/core/types/metric-bucket-types";
 import type { WidgetBubbleDataConfigSectionProps } from "@/core/types/widget-types";
 
@@ -9,9 +10,20 @@ export default function WidgetBubbleDataConfigSection({
   metrics,
   columns,
   handleConfigChange,
+  config,
+  availableFields,
 }: WidgetBubbleDataConfigSectionProps) {
   return (
     <div className="space-y-4">
+      {/* Section Multi-Buckets */}
+      <MultiBucketSection
+        buckets={config?.buckets || []}
+        columns={availableFields || columns}
+        allowMultiple={true}
+        sectionLabel="Buckets"
+        onBucketsChange={(buckets) => handleConfigChange("buckets", buckets)}
+      />
+
       <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
         <div className="font-semibold mb-1">Datasets (x, y, r)</div>
         <div className="space-y-2">

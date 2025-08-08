@@ -98,15 +98,21 @@ export function useCommonWidgetForm(
         config.metrics ? [...config.metrics] : []
     );
 
+    // Référence pour éviter la boucle infinie
+    const isUpdatingMetricStyles = useRef(false);
+
     useEffect(() => {
+        // Éviter la boucle infinie
+        if (isUpdatingMetricStyles.current) {
+            isUpdatingMetricStyles.current = false;
+            return;
+        }
+
         const metrics = config.metrics || [];
-        const metricStyles = config.metricStyles || [];
+        const metricStyles = Array.isArray(config.metricStyles) ? config.metricStyles : [];
 
         // Synchronise les styles avec les métriques
         const syncedStyles = syncMetricStyles(metrics, metricStyles);
-        if (syncedStyles !== metricStyles) {
-            setConfig((c: WidgetConfig) => ({ ...c, metricStyles: syncedStyles }));
-        }
 
         // Met à jour les styles pour les métriques modifiées
         const updatedStyles = ensureMetricStylesForChangedMetrics(
@@ -114,7 +120,10 @@ export function useCommonWidgetForm(
             syncedStyles,
             prevMetricsRef.current
         );
-        if (updatedStyles !== syncedStyles) {
+
+        // Ne met à jour que si les styles ont réellement changé
+        if (JSON.stringify(updatedStyles) !== JSON.stringify(metricStyles)) {
+            isUpdatingMetricStyles.current = true;
             setConfig((c: WidgetConfig) => ({ ...c, metricStyles: updatedStyles }));
         }
 
