@@ -1,21 +1,8 @@
 import { useEffect } from 'react';
-import type { WidgetType } from '@type/widget-types';
-import type { MultiBucketConfig } from '@type/metric-bucket-types';
+import type { UseWidgetAutoConfigProps } from '@type/widget-types';
 import { createDefaultWidgetConfig, optimizeWidgetConfig } from '@utils/widgetConfigDefaults';
 import { ensureMultiBuckets } from '@utils/bucketMigration';
 
-interface UseWidgetAutoConfigProps {
-    widgetType: WidgetType;
-    columns: string[];
-    data?: Record<string, unknown>[];
-    currentConfig: {
-        bucket?: { field: string; label?: string };
-        buckets?: MultiBucketConfig[];
-        metrics?: unknown[];
-    };
-    onConfigChange: (field: string, value: unknown) => void;
-    autoInitialize?: boolean;
-}
 
 /**
  * Hook pour initialiser automatiquement la configuration d'un widget

@@ -4,7 +4,7 @@ import NoDataWidget from "@components/widgets/NoDataWidget";
 import KPIWidget from "@components/visualizations/kpi/KPIWidget";
 import { useKPIGroupVM } from "@hooks/visualizations/kpi/useKPIGroupVM";
 import type { KPIGroupWidgetConfig } from "@type/visualization";
-import type { MetricConfig } from "@type/metric-bucket-types";
+import type { Metric } from "@type/metric-bucket-types";
 
 export default function KPIGroupWidget({
   data,
@@ -44,7 +44,7 @@ export default function KPIGroupWidget({
         gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
       }}
     >
-      {metrics.map((metric: MetricConfig, idx: number) => (
+      {metrics.map((metric: Metric, idx: number) => (
         <KPIWidget
           key={idx}
           data={data}

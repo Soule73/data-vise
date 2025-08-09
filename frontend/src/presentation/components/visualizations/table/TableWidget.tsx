@@ -1,10 +1,9 @@
-// import { useTableWidgetLogic } from "@hooks/visualizations/useTableWidgetVM";
 import Table from "@components/Table";
 import type { TableWidgetConfig } from "@type/visualization";
 import NoDataWidget from "@components/widgets/NoDataWidget";
 import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
 import { TableCellsIcon } from "@heroicons/react/24/outline";
-import { useTableWidgetLogic } from "@/core/hooks/visualizations/useTableWidgetVM";
+import { useTableWidgetLogic } from "@hooks/visualizations/useTableWidgetVM";
 
 export default function TableWidget({
   data,

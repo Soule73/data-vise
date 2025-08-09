@@ -1,12 +1,5 @@
-import type { DataSource } from "@type/data-source";
+import type { DataSource, SourceOption } from "@type/data-source";
 
-/**
- * Interface pour les options de sélection des sources
- */
-export interface SourceOption {
-    value: string;
-    label: string;
-}
 
 /**
  * Transforme les sources de données en options pour un SelectField

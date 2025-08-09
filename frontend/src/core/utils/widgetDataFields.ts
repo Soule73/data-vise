@@ -2,17 +2,18 @@
 // import type { WidgetType } from "@type/widget-types";
 import type { Filter } from "@type/visualization";
 import type {
-  MetricConfig,
+  Metric,
   ScatterMetricConfig,
   BubbleMetricConfig,
   RadarMetricConfig,
   BucketConfig,
 } from "@type/metric-bucket-types";
+import type { ColumnFieldConfig, GroupFieldConfig } from "@type/widget-types";
 
 // Extraction de tous les champs utilisés par les métriques, y compris x, y, r pour scatter/bubble
 function extractAllMetricFields(
   metrics?:
-    | MetricConfig[]
+    | Metric[]
     | ScatterMetricConfig[]
     | BubbleMetricConfig[]
     | RadarMetricConfig[]
@@ -21,7 +22,7 @@ function extractAllMetricFields(
   return metrics.flatMap(
     (
       m:
-        | MetricConfig
+        | Metric
         | ScatterMetricConfig
         | BubbleMetricConfig
         | RadarMetricConfig
@@ -40,8 +41,8 @@ function extractAllMetricFields(
           ...((m as RadarMetricConfig).fields as string[]).filter(Boolean)
         );
       // Standard metric : field
-      if (typeof (m as MetricConfig).field === "string")
-        scatterFields.push((m as MetricConfig).field);
+      if (typeof (m as Metric).field === "string")
+        scatterFields.push((m as Metric).field);
       // Récursif pour sous-métriques
       if (
         typeof m === "object" &&
@@ -57,18 +58,7 @@ function extractAllMetricFields(
 }
 
 // Extraction de tous les champs de groupement (bucket, groupBy, xField, nameField, valueField...)
-interface GroupFieldConfig {
-  bucket?: BucketConfig;
-  xField?: string;
-  groupBy?: string;
-  nameField?: string;
-  valueField?: string;
-  dataConfig?: {
-    groupByFields?: string[];
-    axisFields?: string[];
-  };
-  [key: string]: unknown;
-}
+
 function extractAllGroupFields(config: GroupFieldConfig): string[] {
   const groupFields: string[] = [];
   if (config.bucket?.field) groupFields.push(config.bucket.field);
@@ -89,9 +79,7 @@ function extractAllGroupFields(config: GroupFieldConfig): string[] {
 }
 
 // Extraction de tous les champs de colonnes (table)
-interface ColumnFieldConfig {
-  columns?: Array<string | { key: string; label: string }>;
-}
+
 function extractAllColumnFields(config: ColumnFieldConfig): string[] {
   if (Array.isArray(config.columns)) {
     return config.columns
@@ -112,7 +100,7 @@ function extractAllFilterFields(filters: Filter[] = []): string[] {
 export function getWidgetDataFields(
   config: {
     metrics?:
-    | MetricConfig[]
+    | Metric[]
     | ScatterMetricConfig[]
     | BubbleMetricConfig[]
     | RadarMetricConfig[];

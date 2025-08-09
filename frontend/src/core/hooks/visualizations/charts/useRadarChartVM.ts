@@ -2,6 +2,7 @@
 import type { ChartOptions, ChartData } from "chart.js";
 import type { RadarChartConfig } from "@type/visualization";
 import { useChartLogic } from "@hooks/visualizations/charts/useChartLogic";
+import { createRadarChartDataset } from "@utils/chartDatasetUtils";
 
 export function useRadarChartLogic(
     data: Record<string, any>[],
@@ -18,45 +19,9 @@ export function useRadarChartLogic(
         chartType: "radar",
         data,
         config,
-        customDatasetCreator: (metric, idx, values, _labels, widgetParams, style) => {
-            return {
-                type: 'radar' as const,
-                label: metric.label || `${metric.agg}(${metric.field})`,
-                data: values,
-                backgroundColor: style.color ?
-                    `${style.color}40` :
-                    `hsl(${(idx * 60) % 360}, 70%, 60%, 0.25)`,
-                borderColor: style.borderColor || style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-                borderWidth: style.borderWidth ?? widgetParams.borderWidth ?? 2,
-                pointStyle: style.pointStyle || widgetParams.pointStyle || 'circle',
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                fill: style.fill !== false,
-                tension: 0.1,
-                opacity: style.opacity || 0.7,
-            };
+        customDatasetCreator: (metric, idx, values, labels, widgetParams, style) => {
+            return createRadarChartDataset(metric, idx, values, labels, widgetParams, style);
         },
-        customOptionsCreator: (params) => ({
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    grid: {
-                        display: params.showGrid !== false,
-                    },
-                    ticks: {
-                        display: params.showTicks !== false,
-                    },
-                },
-            },
-            elements: {
-                point: {
-                    radius: params.pointRadius || 3,
-                },
-                line: {
-                    borderWidth: params.borderWidth || 2,
-                },
-            },
-        }),
     });
 
     return {

@@ -2,6 +2,7 @@
 import type { ChartOptions, ChartData } from "chart.js";
 import type { BarChartConfig } from "@type/visualization";
 import { useChartLogic } from "@hooks/visualizations/charts/useChartLogic";
+import { createBarChartDataset } from "@utils/chartDatasetUtils";
 
 export function useBarChartLogic(
     data: Record<string, any>[],
@@ -17,29 +18,9 @@ export function useBarChartLogic(
         chartType: "bar",
         data,
         config,
-        customDatasetCreator: (metric, idx, values, _labels, widgetParams, style) => {
-            return {
-                label: metric.label || `${metric.agg}(${metric.field})`,
-                data: values,
-                backgroundColor: style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-                borderColor: style.borderColor || style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-                borderWidth: style.borderWidth ?? widgetParams.borderWidth ?? 1,
-                barThickness: style.barThickness || widgetParams.barThickness,
-                borderRadius: style.borderRadius || widgetParams.borderRadius || 0,
-                borderSkipped: false,
-            };
+        customDatasetCreator: (metric, idx, values, labels, widgetParams, style) => {
+            return createBarChartDataset(metric, idx, values, labels, widgetParams, style);
         },
-        customOptionsCreator: (params) => ({
-            scales: {
-                x: {
-                    stacked: params.stacked === true,
-                },
-                y: {
-                    stacked: params.stacked === true,
-                },
-            },
-            indexAxis: params.horizontal ? "y" : "x",
-        }),
     });
 
     return {

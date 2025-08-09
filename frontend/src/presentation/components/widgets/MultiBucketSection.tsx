@@ -1,17 +1,10 @@
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import BucketConfigComponent from "@components/widgets/BucketConfigComponent";
-import type { MultiBucketConfig } from "@type/metric-bucket-types";
+import type { MultiBucketConfig, MultiBucketSectionProps } from "@type/metric-bucket-types";
 import { createDefaultBucket } from "@utils/bucketUtils";
 import { useBucketUIStore } from "@store/bucketUI";
 
-interface MultiBucketSectionProps {
-    buckets: MultiBucketConfig[];
-    columns: string[];
-    data?: Record<string, unknown>[];
-    allowMultiple?: boolean;
-    sectionLabel?: string;
-    onBucketsChange: (buckets: MultiBucketConfig[]) => void;
-}
+
 
 export default function MultiBucketSection({
     buckets,

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import * as HeroIcons from "@heroicons/react/24/outline";
 import { useMultiBucketProcessor, type ProcessedBucketItem } from "@hooks/common/useMultiBucketProcessor";
 import type { CardWidgetConfig } from "@type/visualization";
-import type { MetricConfig } from "@type/metric-bucket-types";
+import type { Metric } from "@type/metric-bucket-types";
 
 export function useCardWidgetVM(
   data: Record<string, unknown>[],
@@ -21,7 +21,7 @@ export function useCardWidgetVM(
   const processedData = useMultiBucketProcessor(data, config);
 
   // On prend la première métrique configurée
-  const metric: MetricConfig | undefined = config.metrics?.[0];
+  const metric: Metric | undefined = config.metrics?.[0];
 
   const value = useMemo(() => {
     if (!metric) return 0;

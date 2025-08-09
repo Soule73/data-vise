@@ -3,16 +3,9 @@ import Modal from "@components/Modal";
 import SelectField from "@components/SelectField";
 import VisualizationTypeSelector from "@components/visualizations/VisualizationTypeSelector";
 import Button from "@components/forms/Button";
-import type { WidgetType } from "@type/widget-types";
-import type { DataSource } from "@type/data-source";
+import type { WidgetType, WidgetTypeSelectionModalProps } from "@type/widget-types";
 
-interface WidgetTypeSelectionModalProps {
-    open: boolean;
-    onClose: () => void;
-    onConfirm: (sourceId: string, type: WidgetType) => void;
-    sources: DataSource[];
-    loading?: boolean;
-}
+
 
 export default function WidgetTypeSelectionModal({
     open,

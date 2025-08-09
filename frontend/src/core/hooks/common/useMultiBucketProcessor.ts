@@ -1,33 +1,7 @@
 import { useMemo } from "react";
 import { processMultiBucketData } from "@utils/multiBucketProcessor";
-import type {
-    BarChartConfig,
-    LineChartConfig,
-    PieChartConfig
-} from "@type/visualization";
+import type { ProcessedBucketItem, SupportedConfig } from "@type/metric-bucket-types";
 
-export interface ProcessedBucketItem {
-    key: string | Record<string, string>;
-    metrics: Array<{
-        value: number;
-        field: string;
-        agg: string;
-    }>;
-    count: number;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SupportedConfig = BarChartConfig | LineChartConfig | PieChartConfig | any;
-
-export interface ProcessedBucketItem {
-    key: string | Record<string, string>;
-    metrics: Array<{
-        value: number;
-        field: string;
-        agg: string;
-    }>;
-    count: number;
-}
 
 /**
  * Hook pour traiter les données avec le système multi-bucket

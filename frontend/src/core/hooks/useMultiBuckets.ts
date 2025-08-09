@@ -2,17 +2,8 @@ import { useCallback, useMemo } from 'react';
 // import type { MultiBucketConfig, BucketConfig } from 'metric-bucket-types';
 import { ensureMultiBuckets, migrateLegacyBucket, migrateToLegacyBucket } from '@utils/bucketMigration';
 import { createDefaultBucket } from '@utils/bucketUtils';
-import type { BucketConfig, MultiBucketConfig } from '@type/metric-bucket-types';
+import type { MultiBucketConfig, UseMultiBucketsProps } from '@type/metric-bucket-types';
 
-interface UseMultiBucketsProps {
-    config: {
-        bucket?: BucketConfig;
-        buckets?: MultiBucketConfig[];
-    };
-    columns: string[];
-    allowMultiple?: boolean;
-    onConfigChange: (field: string, value: unknown) => void;
-}
 
 export function useMultiBuckets({
     config,

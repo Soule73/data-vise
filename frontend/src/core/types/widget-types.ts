@@ -15,11 +15,51 @@ import type {
 import type {
   BubbleMetricConfig,
   BucketConfig,
-  MetricConfig,
+  Metric,
   RadarMetricConfig,
   ScatterMetricConfig,
   MultiBucketConfig,
 } from "@type/metric-bucket-types";
+import type { ReactNode } from "react";
+import type { DataSource } from "@type/data-source";
+import type { ChartOptions } from "chart.js";
+
+export type ChartType = "bar" | "line" | "pie" | "scatter" | "bubble" | "radar";
+
+export interface GroupFieldConfig {
+  bucket?: BucketConfig;
+  xField?: string;
+  groupBy?: string;
+  nameField?: string;
+  valueField?: string;
+  dataConfig?: {
+    groupByFields?: string[];
+    axisFields?: string[];
+  };
+  [key: string]: unknown;
+}
+export interface ColumnFieldConfig {
+  columns?: Array<string | { key: string; label: string }>;
+}
+
+/**
+ * Configuration par défaut pour un widget avec buckets multiples
+ */
+export interface DefaultWidgetConfig {
+  metrics: Metric[];
+  buckets: MultiBucketConfig[];
+  bucket?: { field: string; label?: string }; // Pour compatibilité
+}
+
+/**
+ * Interface pour les configurations de widget avec support des buckets multiples
+ */
+export interface MultiBucketCompatibleConfig {
+  bucket?: BucketConfig;
+  buckets?: MultiBucketConfig[];
+  [key: string]: any;
+}
+
 
 export interface Widget {
   _id?: string;
@@ -113,7 +153,7 @@ export interface WidgetDefinition<
 
 export interface WidgetConfig {
   metrics:
-  | MetricConfig[]
+  | Metric[]
   | ScatterMetricConfig[]
   | BubbleMetricConfig[]
   | RadarMetricConfig[];
@@ -124,7 +164,7 @@ export interface WidgetConfig {
 
 export interface WidgetMetricStyleConfigSectionProps<
   TMetric =
-  | MetricConfig
+  | Metric
   | ScatterMetricConfig
   | BubbleMetricConfig
   | RadarMetricConfig,
@@ -423,4 +463,151 @@ export interface BubbleChartWidgetProps extends ChartWidgetProps {
 
 export interface ScatterChartWidgetProps extends ChartWidgetProps {
   config: ScatterChartConfig;
+}
+
+
+export interface DatasetSectionProps<T> {
+  title: string;
+  datasets: T[];
+  onDatasetsChange: (datasets: T[]) => void;
+  renderDatasetContent: (dataset: T, index: number, onUpdate: (updatedDataset: T) => void) => ReactNode;
+  createNewDataset: () => T;
+  getDatasetLabel?: (dataset: T, index: number) => string;
+  collapsible?: boolean;
+  collapsedState?: Record<number, boolean>;
+  onToggleCollapse?: (index: number) => void;
+  minDatasets?: number;
+}
+
+export interface WidgetFormLayoutProps {
+  // Header
+  title: string;
+  isLoading: boolean;
+  onSave: () => void;
+  onCancel?: () => void;
+  saveButtonText?: string;
+  showCancelButton?: boolean;
+
+  // Widget preview
+
+  WidgetComponent: any;
+
+  dataPreview: any[];
+
+  config: any;
+
+  metricsWithLabels: any[];
+  isPreviewReady: boolean;
+
+  // Configuration
+  type: WidgetType;
+  tab: "data" | "metricsAxes" | "params";
+  setTab: (tab: "data" | "metricsAxes" | "params") => void;
+  columns: string[];
+
+  handleConfigChange: (field: string, value: any) => void;
+  handleDragStart: (idx: number) => void;
+  handleDragOver: (idx: number, e: React.DragEvent) => void;
+  handleDrop: (idx: number) => void;
+
+  handleMetricAggOrFieldChange: (idx: number, field: "agg" | "field", value: any) => void;
+
+  handleMetricStyleChange: (idx: number, field: string, value: any) => void;
+
+  // Modal
+  showSaveModal: boolean;
+  setShowSaveModal: (show: boolean) => void;
+  widgetTitle: string;
+  setWidgetTitle: (title: string) => void;
+  visibility: "public" | "private";
+  setVisibility: (visibility: "public" | "private") => void;
+  widgetTitleError: string;
+  setWidgetTitleError: (error: string) => void;
+  onModalConfirm: () => void;
+
+  // Errors
+  error?: string;
+
+  // Optional content
+  additionalHeaderContent?: ReactNode;
+}
+
+export interface WidgetTypeSelectionModalProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: (sourceId: string, type: WidgetType) => void;
+  sources: DataSource[];
+  loading?: boolean;
+}
+
+
+/**
+ * Interface pour le contexte de validation d'un graphique
+ */
+export interface ChartValidationContext {
+  chartType: ChartType;
+  data: Record<string, any>[];
+  metrics?: Metric[];
+  bucket?: { field: string };
+  buckets?: any[];
+}
+
+/**
+ * Interface pour le résultat de validation
+ */
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+/**
+ * Interface pour les données processées
+ */
+export interface ProcessedDataContext {
+  bucketHierarchy: any[];
+  labels: string[];
+  splitData: {
+    series: any[];
+  };
+}
+
+export interface DatasetCreationContext {
+  chartType: ChartType;
+  labels: string[];
+  widgetParams: any;
+  metrics: Metric[];
+  metricStyles: any[];
+  processedData: any;
+  getValues: (metric: Metric) => number[];
+}
+
+export interface UseWidgetAutoConfigProps {
+  widgetType: WidgetType;
+  columns: string[];
+  data?: Record<string, unknown>[];
+  currentConfig: {
+    bucket?: { field: string; label?: string };
+    buckets?: MultiBucketConfig[];
+    metrics?: unknown[];
+  };
+  onConfigChange: (field: string, value: unknown) => void;
+  autoInitialize?: boolean;
+}
+
+
+export interface BaseChartConfig {
+  metrics?: Metric[];
+  bucket?: { field: string };
+  buckets?: any[];
+  metricStyles?: any;
+  widgetParams?: any;
+}
+
+export interface UseChartLogicOptions {
+  chartType: ChartType;
+  data: Record<string, any>[];
+  config: BaseChartConfig;
+  customDatasetCreator?: (metric: Metric, idx: number, values: number[], labels: string[], widgetParams: any, metricStyle: any) => any;
+  customOptionsCreator?: (params: any) => Partial<ChartOptions>;
 }

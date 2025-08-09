@@ -4,7 +4,7 @@ import type {
   KPIGroupWidgetConfig,
   MetricStyleConfig,
 } from "@type/visualization";
-import type { MetricConfig } from "@type/metric-bucket-types";
+import type { Metric } from "@type/metric-bucket-types";
 
 /**
  * Hook pour gérer un groupe de KPI avec support multi-bucket
@@ -13,7 +13,7 @@ import type { MetricConfig } from "@type/metric-bucket-types";
  */
 export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
   gridColumns: number;
-  metrics: MetricConfig[];
+  metrics: Metric[];
   metricStyles: MetricStyleConfig[];
   filters: Filter[] | undefined;
   groupTitle: string;
@@ -39,7 +39,7 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
     return () => window.removeEventListener("resize", handleResize);
   }, [columns]);
 
-  const metrics: MetricConfig[] = useMemo(
+  const metrics: Metric[] = useMemo(
     () => (Array.isArray(config.metrics) ? config.metrics : []),
     [config.metrics]
   );

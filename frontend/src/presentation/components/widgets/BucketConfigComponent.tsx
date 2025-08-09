@@ -10,7 +10,7 @@ import {
     PlusCircleIcon,
     TrashIcon,
 } from "@heroicons/react/24/solid";
-import type { MultiBucketConfig, BucketType } from "@type/metric-bucket-types";
+import type { MultiBucketConfig, BucketType, BucketConfigComponentProps } from "@type/metric-bucket-types";
 import {
     BUCKET_TYPES,
     DATE_INTERVALS,
@@ -20,22 +20,6 @@ import {
     getAvailableColumns,
     validateBucket,
 } from "@utils/bucketUtils";
-
-interface BucketConfigComponentProps {
-    bucket: MultiBucketConfig;
-    index: number;
-    isCollapsed: boolean;
-    columns: string[];
-    data?: Record<string, unknown>[];
-    isOnlyBucket: boolean;
-    canMoveUp: boolean;
-    canMoveDown: boolean;
-    onToggleCollapse: () => void;
-    onUpdate: (bucket: MultiBucketConfig) => void;
-    onDelete: () => void;
-    onMoveUp: () => void;
-    onMoveDown: () => void;
-}
 
 export default function BucketConfigComponent({
     bucket,

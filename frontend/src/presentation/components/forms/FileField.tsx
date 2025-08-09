@@ -1,16 +1,7 @@
-import type { InputFieldProps } from "@type/form-types";
 import { Field, Label } from "@headlessui/react";
 import { forwardRef } from "react";
+import type { FileFieldProps } from "@/core/types/ui";
 
-interface FileFieldProps
-  extends Omit<InputFieldProps, "type" | "value" | "onChange"> {
-  label?: string;
-  error?: string;
-  id?: string;
-  className?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  accept?: string;
-}
 
 const FileField = forwardRef<HTMLInputElement, FileFieldProps>(
   function FileField(

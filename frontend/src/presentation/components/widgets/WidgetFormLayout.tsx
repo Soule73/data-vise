@@ -1,66 +1,14 @@
-import type { ReactNode } from "react";
 import WidgetConfigTabs from "@components/widgets/WidgetConfigTabs";
 import WidgetDataConfigSection from "@components/widgets/WidgetDataConfigSection";
 import WidgetSaveTitleModal from "@components/widgets/WidgetSaveTitleModal";
 import WidgetMetricStyleConfigSection from "@components/widgets/WidgetMetricStyleConfigSection";
 import WidgetParamsConfigSection from "@components/widgets/WidgetParamsConfigSection";
 import { WIDGET_DATA_CONFIG } from "@adapters/visualizations";
-import type { WidgetType } from "@type/widget-types";
+import type { WidgetFormLayoutProps, WidgetType } from "@type/widget-types";
 import { useWidgetTabs } from "@hooks/widget/useWidgetTabs";
 import Button from "@components/forms/Button";
 
-interface WidgetFormLayoutProps {
-    // Header
-    title: string;
-    isLoading: boolean;
-    onSave: () => void;
-    onCancel?: () => void;
-    saveButtonText?: string;
-    showCancelButton?: boolean;
 
-    // Widget preview
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    WidgetComponent: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dataPreview: any[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    metricsWithLabels: any[];
-    isPreviewReady: boolean;
-
-    // Configuration
-    type: WidgetType;
-    tab: "data" | "metricsAxes" | "params";
-    setTab: (tab: "data" | "metricsAxes" | "params") => void;
-    columns: string[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleConfigChange: (field: string, value: any) => void;
-    handleDragStart: (idx: number) => void;
-    handleDragOver: (idx: number, e: React.DragEvent) => void;
-    handleDrop: (idx: number) => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleMetricAggOrFieldChange: (idx: number, field: "agg" | "field", value: any) => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleMetricStyleChange: (idx: number, field: string, value: any) => void;
-
-    // Modal
-    showSaveModal: boolean;
-    setShowSaveModal: (show: boolean) => void;
-    widgetTitle: string;
-    setWidgetTitle: (title: string) => void;
-    visibility: "public" | "private";
-    setVisibility: (visibility: "public" | "private") => void;
-    widgetTitleError: string;
-    setWidgetTitleError: (error: string) => void;
-    onModalConfirm: () => void;
-
-    // Errors
-    error?: string;
-
-    // Optional content
-    additionalHeaderContent?: ReactNode;
-}
 
 export default function WidgetFormLayout({
     title,

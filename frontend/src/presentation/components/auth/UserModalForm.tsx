@@ -3,24 +3,8 @@ import InputField from "@components/forms/InputField";
 import SelectField from "@components/SelectField";
 import Button from "@components/forms/Button";
 import type { User } from "@type/auth-types";
-import type { UseFormReturn } from "react-hook-form";
 import React from "react";
-
-interface UserModalFormProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: () => void;
-  loading: boolean;
-  editingUser: boolean;
-  form: User;
-  setForm: React.Dispatch<React.SetStateAction<User>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  formHook: UseFormReturn<any>;
-  showPassword: boolean;
-  generatePassword: () => void;
-  rolesList: { value: string; label: string }[];
-  getErrorMsg: (err: unknown) => string | undefined;
-}
+import type { UserModalFormProps } from "@/core/types/ui";
 
 export default function UserModalForm({
   open,

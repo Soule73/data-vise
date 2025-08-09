@@ -1,9 +1,17 @@
+import type { BarChartConfig, LineChartConfig, PieChartConfig } from "@type/visualization";
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface Base {
   label?: string;
   field: string;
 }
-export interface MetricConfig extends Base {
+
+/**
+ * Interface pour une métrique
+ */
+export interface Metric extends Base {
   agg: string;
+  type?: string;
 }
 
 export interface BucketConfig extends Base {
@@ -43,6 +51,16 @@ export interface MultiBucketConfig extends Base {
   splitType?: 'series' | 'rows' | 'chart';
 }
 
+export interface UseMultiBucketsProps {
+  config: {
+    bucket?: BucketConfig;
+    buckets?: MultiBucketConfig[];
+  };
+  columns: string[];
+  allowMultiple?: boolean;
+  onConfigChange: (field: string, value: unknown) => void;
+}
+
 export interface BucketUIState {
   collapsedBuckets: Record<string | number, boolean>;
   toggleBucketCollapse: (idx: string | number) => void;
@@ -50,7 +68,7 @@ export interface BucketUIState {
   resetBuckets: () => void;
 }
 
-export interface ScatterMetricConfig extends MetricConfig {
+export interface ScatterMetricConfig extends Metric {
   x: string;
   y: string;
 }
@@ -59,7 +77,7 @@ export interface BubbleMetricConfig extends ScatterMetricConfig {
   r: string;
 }
 
-export interface RadarMetricConfig extends MetricConfig {
+export interface RadarMetricConfig extends Metric {
   fields: string[];
   groupBy?: string;
   groupByValue?: string;
@@ -70,4 +88,106 @@ export interface MetricUICollapseState {
   toggleCollapse: (idx: string | number) => void;
   setCollapsed: (collapsed: Record<string | number, boolean>) => void;
   reset: () => void;
+}
+
+
+export interface BucketConfigComponentProps {
+  bucket: MultiBucketConfig;
+  index: number;
+  isCollapsed: boolean;
+  columns: string[];
+  data?: Record<string, unknown>[];
+  isOnlyBucket: boolean;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onToggleCollapse: () => void;
+  onUpdate: (bucket: MultiBucketConfig) => void;
+  onDelete: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}
+
+export interface CommonMultiBucketSectionProps {
+  config?: { buckets?: MultiBucketConfig[] };
+  columns: string[];
+  availableFields?: string[];
+  onConfigChange: (field: string, value: unknown) => void;
+  sectionLabel?: string;
+  allowMultiple?: boolean;
+}
+
+export interface MetricLabelInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  name: string;
+  id: string;
+  metricIndex: number;
+}
+
+export interface MultiBucketSectionProps {
+  buckets: MultiBucketConfig[];
+  columns: string[];
+  data?: Record<string, unknown>[];
+  allowMultiple?: boolean;
+  sectionLabel?: string;
+  onBucketsChange: (buckets: MultiBucketConfig[]) => void;
+}
+
+/**
+ * Types de données pour les buckets multiples
+ */
+export interface ProcessedData {
+  groupedData: Record<string, any>[];
+  labels: string[];
+  bucketHierarchy: BucketLevel[];
+  splitData: SplitData;
+}
+
+export interface BucketLevel {
+  bucket: MultiBucketConfig;
+  level: number;
+  buckets: BucketItem[];
+  data: Record<string, any>[];
+}
+
+export interface BucketItem {
+  key: string;
+  doc_count: number;
+  data: Record<string, any>[];
+}
+
+export interface SplitData {
+  series: SplitItem[];
+  rows: SplitItem[];
+  charts: SplitItem[];
+}
+
+export interface SplitItem {
+  key: string;
+  data: Record<string, any>[];
+  bucket: MultiBucketConfig;
+}
+
+
+
+export interface ProcessedBucketItem {
+  key: string | Record<string, string>;
+  metrics: Array<{
+    value: number;
+    field: string;
+    agg: string;
+  }>;
+  count: number;
+}
+
+export type SupportedConfig = BarChartConfig | LineChartConfig | PieChartConfig | any;
+
+export interface ProcessedBucketItem {
+  key: string | Record<string, string>;
+  metrics: Array<{
+    value: number;
+    field: string;
+    agg: string;
+  }>;
+  count: number;
 }

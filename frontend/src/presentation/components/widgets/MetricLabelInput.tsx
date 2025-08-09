@@ -1,12 +1,7 @@
+import type { MetricLabelInputProps } from "@type/metric-bucket-types";
 import InputField from "@components/forms/InputField";
 
-interface MetricLabelInputProps {
-    value: string;
-    onChange: (value: string) => void;
-    name: string;
-    id: string;
-    metricIndex: number;
-}
+
 
 export default function MetricLabelInput({
     value,

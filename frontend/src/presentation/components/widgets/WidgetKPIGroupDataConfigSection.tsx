@@ -10,7 +10,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { useMetricUICollapseStore } from "@store/metricUI";
 import type { WidgetKPIGroupDataConfigSectionProps } from "@type/widget-types";
-import type { MetricConfig } from "@type/metric-bucket-types";
+import type { Metric } from "@type/metric-bucket-types";
 import type { KPIGroupWidgetConfig } from "@type/visualization";
 
 export default function WidgetKPIGroupDataConfigSection({
@@ -151,15 +151,15 @@ export default function WidgetKPIGroupDataConfigSection({
 
   const isFilterValueDisabled = (idx: number) => !filters[idx]?.field;
 
-  const getAggLabel = (metric: MetricConfig) =>
+  const getAggLabel = (metric: Metric) =>
     kpiDataConfig.metrics?.allowedAggs.find((a: any) => a.value === metric.agg)
       ?.label ||
     metric.agg ||
     "";
 
-  const getFieldLabel = (metric: MetricConfig) => metric.field || "";
+  const getFieldLabel = (metric: Metric) => metric.field || "";
 
-  const getHeaderLabel = (metric: MetricConfig) => {
+  const getHeaderLabel = (metric: Metric) => {
     const aggLabel = getAggLabel(metric);
     const fieldLabel = getFieldLabel(metric);
     return `${aggLabel}${fieldLabel ? " · " + fieldLabel : ""}`;
@@ -169,7 +169,7 @@ export default function WidgetKPIGroupDataConfigSection({
     <div className="space-y-6">
       {/* Filtres par KPI (centralisé dans config.filters) */}
       {Array.isArray(kpiConfig.metrics) &&
-        kpiConfig.metrics.map((metric: MetricConfig, idx: number) => (
+        kpiConfig.metrics.map((metric: Metric, idx: number) => (
           <div
             key={idx}
             className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
@@ -213,7 +213,7 @@ export default function WidgetKPIGroupDataConfigSection({
       {Array.isArray(kpiConfig.metrics) && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
           <div className="space-y-3">
-            {kpiConfig.metrics.map((metric: MetricConfig, idx: number) => {
+            {kpiConfig.metrics.map((metric: Metric, idx: number) => {
               const headerLabel = getHeaderLabel(metric);
               const isOnlyMetric = kpiConfig.metrics.length === 1;
               return (

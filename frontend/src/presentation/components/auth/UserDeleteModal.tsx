@@ -1,13 +1,6 @@
+import type { UserDeleteModalProps } from "@/core/types/ui";
 import AlertModal from "@components/AlertModal";
-import type { User } from "@type/auth-types";
 
-interface UserDeleteModalProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  loading: boolean;
-  userToDelete: User | null;
-}
 
 export default function UserDeleteModal({
   open,

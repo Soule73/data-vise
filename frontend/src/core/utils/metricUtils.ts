@@ -1,15 +1,6 @@
 import type { WidgetType } from "@type/widget-types";
 import { WIDGET_DATA_CONFIG } from "@adapters/visualizations";
-
-/**
- * Interface pour une métrique
- */
-export interface Metric {
-    field: string;
-    agg: string;
-    label?: string;
-    type?: string;
-}
+import type { Metric } from "@type/metric-bucket-types";
 
 /**
  * Génère un label automatique pour une métrique

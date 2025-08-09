@@ -7,25 +7,8 @@ import {
   autoDetectTimestampField,
   buildDetectParams,
 } from "@utils/dataSourceFormUtils";
+import type { SourceFormState } from "@type/data-source";
 
-export interface SourceFormState {
-  name: string;
-  type: "json" | "csv" | "elasticsearch";
-  endpoint: string;
-  httpMethod: "GET" | "POST";
-  authType: "none" | "bearer" | "apiKey" | "basic";
-  authConfig: {
-    token?: string;
-    apiKey?: string;
-    username?: string;
-    password?: string;
-    headerName?: string;
-  };
-  timestampField: string;
-  esIndex?: string;
-  esQuery?: string;
-  file?: File | null;
-}
 
 export function useSourceFormBase(initial?: Partial<SourceFormState>) {
   const [form, setForm] = useState<SourceFormState>({
@@ -34,18 +17,21 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
     endpoint: initial?.endpoint || "",
     httpMethod: initial?.httpMethod || "GET",
     authType: initial?.authType || "none",
+    visibility: initial?.visibility || "private",
     authConfig: initial?.authConfig || {},
     timestampField: initial?.timestampField || "",
     esIndex: initial?.esIndex || "",
     esQuery: initial?.esQuery || "",
     file: initial?.file || null,
   });
+
   // Ajout : synchronisation du formulaire si initial change
   useEffect(() => {
     if (initial) {
       setForm({
         name: initial.name || "",
         type: initial.type || "json",
+        visibility: initial?.visibility || "private",
         endpoint: initial.endpoint || "",
         httpMethod: initial.httpMethod || "GET",
         authType: initial.authType || "none",

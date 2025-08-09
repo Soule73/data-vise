@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useMultiBucketProcessor, type ProcessedBucketItem } from "@hooks/common/useMultiBucketProcessor";
 import type { KPIWidgetConfig } from "@type/visualization";
-import type { MetricConfig } from "@type/metric-bucket-types";
+import type { Metric } from "@type/metric-bucket-types";
 import type { KPIWidgetVM } from "@type/widget-types";
 
 export function useKPIWidgetVM(
@@ -31,7 +31,7 @@ export function useKPIWidgetVM(
     }
     return data;
   }, [data, config.filters, processedData]);
-  const metric: MetricConfig | undefined = config.metrics?.[0];
+  const metric: Metric | undefined = config.metrics?.[0];
 
   const value = useMemo(() => {
     if (!metric) return 0;

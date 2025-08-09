@@ -1,15 +1,8 @@
-import type { WidgetType } from '@type/widget-types';
-import type { MultiBucketConfig, MetricConfig } from '@type/metric-bucket-types';
+import type { DefaultWidgetConfig, WidgetType } from '@type/widget-types';
+import type { MultiBucketConfig, Metric } from '@type/metric-bucket-types';
 import { createDefaultBucket } from '@utils/bucketUtils';
 
-/**
- * Configuration par défaut pour un widget avec buckets multiples
- */
-export interface DefaultWidgetConfig {
-    metrics: MetricConfig[];
-    buckets: MultiBucketConfig[];
-    bucket?: { field: string; label?: string }; // Pour compatibilité
-}
+
 
 /**
  * Crée une configuration par défaut pour un type de widget donné
@@ -24,7 +17,7 @@ export function createDefaultWidgetConfig(
     const textColumns = getTextColumns(columns, data);
 
     // Métriques par défaut
-    const defaultMetrics: MetricConfig[] = [];
+    const defaultMetrics: Metric[] = [];
 
     // Ajouter une métrique numérique par défaut
     if (numericColumns.length > 0) {

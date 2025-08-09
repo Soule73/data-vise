@@ -3,8 +3,8 @@ import { useMemo } from "react";
 import {
   aggregate,
   // getLabels, getLegendPosition, getTitle, getTitleAlign
-} from "@/core/utils/chartUtils";
-import { useMultiBucketProcessor } from "@/core/hooks/common/useMultiBucketProcessor";
+} from "@utils/chartUtils";
+import { useMultiBucketProcessor } from "@hooks/common/useMultiBucketProcessor";
 
 export function useTableWidgetLogic(data: any[], config: any) {
   // Process data with multi-bucket system

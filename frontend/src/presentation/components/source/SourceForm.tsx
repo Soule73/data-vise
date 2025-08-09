@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import type { SourceFormState } from "@hooks/datasource/useSourceFormBase";
 import InputField from "@components/forms/InputField";
 import SelectField from "@components/SelectField";
 import FileField from "@components/forms/FileField";
@@ -12,34 +11,7 @@ import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { Radio, RadioGroup } from "@headlessui/react";
 import TextareaField from "@components/forms/TextareaField";
-
-interface SourceFormProps {
-  form: SourceFormState;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setFormField: (field: string, value: any) => void;
-  step: number;
-  setStep: (s: number) => void;
-  csvOrigin: "url" | "upload";
-  setCsvOrigin: (v: "url" | "upload") => void;
-  csvFile: File | null;
-  setCsvFile: (f: File | null) => void;
-  columns: { name: string; type: string }[];
-  columnsLoading: boolean;
-  columnsError: string;
-  dataPreview: Record<string, unknown>[];
-  showModal: boolean;
-  setShowModal: (b: boolean) => void;
-  globalError: string;
-  handleNext: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSubmit: (data: Record<string, any>) => void;
-  isEdit?: boolean;
-  filePath?: string | null;
-  setFilePath?: (v: string | null) => void;
-  showFileField?: boolean;
-  setShowFileField?: (v: boolean) => void;
-  fieldErrors?: Record<string, string>;
-}
+import type { SourceFormProps } from "@type/data-source";
 
 const SourceForm: React.FC<SourceFormProps> = ({
   form,

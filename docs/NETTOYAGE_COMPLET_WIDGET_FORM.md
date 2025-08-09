@@ -172,7 +172,7 @@ const handleConfigChange = useCallback((field: string, value: unknown) => {
 ### **2. Types TypeScript plus stricts**
 ```typescript
 // Remplacer les 'any' par des types précis
-interface MetricConfig {
+interface Metric {
     field: string;
     agg: string;
     label: string; // required au lieu d'optionnel

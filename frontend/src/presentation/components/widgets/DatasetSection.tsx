@@ -1,18 +1,6 @@
+import type { DatasetSectionProps } from "@type/widget-types";
 import { XMarkIcon, PlusCircleIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
-import type { ReactNode } from "react";
 
-interface DatasetSectionProps<T> {
-    title: string;
-    datasets: T[];
-    onDatasetsChange: (datasets: T[]) => void;
-    renderDatasetContent: (dataset: T, index: number, onUpdate: (updatedDataset: T) => void) => ReactNode;
-    createNewDataset: () => T;
-    getDatasetLabel?: (dataset: T, index: number) => string;
-    collapsible?: boolean;
-    collapsedState?: Record<number, boolean>;
-    onToggleCollapse?: (index: number) => void;
-    minDatasets?: number;
-}
 
 export default function DatasetSection<T>({
     title,

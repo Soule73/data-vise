@@ -1,7 +1,7 @@
 import type {
   BubbleMetricConfig,
   BucketConfig,
-  MetricConfig,
+  Metric,
   RadarMetricConfig,
   ScatterMetricConfig,
   MultiBucketConfig,
@@ -169,7 +169,7 @@ export abstract class WidgetConfigBase<
   TFilters = Filter[]
 > {
   metrics:
-    | MetricConfig[]
+    | Metric[]
     | ScatterMetricConfig[]
     | BubbleMetricConfig[]
     | RadarMetricConfig[];
@@ -186,7 +186,7 @@ export abstract class WidgetConfigBase<
     metricStyles,
     filters,
   }: {
-    metrics: MetricConfig[];
+    metrics: Metric[];
     bucket?: BucketConfig;
     buckets?: MultiBucketConfig[];
     widgetParams?: TParams;
@@ -222,7 +222,7 @@ export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
   maxWidth?: string | number;
   maxHeight?: string | number;
   constructor(params: {
-    metrics: MetricConfig[];
+    metrics: Metric[];
     bucket?: BucketConfig;
     buckets?: MultiBucketConfig[];
     columns?: { key: string; label: string }[];
