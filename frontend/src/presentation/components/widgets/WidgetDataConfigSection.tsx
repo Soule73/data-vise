@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import SelectField from "@/presentation/components/SelectField";
-import InputField from "@/presentation/components/forms/InputField";
 import Button from "@/presentation/components/forms/Button";
 import {
   XMarkIcon,
@@ -21,6 +20,7 @@ import type {
   RadarMetricConfig,
 } from "@/core/types/metric-bucket-types";
 import { useMultiBuckets } from "@/core/hooks/useMultiBuckets";
+import MetricLabelInput from "@/presentation/components/widgets/MetricLabelInput";
 
 export default function WidgetDataConfigSection({
   type,
@@ -314,16 +314,20 @@ export default function WidgetDataConfigSection({
                         name={`metric-field-${idx}`}
                         id={`metric-field-${idx}`}
                       />
-                      <InputField
-                        label="Label"
-                        value={metric.label}
-                        onChange={(e) => {
+                      <MetricLabelInput
+                        value={metric.label || ""}
+                        onChange={(newValue) => {
+                          console.log(`[DEBUG] MetricLabelInput onChange for metric ${idx}: "${metric.label}" -> "${newValue}"`);
+
                           const newMetrics = [...config.metrics];
-                          newMetrics[idx].label = e.target.value;
+                          newMetrics[idx] = { ...newMetrics[idx], label: newValue };
+                          console.log(`[DEBUG] New metrics:`, newMetrics);
+
                           handleConfigChange("metrics", newMetrics);
                         }}
                         name={`metric-label-${idx}`}
                         id={`metric-label-${idx}`}
+                        metricIndex={idx}
                       />
                     </div>
                   )}

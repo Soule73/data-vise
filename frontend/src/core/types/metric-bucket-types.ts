@@ -65,12 +65,6 @@ export interface RadarMetricConfig extends MetricConfig {
   groupByValue?: string;
 }
 
-export interface MetricLabelState {
-  metricLabels: string[];
-  setMetricLabel: (idx: number, label: string) => void;
-  setAllMetricLabels: (labels: string[]) => void;
-}
-
 export interface MetricUICollapseState {
   collapsedMetrics: Record<string | number, boolean>;
   toggleCollapse: (idx: string | number) => void;

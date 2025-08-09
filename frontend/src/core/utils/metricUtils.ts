@@ -62,29 +62,3 @@ export function reorderMetrics(metrics: Metric[], fromIndex: number, toIndex: nu
 
     return newMetrics;
 }
-
-/**
- * Extrait les labels des métriques pour la synchronisation avec le store
- */
-export function extractMetricLabels(metrics: Metric[]): string[] {
-    const labels: string[] = [];
-    metrics.forEach((metric, idx) => {
-        if (metric.label) {
-            labels[idx] = metric.label;
-        }
-    });
-    return labels;
-}
-
-/**
- * Enrichit les métriques avec des labels depuis le store
- */
-export function enrichMetricsWithLabels(
-    metrics: Metric[],
-    metricLabelsFromStore: string[]
-): Metric[] {
-    return metrics.map((m, idx) => ({
-        ...m,
-        label: metricLabelsFromStore[idx] || m.label || `Métrique ${idx + 1}`,
-    }));
-}

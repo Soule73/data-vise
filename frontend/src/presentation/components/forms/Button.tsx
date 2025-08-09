@@ -40,7 +40,7 @@ export default function Button({
   size = "md",
   color = "indigo",
   variant = "solid",
-  type,
+  type = "button",
   loading = false,
   className = "",
   ...props
@@ -52,7 +52,7 @@ export default function Button({
     <HeadlessButton
       type={type}
       className={[
-        `flex w-full disabled:opacity-50 justify-center items-center rounded-md font-medium transition-colors ${sizeClass} ${colorClass} disabled:cursor-not-allowed`,
+        `flex w-full disabled:opacity-50 justify-center items-center rounded-md font-medium transition-colors ${sizeClass} ${colorClass} disabled:cursor-not-allowed cursor-pointer`,
         className,
       ]
         .filter(Boolean)

@@ -67,14 +67,16 @@ export default function AlertModal({
             leave="ease-in duration-150" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95"
           >
             <DialogPanel className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <button
+              <Button
                 type="button"
-                className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
+                variant="outline"
+                size="sm"
+                className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none w-max"
                 onClick={onClose}
                 aria-label="Fermer le modal"
               >
                 <XMarkIcon className="w-5 h-5" />
-              </button>
+              </Button>
               <div className="flex flex-col items-center text-center">
                 <Icon
                   className={`mx-auto mb-4 w-12 h-12 text-${color}-500 dark:text-${color}-400`}

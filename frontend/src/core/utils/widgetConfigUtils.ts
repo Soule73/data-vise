@@ -120,7 +120,8 @@ export function generateDefaultMetricStyle(): Record<string, any> {
 }
 
 /**
- * Synchronise les styles des métriques avec la configuration
+ * Synchronise les styles des métriques avec la configuration (VERSION SIMPLIFIÉE)
+ * Ajoute ou supprime des styles selon le nombre de métriques
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function syncMetricStyles(metrics: any[], metricStyles: any[] | undefined | null): any[] {
@@ -139,28 +140,4 @@ export function syncMetricStyles(metrics: any[], metricStyles: any[] | undefined
     }
 
     return newStyles;
-}
-
-/**
- * Met à jour les styles manquants pour les métriques modifiées
- */
-export function ensureMetricStylesForChangedMetrics(
-    metrics: unknown[],
-    metricStyles: Record<string, unknown>[],
-    previousMetrics: unknown[]
-): Record<string, unknown>[] {
-    if (
-        previousMetrics &&
-        previousMetrics.length === metrics.length &&
-        previousMetrics.some((m, i) => m !== metrics[i])
-    ) {
-        const newStyles = [...metricStyles];
-        metrics.forEach((_: unknown, idx: number) => {
-            if (!newStyles[idx]) {
-                newStyles[idx] = generateDefaultMetricStyle();
-            }
-        });
-        return newStyles;
-    }
-    return metricStyles;
 }

@@ -7,8 +7,7 @@ import {
     WIDGETS,
     WIDGET_DATA_CONFIG,
 } from "@/data/adapters/visualizations";
-import { useMetricLabelStore } from "@/core/store/metricLabels";
-import { createDragDropHandlers, enrichMetricsWithLabels, ensureMetricStylesForChangedMetrics, extractColumnsFromData, extractMetricLabels, generateDefaultWidgetConfig, generateSourceOptions, isWidgetPreviewReady, reorderMetrics, syncMetricStyles, updateMetricWithAutoLabel } from "@/core/utils";
+import { createDragDropHandlers, extractColumnsFromData, generateDefaultWidgetConfig, generateSourceOptions, isWidgetPreviewReady, reorderMetrics, syncMetricStyles, updateMetricWithAutoLabel } from "@/core/utils";
 
 export function useCommonWidgetForm(
     initialValues?: WidgetFormInitialValues
@@ -44,7 +43,6 @@ export function useCommonWidgetForm(
 
     // Advanced state
     const [draggedMetric, setDraggedMetric] = useState<number | null>(null);
-    const metricLabelStore = useMetricLabelStore();
 
     // Data fetching
     const queryClient = useQueryClient();
@@ -55,32 +53,26 @@ export function useCommonWidgetForm(
     // Computed values
     const WidgetComponent = WIDGETS[type]?.component;
 
-    // Auto config setup when columns change
+    // Auto config setup when columns change - VERSION SIMPLIFIÉE
     const widgetConfig = WIDGET_DATA_CONFIG[type];
     useEffect(() => {
-        if (!initialValues?.disableAutoConfig && columns.length > 0) {
-            if (widgetConfig && widgetConfig.metrics.allowMultiple) {
-                if (!config.metrics || config.metrics.length === 0) {
-                    const newConfig = generateDefaultWidgetConfig(type, columns);
-                    setConfig(newConfig);
-                }
-            } else if (widgetConfig) {
-                if (!config.metrics || config.metrics.length === 0) {
-                    const newConfig = generateDefaultWidgetConfig(type, columns);
-                    setConfig(newConfig);
-                }
-            }
-
-            if (
-                widgetConfig &&
-                widgetConfig.bucket.allow &&
-                (!config.bucket || !config.bucket.field)
-            ) {
-                const newConfig = { ...config, bucket: { field: columns[1] || columns[0] } };
+        if (!initialValues?.disableAutoConfig && columns.length > 0 && widgetConfig) {
+            // Génération de métriques par défaut si aucune n'existe
+            if (!config.metrics || config.metrics.length === 0) {
+                const newConfig = generateDefaultWidgetConfig(type, columns);
                 setConfig(newConfig);
             }
+
+            // Génération de bucket par défaut si autorisé et inexistant
+            if (widgetConfig.bucket.allow && (!config.bucket || !config.bucket.field)) {
+                setConfig((prevConfig: WidgetConfig) => ({
+                    ...prevConfig,
+                    bucket: { field: columns[1] || columns[0] }
+                }));
+            }
         }
-    }, [type, columns, widgetConfig, config, initialValues?.disableAutoConfig]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [type, columns.length, widgetConfig, initialValues?.disableAutoConfig]);
 
     // --- Drag & drop métriques ---
     const { handleDragStart, handleDragOver, handleDrop } = createDragDropHandlers(
@@ -92,58 +84,42 @@ export function useCommonWidgetForm(
         }
     );
 
-    // --- Synchronisation metrics/metricStyles ---
+    // --- Synchronisation metrics/metricStyles SIMPLIFIÉE ---
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const prevMetricsRef = useRef<any[]>(
         config.metrics ? [...config.metrics] : []
     );
 
-    // Référence pour éviter la boucle infinie
-    const isUpdatingMetricStyles = useRef(false);
-
+    // Simplification : Un seul effet pour la synchronisation des styles
     useEffect(() => {
-        // Éviter la boucle infinie
-        if (isUpdatingMetricStyles.current) {
-            isUpdatingMetricStyles.current = false;
-            return;
-        }
-
         const metrics = config.metrics || [];
-        const metricStyles = Array.isArray(config.metricStyles) ? config.metricStyles : [];
 
-        // Synchronise les styles avec les métriques
-        const syncedStyles = syncMetricStyles(metrics, metricStyles);
+        // Seulement si le nombre de métriques a changé (pas les labels)
+        if (metrics.length !== prevMetricsRef.current.length) {
+            const currentStyles = config.metricStyles || [];
+            const updatedStyles = syncMetricStyles(metrics, currentStyles);
 
-        // Met à jour les styles pour les métriques modifiées
-        const updatedStyles = ensureMetricStylesForChangedMetrics(
-            metrics,
-            syncedStyles,
-            prevMetricsRef.current
-        );
-
-        // Ne met à jour que si les styles ont réellement changé
-        if (JSON.stringify(updatedStyles) !== JSON.stringify(metricStyles)) {
-            isUpdatingMetricStyles.current = true;
             setConfig((c: WidgetConfig) => ({ ...c, metricStyles: updatedStyles }));
         }
 
         prevMetricsRef.current = [...metrics];
-    }, [config.metrics, config.metricStyles, type]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [config.metrics?.length]); // Dépendance simplifiée : seulement la longueur
 
-    // --- Handlers génériques ---
+    // --- Handlers génériques SIMPLIFIÉS ---
     function handleConfigChange(field: string, value: unknown) {
-        setConfig((c: WidgetConfig) => ({ ...c, [field]: value }));
+        console.log(`[DEBUG] handleConfigChange called with field: "${field}"`);
+
+        setConfig((currentConfig: WidgetConfig & Record<string, unknown>) => {
+            const newConfig = { ...currentConfig, [field]: value };
+            console.log(`[DEBUG] Setting new config for field "${field}":`, newConfig);
+            return newConfig;
+        });
+        // Plus de synchronisation avec le store - tout est maintenant dans config
     }
 
-    // Synchronise manuellement les labels des métriques avec le store
-    function syncMetricLabelsToStore() {
-        if (Array.isArray(config.metrics)) {
-            const labels = extractMetricLabels(config.metrics);
-            if (labels.length > 0) {
-                metricLabelStore.setAllMetricLabels(labels);
-            }
-        }
-    }
+    // Fonction supprimée car plus de store à synchroniser
+    // Les labels sont maintenant directement dans config.metrics
 
     function handleMetricAggOrFieldChange(
         idx: number,
@@ -158,7 +134,7 @@ export function useCommonWidgetForm(
             type
         );
         handleConfigChange("metrics", newMetrics);
-        metricLabelStore.setMetricLabel(idx, newMetrics[idx].label || "");
+        // Plus de synchronisation avec le store - le label est déjà dans newMetrics
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -169,10 +145,9 @@ export function useCommonWidgetForm(
     }
 
     // --- Métriques enrichies avec label ---
-    const metricsWithLabels = enrichMetricsWithLabels(
-        config.metrics || [],
-        metricLabelStore.metricLabels
-    );
+    // Utiliser directement les métriques du config au lieu d'enrichir avec le store
+    // pour éviter les conflits lors de la saisie utilisateur
+    const metricsWithLabels = config.metrics || [];
 
     // --- Preview ready ---
     const isPreviewReady = isWidgetPreviewReady(WidgetComponent, dataPreview, config);
@@ -253,7 +228,6 @@ export function useCommonWidgetForm(
         handleDrop,
         handleMetricAggOrFieldChange,
         handleMetricStyleChange,
-        syncMetricLabelsToStore,
         loadSourceColumns,
     };
 }

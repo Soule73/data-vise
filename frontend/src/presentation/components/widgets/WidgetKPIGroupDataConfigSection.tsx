@@ -317,10 +317,11 @@ export default function WidgetKPIGroupDataConfigSection({
                       />
                       <InputField
                         label="Label"
-                        value={metric.label}
-                        onChange={(e) =>
-                          handleMetricLabelChange(idx, e.target.value)
-                        }
+                        value={metric.label || ""}
+                        onChange={(e) => {
+                          const target = e.target as HTMLInputElement;
+                          handleMetricLabelChange(idx, target.value);
+                        }}
                         name={`metric-label-${idx}`}
                         id={`metric-label-${idx}`}
                       />

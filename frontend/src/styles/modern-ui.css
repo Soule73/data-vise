@@ -7,7 +7,7 @@
 }
 
 .config-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 1px;
 }
 
 .config-scrollbar::-webkit-scrollbar-track {
@@ -16,7 +16,7 @@
 
 .config-scrollbar::-webkit-scrollbar-thumb {
     background-color: rgb(203 213 225);
-    border-radius: 3px;
+    border-radius: 0px;
 }
 
 .config-scrollbar::-webkit-scrollbar-thumb:hover {

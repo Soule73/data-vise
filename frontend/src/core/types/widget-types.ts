@@ -380,6 +380,5 @@ export interface CommonWidgetFormState {
   handleMetricAggOrFieldChange: (idx: number, field: "agg" | "field", value: any) => void;
 
   handleMetricStyleChange: (idx: number, field: string, value: any) => void;
-  syncMetricLabelsToStore: () => void;
   loadSourceColumns: () => Promise<void>;
 }

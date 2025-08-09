@@ -6,6 +6,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useThemeStore } from "../../core/store/theme";
 import { useApplyThemeClass } from "@/core/hooks/useTheme";
+import type { ThemeMode } from "@/core/types/theme-types";
 
 const themes = [
   {
@@ -38,19 +39,20 @@ export default function ThemeDropdown() {
         {themes.map((t) => (
           <MenuItem key={t.value}>
             {(props) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const isActive = (props as any)?.[
                 "data-headlessui-state"
               ]?.includes("active");
               return (
                 <button
-                  onClick={() => setTheme(t.value as any)}
+
+                  onClick={() => setTheme(t.value as ThemeMode)}
                   className={`
                     hover:bg-gray-100 dark:hover:bg-gray-800 ui-active:bg-gray-100 dark:ui-active:bg-gray-800 cursor-pointer
                     group flex w-full items-center gap-2 rounded-lg px-3 py-1.5 font-medium text-sm transition text-left
-                    ${
-                      theme === t.value
-                        ? "bg-gray-200 dark:bg-gray-700 font-bold text-indigo-700 dark:text-indigo-300"
-                        : "text-gray-900 dark:text-gray-100"
+                    ${theme === t.value
+                      ? "bg-gray-200 dark:bg-gray-700 font-bold text-indigo-700 dark:text-indigo-300"
+                      : "text-gray-900 dark:text-gray-100"
                     }
                     ${isActive ? "bg-gray-100 dark:bg-gray-800" : ""}`}
                 >
