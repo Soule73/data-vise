@@ -97,7 +97,7 @@ const dataSourceService = {
     const source = await DataSource.findById(id);
 
     if (!source) {
-      return { error: { message: "Source non trouvée." }, status: 404 };
+      return toApiError("Source non trouvée.", 404);
     }
 
     const count = await Widget.countDocuments({ dataSourceId: source._id });
@@ -266,7 +266,7 @@ const dataSourceService = {
   async fetchData(
     sourceId: string,
     options: FetchOptions = {}
-  ): Promise<ApiResponse<any[]> & { total?: number }> {
+  ): Promise<ApiResponse<Record<string, any>[]> & { total?: number }> {
     // 1. Vérification du partage
     if (options.shareId) {
       const shareCheck = await verifyShareAccess(sourceId, options.shareId)

@@ -63,5 +63,9 @@ export interface EsConfig {
   authConfig?: AuthConfig;
 }
 
+export interface FetchSourceResponse {
+  data: Record<string, any>;
+  total: number;
+}
 
 export type DataSourceUpdatePayload = Partial<DataSourceCreatePayload>;

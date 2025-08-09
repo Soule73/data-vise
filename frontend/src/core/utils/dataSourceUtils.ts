@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { DataSource, SourceOption } from "@type/data-source";
 
 
@@ -24,8 +25,7 @@ export function findSourceById(sources: DataSource[], sourceId: string): DataSou
 /**
  * Extrait les colonnes depuis les données de prévisualisation
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function extractColumnsFromData(data: any[]): string[] {
+export function extractColumnsFromData(data: Record<string, any>[]): string[] {
     if (!Array.isArray(data) || data.length === 0) {
         return [];
     }
@@ -41,16 +41,14 @@ export function extractColumnsFromData(data: any[]): string[] {
 /**
  * Valide si les données de prévisualisation sont prêtes
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isDataPreviewReady(dataPreview: any[]): boolean {
+export function isDataPreviewReady(dataPreview: Record<string, any>[]): boolean {
     return Array.isArray(dataPreview) && dataPreview.length > 0;
 }
 
 /**
  * Valide si une configuration de widget est prête pour la prévisualisation
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isConfigReady(config: any): boolean {
+export function isConfigReady(config: Record<string, any>): boolean {
     return config && Object.keys(config).length > 0;
 }
 
@@ -58,12 +56,9 @@ export function isConfigReady(config: any): boolean {
  * Valide si un widget est prêt pour la prévisualisation complète
  */
 export function isWidgetPreviewReady(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     WidgetComponent: any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dataPreview: any[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config: any
+    dataPreview: Record<string, any>[],
+    config: Record<string, any>
 ): boolean {
     return Boolean(
         WidgetComponent &&

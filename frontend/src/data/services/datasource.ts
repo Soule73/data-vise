@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from "@services/api";
-import type { AuthConfig, CreateSourcePayload, DataSource } from "@type/data-source";
-import type { ApiResponse } from "@type/api";
+import type { CreateSourcePayload, DataSource, DetectParams, SourceFormState } from "@type/data-source";
+import type { ApiError, ApiResponse } from "@type/api";
 import { extractApiData } from "@utils/api-utils";
 
 export async function getSources(): Promise<DataSource[]> {
@@ -57,18 +58,7 @@ export async function createSource(
 
 export async function updateSource(
   id: string,
-  data: {
-    name: string;
-    type: string;
-    endpoint?: string;
-    config?: Record<string, unknown>;
-    httpMethod?: "GET" | "POST";
-    authType?: "none" | "bearer" | "apiKey" | "basic";
-    authConfig?: AuthConfig;
-    timestampField?: string;
-    esIndex?: string;
-    esQuery?: string;
-  }
+  data: SourceFormState
 ): Promise<DataSource> {
   const res = await api.put<ApiResponse<DataSource>>(`/sources/${id}`, data);
   return extractApiData(res);
@@ -81,17 +71,14 @@ export async function deleteSource(id: string): Promise<{ message: string }> {
   return extractApiData(res);
 }
 
-export async function detectColumns(params: {
-  type?: string;
-  endpoint?: string;
-  filePath?: string;
-  file?: File;
-}): Promise<{
+export async function detectColumns(params: DetectParams | null): Promise<{
   columns: string[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   preview?: any[];
   types?: Record<string, string>;
 }> {
+  if (!params) {
+    throw new Error("No parameters provided for column detection");
+  }
   if (params.file) {
     const formData = new FormData();
     if (params.type) formData.append("type", params.type);
@@ -99,7 +86,6 @@ export async function detectColumns(params: {
     const res = await api.post<
       ApiResponse<{
         columns: string[];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         preview?: any[];
         types?: Record<string, string>;
       }>
@@ -111,7 +97,6 @@ export async function detectColumns(params: {
     const res = await api.post<
       ApiResponse<{
         columns: string[];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         preview?: any[];
         types?: Record<string, string>;
       }>
@@ -120,41 +105,56 @@ export async function detectColumns(params: {
   }
 }
 
+export interface FetchSourceDataOptions {
+  from?: string;
+  to?: string;
+  page?: number;
+  pageSize?: number;
+  fields?: string[] | string;
+  forceRefresh?: boolean;
+  shareId?: string;
+}
+
 export async function fetchSourceData(
-  sourceId: string,
-  options?: {
-    from?: string;
-    to?: string;
-    page?: number;
-    pageSize?: number;
-    fields?: string[] | string;
-    forceRefresh?: boolean;
-    shareId?: string;
+  {
+    sourceId,
+    options
+  }: {
+    sourceId: string;
+    options?: FetchSourceDataOptions;
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<any[]> {
+): Promise<Record<string, any> | ApiError> {
+
   const params = new URLSearchParams();
+
   if (options?.from) params.append("from", options.from);
+
   if (options?.to) params.append("to", options.to);
+
   params.append("page", String(options?.page ?? 1));
+
   params.append("pageSize", String(options?.pageSize ?? 5000));
+
   if (options?.fields) {
     const fieldsStr = Array.isArray(options.fields)
       ? options.fields.join(",")
       : options.fields;
     params.append("fields", fieldsStr);
   }
+
   if (options?.forceRefresh) {
     params.append("forceRefresh", "1");
   }
+
   if (options?.shareId) params.append("shareId", options.shareId);
 
   const url = `/sources/${sourceId}/data${params.toString() ? `?${params}` : ""
     }`;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const res = await api.get<ApiResponse<any>>(url);
+  const res = await api.get<ApiResponse<Record<string, any>>>(url);
+
   const apiData = extractApiData(res);
+
   // Si la réponse contient { data, total }, on retourne data et total
   if (Array.isArray(apiData)) {
     return apiData;

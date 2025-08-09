@@ -14,7 +14,8 @@ import {
   fetchUploadedFile,
   getSourceById,
 } from "@services/datasource";
-import type { DetectParams } from "@type/data-source";
+import type { DetectParams, SourceFormState } from "@type/data-source";
+import type { ApiError } from "@/core/types/api";
 
 export function useSourcesQuery({ queryClient }: { queryClient: QueryClient }) {
   const query = useQuery({
@@ -42,7 +43,7 @@ export function useCreateSourceMutation({
   queryClient,
 }: {
   onSuccess?: () => void;
-  onError?: (e: unknown) => void;
+  onError?: (e: ApiError) => void;
   queryClient: QueryClient;
 }) {
   return useMutation({
@@ -55,7 +56,7 @@ export function useCreateSourceMutation({
   });
 }
 
-export function useDetectColumnsQuery(params: DetectParams, enabled: boolean = true) {
+export function useDetectColumnsQuery(params: DetectParams | null, enabled: boolean = true) {
   return useQuery({
     queryKey: ["detectColumns", params],
     queryFn: () => detectColumns(params),
@@ -92,12 +93,11 @@ export function useUpdateSourceMutation({
   queryClient,
 }: {
   onSuccess?: () => void;
-  onError?: (e: unknown) => void;
+  onError?: (e: ApiError) => void;
   queryClient: QueryClient;
 }) {
   return useMutation({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: SourceFormState }) =>
       updateSource(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sources"] });
@@ -143,13 +143,19 @@ export function useDataBySourceQuery(
     fields?: string[] | string;
     shareId?: string;
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialData?: any[] | null,
+  initialData?: Record<string, unknown>[] | null,
   refreshMs?: number,
   forceRefreshKey?: number
 ) {
 
   const queryKey = buildSourceDataKey(sourceId, options, forceRefreshKey);
+
+  const queryOptions = {
+    page: options?.page ?? 1,
+    pageSize: options?.pageSize ?? 1000,
+    ...options,
+    forceRefresh: !!forceRefreshKey && forceRefreshKey > 0,
+  };
   const {
     data = null,
     isLoading: loading,
@@ -159,22 +165,18 @@ export function useDataBySourceQuery(
     queryKey,
     queryFn: () =>
       sourceId
-        ? fetchSourceData(sourceId, {
-          page: options?.page ?? 1,
-          pageSize: options?.pageSize ?? 1000,
-          ...options,
-          forceRefresh: !!forceRefreshKey && forceRefreshKey > 0,
-        })
+        ? fetchSourceData({ sourceId, options: queryOptions })
         : Promise.resolve(initialData ?? null),
     enabled: !!sourceId,
     initialData,
-    staleTime: 1000 * 60 * 5, // 5 min de cache
+    staleTime: 1000 * 60 * 5,
     refetchInterval: refreshMs && refreshMs > 0 ? refreshMs : false,
     placeholderData: keepPreviousData,
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const total = (data && (data as any).total) || undefined;
+  const total = (data && (data as Record<string, any>).total) || undefined;
+
   const rows = Array.isArray(data) ? data : [];
 
   return {

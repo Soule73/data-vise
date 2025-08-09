@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { dataSourceSchema } from "@validation/datasource";
 import { ZodError } from "zod";
@@ -7,7 +8,7 @@ import {
   autoDetectTimestampField,
   buildDetectParams,
 } from "@utils/dataSourceFormUtils";
-import type { SourceFormState } from "@type/data-source";
+import type { DetectParams, SourceFormState } from "@type/data-source";
 
 
 export function useSourceFormBase(initial?: Partial<SourceFormState>) {
@@ -57,16 +58,14 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
   const [showModal, setShowModal] = useState(false);
 
   // Détection colonnes
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [detectParams, setDetectParams] = useState<any | null>(null);
+  const [detectParams, setDetectParams] = useState<DetectParams | null>(null);
+
   const detectColumnsQueryResult = useDetectColumnsQuery(detectParams, Boolean(detectParams));
-  const detectData = detectColumnsQueryResult.data;
-  const columnsLoading = detectColumnsQueryResult.isLoading;
-  const detectError = detectColumnsQueryResult.error;
-  const isFetching = detectColumnsQueryResult.isFetching;
+
+  const { data: detectData, isLoading: columnsLoading, error: detectError, isFetching } = detectColumnsQueryResult;
+
 
   // Handler pour changer un champ du form
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setFormField = (field: string, value: any) => {
     setForm((f) => {
       const updated = { ...f, [field]: value };
@@ -113,7 +112,6 @@ export function useSourceFormBase(initial?: Partial<SourceFormState>) {
       if (detectError) {
         if (!columnsError)
           setColumnsError(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (detectError as any)?.response?.data?.message ||
             (detectError as Error)?.message ||
             "Impossible de détecter les colonnes"

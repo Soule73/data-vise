@@ -9,6 +9,8 @@ import { useNotificationStore } from "@store/notification";
 import { useDashboardStore } from "@store/dashboard";
 import { ROUTES } from "@constants/routes";
 import { useSourceFormBase } from "@hooks/datasource/useSourceFormBase";
+import type { SourceFormState } from "@/core/types/data-source";
+import type { ApiError } from "@/core/types/api";
 
 export function useEditDataSourceForm() {
   const { id } = useParams<{ id: string }>();
@@ -38,8 +40,7 @@ export function useEditDataSourceForm() {
   }, [initial, setBreadcrumb, id]);
 
   // Soumission finale (édition)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: SourceFormState) => {
     base.setGlobalError("");
     // Pour CSV uploadé, garder filePath, pour CSV distant ou JSON, garder endpoint
     const payload = {
@@ -69,10 +70,8 @@ export function useEditDataSourceForm() {
       });
       navigate("/sources");
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (e: any) => {
+    onError: (e: ApiError) => {
       base.setGlobalError(
-        e?.response?.data?.message ||
         e?.message ||
         "Erreur lors de la modification de la source"
       );

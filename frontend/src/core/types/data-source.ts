@@ -64,8 +64,7 @@ export interface CreateSourcePayload extends DataSourceBase {
   file?: File | null;
 }
 
-export
-  interface SourceFormProps {
+export interface SourceFormProps {
   form: SourceFormState;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFormField: (field: string, value: any) => void;

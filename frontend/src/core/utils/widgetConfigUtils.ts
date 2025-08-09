@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { WidgetType } from "@type/widget-types";
 import {
     WIDGETS,
@@ -7,18 +8,15 @@ import {
 /**
  * Génère une configuration par défaut pour un widget donné en fonction de ses colonnes
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function generateDefaultWidgetConfig(type: WidgetType, columns: string[]): any {
     const widgetDef = WIDGETS[type];
     const schema = widgetDef?.configSchema;
     if (!schema) return {};
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function extractDefaults(obj: any): any {
         if (!obj || typeof obj !== "object") return obj;
         if ("default" in obj) return obj.default;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result: any = {};
         for (const key of Object.keys(obj)) {
             result[key] = extractDefaults(obj[key]);
@@ -45,7 +43,6 @@ export function generateDefaultWidgetConfig(type: WidgetType, columns: string[])
 /**
  * Configure un widget de type graphique (bar, line)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function configureChartWidget(baseConfig: any, columns: string[]): any {
     if (columns.length > 0 && !baseConfig.metrics?.length) {
         baseConfig.metrics = [{
@@ -63,7 +60,6 @@ function configureChartWidget(baseConfig: any, columns: string[]): any {
 /**
  * Configure un widget de type pie
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function configurePieWidget(baseConfig: any, columns: string[]): any {
     if (columns.length > 0 && !baseConfig.metrics?.length) {
         baseConfig.metrics = [{
@@ -81,7 +77,6 @@ function configurePieWidget(baseConfig: any, columns: string[]): any {
 /**
  * Configure un widget de type table
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function configureTableWidget(baseConfig: any, columns: string[]): any {
     if (columns.length > 0 && !baseConfig.columns?.length) {
         baseConfig.columns = columns.slice(0, 5);
@@ -92,7 +87,6 @@ function configureTableWidget(baseConfig: any, columns: string[]): any {
 /**
  * Génère un style par défaut pour une métrique
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function generateDefaultMetricStyle(): Record<string, any> {
     const styleFields = Object.keys(WIDGET_CONFIG_FIELDS).filter((key) =>
         [
@@ -107,7 +101,7 @@ export function generateDefaultMetricStyle(): Record<string, any> {
         ].includes(key)
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const style: Record<string, any> = {};
     styleFields.forEach((field) => {
         const fieldConfig = WIDGET_CONFIG_FIELDS[field as keyof typeof WIDGET_CONFIG_FIELDS];
@@ -123,7 +117,7 @@ export function generateDefaultMetricStyle(): Record<string, any> {
  * Synchronise les styles des métriques avec la configuration (VERSION SIMPLIFIÉE)
  * Ajoute ou supprime des styles selon le nombre de métriques
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function syncMetricStyles(metrics: any[], metricStyles: any[] | undefined | null): any[] {
     // S'assurer que metricStyles est un tableau
     const safeMetricStyles = Array.isArray(metricStyles) ? metricStyles : [];

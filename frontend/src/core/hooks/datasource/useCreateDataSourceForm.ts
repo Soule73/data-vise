@@ -4,6 +4,8 @@ import { useNotificationStore } from "@store/notification";
 import { useCreateSourceMutation } from "@repositories/sources";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSourceFormBase } from "@hooks/datasource/useSourceFormBase";
+import type { ApiError } from "@/core/types/api";
+import type { SourceFormState } from "@/core/types/data-source";
 
 export function useCreateDataSourceForm() {
   const queryClient = useQueryClient();
@@ -25,19 +27,15 @@ export function useCreateDataSourceForm() {
       });
       setTimeout(() => navigate(ROUTES.sources), 1200);
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (e: any) => {
+    onError: (e: ApiError) => {
       base.setGlobalError(
-        e?.response?.data?.message ||
         e?.message ||
         "Erreur lors de la création de la source"
       );
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = (data: any) => {
-    // On envoie tous les champs centralisés
+  const onSubmit = (data: SourceFormState) => {
     mutation.mutate({
       ...base.form,
       ...data,

@@ -39,5 +39,5 @@ export function toApiData<T>(data: T): ApiData<T> {
  * @return {ApiError} - L'erreur convertie au format API.
  */
 export function toApiError<T>(message: string, status: number = 400, errors?: Record<string, string>): ApiError {
-  return { error: { message: message, errors: errors }, status: status };
+  return { message: message, errors: errors || {}, status: status };
 }
