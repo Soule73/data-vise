@@ -2,15 +2,15 @@ import {
   useDeleteSourceMutation,
   useSourcesQuery,
   getUploadedFile,
-} from "@/data/repositories/sources";
-import { useNotificationStore } from "@/core/store/notification";
-import { useUserStore } from "@/core/store/user";
-import { useDashboardStore } from "@/core/store/dashboard";
+} from "@repositories/sources";
+import { useNotificationStore } from "@store/notification";
+import { useUserStore } from "@store/user";
+import { useDashboardStore } from "@store/dashboard";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import type { DataSource } from "@/core/types/data-source";
-import { ROUTES } from "@/core/constants/routes";
+import type { DataSource } from "@type/data-source";
+import { ROUTES } from "@constants/routes";
 
 export function useSourcesPage() {
   const queryClient = useQueryClient();

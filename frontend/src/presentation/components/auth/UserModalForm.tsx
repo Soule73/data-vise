@@ -1,8 +1,8 @@
-import Modal from "@/presentation/components/Modal";
-import InputField from "@/presentation/components/forms/InputField";
-import SelectField from "@/presentation/components/SelectField";
-import Button from "@/presentation/components/forms/Button";
-import type { User } from "@/core/types/auth-types";
+import Modal from "@components/Modal";
+import InputField from "@components/forms/InputField";
+import SelectField from "@components/SelectField";
+import Button from "@components/forms/Button";
+import type { User } from "@type/auth-types";
 import type { UseFormReturn } from "react-hook-form";
 import React from "react";
 
@@ -14,6 +14,7 @@ interface UserModalFormProps {
   editingUser: boolean;
   form: User;
   setForm: React.Dispatch<React.SetStateAction<User>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formHook: UseFormReturn<any>;
   showPassword: boolean;
   generatePassword: () => void;

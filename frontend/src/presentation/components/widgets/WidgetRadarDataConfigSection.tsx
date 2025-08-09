@@ -1,11 +1,11 @@
-import SelectField from "@/presentation/components/SelectField";
-import InputField from "@/presentation/components/forms/InputField";
-import CheckboxField from "@/presentation/components/forms/CheckboxField";
-import CommonMultiBucketSection from "@/presentation/components/widgets/CommonMultiBucketSection";
-import DatasetSection from "@/presentation/components/widgets/DatasetSection";
+import SelectField from "@components/SelectField";
+import InputField from "@components/forms/InputField";
+import CheckboxField from "@components/forms/CheckboxField";
+import CommonMultiBucketSection from "@components/widgets/CommonMultiBucketSection";
+import DatasetSection from "@components/widgets/DatasetSection";
 import { useState } from "react";
-import type { WidgetRadarDataConfigSectionProps } from "@/core/types/widget-types";
-import type { RadarMetricConfig } from "@/core/types/metric-bucket-types";
+import type { WidgetRadarDataConfigSectionProps } from "@type/widget-types";
+import type { RadarMetricConfig } from "@type/metric-bucket-types";
 
 export default function WidgetRadarDataConfigSection({
   metrics,

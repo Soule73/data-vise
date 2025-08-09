@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import type { MultiBucketConfig, BucketConfig } from '@/core/types/metric-bucket-types';
-import { ensureMultiBuckets, migrateLegacyBucket, migrateToLegacyBucket } from '@/core/utils/bucketMigration';
-import { createDefaultBucket } from '@/core/utils/bucketUtils';
+// import type { MultiBucketConfig, BucketConfig } from 'metric-bucket-types';
+import { ensureMultiBuckets, migrateLegacyBucket, migrateToLegacyBucket } from '@utils/bucketMigration';
+import { createDefaultBucket } from '@utils/bucketUtils';
+import type { BucketConfig, MultiBucketConfig } from '@type/metric-bucket-types';
 
 interface UseMultiBucketsProps {
     config: {

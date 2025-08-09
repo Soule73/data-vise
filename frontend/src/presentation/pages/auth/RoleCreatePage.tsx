@@ -1,7 +1,7 @@
-import { useRoleCreate } from "@/core/hooks/auth/useRoleCreate";
-import Button from "@/presentation/components/forms/Button";
-import InputField from "@/presentation/components/forms/InputField";
-import CheckboxField from "@/presentation/components/forms/CheckboxField";
+import { useRoleCreate } from "@hooks/auth/useRoleCreate";
+import Button from "@components/forms/Button";
+import InputField from "@components/forms/InputField";
+import CheckboxField from "@components/forms/CheckboxField";
 
 export default function RoleCreatePage() {
   const {

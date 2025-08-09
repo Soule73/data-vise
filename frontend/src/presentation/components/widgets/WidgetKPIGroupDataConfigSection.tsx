@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import SelectField from "@/presentation/components/SelectField";
-import InputField from "@/presentation/components/forms/InputField";
-import Button from "@/presentation/components/forms/Button";
+import SelectField from "@components/SelectField";
+import InputField from "@components/forms/InputField";
+import Button from "@components/forms/Button";
 import {
   XMarkIcon,
   ChevronUpIcon,
   ChevronDownIcon,
   PlusCircleIcon,
 } from "@heroicons/react/24/solid";
-import { useMetricUICollapseStore } from "@/core/store/metricUI";
-import type { WidgetKPIGroupDataConfigSectionProps } from "@/core/types/widget-types";
-import type { MetricConfig } from "@/core/types/metric-bucket-types";
-import type { KPIGroupWidgetConfig } from "@/core/types/visualization";
+import { useMetricUICollapseStore } from "@store/metricUI";
+import type { WidgetKPIGroupDataConfigSectionProps } from "@type/widget-types";
+import type { MetricConfig } from "@type/metric-bucket-types";
+import type { KPIGroupWidgetConfig } from "@type/visualization";
 
 export default function WidgetKPIGroupDataConfigSection({
   dataConfig,

@@ -1,8 +1,8 @@
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
-import BucketConfigComponent from "./BucketConfigComponent";
-import type { MultiBucketConfig } from "@/core/types/metric-bucket-types";
-import { createDefaultBucket } from "@/core/utils/bucketUtils";
-import { useBucketUIStore } from "@/core/store/bucketUI";
+import BucketConfigComponent from "@components/widgets/BucketConfigComponent";
+import type { MultiBucketConfig } from "@type/metric-bucket-types";
+import { createDefaultBucket } from "@utils/bucketUtils";
+import { useBucketUIStore } from "@store/bucketUI";
 
 interface MultiBucketSectionProps {
     buckets: MultiBucketConfig[];

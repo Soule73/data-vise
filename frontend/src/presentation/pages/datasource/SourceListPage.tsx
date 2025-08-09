@@ -1,12 +1,12 @@
-import Button from "@/presentation/components/forms/Button";
-import Table from "@/presentation/components/Table";
-import Modal from "@/presentation/components/Modal";
-import { useSourcesPage } from "@/core/hooks/datasource/useSourcesPage";
-import { ROUTES } from "@/core/constants/routes";
+import Button from "@components/forms/Button";
+import Table from "@components/Table";
+import Modal from "@components/Modal";
+import { useSourcesPage } from "@hooks/datasource/useSourcesPage";
+import { ROUTES } from "@constants/routes";
 import { Link } from "react-router-dom";
-import { DeleteSourceForm } from "@/presentation/components/source/DeleteSourceForm";
-import type { DataSource } from "@/core/types/data-source";
-import Badge from "@/presentation/components/Badge";
+import { DeleteSourceForm } from "@components/source/DeleteSourceForm";
+import type { DataSource } from "@type/data-source";
+import Badge from "@components/Badge";
 import { DocumentTextIcon, TableCellsIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
 

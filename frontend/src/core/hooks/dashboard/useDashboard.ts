@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { useNotificationStore } from "@/core/store/notification";
+import { useDashboardStore } from "@store/dashboard";
+import { useNotificationStore } from "@store/notification";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import type { DashboardLayoutItem } from "../../types/dashboard-types";
-import { useSourcesQuery } from "../../../data/repositories/sources";
-import type { IntervalUnit } from "@/core/types/dashboard-types";
-import { useUserStore } from "../../store/user";
-import { ROUTES } from "../../constants/routes";
-import { useDashboardIdQuery } from "@/data/repositories/dashboards";
+import type { DashboardLayoutItem } from "@type/dashboard-types";
+import { useSourcesQuery } from "@repositories/sources";
+import type { IntervalUnit } from "@type/dashboard-types";
+import { useUserStore } from "@store/user";
+import { ROUTES } from "@constants/routes";
+import { useDashboardIdQuery } from "@repositories/dashboards";
 import {
   updateDashboardQuery,
   createDashboardQuery,
-} from "@/data/repositories/dashboards";
+} from "@repositories/dashboards";
 import {
   getEffectiveTimeRange,
   buildTimeRange,
@@ -21,13 +21,13 @@ import {
   getDashboardBreadcrumb,
   initDashboardTimeConfig,
   getDashboardPDFFileName,
-} from "@/core/utils/dashboardUtils";
+} from "@utils/dashboardUtils";
 import {
   enableDashboardShare,
   disableDashboardShare,
-} from "@/data/services/dashboard";
-import { exportDashboardToPDF } from "@/core/utils/dashboardExportUtils";
-import type { Widget } from "@/core/types/widget-types";
+} from "@services/dashboard";
+import { exportDashboardToPDF } from "@utils/dashboardExportUtils";
+import type { Widget } from "@type/widget-types";
 
 export function useDashboard(onSaveCallback?: (success: boolean) => void) {
 

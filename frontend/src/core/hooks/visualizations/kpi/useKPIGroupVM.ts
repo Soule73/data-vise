@@ -3,8 +3,8 @@ import type {
   Filter,
   KPIGroupWidgetConfig,
   MetricStyleConfig,
-} from "@/core/types/visualization";
-import type { MetricConfig } from "@/core/types/metric-bucket-types";
+} from "@type/visualization";
+import type { MetricConfig } from "@type/metric-bucket-types";
 
 /**
  * Hook pour gérer un groupe de KPI avec support multi-bucket

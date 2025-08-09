@@ -3,17 +3,17 @@ import {
   useCreateUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
-} from "@/data/repositories/auth";
+} from "@repositories/auth";
 import { useState, useMemo } from "react";
-import { useNotificationStore } from "@/core/store/notification";
-import { useRolesQuery } from "@/data/repositories/roles";
-import { useUsersQuery } from "@/data/repositories/users";
+import { useNotificationStore } from "@store/notification";
+import { useRolesQuery } from "@repositories/roles";
+import { useUsersQuery } from "@repositories/users";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUserStore } from "@/core/store/user";
-import type { User, Role } from "@/core/types/auth-types";
-import { userSchema } from "@/core/validation/user";
+import { useUserStore } from "@store/user";
+import type { User, Role } from "@type/auth-types";
+import { userSchema } from "@validation/user";
 
 export function useUserManagement() {
   const showNotification = useNotificationStore((s) => s.showNotification);

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// import type { WidgetType } from "@/core/types/widget-types";
-import type { Filter } from "../types/visualization";
+// import type { WidgetType } from "@type/widget-types";
+import type { Filter } from "@type/visualization";
 import type {
   MetricConfig,
   ScatterMetricConfig,
   BubbleMetricConfig,
   RadarMetricConfig,
   BucketConfig,
-} from "@/core/types/metric-bucket-types";
+} from "@type/metric-bucket-types";
 
 // Extraction de tous les champs utilisés par les métriques, y compris x, y, r pour scatter/bubble
 function extractAllMetricFields(

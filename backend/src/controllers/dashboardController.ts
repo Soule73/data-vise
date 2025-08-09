@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import type { AuthRequest } from "../middleware/auth";
-import dashboardService from "@/services/dashboardService";
-import { handleServiceResult, toApiError } from "@/utils/api";
+import type { AuthRequest } from "@middleware/auth";
+import dashboardService from "@services/dashboardService";
+import { handleServiceResult, toApiError } from "@utils/api";
 
 /**
  * Contrôleur pour gérer les opérations liées aux dashboards.

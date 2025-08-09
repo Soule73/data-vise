@@ -1,15 +1,9 @@
 import path from "path";
 import fs from "fs/promises";
 import csv from "csvtojson";
-import fetch, { RequestInit } from "node-fetch";
-import { AuthConfig, AuthType, CacheParams, DetectParams, FetchOptions, HttpMethod, IDataSource } from "@/types/sourceType";
-import DataSource from "@/models/DataSource";
-import { toApiError } from "./api";
-import { getSourceCacheKey, sourceCache } from "./sourceCache";
-import Dashboard from "@/models/Dashboard";
-import { DashboardLayoutItem } from "@/types/dashboardType";
-import Widget from "@/models/Widget";
-import { buildFetchOptionsFromConfig } from "./dataSourceUtils";
+import fetch from "node-fetch";
+import { AuthConfig, AuthType, HttpMethod } from "@type/sourceType";
+import { buildFetchOptionsFromConfig } from "@utils/dataSourceUtils";
 
 /**
  * Retourne le chemin absolu d'un fichier, en le normalisant si nécessaire

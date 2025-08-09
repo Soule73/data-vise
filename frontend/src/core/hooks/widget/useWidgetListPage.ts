@@ -1,16 +1,16 @@
 import { useEffect, useState, useMemo } from "react";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { ROUTES } from "@/core/constants/routes";
+import { useDashboardStore } from "@store/dashboard";
+import { ROUTES } from "@constants/routes";
 import {
   useWidgetsQuery,
   useDeleteWidgetMutation,
-} from "@/data/repositories/widgets";
-import { useUserStore } from "@/core/store/user";
-import { useSourcesQuery } from "@/data/repositories/sources";
+} from "@repositories/widgets";
+import { useUserStore } from "@store/user";
+import { useSourcesQuery } from "@repositories/sources";
 import { useQueryClient } from "@tanstack/react-query";
-import { WIDGETS } from "@/data/adapters/visualizations";
-import type { DataSource } from "@/core/types/data-source";
-import type { Widget } from "@/core/types/widget-types";
+import { WIDGETS } from "@adapters/visualizations";
+import type { DataSource } from "@type/data-source";
+import type { Widget } from "@type/widget-types";
 
 export function useWidgetListPage() {
   const queryClient = useQueryClient();

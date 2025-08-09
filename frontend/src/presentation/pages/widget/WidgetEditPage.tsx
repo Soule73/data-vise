@@ -1,5 +1,5 @@
-import { useWidgetEditForm } from "@/core/hooks/widget/useWidgetEditForm";
-import WidgetFormLayout from "@/presentation/components/widgets/WidgetFormLayout";
+import { useWidgetEditForm } from "@hooks/widget/useWidgetEditForm";
+import WidgetFormLayout from "@components/widgets/WidgetFormLayout";
 
 export default function WidgetEditPage() {
   const { loading, error, widget, formReady, form, handleConfirmSave } =

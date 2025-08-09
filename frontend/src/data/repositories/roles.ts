@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
-import type { Permission, Role } from "../../core/types/auth-types";
+import type { Permission, Role } from "@type/auth-types";
 import {
   fetchRoles,
   updateRole,
   deleteRole,
   createRole,
   fetchPermissions,
-} from "@/data/services/role";
+} from "@services/role";
 
 export function useRolesQuery() {
   const {

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import type { NotificationStore } from "../types/notification-types";
+import type { NotificationStore } from "@type/notification-types";
 
 export const useNotificationStore = create<NotificationStore>()(
   devtools((set) => ({

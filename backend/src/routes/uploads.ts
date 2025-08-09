@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "@middleware/auth";
 
 const router = express.Router();
 

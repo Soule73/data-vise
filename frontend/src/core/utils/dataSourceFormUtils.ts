@@ -1,4 +1,4 @@
-import type { DetectParams } from "../types/data-source";
+import type { DetectParams } from "@type/data-source";
 
 /**
  * Mappe les colonnes détectées avec leur type.

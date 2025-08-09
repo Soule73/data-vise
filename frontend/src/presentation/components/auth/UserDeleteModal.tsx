@@ -1,5 +1,5 @@
-import AlertModal from "@/presentation/components/AlertModal";
-import type { User } from "@/core/types/auth-types";
+import AlertModal from "@components/AlertModal";
+import type { User } from "@type/auth-types";
 
 interface UserDeleteModalProps {
   open: boolean;
@@ -25,9 +25,8 @@ export default function UserDeleteModal({
       title="Supprimer l’utilisateur ?"
       description={
         userToDelete
-          ? `Cette action supprimera l’utilisateur «${
-              userToDelete.username || userToDelete.email
-            }», ses widgets et dashboards privés. Les objets publics resteront mais sans propriétaire.`
+          ? `Cette action supprimera l’utilisateur «${userToDelete.username || userToDelete.email
+          }», ses widgets et dashboards privés. Les objets publics resteront mais sans propriétaire.`
           : ""
       }
       confirmLabel="Supprimer"

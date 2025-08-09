@@ -5,7 +5,7 @@ import type {
   RadarMetricConfig,
   ScatterMetricConfig,
   MultiBucketConfig,
-} from "./metric-bucket-types";
+} from "@type/metric-bucket-types";
 
 // --- Base params communs à la plupart des visualisations ---
 export interface BaseChartParams {

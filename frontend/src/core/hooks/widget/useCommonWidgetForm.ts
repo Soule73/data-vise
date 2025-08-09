@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSourcesQuery, useDataBySourceQuery } from "@/data/repositories/sources";
-import type { DataSource } from "@/core/types/data-source";
-import type { WidgetType, WidgetFormInitialValues, WidgetConfig, CommonWidgetFormState } from "@/core/types/widget-types";
+import { useSourcesQuery, useDataBySourceQuery } from "@repositories/sources";
+import type { DataSource } from "@type/data-source";
+import type { WidgetType, WidgetFormInitialValues, WidgetConfig, CommonWidgetFormState } from "@type/widget-types";
 import {
     WIDGETS,
     WIDGET_DATA_CONFIG,
-} from "@/data/adapters/visualizations";
-import { createDragDropHandlers, extractColumnsFromData, generateDefaultWidgetConfig, generateSourceOptions, isWidgetPreviewReady, reorderMetrics, syncMetricStyles, updateMetricWithAutoLabel } from "@/core/utils";
+} from "@adapters/visualizations";
+import { generateDefaultWidgetConfig, syncMetricStyles } from "@utils/widgetConfigUtils";
+import { createDragDropHandlers } from "@utils/dragDropUtils";
+import { reorderMetrics, updateMetricWithAutoLabel } from "@utils/metricUtils";
+import { extractColumnsFromData, generateSourceOptions, isWidgetPreviewReady } from "@utils/dataSourceUtils";
 
 export function useCommonWidgetForm(
     initialValues?: WidgetFormInitialValues

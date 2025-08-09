@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useNotificationStore } from "@/core/store/notification";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { ROUTES } from "@/core/constants/routes";
-import { fetchWidgetById, updateWidget } from "@/data/services/widget";
-import type { DataSource } from "@/core/types/data-source";
-import type { WidgetType, Widget } from "@/core/types/widget-types";
-import { useDataBySourceQuery, useSourcesQuery } from "@/data/repositories/sources";
+import { useNotificationStore } from "@store/notification";
+import { useDashboardStore } from "@store/dashboard";
+import { ROUTES } from "@constants/routes";
+import { fetchWidgetById, updateWidget } from "@services/widget";
+import type { DataSource } from "@type/data-source";
+import type { WidgetType, Widget } from "@type/widget-types";
+import { useDataBySourceQuery, useSourcesQuery } from "@repositories/sources";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCommonWidgetForm } from "./useCommonWidgetForm";
+import { useCommonWidgetForm } from "@hooks/widget/useCommonWidgetForm";
 
 export function useWidgetEditForm() {
   const queryClient = useQueryClient();

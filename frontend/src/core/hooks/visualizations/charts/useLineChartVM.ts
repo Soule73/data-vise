@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ChartOptions, ChartData } from "chart.js";
-import type { LineChartConfig } from "@/core/types/visualization";
-import { useChartLogic } from "./useChartLogic";
+import type { LineChartConfig } from "@type/visualization";
+import { useChartLogic } from "@hooks/visualizations/charts/useChartLogic";
 
 export function useLineChartLogic(
     data: Record<string, any>[],

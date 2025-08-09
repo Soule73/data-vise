@@ -1,4 +1,4 @@
-import type { ApiError, ApiData, ApiResponse } from "@/core/types/api";
+import type { ApiError, ApiData, ApiResponse } from "@type/api";
 
 export function extractApiError(
   err: { message: string } | { errors: Record<string, string> }

@@ -5,18 +5,34 @@ import {
   ChevronDownIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
-import { useKPIWidgetVM } from "@/core/hooks/visualizations/useKPIWidgetVM";
-import InvalideConfigWidget from "../charts/InvalideConfigWidget";
-import NoDataWidget from "../charts/NoDataWidget";
-import type { KPIWidgetConfig } from "@/core/types/visualization";
+import { useKPIWidgetVM } from "@hooks/visualizations/kpi/useKPIWidgetVM";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import type { KPIWidgetConfig } from "@type/visualization";
 
 export default function KPIWidget({
   data,
   config,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>[];
   config: KPIWidgetConfig;
 }) {
+  const {
+    value,
+    title,
+    valueColor,
+    showTrend,
+    showValue,
+    formatValue,
+    trendType,
+    showPercent,
+    trend,
+    trendValue,
+    trendPercent,
+    getTrendColor,
+  } = useKPIWidgetVM(data, config);
+
   if (
     !data ||
     !config.metrics ||
@@ -35,20 +51,6 @@ export default function KPIWidget({
     );
   }
 
-  const {
-    value,
-    title,
-    valueColor,
-    showTrend,
-    showValue,
-    formatValue,
-    trendType,
-    showPercent,
-    trend,
-    trendValue,
-    trendPercent,
-    getTrendColor,
-  } = useKPIWidgetVM(data, config);
 
   function TrendIcon({ direction }: { direction: "up" | "down" }) {
     if (trendType === "caret") {

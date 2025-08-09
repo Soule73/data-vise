@@ -1,7 +1,7 @@
-import DashboardGridItem from "./DashboardGridItem";
-import { useDashboardGrid } from "@/core/hooks/dashboard/useDashboardGrid";
-import type { DashboardGridProps } from "@/core/types/dashboard-types";
+import { useDashboardGrid } from "@hooks/dashboard/useDashboardGrid";
+import type { DashboardGridProps } from "@type/dashboard-types";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import DashboardGridItem from "@components/dashoards/DashboardGridItem";
 
 // Slot d'ajout de widget
 function AddWidgetSlot({

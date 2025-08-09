@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { processMultiBucketData } from "@/core/utils/multiBucketProcessor";
+import { processMultiBucketData } from "@utils/multiBucketProcessor";
 import type {
     BarChartConfig,
     LineChartConfig,
     PieChartConfig
-} from "@/core/types/visualization";
+} from "@type/visualization";
 
 export interface ProcessedBucketItem {
     key: string | Record<string, string>;

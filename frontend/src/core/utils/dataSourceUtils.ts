@@ -1,4 +1,4 @@
-import type { DataSource } from "@/core/types/data-source";
+import type { DataSource } from "@type/data-source";
 
 /**
  * Interface pour les options de sélection des sources

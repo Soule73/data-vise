@@ -1,8 +1,8 @@
 import { Radar } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
-import InvalideConfigWidget from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import { useRadarChartLogic } from "@/core/hooks/visualizations/optimized";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import { useRadarChartLogic } from "@hooks/visualizations/charts/optimized";
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -13,7 +13,7 @@ import {
   Legend,
   Title,
 } from "chart.js";
-import type { RadarChartConfig } from "@/core/types/visualization";
+import type { RadarChartWidgetProps } from "@type/widget-types";
 
 ChartJS.register(
   RadialLinearScale,
@@ -25,14 +25,11 @@ ChartJS.register(
   Title
 );
 
+
 export default function RadarChartWidget({
   data,
   config,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>[];
-  config: RadarChartConfig;
-}) {
+}: RadarChartWidgetProps) {
   const { chartData, options, validDatasets } = useRadarChartLogic(
     data,
     config

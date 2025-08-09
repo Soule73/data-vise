@@ -6,15 +6,15 @@ import {
   UserIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-import { useSidebarAutoClose } from "@/core/store/sidebar";
-import SidebarItem from "../SidebarItem";
-import { ROUTES } from "@/core/constants/routes";
-import { useSidebar } from "@/core/hooks/useSidebar";
+import { useSidebarAutoClose } from "@store/sidebar";
+import SidebarItem from "@components/SidebarItem";
+import { ROUTES } from "@constants/routes";
+import { useSidebar } from "@hooks/useSidebar";
 import { Transition } from "@headlessui/react";
 import type {
   SidebarGroup,
   SidebarGroupItem,
-} from "@/core/types/navigation-types";
+} from "@type/navigation-types";
 
 const sidebarGroups: SidebarGroup[] = [
   {

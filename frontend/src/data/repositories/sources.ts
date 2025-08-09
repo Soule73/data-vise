@@ -13,8 +13,8 @@ import {
   fetchSourceData,
   fetchUploadedFile,
   getSourceById,
-} from "@/data/services/datasource";
-import type { DetectParams } from "@/core/types/data-source";
+} from "@services/datasource";
+import type { DetectParams } from "@type/data-source";
 
 export function useSourcesQuery({ queryClient }: { queryClient: QueryClient }) {
   const query = useQuery({

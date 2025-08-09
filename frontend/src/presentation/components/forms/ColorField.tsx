@@ -1,4 +1,4 @@
-import type { ColorFieldProps } from "@/core/types/form-types";
+import type { ColorFieldProps } from "@type/form-types";
 
 export default function ColorField({
   label = "Couleur",

@@ -1,18 +1,18 @@
 import {
   createRoleSchema,
   updateRoleSchema
-} from "../validation/role";
+} from "@validation/role";
 import {
   registerSchema,
   loginSchema,
   createUserSchema,
   updateUserSchema
-} from "../validation/user";
-import User from "../models/User";
-import Role from "../models/Role";
-import Permission from "../models/Permission";
-import Widget from "../models/Widget";
-import Dashboard from "../models/Dashboard";
+} from "@validation/user";
+import User from "@models/User";
+import Role from "@models/Role";
+import Permission from "@models/Permission";
+import Widget from "@models/Widget";
+import Dashboard from "@models/Dashboard";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import type {
@@ -30,12 +30,12 @@ import type {
   UserResponse,
   UserRoleResponse,
   LeanRoleWithCanDelete
-} from "../types/authType";
+} from "@type/authType";
 import { z } from "zod";
-import { buildErrorObject } from "@/utils/validationUtils";
+import { buildErrorObject } from "@utils/validationUtils";
 import mongoose, { ObjectId } from "mongoose";
-import { ApiResponse } from "@/types/api";
-import { toApiData, toApiError } from "@/utils/api";
+import { ApiResponse } from "@type/api";
+import { toApiData, toApiError } from "@utils/api";
 
 /**
  * Retourne une version "sanitisée" d'un utilisateur, sans mot de passe.

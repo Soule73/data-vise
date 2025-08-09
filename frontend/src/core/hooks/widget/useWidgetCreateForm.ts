@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCreateWidgetMutation } from "@/data/repositories/widgets";
-import { useNotificationStore } from "@/core/store/notification";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { ROUTES } from "@/core/constants/routes";
-import type { WidgetFormInitialValues } from "@/core/types/widget-types";
-import { useCommonWidgetForm } from "./useCommonWidgetForm";
+import { useCreateWidgetMutation } from "@repositories/widgets";
+import { useNotificationStore } from "@store/notification";
+import { useDashboardStore } from "@store/dashboard";
+import { ROUTES } from "@constants/routes";
+import type { WidgetFormInitialValues } from "@type/widget-types";
+import { useCommonWidgetForm } from "@hooks/widget/useCommonWidgetForm";
 
 export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
   const navigate = useNavigate();

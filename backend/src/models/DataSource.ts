@@ -1,4 +1,4 @@
-import { IDataSource } from "@/types/sourceType";
+import { IDataSource } from "@type/sourceType";
 import mongoose, { Schema } from "mongoose";
 
 const DataSourceSchema = new Schema<IDataSource>(

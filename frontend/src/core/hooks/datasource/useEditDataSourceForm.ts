@@ -4,11 +4,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   useUpdateSourceMutation,
   useSourceByIdQuery,
-} from "@/data/repositories/sources";
-import { useNotificationStore } from "@/core/store/notification";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { ROUTES } from "@/core/constants/routes";
-import { useSourceFormBase } from "./useSourceFormBase";
+} from "@repositories/sources";
+import { useNotificationStore } from "@store/notification";
+import { useDashboardStore } from "@store/dashboard";
+import { ROUTES } from "@constants/routes";
+import { useSourceFormBase } from "@hooks/datasource/useSourceFormBase";
 
 export function useEditDataSourceForm() {
   const { id } = useParams<{ id: string }>();

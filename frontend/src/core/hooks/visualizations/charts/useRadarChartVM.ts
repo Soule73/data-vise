@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ChartOptions, ChartData } from "chart.js";
-import type { RadarChartConfig } from "@/core/types/visualization";
-import { useChartLogic } from "./useChartLogic";
+import type { RadarChartConfig } from "@type/visualization";
+import { useChartLogic } from "@hooks/visualizations/charts/useChartLogic";
 
 export function useRadarChartLogic(
     data: Record<string, any>[],

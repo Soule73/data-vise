@@ -1,8 +1,8 @@
-import Button from "@/presentation/components/forms/Button";
-import Modal from "@/presentation/components/Modal";
-import InputField from "@/presentation/components/forms/InputField";
-import CheckboxField from "@/presentation/components/forms/CheckboxField";
-import type { SaveModalProps } from "@/core/types/dashboard-types";
+import Button from "@components/forms/Button";
+import Modal from "@components/Modal";
+import InputField from "@components/forms/InputField";
+import CheckboxField from "@components/forms/CheckboxField";
+import type { SaveModalProps } from "@type/dashboard-types";
 
 export function DashboardSaveModal(props: SaveModalProps) {
   const {

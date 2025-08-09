@@ -1,4 +1,4 @@
-import type { DashboardSharePopoverProps } from "@/core/types/dashboard-types";
+import type { DashboardSharePopoverProps } from "@type/dashboard-types";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import {
   ClipboardDocumentIcon,
@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import React from "react";
 import { Link } from "react-router-dom";
-import Button from "../forms/Button";
+import Button from "@components/forms/Button";
 
 const DashboardSharePopover: React.FC<DashboardSharePopoverProps> = ({
   isShareEnabled,

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { ROUTES } from "@/core/constants/routes";
+import { useDashboardStore } from "@store/dashboard";
+import { ROUTES } from "@constants/routes";
 import {
   useSharedDashboardQuery,
   useSharedDashboardSourcesQuery,
-} from "@/data/repositories/dashboards";
+} from "@repositories/dashboards";
 
 export function useDashboardShare(shareId?: string) {
   const {

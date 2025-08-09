@@ -1,8 +1,8 @@
-import dataSourceService from "@/services/dataSourceService";
+import dataSourceService from "@services/dataSourceService";
 import { Request, Response, NextFunction } from "express";
 import fs from "fs";
-import { handleServiceResult } from "@/utils/api";
-import DataSource from "@/models/DataSource";
+import { handleServiceResult } from "@utils/api";
+import DataSource from "@models/DataSource";
 import path from "path";
 
 /**

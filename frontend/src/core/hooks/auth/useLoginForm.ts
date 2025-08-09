@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { useUserStore } from "@/core/store/user";
-import { useLoginMutation } from "@/data/repositories/auth";
-import { loginSchema, type LoginForm } from "@/core/validation/login";
+import { useUserStore } from "@store/user";
+import { useLoginMutation } from "@repositories/auth";
+import { loginSchema, type LoginForm } from "@validation/login";
 import { useState } from "react";
-import { ROUTES } from "../../constants/routes";
+import { ROUTES } from "@constants/routes";
 
 export function useLoginForm() {
   const setUser = useUserStore((s) => s.setUser);

@@ -1,5 +1,5 @@
-import MultiBucketSection from "@/presentation/components/widgets/MultiBucketSection";
-import type { MultiBucketConfig } from "@/core/types/metric-bucket-types";
+import MultiBucketSection from "@components/widgets/MultiBucketSection";
+import type { MultiBucketConfig } from "@type/metric-bucket-types";
 
 interface CommonMultiBucketSectionProps {
     config?: { buckets?: MultiBucketConfig[] };

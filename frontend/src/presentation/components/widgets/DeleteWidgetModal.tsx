@@ -1,6 +1,6 @@
-import Modal from "@/presentation/components/Modal";
-import Button from "@/presentation/components/forms/Button";
-import type { Widget } from "@/core/types/widget-types";
+import Modal from "@components/Modal";
+import Button from "@components/forms/Button";
+import type { Widget } from "@type/widget-types";
 
 export function DeleteWidgetModal({
   open,

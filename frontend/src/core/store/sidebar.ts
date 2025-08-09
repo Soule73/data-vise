@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { create } from "zustand";
-import type { SidebarStore } from "../types/theme-types";
+import type { SidebarStore } from "@type/theme-types";
 
 export const useSidebarStore = create<SidebarStore>((set) => ({
   open: false,

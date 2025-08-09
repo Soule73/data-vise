@@ -1,5 +1,5 @@
-import type { WidgetType } from "@/core/types/widget-types";
-import { WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
+import type { WidgetType } from "@type/widget-types";
+import { WIDGET_DATA_CONFIG } from "@adapters/visualizations";
 
 /**
  * Interface pour une métrique

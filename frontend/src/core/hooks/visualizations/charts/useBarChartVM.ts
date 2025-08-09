@@ -1,46 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ChartOptions, ChartData } from "chart.js";
-import type { BubbleChartConfig } from "@/core/types/visualization";
-import { useChartLogic } from "./useChartLogic";
+import type { BarChartConfig } from "@type/visualization";
+import { useChartLogic } from "@hooks/visualizations/charts/useChartLogic";
 
-export function useBubbleChartLogic(
+export function useBarChartLogic(
     data: Record<string, any>[],
-    config: BubbleChartConfig
+    config: BarChartConfig
 ): {
-    chartData: ChartData<"bubble">;
-    options: ChartOptions<"bubble">;
+    chartData: ChartData<"bar">;
+    options: ChartOptions<"bar">;
     showNativeValues: boolean;
     valueLabelsPlugin: any;
-    validDatasets: any[];
 } {
 
     const result = useChartLogic({
-        chartType: "bubble",
+        chartType: "bar",
         data,
         config,
         customDatasetCreator: (metric, idx, values, _labels, widgetParams, style) => {
             return {
-                type: 'bubble' as const,
                 label: metric.label || `${metric.agg}(${metric.field})`,
                 data: values,
                 backgroundColor: style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
                 borderColor: style.borderColor || style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-                borderWidth: widgetParams.borderWidth || (style.borderWidth ?? 1),
-                pointStyle: style.pointStyle || widgetParams.pointStyle || 'circle',
-                pointRadius: widgetParams.showPoints !== false ? 5 : 0,
-                pointHoverRadius: widgetParams.showPoints !== false ? 7 : 0,
-                opacity: style.opacity || 0.7,
+                borderWidth: style.borderWidth ?? widgetParams.borderWidth ?? 1,
+                barThickness: style.barThickness || widgetParams.barThickness,
+                borderRadius: style.borderRadius || widgetParams.borderRadius || 0,
+                borderSkipped: false,
             };
         },
-        customOptionsCreator: () => ({
+        customOptionsCreator: (params) => ({
             scales: {
                 x: {
-                    type: 'linear',
-                    position: 'bottom',
+                    stacked: params.stacked === true,
                 },
                 y: {
+                    stacked: params.stacked === true,
                 },
             },
+            indexAxis: params.horizontal ? "y" : "x",
         }),
     });
 
@@ -49,6 +47,5 @@ export function useBubbleChartLogic(
         options: result.options,
         showNativeValues: result.showNativeValues,
         valueLabelsPlugin: result.valueLabelsPlugin,
-        validDatasets: result.validDatasets,
     };
-};
+}

@@ -1,5 +1,5 @@
-import type { AuthLayoutProps } from "@/core/types/layout-types";
-import ThemeDropdown from "../ThemeDropdown";
+import type { AuthLayoutProps } from "@type/layout-types";
+import ThemeDropdown from "@components/ThemeDropdown";
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({
   title,

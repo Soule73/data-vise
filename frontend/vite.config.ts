@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import path from 'path';
 
 export default defineConfig({
   plugins: [
@@ -9,28 +10,21 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': '/src',
-      'components': '/src/components',
-      'pages': '/src/pages',
-      'store': '/src/store',
-      'utils': '/src/utils',
-      'assets': '/src/assets',
-      'hooks': '/src/hooks',
-      'types': '/src/types',
-      'styles': '/src/styles',
-      'api': '/src/api',
-      'config': '/src/config',
-      'context': '/src/context',
-      'services': '/src/services',
-      'constants': '/src/constants',
-      'middleware': '/src/middleware',
-      'lib': '/src/lib',
-      'features': '/src/features',
-      'tests': '/src/tests',
-      'locales': '/src/locales',
-      'theme': '/src/theme',
-      'navigation': '/src/navigation',
-      'models': '/src/models',
+      '@': path.resolve(__dirname, './src'),
+      "@styles": path.resolve(__dirname, './src/styles'),
+      '@components': path.resolve(__dirname, './src/presentation/components'),
+      '@pages': path.resolve(__dirname, './src/presentation/pages'),
+      '@store': path.resolve(__dirname, './src/core/store'),
+      '@utils': path.resolve(__dirname, './src/core/utils'),
+      '@assets': path.resolve(__dirname, './src/core/assets'),
+      '@hooks': path.resolve(__dirname, './src/core/hooks'),
+      '@type': path.resolve(__dirname, './src/core/types'),
+      '@constants': path.resolve(__dirname, './src/core/constants'),
+      '@services': path.resolve(__dirname, './src/data/services'),
+      '@repositories': path.resolve(__dirname, './src/data/repositories'),
+      '@adapters': path.resolve(__dirname, './src/data/adapters'),
+      '@validation': path.resolve(__dirname, './src/core/validation'),
+
     }
   }
 })

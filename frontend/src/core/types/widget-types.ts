@@ -11,7 +11,7 @@ import type {
   KPIGroupWidgetConfig,
   CardWidgetConfig,
   Filter,
-} from "@/core/types/visualization";
+} from "@type/visualization";
 import type {
   BubbleMetricConfig,
   BucketConfig,
@@ -19,7 +19,7 @@ import type {
   RadarMetricConfig,
   ScatterMetricConfig,
   MultiBucketConfig,
-} from "./metric-bucket-types";
+} from "@type/metric-bucket-types";
 
 export interface Widget {
   _id?: string;
@@ -381,4 +381,46 @@ export interface CommonWidgetFormState {
 
   handleMetricStyleChange: (idx: number, field: string, value: any) => void;
   loadSourceColumns: () => Promise<void>;
+}
+
+
+export interface ChartWidgetProps {
+  data: Record<string, any>[];
+  editMode?: boolean;
+}
+
+export interface PieChartWidgetProps extends ChartWidgetProps {
+  config: PieChartConfig;
+}
+
+export interface RadarChartWidgetProps extends ChartWidgetProps {
+  config: RadarChartConfig;
+}
+
+export interface BarChartWidgetProps extends ChartWidgetProps {
+  config: BarChartConfig;
+}
+
+export interface LineChartWidgetProps extends ChartWidgetProps {
+  config: LineChartConfig;
+}
+
+export interface RadarChartWidgetProps extends ChartWidgetProps {
+  config: RadarChartConfig;
+}
+
+export interface BarChartWidgetProps extends ChartWidgetProps {
+  config: BarChartConfig;
+}
+
+export interface LineChartWidgetProps extends ChartWidgetProps {
+  config: LineChartConfig;
+}
+
+export interface BubbleChartWidgetProps extends ChartWidgetProps {
+  config: BubbleChartConfig;
+}
+
+export interface ScatterChartWidgetProps extends ChartWidgetProps {
+  config: ScatterChartConfig;
 }

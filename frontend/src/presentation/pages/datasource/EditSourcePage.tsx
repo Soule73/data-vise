@@ -1,5 +1,5 @@
-import SourceForm from "@/presentation/components/source/SourceForm";
-import { useEditDataSourceForm } from "@/core/hooks/datasource/useEditDataSourceForm";
+import SourceForm from "@components/source/SourceForm";
+import { useEditDataSourceForm } from "@hooks/datasource/useEditDataSourceForm";
 
 export default function EditSourcePage() {
   const formProps = useEditDataSourceForm();

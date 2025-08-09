@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { dataSourceSchema } from "@/core/validation/datasource";
+import { dataSourceSchema } from "@validation/datasource";
 import { ZodError } from "zod";
-import { useDetectColumnsQuery } from "@/data/repositories/sources";
+import { useDetectColumnsQuery } from "@repositories/sources";
 import {
   mapDetectedColumns,
   autoDetectTimestampField,
   buildDetectParams,
-} from "@/core/utils/dataSourceFormUtils";
+} from "@utils/dataSourceFormUtils";
 
 export interface SourceFormState {
   name: string;

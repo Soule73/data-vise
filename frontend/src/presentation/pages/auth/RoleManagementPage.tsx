@@ -1,16 +1,16 @@
-import type { Role, Permission } from "@/core/types/auth-types";
+import type { Role, Permission } from "@type/auth-types";
 import {
   PermissionGroup,
   RoleActions,
   RoleInfo,
-} from "@/presentation/components/RoleManagementParts";
-import AlertModal from "../../components/AlertModal";
+} from "@components/RoleManagementParts";
+import AlertModal from "@components/AlertModal";
 import { Link } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
-import CheckboxField from "@/presentation/components/forms/CheckboxField";
-import { usePermissionsQuery } from "@/data/repositories/roles";
-import { useRoleManagement } from "@/core/hooks/auth/useRoleManagement";
-import { useUserStore } from "@/core/store/user";
+import { ROUTES } from "@constants/routes";
+import CheckboxField from "@components/forms/CheckboxField";
+import { usePermissionsQuery } from "@repositories/roles";
+import { useRoleManagement } from "@hooks/auth/useRoleManagement";
+import { useUserStore } from "@store/user";
 
 export default function RoleManagementPage() {
   const {

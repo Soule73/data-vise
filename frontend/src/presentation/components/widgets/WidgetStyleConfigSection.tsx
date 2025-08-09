@@ -1,15 +1,15 @@
-import ColorField from "@/presentation/components/forms/ColorField";
-import CheckboxField from "@/presentation/components/forms/CheckboxField";
-import InputField from "@/presentation/components/forms/InputField";
-import SelectField from "@/presentation/components/SelectField";
+import ColorField from "@components/forms/ColorField";
+import CheckboxField from "@components/forms/CheckboxField";
+import InputField from "@components/forms/InputField";
+import SelectField from "@components/SelectField";
 import {
   WIDGETS,
   WIDGET_CONFIG_FIELDS,
-} from "../../../data/adapters/visualizations";
+} from "@adapters/visualizations";
 import type {
   WidgetStyleConfigSectionProps,
   WidgetType,
-} from "@/core/types/widget-types";
+} from "@type/widget-types";
 
 export default function WidgetStyleConfigSection({
   type,

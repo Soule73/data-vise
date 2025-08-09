@@ -1,4 +1,4 @@
-import type { MultiBucketConfig, BucketType } from '@/core/types/metric-bucket-types';
+import type { MultiBucketConfig, BucketType } from '@type/metric-bucket-types';
 
 export const BUCKET_TYPES: Array<{ value: BucketType; label: string; description: string }> = [
     {

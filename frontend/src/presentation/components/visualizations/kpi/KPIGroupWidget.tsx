@@ -1,18 +1,22 @@
 import { ChartBarIcon } from "@heroicons/react/24/outline";
-import InvalideConfigWidget from "../charts/InvalideConfigWidget";
-import NoDataWidget from "../charts/NoDataWidget";
-import KPIWidget from "./KPIWidget";
-import { useKPIGroupVM } from "@/core/hooks/visualizations/useKPIGroupVM";
-import type { KPIGroupWidgetConfig } from "@/core/types/visualization";
-import type { MetricConfig } from "@/core/types/metric-bucket-types";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import KPIWidget from "@components/visualizations/kpi/KPIWidget";
+import { useKPIGroupVM } from "@hooks/visualizations/kpi/useKPIGroupVM";
+import type { KPIGroupWidgetConfig } from "@type/visualization";
+import type { MetricConfig } from "@type/metric-bucket-types";
 
 export default function KPIGroupWidget({
   data,
   config,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>[];
   config: KPIGroupWidgetConfig;
 }) {
+  const { metrics, metricStyles, filters, gridColumns, widgetParamsList } =
+    useKPIGroupVM(config);
+
   if (
     !data ||
     !config.metrics ||
@@ -21,6 +25,7 @@ export default function KPIGroupWidget({
   ) {
     return <InvalideConfigWidget />;
   }
+
   if (data.length === 0) {
     return (
       <NoDataWidget
@@ -31,8 +36,6 @@ export default function KPIGroupWidget({
     );
   }
 
-  const { metrics, metricStyles, filters, gridColumns, widgetParamsList } =
-    useKPIGroupVM(config);
 
   return (
     <div

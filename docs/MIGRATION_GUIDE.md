@@ -6,11 +6,11 @@
 
 ```typescript
 // AVANT
-import { useBarChartVM } from '@/core/hooks/visualizations/useBarChartVM';
+import { useBarChartVM } from '@hooks/visualizations/useBarChartVM';
 const { chartData, options } = useBarChartVM(data, config);
 
 // APRÈS
-import { useBarChartLogic } from '@/core/hooks/visualizations/optimized';
+import { useBarChartLogic } from '@hooks/visualizations/optimized';
 const { chartData, options } = useBarChartLogic(data, config);
 ```
 
@@ -18,11 +18,11 @@ const { chartData, options } = useBarChartLogic(data, config);
 
 ```typescript
 // AVANT
-import { useLineChartVM } from '@/core/hooks/visualizations/useLineChartVM';
+import { useLineChartVM } from '@hooks/visualizations/useLineChartVM';
 const result = useLineChartVM(data, config);
 
 // APRÈS
-import { useLineChartLogic } from '@/core/hooks/visualizations/optimized';
+import { useLineChartLogic } from '@hooks/visualizations/optimized';
 const result = useLineChartLogic(data, config);
 ```
 
@@ -30,11 +30,11 @@ const result = useLineChartLogic(data, config);
 
 ```typescript
 // AVANT
-import { usePieChartVM } from '@/core/hooks/visualizations/usePieChartVM';
+import { usePieChartVM } from '@hooks/visualizations/usePieChartVM';
 const { chartData, options } = usePieChartVM(data, config);
 
 // APRÈS
-import { usePieChartLogic } from '@/core/hooks/visualizations/optimized';
+import { usePieChartLogic } from '@hooks/visualizations/optimized';
 const { chartData, options } = usePieChartLogic(data, config);
 ```
 
@@ -42,11 +42,11 @@ const { chartData, options } = usePieChartLogic(data, config);
 
 ```typescript
 // AVANT
-import { useScatterChartVM } from '@/core/hooks/visualizations/useScatterChartVM';
+import { useScatterChartVM } from '@hooks/visualizations/useScatterChartVM';
 const { chartData, options } = useScatterChartVM(data, config);
 
 // APRÈS
-import { useScatterChartLogic } from '@/core/hooks/visualizations/optimized';
+import { useScatterChartLogic } from '@hooks/visualizations/optimized';
 const { chartData, options } = useScatterChartLogic(data, config);
 ```
 
@@ -54,11 +54,11 @@ const { chartData, options } = useScatterChartLogic(data, config);
 
 ```typescript
 // AVANT
-import { useBubbleChartVM } from '@/core/hooks/visualizations/useBubbleChartVM';
+import { useBubbleChartVM } from '@hooks/visualizations/useBubbleChartVM';
 const { chartData, options } = useBubbleChartVM(data, config);
 
 // APRÈS
-import { useBubbleChartLogic } from '@/core/hooks/visualizations/optimized';
+import { useBubbleChartLogic } from '@hooks/visualizations/optimized';
 const { chartData, options } = useBubbleChartLogic(data, config);
 ```
 
@@ -66,11 +66,11 @@ const { chartData, options } = useBubbleChartLogic(data, config);
 
 ```typescript
 // AVANT
-import { useRadarChartVM } from '@/core/hooks/visualizations/useRadarChartVM';
+import { useRadarChartVM } from '@hooks/visualizations/useRadarChartVM';
 const { chartData, options } = useRadarChartVM(data, config);
 
 // APRÈS
-import { useRadarChartLogic } from '@/core/hooks/visualizations/optimized';
+import { useRadarChartLogic } from '@hooks/visualizations/optimized';
 const { chartData, options } = useRadarChartLogic(data, config);
 ```
 
@@ -87,7 +87,7 @@ Get-ChildItem -Path "frontend/src" -Recurse -Include "*.ts","*.tsx" |
 ForEach-Object {
     (Get-Content $_.FullName) -replace 
     "import \{ useBarChartVM \} from.*", 
-    "import { useBarChartLogic } from '@/core/hooks/visualizations/optimized';" |
+    "import { useBarChartLogic } from '@hooks/visualizations/optimized';" |
     Set-Content $_.FullName
 }
 ```

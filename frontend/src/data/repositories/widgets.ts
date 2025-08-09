@@ -4,7 +4,7 @@ import {
   fetchWidgets,
   createWidget,
   deleteWidget,
-} from "@/data/services/widget";
+} from "@services/widget";
 
 export function useWidgetsQuery() {
   return useQuery({

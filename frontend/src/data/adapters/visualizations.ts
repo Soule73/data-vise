@@ -1,20 +1,20 @@
-import BarChartWidget from "@/presentation/components/visualizations/charts/BarChartWidget";
-import LineChartWidget from "@/presentation/components/visualizations/charts/LineChartWidget";
-import PieChartWidget from "@/presentation/components/visualizations/charts/PieChartWidget";
-import TableWidget from "@/presentation/components/visualizations/table/TableWidget";
-import ScatterChartWidget from "@/presentation/components/visualizations/charts/ScatterChartWidget";
-import BubbleChartWidget from "@/presentation/components/visualizations/charts/BubbleChartWidget";
-import RadarChartWidget from "@/presentation/components/visualizations/charts/RadarChartWidget";
-import KPIWidget from "@/presentation/components/visualizations/kpi/KPIWidget";
-import KPIGroupWidget from "@/presentation/components/visualizations/kpi/KPIGroupWidget";
-import CardWidget from "@/presentation/components/visualizations/CardWidget";
+import BarChartWidget from "@components/visualizations/charts/BarChartWidget";
+import LineChartWidget from "@components/visualizations/charts/LineChartWidget";
+import PieChartWidget from "@components/visualizations/charts/PieChartWidget";
+import TableWidget from "@components/visualizations/table/TableWidget";
+import ScatterChartWidget from "@components/visualizations/charts/ScatterChartWidget";
+import BubbleChartWidget from "@components/visualizations/charts/BubbleChartWidget";
+import RadarChartWidget from "@components/visualizations/charts/RadarChartWidget";
+import KPIWidget from "@components/visualizations/kpi/KPIWidget";
+import KPIGroupWidget from "@components/visualizations/kpi/KPIGroupWidget";
+import CardWidget from "@components/visualizations/CardWidget";
 import {
   BarChartConfig,
   LineChartConfig,
   PieChartConfig,
   TableWidgetConfig,
-} from "@/core/types/visualization";
-import type { WidgetDefinition, WidgetType } from "@/core/types/widget-types";
+} from "@type/visualization";
+import type { WidgetDefinition, WidgetType } from "@type/widget-types";
 import {
   ChartBarIcon,
   ChartPieIcon,
@@ -30,7 +30,6 @@ import * as HeroIcons from "@heroicons/react/24/outline";
 // Styles communs pour les métriques (charts)
 const COMMON_METRIC_STYLES = {
   color: { default: "#2563eb", inputType: "color", label: "Couleur" },
-  // labelColor et labelFontSize supprimés ici pour éviter mélange
 };
 
 // Params communs pour les widgets (charts)
@@ -558,7 +557,6 @@ const COMMON_FIELDS = {
   },
 };
 
-// Nettoyage des doublons dans WIDGET_CONFIG_FIELDS
 export const WIDGET_CONFIG_FIELDS: Record<
   string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

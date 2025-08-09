@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ChartOptions, ChartData, TooltipItem } from "chart.js";
-import type { PieChartConfig } from '@/core/types/visualization';
-import { useChartLogic } from './useChartLogic';
+import type { PieChartConfig } from '@type/visualization';
+import { useChartLogic } from '@hooks/visualizations/charts/useChartLogic';
 
 export function usePieChartLogic(
     data: Record<string, any>[],

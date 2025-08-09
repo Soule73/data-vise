@@ -1,16 +1,28 @@
-import { useCardWidgetVM } from "@/core/hooks/visualizations/useCardWidgetVM";
+import { useCardWidgetVM } from "@hooks/visualizations/kpi/useCardWidgetVM";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
-import InvalideConfigWidget from "./charts/InvalideConfigWidget";
-import NoDataWidget from "./charts/NoDataWidget";
-import type { CardWidgetConfig } from "@/core/types/visualization";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import type { CardWidgetConfig } from "@type/visualization";
 
 export default function CardWidget({
   data,
   config,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>[];
   config: CardWidgetConfig;
 }) {
+  const {
+    value,
+    title,
+    description,
+    iconColor,
+    valueColor,
+    descriptionColor,
+    showIcon,
+    IconComponent,
+  } = useCardWidgetVM(data, config);
+
   if (
     !data ||
     !config.metrics ||
@@ -29,16 +41,6 @@ export default function CardWidget({
     );
   }
 
-  const {
-    value,
-    title,
-    description,
-    iconColor,
-    valueColor,
-    descriptionColor,
-    showIcon,
-    IconComponent,
-  } = useCardWidgetVM(data, config);
 
   return (
     <div className="flex flex-col h-full shadow items-center justify-center  max-h-full bg-white dark:bg-gray-900 w-full max-w-full rounded-lg ">

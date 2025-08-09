@@ -1,7 +1,7 @@
 import express from "express";
-import { requirePermission } from "../middleware/requirePermission";
-import userController from "../controllers/userController";
-import { requireAuth } from "../middleware/auth";
+import { requirePermission } from "@middleware/requirePermission";
+import userController from "@controllers/userController";
+import { requireAuth } from "@middleware/auth";
 
 const router = express.Router();
 

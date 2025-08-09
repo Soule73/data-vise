@@ -1,6 +1,6 @@
 import fetch, { RequestInit } from "node-fetch";
-import { buildFetchOptionsFromConfig } from "./dataSourceUtils";
-import { AuthConfig, AuthType, HttpMethod } from "@/types/sourceType";
+import { buildFetchOptionsFromConfig } from "@utils/dataSourceUtils";
+import { AuthConfig, AuthType, HttpMethod } from "@type/sourceType";
 
 /**
  * Récupère les données d'une source JSON distante

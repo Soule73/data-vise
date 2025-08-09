@@ -1,10 +1,10 @@
-import CheckboxField from "@/presentation/components/forms/CheckboxField";
-import InputField from "@/presentation/components/forms/InputField";
-import { WIDGETS } from "@/data/adapters/visualizations";
+import CheckboxField from "@components/forms/CheckboxField";
+import InputField from "@components/forms/InputField";
+import { WIDGETS } from "@adapters/visualizations";
 import type {
   VisualizationTypeSelectorProps,
   WidgetType,
-} from "@/core/types/widget-types";
+} from "@type/widget-types";
 import { useState, type ReactNode } from "react";
 
 export default function VisualizationTypeSelector({

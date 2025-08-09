@@ -1,24 +1,24 @@
 import React, { useEffect, useState, type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "@/presentation/pages/auth/LoginPage";
-import Register from "@/presentation/pages/auth/RegisterPage";
-import SourcesPage from "@/presentation/pages/datasource/SourceListPage";
-import AddSourcePage from "@/presentation/pages/datasource/AddSourcePage";
-import EditSourcePage from "@/presentation/pages/datasource/EditSourcePage";
-import BaseLayout from "@/presentation/components/layouts/BaseLayout";
-import { useUserStore } from "@/core/store/user";
-import { ROUTES } from "@/core/constants/routes";
-import WidgetListPage from "@/presentation/pages/widget/WidgetListPage";
-import WidgetCreatePage from "@/presentation/pages/widget/WidgetCreatePage";
-import RoleManagementPage from "@/presentation/pages/auth/RoleManagementPage";
-import RoleCreatePage from "@/presentation/pages/auth/RoleCreatePage";
-import UserManagementPage from "@/presentation/pages/auth/UserManagementPage";
-import DashboardPage from "@/presentation/pages/dashboard/DashboardPage";
-import DashboardListPage from "@/presentation/pages/dashboard/DashboardListPage";
-import WidgetEditPage from "@/presentation/pages/widget/WidgetEditPage";
-import AppLoader from "@/presentation/components/layouts/AppLoader";
-import DashboardSharePage from "@/presentation/pages/dashboard/DashboardSharePage";
-import ErrorPage from "./presentation/components/layouts/ErrorPage";
+import Login from "@pages/auth/LoginPage";
+import Register from "@pages/auth/RegisterPage";
+import SourcesPage from "@pages/datasource/SourceListPage";
+import AddSourcePage from "@pages/datasource/AddSourcePage";
+import EditSourcePage from "@pages/datasource/EditSourcePage";
+import BaseLayout from "@components/layouts/BaseLayout";
+import { useUserStore } from "@store/user";
+import { ROUTES } from "@constants/routes";
+import WidgetListPage from "@pages/widget/WidgetListPage";
+import WidgetCreatePage from "@pages/widget/WidgetCreatePage";
+import RoleManagementPage from "@pages/auth/RoleManagementPage";
+import RoleCreatePage from "@pages/auth/RoleCreatePage";
+import UserManagementPage from "@pages/auth/UserManagementPage";
+import DashboardPage from "@pages/dashboard/DashboardPage";
+import DashboardListPage from "@pages/dashboard/DashboardListPage";
+import WidgetEditPage from "@pages/widget/WidgetEditPage";
+import AppLoader from "@components/layouts/AppLoader";
+import DashboardSharePage from "@pages/dashboard/DashboardSharePage";
+import ErrorPage from "@components/layouts/ErrorPage";
 
 function RequireAuth({
   children,
@@ -59,10 +59,9 @@ const App: React.FC = () => {
         window.location.pathname !== ROUTES.register &&
         !isDashboardShare
       ) {
-        console.log(
-          "Utilisateur non connecté, redirection vers la page de connexion"
-        );
+
         window.location.replace(ROUTES.login);
+
       }
     }, 1000);
     return () => clearTimeout(timer);

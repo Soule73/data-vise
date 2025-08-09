@@ -1,9 +1,9 @@
-import SelectField from "@/presentation/components/SelectField";
-import InputField from "@/presentation/components/forms/InputField";
-import CommonMultiBucketSection from "@/presentation/components/widgets/CommonMultiBucketSection";
-import DatasetSection from "@/presentation/components/widgets/DatasetSection";
-import type { BubbleMetricConfig } from "@/core/types/metric-bucket-types";
-import type { WidgetBubbleDataConfigSectionProps } from "@/core/types/widget-types";
+import SelectField from "@components/SelectField";
+import InputField from "@components/forms/InputField";
+import CommonMultiBucketSection from "@components/widgets/CommonMultiBucketSection";
+import DatasetSection from "@components/widgets/DatasetSection";
+import type { BubbleMetricConfig } from "@type/metric-bucket-types";
+import type { WidgetBubbleDataConfigSectionProps } from "@type/widget-types";
 
 export default function WidgetBubbleDataConfigSection({
   metrics,

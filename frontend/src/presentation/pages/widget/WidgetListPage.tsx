@@ -1,18 +1,18 @@
 import { useNavigate, Link } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
-import Table from "@/presentation/components/Table";
-import Modal from "@/presentation/components/Modal";
-import { useWidgetListPage } from "@/core/hooks/widget/useWidgetListPage";
-import { DeleteWidgetModal } from "@/presentation/components/widget/DeleteWidgetModal";
-import Button from "@/presentation/components/forms/Button";
-import type { Widget, WidgetType } from "@/core/types/widget-types";
+import { ROUTES } from "@constants/routes";
+import Table from "@components/Table";
+import Modal from "@components/Modal";
+import { useWidgetListPage } from "@hooks/widget/useWidgetListPage";
+import { DeleteWidgetModal } from "@components/widgets/DeleteWidgetModal";
+import Button from "@components/forms/Button";
+import type { Widget, WidgetType } from "@type/widget-types";
 import { useMemo, useState } from "react";
-import { WIDGETS } from "@/data/adapters/visualizations";
-import Badge from "@/presentation/components/Badge";
+import { WIDGETS } from "@adapters/visualizations";
+import Badge from "@components/Badge";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
-import WidgetTypeSelectionModal from "@/presentation/components/widgets/WidgetTypeSelectionModal";
-import { useSourcesQuery } from "@/data/repositories/sources";
+import WidgetTypeSelectionModal from "@components/widgets/WidgetTypeSelectionModal";
+import { useSourcesQuery } from "@repositories/sources";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function WidgetListPage() {

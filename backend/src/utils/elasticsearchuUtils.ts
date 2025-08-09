@@ -1,4 +1,4 @@
-import { DetectParams, EsConfig, FetchOptions, IDataSource } from "@/types/sourceType";
+import { DetectParams, EsConfig, FetchOptions, IDataSource } from "@type/sourceType";
 import { Client } from "@elastic/elasticsearch";
 
 

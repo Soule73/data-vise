@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { BucketUIState } from '@/core/types/metric-bucket-types';
+import type { BucketUIState } from '@type/metric-bucket-types';
 
 export const useBucketUIStore = create<BucketUIState>((set) => ({
     collapsedBuckets: {},

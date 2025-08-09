@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
-import { requirePermission } from "@/middleware/requirePermission";
-import { requireAuth } from "../middleware/auth";
-import widgetController from "../controllers/widgetController";
+import { requirePermission } from "@middleware/requirePermission";
+import { requireAuth } from "@middleware/auth";
+import widgetController from "@controllers/widgetController";
 
 const router = express.Router();
 

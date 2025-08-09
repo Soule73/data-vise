@@ -1,9 +1,9 @@
 import { EllipsisVerticalIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { useGridItem } from "@/core/hooks/dashboard/useGridItem";
-import type { DashboardGridItemProps } from "@/core/types/dashboard-types";
+import { useGridItem } from "@hooks/dashboard/useGridItem";
+import type { DashboardGridItemProps } from "@type/dashboard-types";
 import { Link } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
+import { ROUTES } from "@constants/routes";
 
 function RefreshOverlay() {
   return (

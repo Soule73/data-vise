@@ -8,9 +8,9 @@ import {
     isIsoTimestamp,
     allSameDay,
     formatXTicksLabel,
-} from "@/core/utils/chartUtils";
-import { useMultiBucketProcessor } from "@/core/utils/multiBucketProcessor";
-import type { MetricConfig } from "@/core/types/metric-bucket-types";
+} from "@utils/chartUtils";
+import { useMultiBucketProcessor } from "@utils/multiBucketProcessor";
+import type { MetricConfig } from "@type/metric-bucket-types";
 
 export type ChartType = "bar" | "line" | "pie" | "scatter" | "bubble" | "radar";
 
@@ -125,7 +125,7 @@ export function useChartLogic({
         const defaultColors = {
             bar: `hsl(${(idx * 60) % 360}, 70%, 60%)`,
             line: `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-            pie: undefined, // Géré séparément
+            pie: undefined,
             scatter: `hsl(${(idx * 60) % 360}, 70%, 60%)`,
             bubble: `hsl(${(idx * 60) % 360}, 70%, 60%)`,
             radar: `hsl(${(idx * 60) % 360}, 70%, 60%)`,

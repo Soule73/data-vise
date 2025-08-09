@@ -1,5 +1,5 @@
 import React from "react";
-import type { IntervalUnit } from "@/core/types/dashboard-types";
+import type { IntervalUnit } from "@type/dashboard-types";
 import {
   Popover,
   PopoverButton,
@@ -16,15 +16,15 @@ import {
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 
-import SelectField from "../SelectField";
-import InputField from "../forms/InputField";
-import Button from "../forms/Button";
+import SelectField from "@components/SelectField";
+import InputField from "@components/forms/InputField";
+import Button from "@components/forms/Button";
 
 import {
   formatUnitFr,
   formatShortDateTime,
   INTERVAL_UNITS,
-} from "@/core/utils/timeUtils";
+} from "@utils/timeUtils";
 
 type Props = {
   autoRefreshIntervalValue?: number;

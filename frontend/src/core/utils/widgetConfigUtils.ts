@@ -1,8 +1,8 @@
-import type { WidgetType } from "@/core/types/widget-types";
+import type { WidgetType } from "@type/widget-types";
 import {
     WIDGETS,
     WIDGET_CONFIG_FIELDS,
-} from "@/data/adapters/visualizations";
+} from "@adapters/visualizations";
 
 /**
  * Génère une configuration par défaut pour un widget donné en fonction de ses colonnes

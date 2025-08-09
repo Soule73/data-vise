@@ -1,4 +1,4 @@
-import { useBarChartLogic } from "@/core/hooks/visualizations/optimized";
+import { useBarChartLogic } from "@hooks/visualizations/charts/optimized";
 import {
   Chart as ChartJS,
   BarElement,
@@ -10,9 +10,9 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
-import InvalideConfigWidget from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import type { BarChartConfig } from "@/core/types/visualization";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import type { BarChartWidgetProps } from "@type/widget-types";
+import NoDataWidget from "@components/widgets/NoDataWidget";
 
 ChartJS.register(
   BarElement,
@@ -23,18 +23,14 @@ ChartJS.register(
   Legend
 );
 
+
 export default function BarChartWidget({
   data,
   config,
   // @ts-expect-error : Unused variable in edit mode
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editMode,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>[];
-  config: BarChartConfig;
-  editMode?: boolean;
-}) {
+}: BarChartWidgetProps) {
   const { chartData, options } = useBarChartLogic(data, config);
 
   if (

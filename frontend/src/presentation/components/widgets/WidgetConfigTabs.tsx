@@ -1,4 +1,4 @@
-import type { WidgetConfigTabsProps } from "@/core/types/widget-types";
+import type { WidgetConfigTabsProps } from "@type/widget-types";
 import React from "react";
 
 function TabButton({
@@ -13,8 +13,8 @@ function TabButton({
   return (
     <button
       className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${active
-          ? "border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400"
-          : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+        ? "border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400"
+        : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
         }`}
       onClick={onClick}
     >

@@ -1,12 +1,12 @@
-import { useUserManagement } from "@/core/hooks/auth/useUserManagement";
-import Table from "@/presentation/components/Table";
-import Button from "@/presentation/components/forms/Button";
+import { useUserManagement } from "@hooks/auth/useUserManagement";
+import Table from "@components/Table";
+import Button from "@components/forms/Button";
 import { useEffect } from "react";
-import { useDashboardStore } from "@/core/store/dashboard";
-import type { User } from "@/core/types/auth-types";
-import { ROUTES } from "@/core/constants/routes";
-import UserModalForm from "@/presentation/components/auth/UserModalForm";
-import UserDeleteModal from "@/presentation/components/auth/UserDeleteModal";
+import { useDashboardStore } from "@store/dashboard";
+import type { User } from "@type/auth-types";
+import { ROUTES } from "@constants/routes";
+import UserModalForm from "@components/auth/UserModalForm";
+import UserDeleteModal from "@components/auth/UserDeleteModal";
 
 function getErrorMsg(err: unknown) {
   if (!err) return undefined;

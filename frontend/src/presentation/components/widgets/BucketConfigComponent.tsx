@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import SelectField from "@/presentation/components/SelectField";
-import InputField from "@/presentation/components/forms/InputField";
-import Button from "@/presentation/components/forms/Button";
+import SelectField from "@components/SelectField";
+import InputField from "@components/forms/InputField";
+import Button from "@components/forms/Button";
 import {
     XMarkIcon,
     ChevronUpIcon,
@@ -10,7 +10,7 @@ import {
     PlusCircleIcon,
     TrashIcon,
 } from "@heroicons/react/24/solid";
-import type { MultiBucketConfig, BucketType } from "@/core/types/metric-bucket-types";
+import type { MultiBucketConfig, BucketType } from "@type/metric-bucket-types";
 import {
     BUCKET_TYPES,
     DATE_INTERVALS,
@@ -19,7 +19,7 @@ import {
     generateBucketLabel,
     getAvailableColumns,
     validateBucket,
-} from "@/core/utils/bucketUtils";
+} from "@utils/bucketUtils";
 
 interface BucketConfigComponentProps {
     bucket: MultiBucketConfig;

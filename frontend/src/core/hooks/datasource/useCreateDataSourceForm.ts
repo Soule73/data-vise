@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../../constants/routes";
-import { useNotificationStore } from "@/core/store/notification";
-import { useCreateSourceMutation } from "@/data/repositories/sources";
+import { ROUTES } from "@constants/routes";
+import { useNotificationStore } from "@store/notification";
+import { useCreateSourceMutation } from "@repositories/sources";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSourceFormBase } from "./useSourceFormBase";
+import { useSourceFormBase } from "@hooks/datasource/useSourceFormBase";
 
 export function useCreateDataSourceForm() {
   const queryClient = useQueryClient();

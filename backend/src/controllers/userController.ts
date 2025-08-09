@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import userService from "../services/userService";
-import { handleServiceResult } from "@/utils/api";
+import userService from "@services/userService";
+import { handleServiceResult } from "@utils/api";
 
 /**
  * Contrôleur pour gérer les opérations liées aux utilisateurs et aux rôles.

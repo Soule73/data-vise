@@ -1,7 +1,7 @@
-import { AuthRequest } from "@/types/authType";
+import { AuthRequest } from "@type/authType";
 import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/User";
+import User from "@models/User";
 
 /**
  * Middleware pour vérifier l'authentification de l'utilisateur.
@@ -13,7 +13,7 @@ import User from "../models/User";
  * @param {Response} res - La réponse HTTP.
  * @param {NextFunction} next - La fonction de rappel pour passer au middleware suivant.
  * @returns {Promise<void>} - Une promesse qui résout lorsque la vérification est
- */
+*/
 export async function requireAuth(
   req: AuthRequest,
   res: Response,
@@ -74,4 +74,5 @@ export function requireRole(role: "admin" | "user") {
   };
 }
 
-export type { AuthRequest } from "../types/authType";
+
+export type { AuthRequest } from "@type/authType";

@@ -1,5 +1,5 @@
-import DataSource from "../models/DataSource";
-import Widget from "../models/Widget";
+import DataSource from "@models/DataSource";
+import Widget from "@models/Widget";
 import {
   buildColumnsResult,
   computeCacheParams,
@@ -12,7 +12,7 @@ import {
   resolveDetectConfig,
   selectFields,
   verifyShareAccess,
-} from "@/utils/dataSourceUtils";
+} from "@utils/dataSourceUtils";
 import fs from "fs/promises";
 import type {
   DataSourceCreatePayload,
@@ -20,17 +20,17 @@ import type {
   DetectParams,
   FetchOptions,
   IDataSource,
-} from "@/types/sourceType";
-import type { ApiResponse, ApiData } from "@/types/api";
-import { sourceCache } from "@/utils/sourceCache";
-import { toApiData, toApiError } from "@/utils/api";
-import { dataSourceSchema } from "@/validation/dataSource";
-import { buildErrorObject } from "@/utils/validationUtils";
+} from "@type/sourceType";
+import type { ApiResponse, ApiData } from "@type/api";
+import { sourceCache } from "@utils/sourceCache";
+import { toApiData, toApiError } from "@utils/api";
+import { dataSourceSchema } from "@validation/dataSource";
+import { buildErrorObject } from "@utils/validationUtils";
 import {
   detectColumnsElasticsearch,
   fetchElasticsearchData
-} from "@/utils/elasticsearchuUtils";
-import { getAbsolutePath } from "@/utils/cvsUtils";
+} from "@utils/elasticsearchuUtils";
+import { getAbsolutePath } from "@utils/cvsUtils";
 
 /**
  * Service de gestion des sources de données (DataSource).

@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { useMultiBucketProcessor, type ProcessedBucketItem } from "@/core/hooks/common/useMultiBucketProcessor";
-import type { KPIWidgetConfig } from "@/core/types/visualization";
-import type { MetricConfig } from "@/core/types/metric-bucket-types";
-import type { KPIWidgetVM } from "@/core/types/widget-types";
+import { useMultiBucketProcessor, type ProcessedBucketItem } from "@hooks/common/useMultiBucketProcessor";
+import type { KPIWidgetConfig } from "@type/visualization";
+import type { MetricConfig } from "@type/metric-bucket-types";
+import type { KPIWidgetVM } from "@type/widget-types";
 
 export function useKPIWidgetVM(
   data: Record<string, unknown>[],

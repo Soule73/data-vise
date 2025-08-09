@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
-import WidgetConfigTabs from "@/presentation/components/widgets/WidgetConfigTabs";
-import WidgetDataConfigSection from "@/presentation/components/widgets/WidgetDataConfigSection";
-import WidgetSaveTitleModal from "@/presentation/components/widgets/WidgetSaveTitleModal";
-import WidgetMetricStyleConfigSection from "@/presentation/components/widgets/WidgetMetricStyleConfigSection";
-import WidgetParamsConfigSection from "@/presentation/components/widgets/WidgetParamsConfigSection";
-import { WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
-import type { WidgetType } from "@/core/types/widget-types";
-import { useWidgetTabs } from "@/core/hooks/widget/useWidgetTabs";
-import Button from "../forms/Button";
+import WidgetConfigTabs from "@components/widgets/WidgetConfigTabs";
+import WidgetDataConfigSection from "@components/widgets/WidgetDataConfigSection";
+import WidgetSaveTitleModal from "@components/widgets/WidgetSaveTitleModal";
+import WidgetMetricStyleConfigSection from "@components/widgets/WidgetMetricStyleConfigSection";
+import WidgetParamsConfigSection from "@components/widgets/WidgetParamsConfigSection";
+import { WIDGET_DATA_CONFIG } from "@adapters/visualizations";
+import type { WidgetType } from "@type/widget-types";
+import { useWidgetTabs } from "@hooks/widget/useWidgetTabs";
+import Button from "@components/forms/Button";
 
 interface WidgetFormLayoutProps {
     // Header

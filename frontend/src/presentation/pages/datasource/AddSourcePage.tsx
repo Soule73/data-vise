@@ -1,8 +1,8 @@
-import SourceForm from "@/presentation/components/source/SourceForm";
-import { useCreateDataSourceForm } from "@/core/hooks/datasource/useCreateDataSourceForm";
-import { useDashboardStore } from "@/core/store/dashboard";
+import SourceForm from "@components/source/SourceForm";
+import { useCreateDataSourceForm } from "@hooks/datasource/useCreateDataSourceForm";
+import { useDashboardStore } from "@store/dashboard";
 import { useEffect } from "react";
-import { ROUTES } from "@/core/constants/routes";
+import { ROUTES } from "@constants/routes";
 
 export default function AddSourcePage() {
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);

@@ -7,9 +7,9 @@ import {
   createDashboard as apiCreateDashboard,
   fetchSharedDashboard,
   fetchSharedDashboardSources,
-} from "@/data/services/dashboard";
-import type { Dashboard } from "@/core/types/dashboard-types";
-import api from "@/data/services/api";
+} from "@services/dashboard";
+import type { Dashboard } from "@type/dashboard-types";
+import api from "@services/api";
 
 // Liste de tous les tableaux de bord
 export function useDashboardsQuery() {

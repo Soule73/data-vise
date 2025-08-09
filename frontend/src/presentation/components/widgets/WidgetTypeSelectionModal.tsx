@@ -1,10 +1,10 @@
 import { useState } from "react";
-import Modal from "@/presentation/components/Modal";
-import SelectField from "@/presentation/components/SelectField";
-import VisualizationTypeSelector from "@/presentation/components/visualizations/VisualizationTypeSelector";
-import Button from "@/presentation/components/forms/Button";
-import type { WidgetType } from "@/core/types/widget-types";
-import type { DataSource } from "@/core/types/data-source";
+import Modal from "@components/Modal";
+import SelectField from "@components/SelectField";
+import VisualizationTypeSelector from "@components/visualizations/VisualizationTypeSelector";
+import Button from "@components/forms/Button";
+import type { WidgetType } from "@type/widget-types";
+import type { DataSource } from "@type/data-source";
 
 interface WidgetTypeSelectionModalProps {
     open: boolean;

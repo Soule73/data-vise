@@ -1,17 +1,17 @@
-import Dashboard from "../models/Dashboard";
-import Widget from "../models/Widget";
+import Dashboard from "@models/Dashboard";
+import Widget from "@models/Widget";
 import type {
   IDashboard,
   DashboardCreatePayload,
   DashboardUpdatePayload,
-} from "@/types/dashboardType";
-// import type { IWidget } from "@/types/widgetType";
-import type { ApiResponse } from "@/types/api";
-import { cleanTimeRange } from "@/utils/dataSourceUtils";
-import DataSource from "@/models/DataSource";
-import { IDataSource } from "@/types/sourceType";
-import { toApiData, toApiError } from "@/utils/api";
-import { generateUUID } from "@/utils/uuidGenerator";
+} from "@type/dashboardType";
+// import type { IWidget } from "@type/widgetType";
+import type { ApiResponse } from "@type/api";
+import { cleanTimeRange } from "@utils/dataSourceUtils";
+import DataSource from "@models/DataSource";
+import { IDataSource } from "@type/sourceType";
+import { toApiData, toApiError } from "@utils/api";
+import { generateUUID } from "@utils/uuidGenerator";
 
 /**
  * Service pour gérer les opérations liées aux dashboards.

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchUsers } from "@/data/services/user";
-import type { User } from "@/core/types/auth-types";
+import { fetchUsers } from "@services/user";
+import type { User } from "@type/auth-types";
 
 export function useUsersQuery() {
     return useQuery<User[]>({

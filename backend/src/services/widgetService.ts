@@ -1,13 +1,13 @@
-import Widget from "../models/Widget";
-import Dashboard from "../models/Dashboard";
+import Widget from "@models/Widget";
+import Dashboard from "@models/Dashboard";
 import type {
   IWidget,
   WidgetCreatePayload,
   WidgetUpdatePayload,
-} from "@/types/widgetType";
-import type { ApiResponse } from "@/types/api";
-import { toApiData, toApiError } from "@/utils/api";
-import { generateUUID } from "@/utils/uuidGenerator";
+} from "@type/widgetType";
+import type { ApiResponse } from "@type/api";
+import { toApiData, toApiError } from "@utils/api";
+import { generateUUID } from "@utils/uuidGenerator";
 
 /**
  * Service pour gérer les opérations liées aux widgets.

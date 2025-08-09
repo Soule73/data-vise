@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRegisterMutation } from "@/data/repositories/auth";
-import { registerSchema, type RegisterForm } from "@/core/validation/register";
-import { useUserStore } from "@/core/store/user";
+import { useRegisterMutation } from "@repositories/auth";
+import { registerSchema, type RegisterForm } from "@validation/register";
+import { useUserStore } from "@store/user";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
+import { ROUTES } from "@constants/routes";
 
 export function useRegisterForm() {
   const setUser = useUserStore((s) => s.setUser);

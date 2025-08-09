@@ -1,15 +1,15 @@
-import { WIDGETS } from "@/data/adapters/visualizations";
+import { WIDGETS } from "@adapters/visualizations";
 import { useRef, useEffect, useMemo, useState } from "react";
-import type { DataSource } from "../../types/data-source";
-import { getWidgetDataFields } from "@/core/utils/widgetDataFields";
-import { useDataBySourceQuery } from "@/data/repositories/sources";
+import type { DataSource } from "@type/data-source";
+import { getWidgetDataFields } from "@utils/widgetDataFields";
+import { useDataBySourceQuery } from "@repositories/sources";
 import {
   getWidgetComponent,
   getDataError,
   getGridItemStyleProps,
   useGridItemResizeObserver,
-} from "@/core/utils/gridItemUtils";
-import type { UseGridItemProps } from "../../types/dashboard-types";
+} from "@utils/gridItemUtils";
+import type { UseGridItemProps } from "@type/dashboard-types";
 
 export function useGridItem({
   widget,

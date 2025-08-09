@@ -1,10 +1,10 @@
-import SelectField from "./SelectField";
+import SelectField from "@components/SelectField";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
 } from "@heroicons/react/24/outline";
-import type { PaginationProps } from "@/core/types/table-types";
+import type { PaginationProps } from "@type/table-types";
 
 export default function Pagination({
   effectivePage,
@@ -22,11 +22,10 @@ export default function Pagination({
       >
         {/* First */}
         <button
-          className={`px-2 py-1 rounded text-xs font-medium ${
-            effectivePage === 1
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-indigo-600 hover:bg-indigo-50 dark:hover:bg-gray-800"
-          }`}
+          className={`px-2 py-1 rounded text-xs font-medium ${effectivePage === 1
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-indigo-600 hover:bg-indigo-50 dark:hover:bg-gray-800"
+            }`}
           onClick={() => effectivePage !== 1 && handlePageChange(1)}
           disabled={effectivePage === 1}
           aria-label="Première page"
@@ -35,11 +34,10 @@ export default function Pagination({
         </button>
         {/* Chevron gauche */}
         <button
-          className={`px-2 py-1 rounded text-xs ${
-            effectivePage === 1
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-indigo-600 hover:bg-indigo-50 dark:hover:bg-gray-800"
-          }`}
+          className={`px-2 py-1 rounded text-xs ${effectivePage === 1
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-indigo-600 hover:bg-indigo-50 dark:hover:bg-gray-800"
+            }`}
           onClick={() =>
             effectivePage > 1 && handlePageChange(effectivePage - 1)
           }
@@ -71,11 +69,10 @@ export default function Pagination({
         )}
         {/* Chevron droite */}
         <button
-          className={`px-2 py-1 rounded text-xs ${
-            effectivePage === pageCount
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-indigo-600 hover:bg-indigo-50 dark:hover:bg-gray-800"
-          }`}
+          className={`px-2 py-1 rounded text-xs ${effectivePage === pageCount
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-indigo-600 hover:bg-indigo-50 dark:hover:bg-gray-800"
+            }`}
           onClick={() =>
             effectivePage < pageCount && handlePageChange(effectivePage + 1)
           }
@@ -86,11 +83,10 @@ export default function Pagination({
         </button>
         {/* Last */}
         <button
-          className={`px-2 py-1 rounded text-xs font-medium ${
-            effectivePage === pageCount
-              ? "text-gray-400 cursor-not-allowed"
-              : "text-indigo-600 hover:bg-indigo-50 dark:hover:bg-gray-800"
-          }`}
+          className={`px-2 py-1 rounded text-xs font-medium ${effectivePage === pageCount
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-indigo-600 hover:bg-indigo-50 dark:hover:bg-gray-800"
+            }`}
           onClick={() =>
             effectivePage !== pageCount && handlePageChange(pageCount)
           }

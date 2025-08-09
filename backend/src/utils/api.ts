@@ -1,4 +1,4 @@
-import { ApiData, ApiError, ApiResponse } from "@/types/api";
+import { ApiData, ApiError, ApiResponse } from "@type/api";
 import { Response } from "express";
 
 /**

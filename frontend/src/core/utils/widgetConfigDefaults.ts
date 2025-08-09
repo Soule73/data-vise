@@ -1,6 +1,6 @@
-import type { WidgetType } from '@/core/types/widget-types';
-import type { MultiBucketConfig, MetricConfig } from '@/core/types/metric-bucket-types';
-import { createDefaultBucket } from './bucketUtils';
+import type { WidgetType } from '@type/widget-types';
+import type { MultiBucketConfig, MetricConfig } from '@type/metric-bucket-types';
+import { createDefaultBucket } from '@utils/bucketUtils';
 
 /**
  * Configuration par défaut pour un widget avec buckets multiples

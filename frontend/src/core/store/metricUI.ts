@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { MetricUICollapseState } from '../types/metric-bucket-types';
+import type { MetricUICollapseState } from '@type/metric-bucket-types';
 
 
 export const useMetricUICollapseStore = create<MetricUICollapseState>((set) => ({

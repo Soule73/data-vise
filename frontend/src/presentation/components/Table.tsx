@@ -1,8 +1,9 @@
-import React from "react";
-import { useTableSearchStore } from "../../core/store/tableSearch";
-import Pagination from "./Pagination";
-import TableSearch from "./TableSearch";
-import type { TableProps } from "@/core/types/table-types";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useTableSearchStore } from "@store/tableSearch";
+import Pagination from "@components/Pagination";
+import TableSearch from "@components/TableSearch";
+import type { TableProps } from "@type/table-types";
 
 export default function Table<T extends { [key: string]: any }>({
   columns,
@@ -20,7 +21,7 @@ export default function Table<T extends { [key: string]: any }>({
   searchValue = "",
   name,
 }: TableProps<T>) {
-  React.useEffect(() => {
+  useEffect(() => {
     return () => { };
   }, []);
 
@@ -41,16 +42,18 @@ export default function Table<T extends { [key: string]: any }>({
     (state: any) => state.reset
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (onSearch && searchValue !== zustandSearch) {
       setZustandSearch(searchValue || "");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       resetZustandSearch();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const effectiveSearch = searchable
@@ -74,12 +77,12 @@ export default function Table<T extends { [key: string]: any }>({
       )
       : data;
 
-  const [localPage, setLocalPage] = React.useState(1);
+  const [localPage, setLocalPage] = useState(1);
 
-  const [localRowPerPage, setLocalRowPerPage] = React.useState(
+  const [localRowPerPage, setLocalRowPerPage] = useState(
     () => rowPerPage
   );
-  React.useEffect(() => {
+  useEffect(() => {
 
     setLocalRowPerPage(rowPerPage);
   }, [rowPerPage]);
@@ -103,7 +106,7 @@ export default function Table<T extends { [key: string]: any }>({
     )
     : filteredData;
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     if (onSearch) onSearch(e.target.value);
     else setZustandSearch(e.target.value);
     if (!onPageChange) setLocalPage(1);
@@ -114,7 +117,7 @@ export default function Table<T extends { [key: string]: any }>({
     else setLocalPage(newPage);
   };
 
-  const handleRowPerPageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRowPerPageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     if (onPageChange) {
       if (onPageChange) onPageChange(1);
@@ -124,7 +127,7 @@ export default function Table<T extends { [key: string]: any }>({
     }
   };
 
-  const searchMountCount = React.useRef(0);
+  const searchMountCount = useRef(0);
 
   return (
     <div className="relative w-full h-full max-w-full max-h-full overflow-auto config-scrollbar">

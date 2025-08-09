@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { IWidget } from "./widgetType";
+import { IWidget } from "@type/widgetType";
 
 export interface DashboardLayoutItem {
   widgetId: string;

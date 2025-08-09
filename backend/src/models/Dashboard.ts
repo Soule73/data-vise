@@ -1,4 +1,4 @@
-import { DashboardHistoryItem, IDashboard } from "@/types/dashboardType";
+import { DashboardHistoryItem, IDashboard } from "@type/dashboardType";
 import mongoose from "mongoose";
 
 const { Schema } = mongoose;
@@ -54,8 +54,6 @@ const DashboardSchema = new Schema(
     shareId: {
       type: String,
       default: null,
-      // unique: true,
-      // sparse: true,
     },
     autoRefreshIntervalValue: { type: Number },
     autoRefreshIntervalUnit: { type: String },

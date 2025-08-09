@@ -1,10 +1,11 @@
-import "@/core/chartjs-register";
-import { usePieChartLogic } from "@/core/hooks/visualizations/optimized";
+import "@utils/chartjs-register";
+import { usePieChartLogic } from "@hooks/visualizations/charts/optimized";
 import { Pie } from "react-chartjs-2";
 import { ChartPieIcon } from "@heroicons/react/24/outline";
-import { InvalideConfigWidget } from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import type { PieChartConfig } from "@/core/types/visualization";
+import { InvalideConfigWidget } from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import type { PieChartWidgetProps } from "@type/widget-types";
+
 
 export default function PieChartWidget({
   data,
@@ -12,12 +13,7 @@ export default function PieChartWidget({
   // @ts-expect-error : Unused variable in edit mode
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editMode,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>[];
-  config: PieChartConfig;
-  editMode?: boolean;
-}) {
+}: PieChartWidgetProps) {
   const { chartData, options, showNativeValues, valueLabelsPlugin } =
     usePieChartLogic(data, config);
 

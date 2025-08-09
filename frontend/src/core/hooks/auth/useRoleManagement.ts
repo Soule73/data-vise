@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useUpdateRoleMutation, useDeleteRoleMutation } from "@/data/repositories/roles";
+import { useUpdateRoleMutation, useDeleteRoleMutation } from "@repositories/roles";
 import { useState, useEffect } from "react";
-import { useNotificationStore } from "@/core/store/notification";
-import { useRolesQuery, usePermissionsQuery } from "@/data/repositories/roles";
-import { useDashboardStore } from "@/core/store/dashboard";
+import { useNotificationStore } from "@store/notification";
+import { useRolesQuery, usePermissionsQuery } from "@repositories/roles";
+import { useDashboardStore } from "@store/dashboard";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { roleSchema } from "@/core/validation/role";
-import { groupPermissionsByModel, toggleArrayValue } from "@/core/utils/roleUtils";
+import { roleSchema } from "@validation/role";
+import { groupPermissionsByModel, toggleArrayValue } from "@utils/roleUtils";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function useRoleManagement() {

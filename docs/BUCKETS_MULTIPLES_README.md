@@ -47,7 +47,7 @@ frontend/src/
 ### 1. Configuration d'un bucket simple
 
 ```typescript
-import { createDefaultBucket } from '@/core/utils/bucketUtils';
+import { createDefaultBucket } from '@utils/bucketUtils';
 
 const bucket = createDefaultBucket('terms', 'category');
 // Résultat: { field: 'category', type: 'terms', order: 'desc', size: 10, ... }
@@ -56,7 +56,7 @@ const bucket = createDefaultBucket('terms', 'category');
 ### 2. Configuration de buckets multiples
 
 ```typescript
-import { useMultiBuckets } from '@/core/hooks/useMultiBuckets';
+import { useMultiBuckets } from '@hooks/useMultiBuckets';
 
 const {
   buckets,
@@ -75,7 +75,7 @@ const {
 ### 3. Traitement des données
 
 ```typescript
-import { useMultiBucketProcessor } from '@/core/utils/multiBucketProcessor';
+import { useMultiBucketProcessor } from '@utils/multiBucketProcessor';
 
 const processedData = useMultiBucketProcessor(data, config);
 // Résultat: { groupedData, labels, bucketHierarchy, splitData }
@@ -244,7 +244,7 @@ export const WIDGET_DATA_CONFIG = {
 
 Un composant de test est disponible :
 ```typescript
-import MultiBucketTestComponent from '@/presentation/components/test/MultiBucketTestComponent';
+import MultiBucketTestComponent from '@components/test/MultiBucketTestComponent';
 ```
 
 Ce composant permet de :

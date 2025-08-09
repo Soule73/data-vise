@@ -1,10 +1,10 @@
-import ModalSidebarRight from "@/presentation/components/ModalSidebarRight";
-import Button from "@/presentation/components/forms/Button";
-import InputField from "@/presentation/components/forms/InputField";
-import type { Widget, WidgetSelectModalProps } from "@/core/types/widget-types";
-import { WIDGETS } from "@/data/adapters/visualizations";
+import ModalSidebarRight from "@components/ModalSidebarRight";
+import Button from "@components/forms/Button";
+import InputField from "@components/forms/InputField";
+import type { Widget, WidgetSelectModalProps } from "@type/widget-types";
+import { WIDGETS } from "@adapters/visualizations";
 import { useState, useMemo } from "react";
-import { useWidgetsQuery } from "@/data/repositories/widgets";
+import { useWidgetsQuery } from "@repositories/widgets";
 
 export default function WidgetSelectModal({
   open,

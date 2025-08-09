@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import type { WidgetType } from '@/core/types/widget-types';
-import type { MultiBucketConfig } from '@/core/types/metric-bucket-types';
-import { createDefaultWidgetConfig, optimizeWidgetConfig } from '@/core/utils/widgetConfigDefaults';
-import { ensureMultiBuckets } from '@/core/utils/bucketMigration';
+import type { WidgetType } from '@type/widget-types';
+import type { MultiBucketConfig } from '@type/metric-bucket-types';
+import { createDefaultWidgetConfig, optimizeWidgetConfig } from '@utils/widgetConfigDefaults';
+import { ensureMultiBuckets } from '@utils/bucketMigration';
 
 interface UseWidgetAutoConfigProps {
     widgetType: WidgetType;

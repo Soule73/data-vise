@@ -23,14 +23,14 @@ L'optimisation des hooks de visualisation a été **complètement réalisée** a
 ## 🏗️ Architecture finale
 
 ```
-📁 visualizations/
+📁 visualizations/chats
 ├── 🧠 useChartLogic.ts           (362 lignes - logique commune)
-├── 📊 useBarChartVMOptimized.ts   (38 lignes)
-├── 📈 useLineChartVMOptimized.ts  (63 lignes)
-├── 🥧 usePieChartVMOptimized.ts   (60 lignes)
-├── 📍 useScatterChartVMOptimized.ts (61 lignes)
-├── 🫧 useBubbleChartVMOptimized.ts  (62 lignes)
-├── 🔄 useRadarChartVMOptimized.ts   (69 lignes)
+├── 📊 useBarChartVM.ts   (38 lignes)
+├── 📈 useLineChartVM.ts  (63 lignes)
+├── 🥧 usePieChartVM.ts   (60 lignes)
+├── 📍 useScatterChartVM.ts (61 lignes)
+├── 🫧 useBubbleChartVM.ts  (62 lignes)
+├── 🔄 useRadarChartVM.ts   (69 lignes)
 ├── 📦 optimized.ts               (export centralisé)
 ├── 📋 MIGRATION_GUIDE.md
 └── 📚 OPTIMIZATION_README.md
@@ -65,7 +65,7 @@ import {
   useScatterChartLogic,
   useBubbleChartLogic,
   useRadarChartLogic 
-} from '@/core/hooks/visualizations/optimized';
+} from '@hooks/visualizations/optimized';
 ```
 
 ### Composants de widgets migrés

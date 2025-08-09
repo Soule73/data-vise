@@ -70,7 +70,7 @@ import {
     isIsoTimestamp,
     allSameDay,
     formatXTicksLabel,
-} from "@/core/utils/chartUtils";
+} from "@utils/chartUtils";
 ```
 
 ## 📋 Changements apportés

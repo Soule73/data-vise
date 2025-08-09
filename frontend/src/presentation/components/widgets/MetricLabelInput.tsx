@@ -1,4 +1,4 @@
-import InputField from "@/presentation/components/forms/InputField";
+import InputField from "@components/forms/InputField";
 
 interface MetricLabelInputProps {
     value: string;

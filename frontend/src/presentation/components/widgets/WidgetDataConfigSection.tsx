@@ -1,26 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import SelectField from "@/presentation/components/SelectField";
-import Button from "@/presentation/components/forms/Button";
+import SelectField from "@components/SelectField";
+import Button from "@components/forms/Button";
 import {
   XMarkIcon,
   ChevronUpIcon,
   ChevronDownIcon,
   PlusCircleIcon,
 } from "@heroicons/react/24/solid";
-import { useMetricUICollapseStore } from "@/core/store/metricUI";
-import type { WidgetDataConfigSectionFixedProps } from "@/core/types/widget-types";
-import WidgetBubbleDataConfigSection from "@/presentation/components/widgets/WidgetBubbleDataConfigSection";
-import WidgetScatterDataConfigSection from "@/presentation/components/widgets/WidgetScatterDataConfigSection";
-import WidgetRadarDataConfigSection from "@/presentation/components/widgets/WidgetRadarDataConfigSection";
-import WidgetKPIGroupDataConfigSection from "@/presentation/components/widgets/WidgetKPIGroupDataConfigSection";
-import MultiBucketSection from "@/presentation/components/widgets/MultiBucketSection";
-import { WIDGETS, WIDGET_DATA_CONFIG } from "@/data/adapters/visualizations";
-import type {
-  BubbleMetricConfig,
-  RadarMetricConfig,
-} from "@/core/types/metric-bucket-types";
-import { useMultiBuckets } from "@/core/hooks/useMultiBuckets";
-import MetricLabelInput from "@/presentation/components/widgets/MetricLabelInput";
+import { useMetricUICollapseStore } from "@store/metricUI";
+import type { WidgetDataConfigSectionFixedProps } from "@type/widget-types";
+import WidgetBubbleDataConfigSection from "@components/widgets/WidgetBubbleDataConfigSection";
+import WidgetScatterDataConfigSection from "@components/widgets/WidgetScatterDataConfigSection";
+import WidgetRadarDataConfigSection from "@components/widgets/WidgetRadarDataConfigSection";
+import WidgetKPIGroupDataConfigSection from "@components/widgets/WidgetKPIGroupDataConfigSection";
+import MultiBucketSection from "@components/widgets/MultiBucketSection";
+import { WIDGETS, WIDGET_DATA_CONFIG } from "@adapters/visualizations";
+import { useMultiBuckets } from "@hooks/useMultiBuckets";
+import MetricLabelInput from "@components/widgets/MetricLabelInput";
+import type { BubbleMetricConfig, RadarMetricConfig } from "@type/metric-bucket-types";
 
 export default function WidgetDataConfigSection({
   type,

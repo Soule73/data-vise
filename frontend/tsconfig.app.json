@@ -29,6 +29,45 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "@styles/*": [
+        "src/styles/*"
+      ],
+      "@components/*": [
+        "src/presentation/components/*"
+      ],
+      "@pages/*": [
+        "src/presentation/pages/*"
+      ],
+      "@store/*": [
+        "src/core/store/*"
+      ],
+      "@utils/*": [
+        "src/core/utils/*"
+      ],
+      "@assets/*": [
+        "src/core/assets/*"
+      ],
+      "@hooks/*": [
+        "src/core/hooks/*"
+      ],
+      "@type/*": [
+        "src/core/types/*"
+      ],
+      "@constants/*": [
+        "src/core/constants/*"
+      ],
+      "@services/*": [
+        "src/data/services/*"
+      ],
+      "@repositories/*": [
+        "src/data/repositories/*"
+      ],
+      "@adapters/*": [
+        "src/data/adapters/*"
+      ],
+      "@validation/*": [
+        "src/core/validation/*"
       ]
     }
   },

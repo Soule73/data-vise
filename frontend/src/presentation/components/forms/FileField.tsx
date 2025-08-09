@@ -1,4 +1,4 @@
-import type { InputFieldProps } from "@/core/types/form-types";
+import type { InputFieldProps } from "@type/form-types";
 import { Field, Label } from "@headlessui/react";
 import { forwardRef } from "react";
 

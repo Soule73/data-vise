@@ -1,15 +1,15 @@
-import ColorField from "@/presentation/components/forms/ColorField";
-import InputField from "@/presentation/components/forms/InputField";
+import ColorField from "@components/forms/ColorField";
+import InputField from "@components/forms/InputField";
 import {
   WIDGETS,
   WIDGET_CONFIG_FIELDS,
-} from "../../../data/adapters/visualizations";
+} from "@adapters/visualizations";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
-import { useMetricUICollapseStore } from "@/core/store/metricUI";
+import { useMetricUICollapseStore } from "@store/metricUI";
 import type {
   MetricStyleFieldSchema,
   WidgetMetricStyleConfigSectionProps,
-} from "@/core/types/widget-types";
+} from "@type/widget-types";
 
 export default function WidgetMetricStyleConfigSection({
   type,

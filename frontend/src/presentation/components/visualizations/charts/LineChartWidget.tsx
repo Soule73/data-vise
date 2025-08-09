@@ -1,4 +1,4 @@
-import { useLineChartLogic } from "@/core/hooks/visualizations/optimized";
+import { useLineChartLogic } from "@hooks/visualizations/charts/optimized";
 import { PresentationChartLineIcon } from "@heroicons/react/24/outline";
 import {
   Chart as ChartJS,
@@ -12,9 +12,9 @@ import {
   Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import InvalideConfigWidget from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import type { LineChartConfig } from "@/core/types/visualization";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import type { LineChartWidgetProps } from "@type/widget-types";
 
 ChartJS.register(
   LineElement,
@@ -33,12 +33,7 @@ export default function LineChartWidget({
   // @ts-expect-error : Unused variable in edit mode
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editMode,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>[];
-  config: LineChartConfig;
-  editMode?: boolean;
-}) {
+}: LineChartWidgetProps) {
   const { chartData, options, showNativeValues, valueLabelsPlugin } =
     useLineChartLogic(data, config);
 

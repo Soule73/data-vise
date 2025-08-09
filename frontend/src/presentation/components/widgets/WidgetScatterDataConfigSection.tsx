@@ -1,10 +1,10 @@
-import type { ScatterMetricConfig } from "@/core/types/metric-bucket-types";
-import SelectField from "@/presentation/components/SelectField";
-import InputField from "@/presentation/components/forms/InputField";
-import CommonMultiBucketSection from "@/presentation/components/widgets/CommonMultiBucketSection";
-import DatasetSection from "@/presentation/components/widgets/DatasetSection";
+import type { ScatterMetricConfig } from "@type/metric-bucket-types";
+import SelectField from "@components/SelectField";
+import InputField from "@components/forms/InputField";
+import CommonMultiBucketSection from "@components/widgets/CommonMultiBucketSection";
+import DatasetSection from "@components/widgets/DatasetSection";
 import { useState } from "react";
-import type { WidgetScatterDataConfigSectionProps } from "@/core/types/widget-types";
+import type { WidgetScatterDataConfigSectionProps } from "@type/widget-types";
 
 export default function WidgetScatterDataConfigSection({
   metrics,

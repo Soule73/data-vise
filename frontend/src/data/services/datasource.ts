@@ -1,7 +1,7 @@
-import api from "./api";
-import type { AuthConfig, CreateSourcePayload, DataSource } from "@/core/types/data-source";
-import type { ApiResponse } from "@/core/types/api";
-import { extractApiData } from "../../core/utils/api-utils";
+import api from "@services/api";
+import type { AuthConfig, CreateSourcePayload, DataSource } from "@type/data-source";
+import type { ApiResponse } from "@type/api";
+import { extractApiData } from "@utils/api-utils";
 
 export async function getSources(): Promise<DataSource[]> {
   const res = await api.get<ApiResponse<DataSource[]>>("/sources");

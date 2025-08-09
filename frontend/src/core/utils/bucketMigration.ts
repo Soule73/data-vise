@@ -1,5 +1,5 @@
-import type { BucketConfig, MultiBucketConfig } from '@/core/types/metric-bucket-types';
-import { createDefaultBucket } from './bucketUtils';
+import type { BucketConfig, MultiBucketConfig } from '@type/metric-bucket-types';
+import { createDefaultBucket } from '@utils/bucketUtils';
 
 /**
  * Convertit un ancien bucket en nouveau bucket multiple

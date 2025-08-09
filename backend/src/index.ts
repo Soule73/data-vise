@@ -2,13 +2,13 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import authRoutes from "@/routes/auth";
-import dataSourceRoutes from "@/routes/datasource";
-import widgetRoutes from "@/routes/widget";
-import dashboardRoutes from "@/routes/dashboard";
-import uploadsRoutes from "@/routes/uploads";
+import authRoutes from "@routes/auth";
+import dataSourceRoutes from "@routes/datasource";
+import widgetRoutes from "@routes/widget";
+import dashboardRoutes from "@routes/dashboard";
+import uploadsRoutes from "@routes/uploads";
 import type { Request, Response, NextFunction } from "express";
-import { initPermissionsAndRoles } from "./data/initPermissions";
+import { initPermissionsAndRoles } from "@data/initPermissions";
 
 dotenv.config();
 

@@ -1,4 +1,4 @@
-import { IUser } from "@/types/authType";
+import { IUser } from "@type/authType";
 import mongoose from "mongoose";
 
 const { Schema } = mongoose;

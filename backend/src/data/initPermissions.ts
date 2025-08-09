@@ -1,6 +1,6 @@
-import User from "@/models/User";
-import Permission from "../models/Permission";
-import Role from "../models/Role";
+import User from "@models/User";
+import Permission from "@models/Permission";
+import Role from "@models/Role";
 import bcrypt from "bcryptjs";
 
 const permissions = [

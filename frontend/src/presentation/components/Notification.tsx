@@ -1,7 +1,7 @@
-import type { NotificationProps } from "@/core/types/notification-types";
+import type { NotificationProps } from "@type/notification-types";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef } from "react";
-import Button from "./forms/Button";
+import Button from "@components/forms/Button";
 
 export type NotificationType =
   | "success"

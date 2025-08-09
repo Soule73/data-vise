@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { requirePermission } from "../middleware/requirePermission";
-import { requireAuth } from "../middleware/auth";
-import dataSourceController from "../controllers/dataSourceController";
-import uploadFileService from "@/services/upload_file_service";
+import { requirePermission } from "@middleware/requirePermission";
+import { requireAuth } from "@middleware/auth";
+import dataSourceController from "@controllers/dataSourceController";
+import uploadFileService from "@services/upload_file_service";
 
 const router = Router();
 

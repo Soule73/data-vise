@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { MultiBucketConfig, BucketConfig } from '@/core/types/metric-bucket-types';
-import { ensureMultiBuckets } from '@/core/utils/bucketMigration';
+import type { MultiBucketConfig, BucketConfig } from '@type/metric-bucket-types';
+import { ensureMultiBuckets } from '@utils/bucketMigration';
 
 /**
  * Interface pour les configurations de widget avec support des buckets multiples

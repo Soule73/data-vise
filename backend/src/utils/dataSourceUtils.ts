@@ -2,15 +2,15 @@ import { RequestInit } from "node-fetch";
 import {
   AuthConfig, AuthType, CacheParams,
   DetectParams, FetchOptions, HttpMethod, IDataSource
-} from "@/types/sourceType";
-import DataSource from "@/models/DataSource";
-import { toApiError } from "./api";
-import { getSourceCacheKey, sourceCache } from "./sourceCache";
-import Dashboard from "@/models/Dashboard";
-import { DashboardLayoutItem } from "@/types/dashboardType";
-import Widget from "@/models/Widget";
-import { fetchRemoteJson } from "./jsonUtils";
-import { fetchRemoteCsv, readCsvFile } from "./cvsUtils";
+} from "@type/sourceType";
+import DataSource from "@models/DataSource";
+import { toApiError } from "@utils/api";
+import { getSourceCacheKey, sourceCache } from "@utils/sourceCache";
+import Dashboard from "@models/Dashboard";
+import { DashboardLayoutItem } from "@type/dashboardType";
+import Widget from "@models/Widget";
+import { fetchRemoteJson } from "@utils/jsonUtils";
+import { fetchRemoteCsv, readCsvFile } from "@utils/cvsUtils";
 
 // Map pour suivre les chargements en cours (anti-stampede)
 const inflightLoads = new Map<string, Promise<any[]>>();

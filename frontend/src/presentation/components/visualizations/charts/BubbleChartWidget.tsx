@@ -1,9 +1,9 @@
 import { Bubble } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
-import InvalideConfigWidget from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import { useBubbleChartLogic } from "@/core/hooks/visualizations/optimized";
-import type { BubbleChartConfig } from "@/core/types/visualization";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import { useBubbleChartLogic } from "@hooks/visualizations/charts/optimized";
+import type { BubbleChartWidgetProps } from "@type/widget-types";
 
 export default function BubbleChartWidget({
   data,
@@ -11,12 +11,7 @@ export default function BubbleChartWidget({
   // @ts-expect-error : Unused variable in edit mode
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editMode,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>[];
-  config: BubbleChartConfig;
-  editMode?: boolean;
-}) {
+}: BubbleChartWidgetProps) {
   const { chartData, options, validDatasets } = useBubbleChartLogic(
     data,
     config

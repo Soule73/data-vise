@@ -1,15 +1,15 @@
-import ColorField from "@/presentation/components/forms/ColorField";
-import InputField from "@/presentation/components/forms/InputField";
-import CheckboxField from "@/presentation/components/forms/CheckboxField";
-import SelectField from "@/presentation/components/SelectField";
+import ColorField from "@components/forms/ColorField";
+import InputField from "@components/forms/InputField";
+import CheckboxField from "@components/forms/CheckboxField";
+import SelectField from "@components/SelectField";
 import {
   WIDGETS,
   WIDGET_CONFIG_FIELDS,
-} from "../../../data/adapters/visualizations";
-import Button from "../forms/Button";
+} from "@adapters/visualizations";
+import Button from "@components/forms/Button";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import * as HeroIcons from "@heroicons/react/24/outline";
-import type { WidgetParamsConfigSectionProps } from "@/core/types/widget-types";
+import type { WidgetParamsConfigSectionProps } from "@type/widget-types";
 
 export default function WidgetParamsConfigSection({
   type,

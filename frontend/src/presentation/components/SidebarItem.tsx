@@ -1,4 +1,4 @@
-import type { SidebarItemProps } from '@/core/types/navigation-types';
+import type { SidebarItemProps } from '@type/navigation-types';
 import { NavLink } from 'react-router-dom';
 
 export default function SidebarItem({ to, children, icon }: SidebarItemProps) {
@@ -8,7 +8,7 @@ export default function SidebarItem({ to, children, icon }: SidebarItemProps) {
       className={({ isActive }) =>
         `flex items-center gap-2 px-3 py-2 rounded transition font-medium text-sm
         ${isActive ? 'bg-indigo-900/15 text-indigo-900 dark:text-white font-bold dark:bg-indigo-800'
-              : 'hover:bg-primary-light/60 dark:text-gray-200'}`
+          : 'hover:bg-primary-light/60 dark:text-gray-200'}`
       }
       end
     >
