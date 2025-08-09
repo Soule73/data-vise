@@ -1,4 +1,4 @@
-import { useLineChartLogic } from "@/core/hooks/visualizations/useLineChartVM";
+import { useLineChartLogic } from "@/core/hooks/visualizations/optimized";
 import { PresentationChartLineIcon } from "@heroicons/react/24/outline";
 import {
   Chart as ChartJS,
@@ -30,13 +30,18 @@ ChartJS.register(
 export default function LineChartWidget({
   data,
   config,
-  //@ts-ignore
+  // @ts-expect-error : Unused variable in edit mode
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editMode,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>[];
   config: LineChartConfig;
   editMode?: boolean;
 }) {
+  const { chartData, options, showNativeValues, valueLabelsPlugin } =
+    useLineChartLogic(data, config);
+
   if (
     !data ||
     !config.metrics ||
@@ -56,8 +61,7 @@ export default function LineChartWidget({
       />
     );
   }
-  const { chartData, options, showNativeValues, valueLabelsPlugin } =
-    useLineChartLogic(data, config);
+
   return (
     <div className=" bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
       <Line

@@ -1,5 +1,5 @@
 import "@/core/chartjs-register";
-import { usePieChartLogic } from "@/core/hooks/visualizations/usePieChartVM";
+import { usePieChartLogic } from "@/core/hooks/visualizations/optimized";
 import { Pie } from "react-chartjs-2";
 import { ChartPieIcon } from "@heroicons/react/24/outline";
 import { InvalideConfigWidget } from "./InvalideConfigWidget";
@@ -9,13 +9,18 @@ import type { PieChartConfig } from "@/core/types/visualization";
 export default function PieChartWidget({
   data,
   config,
-  //@ts-ignore
+  // @ts-expect-error : Unused variable in edit mode
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editMode,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>[];
   config: PieChartConfig;
   editMode?: boolean;
 }) {
+  const { chartData, options, showNativeValues, valueLabelsPlugin } =
+    usePieChartLogic(data, config);
+
   if (
     !data ||
     !config.metrics ||
@@ -35,8 +40,6 @@ export default function PieChartWidget({
       />
     );
   }
-  const { chartData, options, showNativeValues, valueLabelsPlugin } =
-    usePieChartLogic(data, config);
 
   return (
     <div className="shadow bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">

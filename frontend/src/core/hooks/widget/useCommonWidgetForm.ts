@@ -108,11 +108,11 @@ export function useCommonWidgetForm(
 
     // --- Handlers génériques SIMPLIFIÉS ---
     function handleConfigChange(field: string, value: unknown) {
-        console.log(`[DEBUG] handleConfigChange called with field: "${field}"`);
+        // console.log(`[DEBUG] handleConfigChange called with field: "${field}"`);
 
         setConfig((currentConfig: WidgetConfig & Record<string, unknown>) => {
             const newConfig = { ...currentConfig, [field]: value };
-            console.log(`[DEBUG] Setting new config for field "${field}":`, newConfig);
+            // console.log(`[DEBUG] Setting new config for field "${field}":`, newConfig);
             return newConfig;
         });
         // Plus de synchronisation avec le store - tout est maintenant dans config

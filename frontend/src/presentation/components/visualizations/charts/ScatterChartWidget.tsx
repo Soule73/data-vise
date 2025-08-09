@@ -1,4 +1,4 @@
-import { useScatterChartLogic } from "@/core/hooks/visualizations/useScatterChartVM";
+import { useScatterChartLogic } from "@/core/hooks/visualizations/optimized";
 import {
   Chart as ChartJS,
   ScatterController,
@@ -26,13 +26,17 @@ ChartJS.register(
 export default function ScatterChartWidget({
   data,
   config,
-  //@ts-ignore
+  // @ts-expect-error : Unused variable in edit mode
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editMode,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>[];
   config: ScatterChartConfig;
   editMode?: boolean;
 }) {
+  const { chartData, options } = useScatterChartLogic(data, config);
+
   if (
     !data ||
     !config.metrics ||
@@ -50,7 +54,7 @@ export default function ScatterChartWidget({
       />
     );
   }
-  const { chartData, options } = useScatterChartLogic(data, config);
+
   return (
     <div className="shadow bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
       <Scatter
