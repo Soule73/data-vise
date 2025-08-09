@@ -18,23 +18,22 @@ export function useRadarChartLogic(
         chartType: "radar",
         data,
         config,
-        customDatasetCreator: (metric, idx, values) => {
-            const style = config.metricStyles?.[idx] || {};
-
+        customDatasetCreator: (metric, idx, values, _labels, widgetParams, style) => {
             return {
                 type: 'radar' as const,
                 label: metric.label || `${metric.agg}(${metric.field})`,
                 data: values,
                 backgroundColor: style.color ?
-                    `${style.color}40` : // Transparence pour le radar
+                    `${style.color}40` :
                     `hsl(${(idx * 60) % 360}, 70%, 60%, 0.25)`,
                 borderColor: style.borderColor || style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-                borderWidth: style.borderWidth ?? 2,
-                pointStyle: style.pointStyle || 'circle',
+                borderWidth: style.borderWidth ?? widgetParams.borderWidth ?? 2,
+                pointStyle: style.pointStyle || widgetParams.pointStyle || 'circle',
                 pointRadius: 4,
                 pointHoverRadius: 6,
                 fill: style.fill !== false,
                 tension: 0.1,
+                opacity: style.opacity || 0.7,
             };
         },
         customOptionsCreator: (params) => ({

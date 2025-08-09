@@ -17,6 +17,18 @@ export function useBarChartLogic(
         chartType: "bar",
         data,
         config,
+        customDatasetCreator: (metric, idx, values, _labels, widgetParams, style) => {
+            return {
+                label: metric.label || `${metric.agg}(${metric.field})`,
+                data: values,
+                backgroundColor: style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
+                borderColor: style.borderColor || style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
+                borderWidth: style.borderWidth ?? widgetParams.borderWidth ?? 1,
+                barThickness: style.barThickness || widgetParams.barThickness,
+                borderRadius: style.borderRadius || widgetParams.borderRadius || 0,
+                borderSkipped: false,
+            };
+        },
         customOptionsCreator: (params) => ({
             scales: {
                 x: {

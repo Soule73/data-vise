@@ -26,7 +26,7 @@ export interface UseChartLogicOptions {
     chartType: ChartType;
     data: Record<string, any>[];
     config: BaseChartConfig;
-    customDatasetCreator?: (metric: MetricConfig, idx: number, values: number[], labels: string[]) => any;
+    customDatasetCreator?: (metric: MetricConfig, idx: number, values: number[], labels: string[], widgetParams: any, metricStyle: any) => any;
     customOptionsCreator?: (params: any) => Partial<ChartOptions>;
 }
 
@@ -67,7 +67,55 @@ export function useChartLogic({
     );
 
     // Paramètres communs mémorisés
-    const widgetParams = useMemo(() => config.widgetParams ?? {}, [config.widgetParams]);
+    // Fusion des paramètres avec les valeurs par défaut de l'adaptateur
+    const widgetParams = useMemo(() => ({
+        // Paramètres par défaut COMMON_WIDGET_PARAMS de l'adaptateur
+        title: "",
+        legendPosition: "top",
+        xLabel: "",
+        yLabel: "",
+        labelFormat: "{label}: {value} ({percent}%)",
+        tooltipFormat: "{label}: {value}",
+        titleAlign: "center",
+        labelFontSize: 12,
+        labelColor: "#000000",
+        legend: true,
+        showGrid: true,
+        showValues: false,
+
+        // Paramètres spécifiques par type de widget selon l'adaptateur
+        stacked: false,
+        horizontal: false,
+        cutout: "0%",
+        showPoints: true,
+        tension: 0,
+        fill: false,
+        borderWidth: 1,
+        borderColor: "#000000",
+        barThickness: undefined,
+        borderRadius: 0,
+        borderDash: "",
+        stepped: false,
+        pointStyle: "circle",
+        colors: [
+            "#6366f1", "#f59e42", "#10b981", "#ef4444", "#fbbf24",
+            "#3b82f6", "#a21caf", "#14b8a6", "#eab308", "#f472b6"
+        ],
+
+        // Paramètres pour widgets spécialisés
+        pageSize: 10,
+        columns: 2,
+        showTrend: true,
+        valueColor: "#2563eb",
+        iconColor: "#6366f1",
+        descriptionColor: "#6b7280",
+        showIcon: true,
+        icon: "ChartBarIcon",
+        description: "",
+
+        // Fusionner avec les paramètres réels du config (priorité aux valeurs utilisateur)
+        ...config.widgetParams,
+    }), [config.widgetParams]);
 
     // Gestion des couleurs communes
     const getDatasetColor = useCallback((idx: number, style?: any) => {
@@ -105,7 +153,7 @@ export function useChartLogic({
                 const style = styles[idx] || {};
 
                 if (customDatasetCreator) {
-                    return customDatasetCreator(metric, idx, values, labels);
+                    return customDatasetCreator(metric, idx, values, labels, widgetParams, style);
                 }
 
                 // Dataset par défaut
@@ -126,7 +174,7 @@ export function useChartLogic({
             const style = styles[idx] || {};
 
             if (customDatasetCreator) {
-                return customDatasetCreator(metric, idx, values, labels);
+                return customDatasetCreator(metric, idx, values, labels, widgetParams, style);
             }
 
             return createDefaultDataset(chartType, {
@@ -147,6 +195,7 @@ export function useChartLogic({
         chartType,
         customDatasetCreator,
         getDatasetColor,
+        widgetParams,
     ]);
 
     // Options communes
@@ -180,7 +229,7 @@ export function useChartLogic({
         processedData,
         labels,
         getValues,
-        validDatasets: config.metrics || [], // Pour compatibilité
+        validDatasets: config.metrics || [],
     };
 }
 
@@ -192,29 +241,45 @@ function createDefaultDataset(chartType: ChartType, baseDataset: any) {
         bar: {
             barThickness: baseDataset.barThickness,
             borderRadius: baseDataset.borderRadius || 0,
+            borderSkipped: false,
         },
         line: {
-            fill: baseDataset.fill || false,
+            fill: baseDataset.fill !== undefined ? baseDataset.fill : false,
             tension: baseDataset.tension || 0,
             pointStyle: baseDataset.pointStyle || "circle",
             stepped: baseDataset.stepped || false,
-            borderDash: baseDataset.borderDash ?
-                baseDataset.borderDash.split(',').map((n: string) => parseInt(n.trim())) :
-                undefined,
+            borderDash: Array.isArray(baseDataset.borderDash) ? baseDataset.borderDash :
+                (baseDataset.borderDash ? baseDataset.borderDash.split(',').map((n: string) => parseInt(n.trim())) : []),
+            pointRadius: baseDataset.pointRadius || 3,
+            pointHoverRadius: baseDataset.pointHoverRadius || 5,
+            pointBackgroundColor: baseDataset.pointBackgroundColor || baseDataset.backgroundColor,
+            pointBorderColor: baseDataset.pointBorderColor || baseDataset.borderColor,
         },
         pie: {
-            // Géré différemment pour pie
+            hoverOffset: 4,
+            borderAlign: 'inner',
+            cutout: baseDataset.cutout || "0%",
         },
         scatter: {
             pointStyle: baseDataset.pointStyle || "circle",
             showLine: false,
+            pointRadius: baseDataset.pointRadius || 5,
+            pointHoverRadius: baseDataset.pointHoverRadius || 7,
+            opacity: baseDataset.opacity || 0.7,
         },
         bubble: {
             pointStyle: baseDataset.pointStyle || "circle",
+            pointRadius: baseDataset.pointRadius || 5,
+            pointHoverRadius: baseDataset.pointHoverRadius || 7,
+            opacity: baseDataset.opacity || 0.7,
         },
         radar: {
             fill: baseDataset.fill !== false,
             pointStyle: baseDataset.pointStyle || "circle",
+            pointRadius: baseDataset.pointRadius || 4,
+            pointHoverRadius: baseDataset.pointHoverRadius || 6,
+            tension: 0.1,
+            opacity: baseDataset.opacity || 0.7,
         },
     };
 
@@ -240,12 +305,19 @@ function createBaseOptions(chartType: ChartType, params: any, labels: string[]):
                 display: !!params.title,
                 text: params.title || "",
                 align: params.titleAlign || "center",
+                color: params.labelColor || "#000000",
+                font: {
+                    size: params.labelFontSize || 12,
+                },
             },
             tooltip: {
                 callbacks: {
                     label: (context: TooltipItem<any>) => {
                         const value = context.parsed.y ?? context.parsed;
-                        return `${context.dataset.label || ""}: ${value}`;
+                        const format = params.tooltipFormat || "{label}: {value}";
+                        return format
+                            .replace("{label}", context.dataset.label || "")
+                            .replace("{value}", value);
                     },
                 },
             },
@@ -262,21 +334,30 @@ function createBaseOptions(chartType: ChartType, params: any, labels: string[]):
                 title: {
                     display: !!params.xLabel,
                     text: params.xLabel || "",
-                },
-                ticks: {
-                    callback: (_: any, index: number) => {
-                        return formatXTicksLabel(labels[index], isTimeSeries);
+                    color: params.labelColor || "#000000",
+                    font: {
+                        size: params.labelFontSize || 12,
                     },
                 },
+                stacked: params.stacked === true,
                 grid: {
                     display: params.showGrid !== false,
                 },
+                ticks: isTimeSeries ? {
+                    callback: (_: any, index: number) => {
+                        return formatXTicksLabel(labels[index], params.labelFormat);
+                    },
+                } : {},
             },
             y: {
                 display: true,
                 title: {
                     display: !!params.yLabel,
                     text: params.yLabel || "",
+                    color: params.labelColor || "#000000",
+                    font: {
+                        size: params.labelFontSize || 12,
+                    },
                 },
                 beginAtZero: true,
                 stacked: params.stacked === true,
@@ -291,6 +372,99 @@ function createBaseOptions(chartType: ChartType, params: any, labels: string[]):
         }
     }
 
+    // Options spécifiques pour les graphiques pie
+    if (chartType === "pie") {
+        baseOptions.cutout = params.cutout || "0%";
+        baseOptions.plugins!.tooltip = {
+            callbacks: {
+                label: (context: TooltipItem<any>) => {
+                    const label = context.label || '';
+                    const value = context.parsed || 0;
+                    const total = context.dataset.data.reduce((sum: number, val: number) => sum + val, 0);
+                    const percentage = ((value / total) * 100).toFixed(1);
+                    const format = params.labelFormat || "{label}: {value} ({percent}%)";
+                    return format
+                        .replace("{label}", label)
+                        .replace("{value}", value)
+                        .replace("{percent}", percentage);
+                },
+            },
+        };
+    }
+
+    // Options spécifiques pour scatter et bubble
+    if (chartType === "scatter" || chartType === "bubble") {
+        baseOptions.scales = {
+            x: {
+                type: 'linear',
+                position: 'bottom',
+                title: {
+                    display: !!params.xLabel,
+                    text: params.xLabel || '',
+                    color: params.labelColor || "#000000",
+                    font: {
+                        size: params.labelFontSize || 12,
+                    },
+                },
+                grid: {
+                    display: params.showGrid !== false,
+                },
+            },
+            y: {
+                title: {
+                    display: !!params.yLabel,
+                    text: params.yLabel || '',
+                    color: params.labelColor || "#000000",
+                    font: {
+                        size: params.labelFontSize || 12,
+                    },
+                },
+                grid: {
+                    display: params.showGrid !== false,
+                },
+            },
+        };
+    }
+
+    // Options spécifiques pour radar
+    if (chartType === "radar") {
+        baseOptions.scales = {
+            r: {
+                beginAtZero: true,
+                grid: {
+                    display: params.showGrid !== false,
+                },
+                ticks: {
+                    display: params.showTicks !== false,
+                    color: params.labelColor || "#000000",
+                    font: {
+                        size: params.labelFontSize || 12,
+                    },
+                },
+            },
+        };
+        baseOptions.elements = {
+            point: {
+                radius: params.pointRadius || 3,
+            },
+            line: {
+                borderWidth: params.borderWidth || 2,
+            },
+        };
+    }
+
+    // Options pour l'affichage des points (line, scatter, bubble, radar)
+    if (["line", "scatter", "bubble", "radar"].includes(chartType)) {
+        baseOptions.elements = {
+            ...baseOptions.elements,
+            point: {
+                ...baseOptions.elements?.point,
+                radius: params.showPoints === false ? 0 : (params.pointRadius || 3),
+                hoverRadius: params.showPoints === false ? 0 : (params.pointHoverRadius || 5),
+            },
+        };
+    }
+
     return baseOptions;
 }
 
@@ -298,19 +472,42 @@ function createBaseOptions(chartType: ChartType, params: any, labels: string[]):
  * Fusionne les options personnalisées avec les options de base
  */
 function mergeOptions(baseOptions: any, customOptions: any): any {
-    // Fusion profonde simple
-    return {
-        ...baseOptions,
-        ...customOptions,
-        plugins: {
+    // Fusion profonde optimisée pour Chart.js
+    const result = { ...baseOptions };
+
+    // Fusionner les plugins
+    if (customOptions.plugins) {
+        result.plugins = {
             ...baseOptions.plugins,
             ...customOptions.plugins,
-        },
-        scales: {
-            ...baseOptions.scales,
-            ...customOptions.scales,
-        },
-    };
+        };
+    }
+
+    // Fusionner les scales de manière profonde
+    if (customOptions.scales) {
+        result.scales = { ...baseOptions.scales };
+
+        Object.keys(customOptions.scales).forEach(scaleKey => {
+            result.scales[scaleKey] = {
+                ...baseOptions.scales?.[scaleKey],
+                ...customOptions.scales[scaleKey],
+                // Fusionner les title des axes
+                title: {
+                    ...baseOptions.scales?.[scaleKey]?.title,
+                    ...customOptions.scales[scaleKey]?.title,
+                },
+            };
+        });
+    }
+
+    // Fusionner les autres propriétés
+    Object.keys(customOptions).forEach(key => {
+        if (key !== 'plugins' && key !== 'scales') {
+            result[key] = customOptions[key];
+        }
+    });
+
+    return result;
 }
 
 /**

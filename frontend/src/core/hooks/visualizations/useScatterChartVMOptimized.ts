@@ -17,37 +17,28 @@ export function useScatterChartLogic(
         chartType: "scatter",
         data,
         config,
-        customDatasetCreator: (metric, idx, values) => {
-            const style = config.metricStyles?.[idx] || {};
-
+        customDatasetCreator: (metric, idx, values, _labels, widgetParams, style) => {
             return {
                 type: 'scatter' as const,
                 label: metric.label || `${metric.agg}(${metric.field})`,
                 data: values,
                 backgroundColor: style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
                 borderColor: style.borderColor || style.color || `hsl(${(idx * 60) % 360}, 70%, 60%)`,
-                borderWidth: style.borderWidth ?? 1,
-                pointStyle: style.pointStyle || 'circle',
-                pointRadius: 5,
-                pointHoverRadius: 7,
+                borderWidth: widgetParams.borderWidth || (style.borderWidth ?? 1),
+                pointStyle: style.pointStyle || widgetParams.pointStyle || 'circle',
+                pointRadius: widgetParams.showPoints !== false ? 5 : 0,
+                pointHoverRadius: widgetParams.showPoints !== false ? 7 : 0,
                 showLine: false,
+                opacity: style.opacity || 0.7,
             };
         },
-        customOptionsCreator: (params) => ({
+        customOptionsCreator: () => ({
             scales: {
                 x: {
                     type: 'linear',
                     position: 'bottom',
-                    title: {
-                        display: !!params.xLabel,
-                        text: params.xLabel || '',
-                    },
                 },
                 y: {
-                    title: {
-                        display: !!params.yLabel,
-                        text: params.yLabel || '',
-                    },
                 },
             },
         }),

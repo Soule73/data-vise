@@ -17,12 +17,14 @@ export function usePieChartLogic(
         chartType: "pie",
         data,
         config,
-        customDatasetCreator: (metric, idx, values, labels) => {
-            const style = config.metricStyles?.[idx] || {};
+        customDatasetCreator: (metric, _idx, values, labels, widgetParams, style) => {
+            const defaultColors = widgetParams.colors || [
+                "#6366f1", "#f59e42", "#10b981", "#ef4444", "#fbbf24",
+                "#3b82f6", "#a21caf", "#14b8a6", "#eab308", "#f472b6"
+            ];
 
-            // Pour les graphiques en secteurs, chaque segment a sa propre couleur
             const colors = labels.map((_, index) =>
-                `hsl(${(index * 40) % 360}, 70%, 60%)`
+                style.color || defaultColors[index % defaultColors.length] || `hsl(${(index * 40) % 360}, 70%, 60%)`
             );
 
             return {
@@ -30,9 +32,12 @@ export function usePieChartLogic(
                 label: metric.label || `${metric.agg}(${metric.field})`,
                 data: values,
                 backgroundColor: colors,
-                borderColor: colors.map(color => style.borderColor || color),
-                borderWidth: style.borderWidth ?? 1,
+                borderColor: colors.map(color =>
+                    widgetParams.borderColor || style.borderColor || color
+                ),
+                borderWidth: widgetParams.borderWidth || (style.borderWidth ?? 1),
                 hoverOffset: 4,
+                cutout: widgetParams.cutout || "0%",
             };
         },
         customOptionsCreator: (params) => ({
