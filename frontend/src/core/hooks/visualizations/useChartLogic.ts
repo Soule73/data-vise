@@ -5,9 +5,6 @@ import type { Chart as ChartJSInstance } from "chart.js";
 import {
     aggregate,
     getLabels,
-    getLegendPosition,
-    getTitle,
-    getTitleAlign,
     isIsoTimestamp,
     allSameDay,
     formatXTicksLabel,
@@ -237,12 +234,12 @@ function createBaseOptions(chartType: ChartType, params: any, labels: string[]):
         plugins: {
             legend: {
                 display: params.legend !== false,
-                position: getLegendPosition(params.legendPosition),
+                position: params.legendPosition || "top",
             },
             title: {
                 display: !!params.title,
-                text: getTitle(params.title),
-                align: getTitleAlign(params.titleAlign),
+                text: params.title || "",
+                align: params.titleAlign || "center",
             },
             tooltip: {
                 callbacks: {
