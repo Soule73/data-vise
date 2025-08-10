@@ -13,7 +13,7 @@ import clsx from "clsx";
 
 const SelectField = forwardRef<HTMLInputElement, SelectFieldProps>(
   (
-    { label, options, error, id, className, value, onChange, ...props },
+    { label, options, error, textSize, id, className, value, onChange, ...props },
     ref
   ) => {
     const [query, setQuery] = useState("");
@@ -30,11 +30,24 @@ const SelectField = forwardRef<HTMLInputElement, SelectFieldProps>(
       [query, options]
     );
 
+    const inputTextSize = useMemo(() => {
+      switch (textSize) {
+        case "sm":
+          return "text-xs";
+        case "md":
+          return "text-sm";
+        case "lg":
+          return "text-base";
+        default:
+          return "text-sm";
+      }
+    }, [textSize]);
+
     return (
       <div>
         <label
           htmlFor={id}
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          className={`block mb-2 font-medium text-gray-900 dark:text-white ${inputTextSize}`}
         >
           {label}
         </label>
@@ -50,7 +63,7 @@ const SelectField = forwardRef<HTMLInputElement, SelectFieldProps>(
           <div className="relative flex items-center">
             <ComboboxInput
               className={clsx(
-                "block w-full rounded-md bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors",
+                `block w-full rounded-md bg-white dark:bg-gray-900 px-3 py-2 ${inputTextSize} text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors `,
                 className
               )}
               displayValue={(item) => {
@@ -80,19 +93,18 @@ const SelectField = forwardRef<HTMLInputElement, SelectFieldProps>(
           <ComboboxOptions
             anchor="bottom"
             transition
-            className={clsx(
-              "w-(--input-width) z-50 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 py-1 shadow-lg max-h-60 overflow-auto",
-              "transition duration-100 ease-in data-leave:data-closed:opacity-0"
-            )}
+            className={
+              `w-(--input-width) config-scrollbar z-50 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 py-1 shadow-lg max-h-60 overflow-auto transition duration-100 ease-in data-leave:data-closed:opacity-0 ${inputTextSize} `
+            }
           >
             {filteredOptions.map((opt) => (
               <ComboboxOption
                 key={opt.value}
                 value={opt}
-                className="group flex cursor-default items-center gap-2 px-3 py-2 select-none data-focus:bg-blue-50 dark:data-focus:bg-blue-900/50 transition-colors"
+                className={`group flex cursor-default items-center gap-2 px-3 py-2 select-none data-focus:bg-blue-50 dark:data-focus:bg-blue-900/50 transition-colors ${inputTextSize}`}
               >
                 <CheckIcon className="invisible h-4 w-4 text-blue-600 dark:text-blue-400 group-data-selected:visible" />
-                <div className="text-sm text-gray-900 dark:text-gray-100">
+                <div className={`text-sm text-gray-900 dark:text-gray-100 ${inputTextSize}`}>
                   {opt.label}
                 </div>
               </ComboboxOption>

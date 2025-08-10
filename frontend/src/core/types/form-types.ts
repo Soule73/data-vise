@@ -1,12 +1,13 @@
 // ======================================================
 // 4. Form Fields & Composants UI
 // ======================================================
-
+export type TextSize = 'sm' | 'md' | 'lg';
 export interface SelectFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   options: Option[];
   label?: string;
   error?: string;
+  textSize?: TextSize;
 }
 
 export interface Option {
@@ -18,6 +19,7 @@ export interface InputFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  textSize?: TextSize;
 }
 
 export interface CheckboxFieldProps {
