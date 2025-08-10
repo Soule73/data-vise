@@ -7,7 +7,7 @@ import {
     allSameDay,
     formatXTicksLabel,
 } from "@utils/chartUtils";
-import type { ChartType } from "../types/widget-types";
+import type { ChartType } from "@type/widget-types";
 
 /**
  * Crée un dataset par défaut selon le type de chart
@@ -102,7 +102,8 @@ function createBaseOptions(chartType: ChartType, params: any, labels: string[]):
 
     // Options spécifiques au type
     if (chartType === "bar" || chartType === "line") {
-        const isTimeSeries = labels.length > 0 && isIsoTimestamp(labels[0]) && allSameDay(labels);
+        const isTimeSeries = labels.length > 0 && isIsoTimestamp(labels[0]);
+        const isSameDay = isTimeSeries && allSameDay(labels);
 
         baseOptions.scales = {
             x: {
@@ -121,9 +122,14 @@ function createBaseOptions(chartType: ChartType, params: any, labels: string[]):
                 },
                 ticks: isTimeSeries ? {
                     callback: (_: any, index: number) => {
-                        return formatXTicksLabel(labels[index], params.labelFormat);
+                        return formatXTicksLabel(labels[index], isSameDay);
                     },
-                } : {},
+                    maxRotation: 45,
+                    minRotation: 0,
+                } : {
+                    maxRotation: 45,
+                    minRotation: 0,
+                },
             },
             y: {
                 display: true,

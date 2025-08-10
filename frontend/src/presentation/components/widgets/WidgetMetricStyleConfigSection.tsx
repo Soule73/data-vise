@@ -1,5 +1,7 @@
 import ColorField from "@components/forms/ColorField";
 import InputField from "@components/forms/InputField";
+import Button from "@components/forms/Button";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
   WIDGETS,
   WIDGET_CONFIG_FIELDS,
@@ -109,10 +111,62 @@ export default function WidgetMetricStyleConfigSection({
           </div>
           {!collapsedMetrics[idx] && (
             <div className="grid grid-cols-1 gap-4">
-              {Object.entries(metricStyleSchema).map(([field]) => {
-                const meta = WIDGET_CONFIG_FIELDS[field] || {};
+              {Object.entries(metricStyleSchema).map(([field, metaRaw]) => {
+                const meta = (metaRaw as MetricStyleFieldSchema) || WIDGET_CONFIG_FIELDS[field] || {};
                 const label = meta.label || field;
                 const defaultValue = meta.default;
+
+                // Support pour color-array (utilisé dans pie chart)
+                if (meta.inputType === "color-array" || field === "colors") {
+                  const colorArray = (safeMetricStyles[idx]?.[field] || defaultValue || ["#2563eb"]) as string[];
+                  return (
+                    <div key={field} className="flex flex-col gap-2">
+                      <label className="text-sm font-medium text-gray-900 dark:text-white">
+                        {label}
+                      </label>
+                      <div className="flex flex-wrap items-end gap-2">
+                        {colorArray.map((color: string, colorIdx: number) => (
+                          <div key={colorIdx} className="flex items-center gap-1">
+                            <ColorField
+                              value={color || "#2563eb"}
+                              onChange={(val) => {
+                                const newArray = [...colorArray];
+                                newArray[colorIdx] = val;
+                                handleMetricStyleChange(idx, field, newArray);
+                              }}
+                              name={`metric-style-${idx}-${field}-${colorIdx}`}
+                              id={`metric-style-${idx}-${field}-${colorIdx}`}
+                            />
+                            <button
+                              type="button"
+                              className="text-xs text-red-500 hover:underline"
+                              onClick={() => {
+                                const newArray = [...colorArray];
+                                newArray.splice(colorIdx, 1);
+                                handleMetricStyleChange(idx, field, newArray.length > 0 ? newArray : ["#2563eb"]);
+                              }}
+                              title="Supprimer cette couleur"
+                            >
+                              <XMarkIcon className="w-5 h-5 inline-block" />
+                            </button>
+                          </div>
+                        ))}
+                        <Button
+                          variant="outline"
+                          type="button"
+                          className="w-max text-xs h-max text-indigo-600 border border-indigo-300 rounded px-2 py-1 hover:bg-indigo-50"
+                          onClick={() => {
+                            const newArray = [...colorArray, "#2563eb"];
+                            handleMetricStyleChange(idx, field, newArray);
+                          }}
+                        >
+                          + Couleur
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                }
+
                 if (
                   meta.inputType === "color" ||
                   field === "color" ||

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useNotificationStore } from "@store/notification";
 import { useDashboardStore } from "@store/dashboard";
@@ -84,45 +84,31 @@ export function useWidgetEditForm() {
 
   // Préparer les valeurs initiales pour le hook formulaire dès que tout est chargé
   useEffect(() => {
-    if (widget && source && columns.length > 0) {
+    if (widget && source && columns.length > 0 && realSourceData) {
       setFormReady(true);
     }
-  }, [widget, source, columns]);
+  }, [widget, source, columns, realSourceData]);
 
-  // Utilisation du hook centralisé avec initialValues (comme en création)
-  const form = useCommonWidgetForm(
-    formReady
-      ? {
-        type: (widget?.type as WidgetType) || "bar",
-        config: config,
-        title: widgetTitle,
-        sourceId: widget?.dataSourceId,
-        columns: columns,
-        dataPreview: Array.isArray(realSourceData)
-          ? (realSourceData as Record<string, unknown>[])
-          : [],
-        visibility: visibility,
-        disableAutoConfig: true,
-      }
-      : undefined
-  );
+  // Préparer les valeurs initiales une fois que tout est prêt (useMemo pour éviter la re-création)
+  const initialValues = useMemo(() => {
+    if (!formReady) return undefined;
 
-  // Synchronise le formulaire avec les données chargées (widget, config, etc.)
-  useEffect(() => {
-    if (formReady) {
-      form.setType((widget?.type as WidgetType) || "bar");
-      form.setConfig(config || {});
-      form.setTitle(widgetTitle || "");
-      form.setSourceId(widget?.dataSourceId || "");
-      form.setColumns(columns || []);
-      form.setVisibility(visibility || "private");
-      form.setWidgetTitle(widgetTitle || "");
-      // Pour la preview
-      if (realSourceData) {
-        form.setDataPreview(realSourceData);
-      }
-    }
-  }, [formReady, widget, config, widgetTitle, columns, visibility, realSourceData, form]);
+    return {
+      type: (widget?.type as WidgetType) || "bar",
+      config: config,
+      title: widgetTitle,
+      sourceId: widget?.dataSourceId,
+      columns: columns,
+      dataPreview: Array.isArray(realSourceData)
+        ? (realSourceData as Record<string, unknown>[])
+        : [],
+      visibility: visibility,
+      disableAutoConfig: true, // IMPORTANT: empêche l'auto-génération
+    };
+  }, [formReady, widget?.type, widget?.dataSourceId, config, widgetTitle, columns, realSourceData, visibility]);
+
+  // Utilisation du hook centralisé avec initialValues
+  const form = useCommonWidgetForm(initialValues);
 
   // Gestion de la sauvegarde spécifique à l'édition
   async function handleSave() {

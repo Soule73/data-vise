@@ -11,7 +11,6 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
   // <Profiler id="App" onRender={(id, phase, actualDuration) => {
-  //   console.log({ id, phase, actualDuration });
   // }}>
   <StrictMode>
     <QueryClientProvider client={queryClient}>

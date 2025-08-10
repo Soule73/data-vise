@@ -37,7 +37,8 @@ export const defaultColors = [
 export function getColors(labels: string[], config: any, idx = 0) {
   // 1. Tableau de couleurs fourni (priorité)
   const customColors =
-    config.metricStyles?.[idx]?.colors || config.widgetParams?.colors;
+    config.metricStyles?.[idx]?.colors;
+
   if (Array.isArray(customColors) && customColors.length > 0) {
     return labels.map((_, i) => customColors[i % customColors.length]);
   } else if (config.metricStyles?.[idx]?.color) {
@@ -70,61 +71,126 @@ export function getTitleAlign(config: any) {
   return config.widgetParams?.titleAlign || config.titleAlign || "center";
 }
 
-// Utilitaire : détecte si un label est un timestamp ISO
+// Utilitaire : détecte si un label est un timestamp ISO ou une date formatée
 export function isIsoTimestamp(val: any): boolean {
-  return typeof val === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(val);
+  return typeof val === "string" &&
+    (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(val) || // ISO avec heures
+      /^\d{4}-\d{2}-\d{2}$/.test(val) ||           // Date simple
+      /^\d{4}-\d{2}$/.test(val) ||                 // Année-mois
+      /^\d{4}-W\d{1,2}$/.test(val));               // Semaine
 }
 
 // Utilitaire : tous les labels sont-ils du même jour ?
 export function allSameDay(labels: string[]): boolean {
   if (!labels || labels.length === 0) return false;
-  const first = new Date(labels[0]);
-  return labels.every((l) => {
-    const d = new Date(l);
-    return (
-      d.getFullYear() === first.getFullYear() &&
-      d.getMonth() === first.getMonth() &&
-      d.getDate() === first.getDate()
-    );
-  });
+
+  // Pour les dates ISO avec heures
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(labels[0])) {
+    const first = new Date(labels[0]);
+    return labels.every((l) => {
+      const d = new Date(l);
+      return (
+        d.getFullYear() === first.getFullYear() &&
+        d.getMonth() === first.getMonth() &&
+        d.getDate() === first.getDate()
+      );
+    });
+  }
+
+  return false;
 }
 
 // Utilitaire : formate un label timestamp pour l'axe X
 export function formatXTicksLabel(raw: string, onlyTimeIfSameDay = false): string {
-  if (!isIsoTimestamp(raw)) return raw;
-  const d = new Date(raw);
-  if (isNaN(d.getTime())) return raw;
-  if (onlyTimeIfSameDay) {
-    return d.toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } else {
-    return d.toLocaleString("fr-FR", {
-      year: "2-digit",
-      month: "2-digit",
+  if (!raw || typeof raw !== 'string') return String(raw);
+
+  // Déjà formaté (format lisible français) - ne pas reformater
+  if (!/^\d{4}/.test(raw) && !raw.includes('T') && !raw.includes('Z')) {
+    return raw;
+  }
+
+  // Format ISO avec timezone (ex: 2023-01-15T14:30:00Z)
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z?$/.test(raw)) {
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return raw;
+
+    if (onlyTimeIfSameDay) {
+      return d.toLocaleTimeString("fr-FR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } else {
+      return d.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+  }
+
+  // Format date simple (ex: 2023-01-15)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleDateString("fr-FR", {
       day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
+      month: "2-digit",
     });
   }
+
+  // Format année-mois (ex: 2023-01)
+  if (/^\d{4}-\d{2}$/.test(raw)) {
+    const [year, month] = raw.split('-');
+    const d = new Date(parseInt(year), parseInt(month) - 1);
+    return d.toLocaleDateString("fr-FR", { month: "short" });
+  }
+
+  // Format semaine (ex: 2023-W1)
+  if (/^\d{4}-W\d{1,2}$/.test(raw)) {
+    const match = raw.match(/(\d{4})-W(\d{1,2})/);
+    if (match) {
+      return `S${match[2]}`;
+    }
+  }
+
+  // Format année seule (ex: 2023)
+  if (/^\d{4}$/.test(raw)) {
+    return raw;
+  }
+
+  return raw;
 }
 
 // Formate une valeur pour affichage dans un tooltip (date/datetime ou autre)
 export function formatTooltipValue(val: any): string {
-  if (isIsoTimestamp(val)) {
+  if (!val || typeof val !== 'string') return String(val);
+
+  // Format ISO avec timezone (ex: 2023-01-15T14:30:00Z)
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z?$/.test(val)) {
     const d = new Date(val);
     if (!isNaN(d.getTime())) {
-      // Affichage date+heure lisible
-      return d.toLocaleString("fr-FR", {
-        year: "2-digit",
-        month: "2-digit",
+      return d.toLocaleDateString("fr-FR", {
         day: "2-digit",
+        month: "long",
+        year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
-        second: "2-digit",
       });
     }
   }
+
+  // Format date simple (ex: 2023-01-15)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+    }
+  }
+
   return String(val);
 }

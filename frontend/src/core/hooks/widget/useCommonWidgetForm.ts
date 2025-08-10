@@ -38,8 +38,41 @@ export function useCommonWidgetForm(
     const [visibility, setVisibility] = useState<"public" | "private">(
         initialValues?.visibility || "private"
     );
-    const [widgetTitle, setWidgetTitle] = useState(title || "");
+    const [widgetTitle, setWidgetTitle] = useState(initialValues?.title || "");
     const [widgetTitleError, setWidgetTitleError] = useState("");
+
+    // Synchronisation avec les initialValues (pour le mode édition)
+    const hasInitialized = useRef(false);
+    useEffect(() => {
+        if (initialValues && Object.keys(initialValues).length > 0 && !hasInitialized.current) {
+
+            if (initialValues.type && initialValues.type !== type) {
+                setType(initialValues.type);
+            }
+            if (initialValues.sourceId && initialValues.sourceId !== sourceId) {
+                setSourceId(initialValues.sourceId);
+            }
+            if (initialValues.columns && initialValues.columns.length > 0) {
+                setColumns(initialValues.columns);
+            }
+            if (initialValues.dataPreview && initialValues.dataPreview.length > 0) {
+                setDataPreview(initialValues.dataPreview);
+            }
+            if (initialValues.config && Object.keys(initialValues.config).length > 0) {
+                setConfig(initialValues.config);
+            }
+            if (initialValues.title && initialValues.title !== title) {
+                setTitle(initialValues.title);
+                setWidgetTitle(initialValues.title);
+            }
+            if (initialValues.visibility && initialValues.visibility !== visibility) {
+                setVisibility(initialValues.visibility);
+            }
+
+            hasInitialized.current = true;
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialValues?.type, initialValues?.sourceId, initialValues?.title, initialValues?.visibility]);
 
     // Error handling
     const [error, setError] = useState("");
@@ -59,7 +92,12 @@ export function useCommonWidgetForm(
     // Auto config setup when columns change - VERSION SIMPLIFIÉE
     const widgetConfig = WIDGET_DATA_CONFIG[type];
     useEffect(() => {
-        if (!initialValues?.disableAutoConfig && columns.length > 0 && widgetConfig) {
+        // NE PAS exécuter si l'auto-config est désactivée (mode édition)
+        if (initialValues?.disableAutoConfig) {
+            return;
+        }
+
+        if (columns.length > 0 && widgetConfig) {
             // Génération de métriques par défaut si aucune n'existe
             if (!config.metrics || config.metrics.length === 0) {
                 const newConfig = generateDefaultWidgetConfig(type, columns);
@@ -111,11 +149,9 @@ export function useCommonWidgetForm(
 
     // --- Handlers génériques SIMPLIFIÉS ---
     function handleConfigChange(field: string, value: unknown) {
-        // console.log(`[DEBUG] handleConfigChange called with field: "${field}"`);
 
         setConfig((currentConfig: WidgetConfig & Record<string, unknown>) => {
             const newConfig = { ...currentConfig, [field]: value };
-            // console.log(`[DEBUG] Setting new config for field "${field}":`, newConfig);
             return newConfig;
         });
         // Plus de synchronisation avec le store - tout est maintenant dans config

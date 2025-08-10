@@ -314,11 +314,10 @@ export default function WidgetDataConfigSection({
                       <MetricLabelInput
                         value={metric.label || ""}
                         onChange={(newValue) => {
-                          console.log(`[DEBUG] MetricLabelInput onChange for metric ${idx}: "${metric.label}" -> "${newValue}"`);
 
                           const newMetrics = [...config.metrics];
                           newMetrics[idx] = { ...newMetrics[idx], label: newValue };
-                          console.log(`[DEBUG] New metrics:`, newMetrics);
+
 
                           handleConfigChange("metrics", newMetrics);
                         }}

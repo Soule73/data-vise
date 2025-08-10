@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { DEFAULT_CHART_COLORS } from "@adapters/visualizations";
 import type { ChartType } from "@type/widget-types";
 
-/**
- * Palette de couleurs par défaut pour les graphiques
- */
-export const DEFAULT_CHART_COLORS = [
-    "#6366f1", "#f59e42", "#10b981", "#ef4444", "#fbbf24",
-    "#3b82f6", "#a21caf", "#14b8a6", "#eab308", "#f472b6"
-];
 
 /**
  * Génère une couleur HSL basée sur l'index
@@ -54,11 +48,7 @@ export function getDatasetColor(
 export function generateColorsForLabels(
     labels: string[],
     customColors?: string[],
-    baseStyle?: any
 ): string[] {
-    if (baseStyle?.color) {
-        return labels.map(() => baseStyle.color);
-    }
 
     const palette = customColors || DEFAULT_CHART_COLORS;
     return labels.map((_, index) =>

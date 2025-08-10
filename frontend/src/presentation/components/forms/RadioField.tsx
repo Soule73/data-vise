@@ -1,4 +1,4 @@
-import type { RadioFieldProps } from "@/core/types/ui";
+import type { RadioFieldProps } from "@type/ui";
 import React from "react";
 
 

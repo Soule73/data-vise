@@ -13,9 +13,108 @@ export function getChartLabels(
     bucketField?: string
 ): string[] {
     if (processedData.labels.length > 0) {
+        // Utiliser les labels formatés du processeur si disponibles
         return processedData.labels;
     }
-    return getLabels(data, bucketField || '');
+
+    // Fallback vers les labels bruts et les formater
+    const rawLabels = getLabels(data, bucketField || '');
+    return formatLabelsForDisplay(rawLabels);
+}
+
+/**
+ * Formate les labels pour un meilleur affichage selon leur type
+ */
+export function formatLabelsForDisplay(labels: string[]): string[] {
+    return labels.map(label => {
+        // Détecter et formater les dates ISO avec timezone
+        if (typeof label === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z?$/.test(label)) {
+            const date = new Date(label);
+            if (!isNaN(date.getTime())) {
+                return formatDateLabel(date, detectDateInterval(labels));
+            }
+        }
+
+        // Détecter et formater les dates simples (YYYY-MM-DD)
+        if (typeof label === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(label)) {
+            const date = new Date(label);
+            if (!isNaN(date.getTime())) {
+                return date.toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+        }
+
+        // Détecter et formater les dates mois (YYYY-MM)
+        if (typeof label === 'string' && /^\d{4}-\d{2}$/.test(label)) {
+            const [year, month] = label.split('-');
+            const date = new Date(parseInt(year), parseInt(month) - 1);
+            return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' });
+        }
+
+        // Détecter et formater les semaines (YYYY-WXX)
+        if (typeof label === 'string' && /^\d{4}-W\d{1,2}$/.test(label)) {
+            const match = label.match(/(\d{4})-W(\d{1,2})/);
+            if (match) {
+                return `Semaine ${match[2]}, ${match[1]}`;
+            }
+        }
+
+        return label;
+    });
+}
+
+/**
+ * Détecte l'intervalle de temps basé sur les patterns des labels
+ */
+function detectDateInterval(labels: string[]): 'year' | 'month' | 'week' | 'day' | 'hour' | 'minute' {
+    if (labels.length === 0) return 'day';
+
+    const firstLabel = labels[0];
+
+    // Détecter par pattern
+    if (/^\d{4}$/.test(firstLabel)) return 'year';
+    if (/^\d{4}-\d{2}$/.test(firstLabel)) return 'month';
+    if (/^\d{4}-W\d{1,2}$/.test(firstLabel)) return 'week';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(firstLabel)) return 'day';
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:00:00/.test(firstLabel)) return 'hour';
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00/.test(firstLabel)) return 'minute';
+
+    return 'day';
+}
+
+/**
+ * Formate un label de date selon l'intervalle détecté
+ */
+function formatDateLabel(date: Date, interval: 'year' | 'month' | 'week' | 'day' | 'hour' | 'minute'): string {
+    switch (interval) {
+        case 'year':
+            return date.getFullYear().toString();
+        case 'month':
+            return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' });
+        case 'day':
+            return date.toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        case 'hour':
+            return date.toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }) + `, ${date.getHours()}h`;
+        case 'minute':
+            return date.toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }) + `, ${date.getHours()}h${String(date.getMinutes()).padStart(2, '0')}`;
+        default:
+            return date.toLocaleDateString('fr-FR');
+    }
 }
 
 /**

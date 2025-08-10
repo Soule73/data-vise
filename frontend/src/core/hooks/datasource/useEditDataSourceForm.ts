@@ -9,8 +9,8 @@ import { useNotificationStore } from "@store/notification";
 import { useDashboardStore } from "@store/dashboard";
 import { ROUTES } from "@constants/routes";
 import { useSourceFormBase } from "@hooks/datasource/useSourceFormBase";
-import type { SourceFormState } from "@/core/types/data-source";
-import type { ApiError } from "@/core/types/api";
+import type { SourceFormState } from "@type/data-source";
+import type { ApiError } from "@type/api";
 
 export function useEditDataSourceForm() {
   const { id } = useParams<{ id: string }>();

@@ -1,6 +1,6 @@
 import { Field, Label } from "@headlessui/react";
 import { forwardRef } from "react";
-import type { FileFieldProps } from "@/core/types/ui";
+import type { FileFieldProps } from "@type/ui";
 
 
 const FileField = forwardRef<HTMLInputElement, FileFieldProps>(

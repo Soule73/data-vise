@@ -6,7 +6,7 @@ import { useUserStore } from "@store/user";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@constants/routes";
-import type { ApiError } from "@/core/types/api";
+import type { ApiError } from "@type/api";
 
 export function useRegisterForm() {
   const setUser = useUserStore((s) => s.setUser);

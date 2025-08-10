@@ -4,8 +4,8 @@ import { useNotificationStore } from "@store/notification";
 import { useCreateSourceMutation } from "@repositories/sources";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSourceFormBase } from "@hooks/datasource/useSourceFormBase";
-import type { ApiError } from "@/core/types/api";
-import type { SourceFormState } from "@/core/types/data-source";
+import type { ApiError } from "@type/api";
+import type { SourceFormState } from "@type/data-source";
 
 export function useCreateDataSourceForm() {
   const queryClient = useQueryClient();

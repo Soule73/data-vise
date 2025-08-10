@@ -1,4 +1,4 @@
-import type { UserDeleteModalProps } from "@/core/types/ui";
+import type { UserDeleteModalProps } from "@type/ui";
 import AlertModal from "@components/AlertModal";
 
 

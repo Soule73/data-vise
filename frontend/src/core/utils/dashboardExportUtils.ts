@@ -11,10 +11,6 @@ export async function exportDashboardToPDF({
   filename = "dashboard.pdf",
   orientation = "landscape",
 } = {}) {
-  // Log pour debug : vérifier que la fonction est bien appelée
-  console.log(
-    "[exportDashboardToPDF] Début export PDF (html-to-image, mode grille)"
-  );
   const grid = document.querySelector(gridSelector);
   if (!grid) {
     alert("Grille du dashboard introuvable");
@@ -85,7 +81,7 @@ export async function exportDashboardToPDF({
     const imgHeight = img.height * ratio;
     pdf.addImage(dataUrl, "PNG", 20, 20, imgWidth, imgHeight);
     pdf.save(filename);
-    console.log(`[exportDashboardToPDF] PDF généré (layout fidèle à l'écran).`);
+
   } catch (err) {
     alert("Erreur lors de la génération du PDF.");
     console.error("Erreur lors de la sauvegarde du PDF:", err);

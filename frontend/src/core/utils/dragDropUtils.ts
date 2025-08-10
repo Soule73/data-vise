@@ -1,5 +1,5 @@
 import React from "react";
-import type { DragDropHandlers } from "../types/ui";
+import type { DragDropHandlers } from "@type/ui";
 
 
 

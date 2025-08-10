@@ -27,6 +27,14 @@ import {
 } from "@heroicons/react/24/outline";
 import * as HeroIcons from "@heroicons/react/24/outline";
 
+/**
+ * Palette de couleurs par défaut pour les graphiques
+ */
+export const DEFAULT_CHART_COLORS = [
+  "#6366f1", "#f59e42", "#10b981", "#ef4444", "#fbbf24",
+  "#3b82f6", "#a21caf", "#14b8a6", "#eab308", "#f472b6"
+];
+
 // Styles communs pour les métriques (charts)
 const COMMON_METRIC_STYLES = {
   color: { default: "#2563eb", inputType: "color", label: "Couleur" },
@@ -229,37 +237,26 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     configSchema: {
       ...PieChartConfig,
       metricStyles: {
-      },
-      widgetParams: {
-        // On retire xLabel et yLabel du pie chart
-        ...Object.fromEntries(Object.entries(COMMON_WIDGET_PARAMS).filter(([k]) => k !== "xLabel" && k !== "yLabel")),
-        cutout: { default: "0%", inputType: "text", label: "Trous (doughnut)" },
-        borderWidth: {
-          default: 1,
-          inputType: "number",
-          label: "Épaisseur bordure",
+        colors: {
+          default: DEFAULT_CHART_COLORS,
+          inputType: "color-array",
+          label: "Couleurs des parts (pie)",
         },
         borderColor: {
           default: "#000000",
           inputType: "color",
           label: "Couleur de bordure",
         },
-        colors: {
-          default: [
-            "#6366f1",
-            "#f59e42",
-            "#10b981",
-            "#ef4444",
-            "#fbbf24",
-            "#3b82f6",
-            "#a21caf",
-            "#14b8a6",
-            "#eab308",
-            "#f472b6",
-          ],
-          inputType: "color-array",
-          label: "Couleurs des parts (pie)",
+        borderWidth: {
+          default: 1,
+          inputType: "number",
+          label: "Épaisseur bordure",
         },
+      },
+      widgetParams: {
+        // On retire xLabel et yLabel du pie chart et showGrid
+        ...Object.fromEntries(Object.entries(COMMON_WIDGET_PARAMS).filter(([k]) => k !== "xLabel" && k !== "yLabel" && k !== "showGrid")),
+        cutout: { default: "0%", inputType: "text", label: "Trous (doughnut)" },
       },
     },
   },

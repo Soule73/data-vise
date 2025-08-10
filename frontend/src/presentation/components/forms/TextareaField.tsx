@@ -1,4 +1,4 @@
-import type { TextareaFieldProps } from "@/core/types/ui";
+import type { TextareaFieldProps } from "@type/ui";
 import { Field, Label } from "@headlessui/react";
 import { forwardRef } from "react";
 

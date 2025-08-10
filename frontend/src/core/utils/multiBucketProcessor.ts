@@ -176,7 +176,27 @@ export class MultiBucketDataProcessor {
         const grouped = new Map<string, Record<string, any>[]>();
 
         data.forEach(row => {
-            const dateValue = new Date(row[bucket.field]);
+            const rawDateValue = row[bucket.field];
+
+            // Vérification et validation de la date
+            if (!rawDateValue) {
+                return; // Ignorer les valeurs nulles/undefined
+            }
+
+            // Ignorer les valeurs qui ne peuvent pas être converties en date
+            if (typeof rawDateValue === 'object' && rawDateValue !== null && !(rawDateValue instanceof Date)) {
+                console.warn(`Type de données non supporté pour date_histogram: ${typeof rawDateValue}, valeur: ${JSON.stringify(rawDateValue)}, ignorée`);
+                return;
+            }
+
+            const dateValue = new Date(rawDateValue);
+
+            // Vérifier si la date est valide
+            if (isNaN(dateValue.getTime())) {
+                console.warn(`Date invalide détectée: ${rawDateValue}, ignorée`);
+                return; // Ignorer les dates invalides
+            }
+
             let bucketKey: string;
 
             // Grouper selon l'intervalle de date
@@ -187,7 +207,24 @@ export class MultiBucketDataProcessor {
                 case 'month':
                     bucketKey = `${dateValue.getFullYear()}-${String(dateValue.getMonth() + 1).padStart(2, '0')}`;
                     break;
+                case 'week': {
+                    // Calculer le début de la semaine (lundi)
+                    const weekStart = new Date(dateValue);
+                    const dayOfWeek = weekStart.getDay();
+                    const diff = weekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+                    weekStart.setDate(diff);
+                    bucketKey = `${weekStart.getFullYear()}-W${this.getWeekNumber(weekStart)}`;
+                    break;
+                }
                 case 'day':
+                    bucketKey = dateValue.toISOString().split('T')[0];
+                    break;
+                case 'hour':
+                    bucketKey = `${dateValue.toISOString().split('T')[0]}T${String(dateValue.getUTCHours()).padStart(2, '0')}:00:00Z`;
+                    break;
+                case 'minute':
+                    bucketKey = `${dateValue.toISOString().split('T')[0]}T${String(dateValue.getUTCHours()).padStart(2, '0')}:${String(dateValue.getUTCMinutes()).padStart(2, '0')}:00Z`;
+                    break;
                 default:
                     bucketKey = dateValue.toISOString().split('T')[0];
                     break;
@@ -206,6 +243,7 @@ export class MultiBucketDataProcessor {
 
         const bucketData = sortedEntries.map(([key, rows]) => ({
             key,
+            key_as_string: this.formatDateLabel(key, bucket.dateInterval),
             doc_count: rows.length,
             data: rows
         }));
@@ -307,7 +345,90 @@ export class MultiBucketDataProcessor {
         // Pour l'instant, utiliser les labels du premier niveau
         // TODO: Implémenter une logique plus sophistiquée pour les buckets imbriqués
         const firstLevel = hierarchy[0];
-        return firstLevel.buckets.map(bucket => bucket.key);
+        return firstLevel.buckets.map(bucket => {
+            // Utiliser le label formaté s'il est disponible, sinon utiliser la clé
+            return bucket.key_as_string || bucket.key;
+        });
+    }
+
+    /**
+     * Calcule le numéro de semaine ISO 8601 pour une date donnée
+     */
+    private getWeekNumber(date: Date): number {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+    }
+
+    /**
+     * Formate un label de date selon l'intervalle pour un affichage plus lisible
+     */
+    private formatDateLabel(key: string, interval?: string): string {
+        if (!interval) return key;
+
+        try {
+            switch (interval) {
+                case 'year':
+                    return key; // Déjà formaté comme "2023"
+                case 'month': {
+                    // Convertir "2023-01" en "Janvier 2023"
+                    const [year, month] = key.split('-');
+                    const date = new Date(parseInt(year), parseInt(month) - 1);
+                    return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' });
+                }
+                case 'week': {
+                    // Convertir "2023-W1" en "Semaine 1, 2023"
+                    const weekMatch = key.match(/(\d+)-W(\d+)/);
+                    if (weekMatch) {
+                        return `Semaine ${weekMatch[2]}, ${weekMatch[1]}`;
+                    }
+                    return key;
+                }
+                case 'day': {
+                    // Convertir "2023-01-15" en "15 janvier 2023"
+                    const dayDate = new Date(key);
+                    if (!isNaN(dayDate.getTime())) {
+                        return dayDate.toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                    }
+                    return key;
+                }
+                case 'hour': {
+                    // Convertir "2023-01-15T14:00:00Z" en "15 jan 2023, 14h"
+                    const hourDate = new Date(key);
+                    if (!isNaN(hourDate.getTime())) {
+                        return hourDate.toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                        }) + `, ${hourDate.getHours()}h`;
+                    }
+                    return key;
+                }
+                case 'minute': {
+                    // Convertir "2023-01-15T14:30:00Z" en "15 jan 2023, 14h30"
+                    const minuteDate = new Date(key);
+                    if (!isNaN(minuteDate.getTime())) {
+                        return minuteDate.toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                        }) + `, ${minuteDate.getHours()}h${String(minuteDate.getMinutes()).padStart(2, '0')}`;
+                    }
+                    return key;
+                }
+                default:
+                    return key;
+            }
+        } catch (error) {
+            console.warn(`Erreur lors du formatage du label de date: ${key}`, error);
+            return key;
+        }
     }
 }
 

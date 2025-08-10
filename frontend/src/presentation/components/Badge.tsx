@@ -1,4 +1,4 @@
-import type { BadgeColor, BadgeProps } from "@/core/types/ui";
+import type { BadgeColor, BadgeProps } from "@type/ui";
 
 const colorClasses: Record<BadgeColor, string> = {
   gray: "bg-gray-100 text-gray-800",

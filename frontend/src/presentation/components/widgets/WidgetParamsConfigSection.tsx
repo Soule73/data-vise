@@ -6,8 +6,6 @@ import {
   WIDGETS,
   WIDGET_CONFIG_FIELDS,
 } from "@adapters/visualizations";
-import Button from "@components/forms/Button";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import * as HeroIcons from "@heroicons/react/24/outline";
 import type { WidgetParamsConfigSectionProps } from "@type/widget-types";
 
@@ -36,8 +34,6 @@ export default function WidgetParamsConfigSection({
   const getInputType = (field: string) =>
     getWidgetParamMeta(field).inputType ||
     WIDGET_CONFIG_FIELDS[field]?.inputType;
-
-  const getColorArray = (field: string) => config.widgetParams?.[field] || [""];
 
   const getSelectValue = (field: string) =>
     config.widgetParams?.[field] || getDefaultValue(field) || "";
@@ -164,67 +160,6 @@ export default function WidgetParamsConfigSection({
                       </span>
                     </>
                   )}
-                </div>
-              </div>
-            );
-          }
-          if (inputType === "color-array") {
-            return (
-              <div key={field} className="flex flex-col gap-1">
-                <label
-                  className="text-sm font-medium"
-                  htmlFor={`widget-param-${field}`}
-                >
-                  {label}
-                </label>
-                <div className="flex flex-wrap items-end gap-2">
-                  {getColorArray(field).map((color: string, i: number) => (
-                    <div key={i} className="flex items-center gap-1">
-                      <ColorField
-                        value={color || "#2563eb"}
-                        onChange={(val) => {
-                          const arr = [...getColorArray(field)];
-                          arr[i] = val;
-                          handleConfigChange("widgetParams", {
-                            ...config.widgetParams,
-                            [field]: arr,
-                          });
-                        }}
-                        name={`widget-param-${field}-${i}`}
-                        id={`widget-param-${field}-${i}`}
-                      />
-                      <button
-                        type="button"
-                        className="text-xs text-red-500 hover:underline"
-                        onClick={() => {
-                          const arr = [...getColorArray(field)];
-                          arr.splice(i, 1);
-                          handleConfigChange("widgetParams", {
-                            ...config.widgetParams,
-                            [field]: arr.length > 0 ? arr : undefined,
-                          });
-                        }}
-                        title="Supprimer cette couleur"
-                      >
-                        <XMarkIcon className="w-5 h-5 inline-block" />
-                      </button>
-                    </div>
-                  ))}
-                  <Button
-                    variant="outline"
-                    type="button"
-                    className="w-max text-xs h-max text-indigo-600 border border-indigo-300 rounded px-2 py-1 hover:bg-indigo-50"
-                    onClick={() => {
-                      const arr = [...getColorArray(field)];
-                      arr.push("#2563eb");
-                      handleConfigChange("widgetParams", {
-                        ...config.widgetParams,
-                        [field]: arr,
-                      });
-                    }}
-                  >
-                    + Ajouter une couleur
-                  </Button>
                 </div>
               </div>
             );

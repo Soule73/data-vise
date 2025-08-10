@@ -152,6 +152,7 @@ export interface BucketLevel {
 
 export interface BucketItem {
   key: string;
+  key_as_string?: string;  // Label formaté pour l'affichage
   doc_count: number;
   data: Record<string, any>[];
 }

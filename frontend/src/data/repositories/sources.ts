@@ -15,7 +15,7 @@ import {
   getSourceById,
 } from "@services/datasource";
 import type { DetectParams, SourceFormState } from "@type/data-source";
-import type { ApiError } from "@/core/types/api";
+import type { ApiError } from "@type/api";
 
 export function useSourcesQuery({ queryClient }: { queryClient: QueryClient }) {
   const query = useQuery({

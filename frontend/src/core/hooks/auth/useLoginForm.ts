@@ -6,7 +6,7 @@ import { useLoginMutation } from "@repositories/auth";
 import { loginSchema, type LoginForm } from "@validation/login";
 import { useState } from "react";
 import { ROUTES } from "@constants/routes";
-import type { ApiError } from "@/core/types/api";
+import type { ApiError } from "@type/api";
 
 export function useLoginForm() {
   const setUser = useUserStore((s) => s.setUser);

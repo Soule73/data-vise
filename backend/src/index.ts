@@ -16,8 +16,6 @@ const PORT = process.env.PORT;
 
 const allowOrigin = process.env.CORS_ORIGIN;
 
-console.log("CORS Origin:", allowOrigin);
-
 const appDomain = process.env.APP_DOMAIN;
 
 const appDebug = process.env.APP_DEGUG;
@@ -51,7 +49,6 @@ mongoose
     connectTimeoutMS: 10000,
   })
   .then(async () => {
-    console.log("Connecté à MongoDB");
 
     await initPermissionsAndRoles();
 

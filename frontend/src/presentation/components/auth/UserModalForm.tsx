@@ -4,7 +4,7 @@ import SelectField from "@components/SelectField";
 import Button from "@components/forms/Button";
 import type { User } from "@type/auth-types";
 import React from "react";
-import type { UserModalFormProps } from "@/core/types/ui";
+import type { UserModalFormProps } from "@type/ui";
 
 export default function UserModalForm({
   open,

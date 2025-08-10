@@ -2,7 +2,7 @@
 import type { Metric } from "@type/metric-bucket-types";
 import type { DatasetCreationContext } from "@type/widget-types";
 import { createDefaultDataset } from "@utils/chartConfigUtils";
-import { getDatasetColor, generateColorsForLabels, addTransparency } from "./chartColorUtils";
+import { getDatasetColor, generateColorsForLabels, addTransparency } from "@utils/chartColorUtils";
 import { aggregate } from "@utils/chartUtils";
 
 
@@ -63,7 +63,7 @@ export function createMetricDatasets(
         return createDefaultDataset(chartType, {
             label: metric.label || `${metric.agg}(${metric.field})`,
             data: values,
-            backgroundColor: getDatasetColor(chartType, idx, style, widgetParams.colors),
+            backgroundColor: getDatasetColor(chartType, idx, style, style.colors),
             borderColor: style.borderColor || getDatasetColor(chartType, idx, style),
             borderWidth: style.borderWidth ?? 1,
             ...style,
@@ -116,7 +116,7 @@ export function createBarChartDataset(
     return {
         label: metric.label || `${metric.agg}(${metric.field})`,
         data: values,
-        backgroundColor: getDatasetColor('bar', idx, style, widgetParams.colors),
+        backgroundColor: getDatasetColor('bar', idx, style, style.colors),
         borderColor: style.borderColor || getDatasetColor('bar', idx, style),
         borderWidth: style.borderWidth ?? widgetParams.borderWidth ?? 1,
         barThickness: style.barThickness || widgetParams.barThickness,
@@ -139,7 +139,7 @@ export function createLineChartDataset(
     return {
         label: metric.label || `${metric.agg}(${metric.field})`,
         data: values,
-        backgroundColor: getDatasetColor('line', idx, style, widgetParams.colors),
+        backgroundColor: getDatasetColor('line', idx, style, style.colors),
         borderColor: style.borderColor || getDatasetColor('line', idx, style),
         borderWidth: style.borderWidth ?? widgetParams.borderWidth ?? 2,
         fill: style.fill !== undefined ? style.fill : widgetParams.fill,
@@ -170,7 +170,7 @@ export function createScatterChartDataset(
         type: 'scatter' as const,
         label: metric.label || `${metric.agg}(${metric.field})`,
         data: values,
-        backgroundColor: getDatasetColor('scatter', idx, style, widgetParams.colors),
+        backgroundColor: getDatasetColor('scatter', idx, style, style.colors),
         borderColor: style.borderColor || getDatasetColor('scatter', idx, style),
         borderWidth: widgetParams.borderWidth || (style.borderWidth ?? 1),
         pointStyle: style.pointStyle || widgetParams.pointStyle || 'circle',
@@ -196,7 +196,7 @@ export function createBubbleChartDataset(
         type: 'bubble' as const,
         label: metric.label || `${metric.agg}(${metric.field})`,
         data: values,
-        backgroundColor: getDatasetColor('bubble', idx, style, widgetParams.colors),
+        backgroundColor: getDatasetColor('bubble', idx, style, style.colors),
         borderColor: style.borderColor || getDatasetColor('bubble', idx, style),
         borderWidth: widgetParams.borderWidth || (style.borderWidth ?? 1),
         pointStyle: style.pointStyle || widgetParams.pointStyle || 'circle',
@@ -217,7 +217,7 @@ export function createRadarChartDataset(
     widgetParams: any,
     style: any
 ): any {
-    const baseColor = getDatasetColor('radar', idx, style, widgetParams.colors);
+    const baseColor = getDatasetColor('radar', idx, style, style.colors);
     return {
         type: 'radar' as const,
         label: metric.label || `${metric.agg}(${metric.field})`,
@@ -246,7 +246,7 @@ export function createPieChartDataset(
     widgetParams: any,
     style: any
 ): any {
-    const colors = generateColorsForLabels(labels, widgetParams.colors, style);
+    const colors = generateColorsForLabels(labels, style.colors);
 
     return {
         label: metric.label || `${metric.agg}(${metric.field})`,

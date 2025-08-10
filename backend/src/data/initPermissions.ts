@@ -96,8 +96,6 @@ export async function initPermissionsAndRoles() {
         roleId: adminRole ? adminRole._id : undefined,
         email: "admin@example.com"
       });
-      // eslint-disable-next-line no-console
-      console.log("[initPermissions] Utilisateur admin créé (admin/admin)");
     }
   }
 }
