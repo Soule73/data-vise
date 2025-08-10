@@ -326,20 +326,17 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     configSchema: {
       metricStyles: {
         ...COMMON_METRIC_STYLES,
-        opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
-      },
-      widgetParams: {
-        ...COMMON_WIDGET_PARAMS,
-        showPoints: {
-          default: true,
-          inputType: "checkbox",
-          label: "Afficher les points",
+        borderColor: {
+          default: "#000000",
+          inputType: "color",
+          label: "Couleur de bordure",
         },
         borderWidth: {
           default: 1,
           inputType: "number",
           label: "Épaisseur bordure",
         },
+        opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
         pointStyle: {
           default: "circle",
           inputType: "select",
@@ -355,6 +352,34 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
             { value: "line", label: "Ligne" },
             { value: "dash", label: "Tiret" },
           ],
+        },
+        pointRadius: {
+          default: 5,
+          inputType: "number",
+          label: "Taille des points",
+        },
+        pointHoverRadius: {
+          default: 7,
+          inputType: "number",
+          label: "Taille hover points",
+        },
+      },
+      widgetParams: {
+        ...COMMON_WIDGET_PARAMS,
+        showPoints: {
+          default: true,
+          inputType: "checkbox",
+          label: "Afficher les points",
+        },
+        xLabel: {
+          default: "",
+          inputType: "text",
+          label: "Label axe X",
+        },
+        yLabel: {
+          default: "",
+          inputType: "text",
+          label: "Label axe Y",
         },
       },
     },
@@ -896,8 +921,8 @@ export const WIDGET_DATA_CONFIG: Record<
   },
   bubble: {
     metrics: COMMON_METRICS,
-    bucket: COMMON_BUCKET,
-    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets" },
+    bucket: { ...COMMON_BUCKET, allow: false },
+    buckets: { ...COMMON_MULTI_BUCKETS, allow: false },
   },
   radar: {
     metrics: COMMON_METRICS,

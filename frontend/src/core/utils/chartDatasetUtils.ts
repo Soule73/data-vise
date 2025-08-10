@@ -185,24 +185,39 @@ export function createScatterChartDataset(
  * Crée un dataset spécialisé pour bubble chart
  */
 export function createBubbleChartDataset(
-    metric: Metric,
+    metric: any, // BubbleMetricConfig avec x, y, r et bubbleData
     idx: number,
-    values: number[],
+    bubbleData: Array<{ x: number; y: number; r: number }>,
     _labels: string[],
     widgetParams: any,
     style: any
 ): any {
+    const baseColor = getDatasetColor('bubble', idx, style, style.colors);
+    let backgroundColor = baseColor;
+
+    // Gérer l'opacité
+    if (style.opacity !== undefined && style.opacity !== null) {
+        if (typeof baseColor === 'string' && baseColor.startsWith('#')) {
+            // Convertir hex en rgba avec opacité
+            const r = parseInt(baseColor.slice(1, 3), 16);
+            const g = parseInt(baseColor.slice(3, 5), 16);
+            const b = parseInt(baseColor.slice(5, 7), 16);
+            backgroundColor = `rgba(${r}, ${g}, ${b}, ${style.opacity})`;
+        }
+    }
+
     return {
         type: 'bubble' as const,
-        label: metric.label || `${metric.agg}(${metric.field})`,
-        data: values,
-        backgroundColor: getDatasetColor('bubble', idx, style, style.colors),
-        borderColor: style.borderColor || getDatasetColor('bubble', idx, style),
-        borderWidth: widgetParams.borderWidth || (style.borderWidth ?? 1),
-        pointStyle: style.pointStyle || widgetParams.pointStyle || 'circle',
-        pointRadius: widgetParams.showPoints !== false ? 5 : 0,
-        pointHoverRadius: widgetParams.showPoints !== false ? 7 : 0,
-        opacity: style.opacity || 0.7,
+        label: metric.label,
+        data: bubbleData,
+        backgroundColor,
+        borderColor: style.borderColor || baseColor,
+        borderWidth: style.borderWidth || 1,
+        pointStyle: style.pointStyle || 'circle',
+        pointRadius: widgetParams.showPoints !== false ? (style.pointRadius || 5) : 0,
+        pointHoverRadius: widgetParams.showPoints !== false ? (style.pointHoverRadius || 7) : 0,
+        hoverBackgroundColor: backgroundColor,
+        hoverBorderColor: style.borderColor || baseColor,
     };
 }
 

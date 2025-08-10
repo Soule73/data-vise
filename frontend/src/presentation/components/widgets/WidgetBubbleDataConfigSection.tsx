@@ -1,6 +1,5 @@
 import SelectField from "@components/SelectField";
 import InputField from "@components/forms/InputField";
-import CommonMultiBucketSection from "@components/widgets/CommonMultiBucketSection";
 import DatasetSection from "@components/widgets/DatasetSection";
 import type { BubbleMetricConfig } from "@type/metric-bucket-types";
 import type { WidgetBubbleDataConfigSectionProps } from "@type/widget-types";
@@ -9,8 +8,6 @@ export default function WidgetBubbleDataConfigSection({
   metrics,
   columns,
   handleConfigChange,
-  config,
-  availableFields,
 }: WidgetBubbleDataConfigSectionProps) {
   const renderBubbleDatasetContent = (dataset: BubbleMetricConfig, idx: number, onUpdate: (updatedDataset: BubbleMetricConfig) => void) => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
@@ -80,16 +77,6 @@ export default function WidgetBubbleDataConfigSection({
 
   return (
     <div className="space-y-6">
-      {/* Section Multi-Buckets avec le composant générique */}
-      <CommonMultiBucketSection
-        config={config}
-        columns={columns}
-        availableFields={availableFields}
-        onConfigChange={handleConfigChange}
-        sectionLabel="Buckets"
-        allowMultiple={true}
-      />
-
       {/* Section Datasets avec le composant générique */}
       <DatasetSection
         title="Datasets (x, y, r)"
