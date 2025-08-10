@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ScatterMetricConfig } from "@type/metric-bucket-types";
+import type { Filter } from "@type/visualization";
+import { applyAllFilters } from "./filterUtils";
 
 /**
  * Utilitaires spécialisés pour les graphiques scatter
@@ -98,21 +100,27 @@ export function convertToScatterData(
 }
 
 /**
- * Traite toutes les métriques scatter et retourne les datasets
+ * Traite toutes les métriques scatter et retourne les datasets avec filtres appliqués
  */
 export function processScatterMetrics(
     data: Record<string, any>[],
-    metrics: ScatterMetricConfig[]
+    metrics: ScatterMetricConfig[],
+    globalFilters?: Filter[]
 ): Array<{
     metric: ScatterMetricConfig;
     scatterData: Array<{ x: number; y: number }>;
     index: number;
 }> {
-    return metrics.map((metric, index) => ({
-        metric,
-        scatterData: convertToScatterData(data, metric),
-        index
-    }));
+    return metrics.map((metric, index) => {
+        // Appliquer les filtres globaux et les filtres spécifiques au dataset
+        const filteredData = applyAllFilters(data, globalFilters, metric.datasetFilters);
+
+        return {
+            metric,
+            scatterData: convertToScatterData(filteredData, metric),
+            index
+        };
+    });
 }
 
 /**

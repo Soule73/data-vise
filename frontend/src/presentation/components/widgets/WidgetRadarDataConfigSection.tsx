@@ -2,6 +2,7 @@ import SelectField from "@components/SelectField";
 import InputField from "@components/forms/InputField";
 import CheckboxField from "@components/forms/CheckboxField";
 import DatasetSection from "@components/widgets/DatasetSection";
+import DatasetFiltersConfig from "@components/widgets/DatasetFiltersConfig";
 import { useState } from "react";
 import type { WidgetRadarDataConfigSectionProps } from "@type/widget-types";
 import type { RadarMetricConfig } from "@type/metric-bucket-types";
@@ -121,6 +122,15 @@ export default function WidgetRadarDataConfigSection({
           id={`radar-groupby-value-${idx}`}
         />
       )}
+
+      {/* Section filtres spécifiques au dataset */}
+      <DatasetFiltersConfig
+        filters={dataset.datasetFilters || []}
+        columns={columns}
+        data={data}
+        onFiltersChange={(filters) => onUpdate({ ...dataset, datasetFilters: filters })}
+        datasetIndex={idx}
+      />
     </div>
   );
 

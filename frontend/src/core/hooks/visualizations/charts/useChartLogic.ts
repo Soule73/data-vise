@@ -9,6 +9,7 @@ import { validateChartInput, sanitizeChartData } from "@utils/chartValidationUti
 import { getChartLabels, createGetValuesFunction } from "@utils/chartDataUtils";
 import { createChartDatasets, prepareMetricStyles } from "@utils/chartDatasetUtils";
 import { getCustomChartOptions } from "@utils/chartOptionsUtils";
+import { applyAllFilters } from "@utils/filterUtils";
 
 
 
@@ -23,8 +24,16 @@ export function useChartLogic({
     customDatasetCreator,
     customOptionsCreator,
 }: UseChartLogicOptions) {
-    // Validation et nettoyage des données d'entrée
-    const cleanData = useMemo(() => sanitizeChartData(data), [data]);
+    // Application des filtres globaux en premier
+    const filteredData = useMemo(() => {
+        if (config.globalFilters && config.globalFilters.length > 0) {
+            return applyAllFilters(data, config.globalFilters, []);
+        }
+        return data;
+    }, [data, config.globalFilters]);
+
+    // Validation et nettoyage des données filtrées
+    const cleanData = useMemo(() => sanitizeChartData(filteredData), [filteredData]);
 
     // Validation de la configuration
     const validationResult = useMemo(() =>

@@ -12,6 +12,7 @@ import { useMetricUICollapseStore } from "@store/metricUI";
 import type { WidgetKPIGroupDataConfigSectionProps } from "@type/widget-types";
 import type { Metric } from "@type/metric-bucket-types";
 import type { KPIGroupWidgetConfig } from "@type/visualization";
+import GlobalFiltersConfig from "@components/widgets/GlobalFiltersConfig";
 
 export default function WidgetKPIGroupDataConfigSection({
   dataConfig,
@@ -31,30 +32,6 @@ export default function WidgetKPIGroupDataConfigSection({
   const kpiConfig = config as KPIGroupWidgetConfig;
 
   const kpiDataConfig = dataConfig as { metrics: any };
-
-  const filters = (kpiConfig.filters ?? []) as {
-    field: string;
-    value: string;
-  }[];
-
-  const handleFilterFieldChange = (idx: number, value: string) => {
-    const newFilters = [...filters];
-    newFilters[idx] = {
-      ...(newFilters[idx] || {}),
-      field: value,
-      value: "",
-    };
-    handleConfigChange("filters", newFilters);
-  };
-
-  const handleFilterValueChange = (idx: number, value: string) => {
-    const newFilters = [...filters];
-    newFilters[idx] = {
-      ...(newFilters[idx] || {}),
-      value,
-    };
-    handleConfigChange("filters", newFilters);
-  };
 
   const handleMetricMoveUp = (idx: number) => {
     if (idx === 0) return;
@@ -120,37 +97,6 @@ export default function WidgetKPIGroupDataConfigSection({
     ]);
   };
 
-  const getFilterFieldOptions = (idx: number) => [
-    { value: "", label: "-- Aucun --" },
-    ...columns.map((col) => ({ value: String(col), label: col })),
-    ...Array.from(
-      new Set(
-        (data || [])
-          .map((row) => row[filters[idx]?.field ?? ""])
-          .filter((val) => val !== undefined && val !== null && val !== "")
-      )
-    ).map((val) => ({ value: String(val), label: String(val) })),
-  ];
-
-  const getFilterValueOptions = (idx: number) =>
-    filters[idx]?.field
-      ? [
-        { value: "", label: "-- Toutes --" },
-        ...Array.from(
-          new Set(
-            (data || [])
-              .map(
-                (row: Record<string, unknown>) =>
-                  row[filters[idx]?.field ?? ""]
-              )
-              .filter((v) => v !== undefined && v !== null && v !== "")
-          )
-        ).map((v) => ({ value: String(v), label: String(v) })),
-      ]
-      : [{ value: "", label: "-- Choisir --" }];
-
-  const isFilterValueDisabled = (idx: number) => !filters[idx]?.field;
-
   const getAggLabel = (metric: Metric) =>
     kpiDataConfig.metrics?.allowedAggs.find((a: any) => a.value === metric.agg)
       ?.label ||
@@ -167,45 +113,14 @@ export default function WidgetKPIGroupDataConfigSection({
 
   return (
     <div className="space-y-6">
-      {/* Filtres par KPI (centralisé dans config.filters) */}
-      {Array.isArray(kpiConfig.metrics) &&
-        kpiConfig.metrics.map((metric: Metric, idx: number) => (
-          <div
-            key={idx}
-            className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-          >
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
-              Filtrer KPI {metric.label || metric.field || idx + 1}
-            </h3>
-            <div className="space-y-3">
-              <SelectField
-                label="Champ"
-                value={filters[idx]?.field || ""}
-                onChange={(e) => handleFilterFieldChange(idx, e.target.value)}
-                options={
-                  Array.isArray(getFilterFieldOptions(idx))
-                    ? getFilterFieldOptions(idx)
-                    : []
-                }
-                name={`filter-field-${idx}`}
-                id={`filter-field-${idx}`}
-              />
-              <SelectField
-                label="Valeur"
-                value={filters[idx]?.value || ""}
-                onChange={(e) => handleFilterValueChange(idx, e.target.value)}
-                options={
-                  Array.isArray(getFilterValueOptions(idx))
-                    ? getFilterValueOptions(idx)
-                    : []
-                }
-                name={`filter-value-${idx}`}
-                id={`filter-value-${idx}`}
-                disabled={isFilterValueDisabled(idx)}
-              />
-            </div>
-          </div>
-        ))}
+      {/* Filtres globaux */}
+      <GlobalFiltersConfig
+        filters={kpiConfig.globalFilters || []}
+        columns={columns}
+        data={data}
+        onFiltersChange={(filters) => handleConfigChange('globalFilters', filters)}
+      />
+
       {/* Métriques (metrics) */}
       {kpiDataConfig.metrics?.label && (
         <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">{kpiDataConfig.metrics.label}</h3>

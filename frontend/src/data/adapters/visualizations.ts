@@ -110,8 +110,19 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     description: "Un graphique à barres montrant les données",
     component: BarChartWidget,
     icon: ChartBarIcon,
+    enableFilter: true,
     configSchema: {
       ...BarChartConfig,
+      globalFilters: {
+        type: "array",
+        label: "Filtres globaux",
+        itemSchema: {
+          field: { inputType: "select", label: "Champ" },
+          operator: { inputType: "select", label: "Opérateur" },
+          value: { inputType: "select", label: "Valeur" },
+        },
+        default: [],
+      },
       metricStyles: {
         ...COMMON_METRIC_STYLES,
         borderColor: {
@@ -156,8 +167,19 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     description: "Un graphique linéaire montrant les tendances dans les données",
     component: LineChartWidget,
     icon: ArrowTrendingUpIcon,
+    enableFilter: true,
     configSchema: {
       ...LineChartConfig,
+      globalFilters: {
+        type: "array",
+        label: "Filtres globaux",
+        itemSchema: {
+          field: { inputType: "select", label: "Champ" },
+          operator: { inputType: "select", label: "Opérateur" },
+          value: { inputType: "select", label: "Valeur" },
+        },
+        default: [],
+      },
       metricStyles: {
         ...COMMON_METRIC_STYLES,
         borderColor: {
@@ -234,8 +256,19 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     component: PieChartWidget,
     icon: ChartPieIcon,
     allowMultipleMetrics: false,
+    enableFilter: true,
     configSchema: {
       ...PieChartConfig,
+      globalFilters: {
+        type: "array",
+        label: "Filtres globaux",
+        itemSchema: {
+          field: { inputType: "select", label: "Champ" },
+          operator: { inputType: "select", label: "Opérateur" },
+          value: { inputType: "select", label: "Valeur" },
+        },
+        default: [],
+      },
       metricStyles: {
         colors: {
           default: DEFAULT_CHART_COLORS,
@@ -266,8 +299,19 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     description: "Un tableau montrant les données sous forme de grille",
     component: TableWidget,
     icon: TableCellsIcon,
+    enableFilter: true,
     configSchema: {
       ...TableWidgetConfig,
+      globalFilters: {
+        type: "array",
+        label: "Filtres globaux",
+        itemSchema: {
+          field: { inputType: "select", label: "Champ" },
+          operator: { inputType: "select", label: "Opérateur" },
+          value: { inputType: "select", label: "Valeur" },
+        },
+        default: [],
+      },
       metricStyles: {},
       widgetParams: {
         pageSize: { default: 10, inputType: "number", label: "Taille de page" },
@@ -281,6 +325,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     description: "Un graphique de dispersion montrant la relation entre deux variables",
     component: ScatterChartWidget,
     icon: ArrowTrendingUpIcon,
+    enableFilter: true, // Permettre les filtres globaux
     configSchema: {
       metricStyles: {
         ...COMMON_METRIC_STYLES,
@@ -348,6 +393,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     description: "Un graphique à bulles montrant la relation entre trois variables",
     component: BubbleChartWidget,
     icon: ChatBubbleLeftIcon,
+    enableFilter: true, // Permettre les filtres globaux
     configSchema: {
       metricStyles: {
         ...COMMON_METRIC_STYLES,
@@ -415,6 +461,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     description: "Un graphique radar montrant la répartition des données",
     component: RadarChartWidget,
     icon: ArrowTrendingUpIcon,
+    enableFilter: true, // Permettre les filtres globaux
     configSchema: {
       metricStyles: {
         ...COMMON_METRIC_STYLES,
@@ -478,6 +525,16 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     enableFilter: true,
     configSchema: {
       metricStyles: {},
+      globalFilters: {
+        type: "array",
+        label: "Filtres globaux",
+        itemSchema: {
+          field: { inputType: "select", label: "Champ" },
+          operator: { inputType: "select", label: "Opérateur" },
+          value: { inputType: "select", label: "Valeur" },
+        },
+        default: [],
+      },
       widgetParams: {
         title: { default: "", inputType: "text", label: "Titre du KPI" },
         valueColor: {
@@ -560,11 +617,12 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
           label: "Couleur de la valeur",
         },
       },
-      filters: {
+      globalFilters: {
         type: "array",
-        label: "Filtres par KPI",
+        label: "Filtres globaux",
         itemSchema: {
           field: { inputType: "select", label: "Champ" },
+          operator: { inputType: "select", label: "Opérateur" },
           value: { inputType: "select", label: "Valeur" },
         },
         default: [],
@@ -646,6 +704,16 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     enableFilter: true,
     configSchema: {
       metricStyles: {},
+      globalFilters: {
+        type: "array",
+        label: "Filtres globaux",
+        itemSchema: {
+          field: { inputType: "select", label: "Champ" },
+          operator: { inputType: "select", label: "Opérateur" },
+          value: { inputType: "select", label: "Valeur" },
+        },
+        default: [],
+      },
       widgetParams: {
         title: { default: "", inputType: "text", label: "Titre de la carte" },
         description: { default: "", inputType: "text", label: "Description" },

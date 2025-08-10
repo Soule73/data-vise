@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { BubbleMetricConfig } from "@type/metric-bucket-types";
+import type { Filter } from "@type/visualization";
+import { applyAllFilters } from "./filterUtils";
 
 /**
  * Utilitaires spécialisés pour les graphiques bubble
@@ -104,21 +106,27 @@ export function convertToBubbleData(
 }
 
 /**
- * Traite toutes les métriques bubble et retourne les datasets
+ * Traite toutes les métriques bubble et retourne les datasets avec filtres appliqués
  */
 export function processBubbleMetrics(
     data: Record<string, any>[],
-    metrics: BubbleMetricConfig[]
+    metrics: BubbleMetricConfig[],
+    globalFilters?: Filter[]
 ): Array<{
     metric: BubbleMetricConfig;
     bubbleData: Array<{ x: number; y: number; r: number }>;
     index: number;
 }> {
-    return metrics.map((metric, index) => ({
-        metric,
-        bubbleData: convertToBubbleData(data, metric),
-        index
-    }));
+    return metrics.map((metric, index) => {
+        // Appliquer les filtres globaux et les filtres spécifiques au dataset
+        const filteredData = applyAllFilters(data, globalFilters, metric.datasetFilters);
+
+        return {
+            metric,
+            bubbleData: convertToBubbleData(filteredData, metric),
+            index
+        };
+    });
 }
 
 /**

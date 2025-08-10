@@ -116,7 +116,6 @@ export type VisualizationWidgetPropsMap = {
     config: ScatterChartConfig;
   };
   bubble: BaseVisualizationWidgetPropsMap & {
-
     config: BubbleChartConfig;
   };
   radar: BaseVisualizationWidgetPropsMap & {
@@ -143,12 +142,28 @@ export interface WidgetDefinition<
   type: T;
   label: string;
   description: string;
-  component: React.ComponentType<VisualizationWidgetProps<T>>;
+  component: React.ComponentType<any>; // Temporairement élargi pour éviter les erreurs de types
   configSchema: TConfig;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   allowMultipleMetrics?: boolean;
   hideBucket?: boolean;
   enableFilter?: boolean;
+}
+
+// Interfaces spécialisées pour les widgets avec types stricts
+export interface ScatterWidgetDefinition extends Omit<WidgetDefinition, 'component'> {
+  type: 'scatter';
+  component: React.ComponentType<ScatterChartWidgetProps>;
+}
+
+export interface BubbleWidgetDefinition extends Omit<WidgetDefinition, 'component'> {
+  type: 'bubble';
+  component: React.ComponentType<BubbleChartWidgetProps>;
+}
+
+export interface RadarWidgetDefinition extends Omit<WidgetDefinition, 'component'> {
+  type: 'radar';
+  component: React.ComponentType<RadarChartWidgetProps>;
 }
 
 export interface WidgetConfig {
@@ -158,6 +173,7 @@ export interface WidgetConfig {
   | BubbleMetricConfig[]
   | RadarMetricConfig[];
   filter?: Filter;
+  globalFilters?: Filter[]; // Filtres globaux pour les graphiques spécialisés
   bucket?: BucketConfig; // Legacy pour compatibilité
   buckets?: MultiBucketConfig[]; // Nouveaux buckets multiples
 }
@@ -238,6 +254,7 @@ export interface WidgetFormInitialValues<TConfig = any> {
 export interface WidgetScatterDataConfigSectionProps {
   metrics: ScatterMetricConfig[];
   columns: string[];
+  data?: any[];
   handleConfigChange: (
     field: string,
     value:
@@ -265,6 +282,7 @@ export interface WidgetRadarDataConfigSectionProps {
 export interface WidgetBubbleDataConfigSectionProps {
   metrics: BubbleMetricConfig[];
   columns: string[];
+  data?: any[];
   handleConfigChange: (
     field: string,
     value: BubbleMetricConfig[] | BubbleMetricConfig | any
@@ -604,6 +622,7 @@ export interface BaseChartConfig {
   buckets?: any[];
   metricStyles?: any;
   widgetParams?: any;
+  globalFilters?: Filter[];
 }
 
 export interface UseChartLogicOptions {

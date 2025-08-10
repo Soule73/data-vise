@@ -51,10 +51,10 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
     [config.metricStyles]
   );
 
-  // Extraction des filtres
+  // Extraction des filtres globaux
   const filters = useMemo<Filter[] | undefined>(
-    () => config.filters,
-    [config.filters]
+    () => config.globalFilters,
+    [config.globalFilters]
   );
 
   // Support multi-bucket

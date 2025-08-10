@@ -1,6 +1,8 @@
 import type { ProcessedBucketItem } from "@type/metric-bucket-types";
 import type { Metric } from "@type/metric-bucket-types";
 import type { MetricStyleConfig } from "@type/visualization";
+import type { Filter } from "@type/visualization";
+import { applyAllFilters } from "./filterUtils";
 
 /**
  * Interface pour les configurations de widget avec filtre
@@ -8,6 +10,7 @@ import type { MetricStyleConfig } from "@type/visualization";
 export interface FilterableConfig {
     filter?: { field: string; value: string };
     filters?: Array<{ field: string; value: string | number | readonly string[] | undefined }>;
+    globalFilters?: Filter[];
 }
 
 /**
@@ -27,16 +30,19 @@ export function applyKPIFilters(
 ): Record<string, unknown>[] {
     let baseData = data;
 
-    // Appliquer le filtre unique (config.filter au singulier) pour KPI/Card
-    if (config.filter?.field && config.filter?.value !== undefined && config.filter?.value !== "") {
+    // Priorité aux filtres globaux (nouveau système)
+    if (config.globalFilters && config.globalFilters.length > 0) {
+        baseData = applyAllFilters(baseData, config.globalFilters, []);
+    }
+    // Appliquer le filtre unique (config.filter au singulier) pour KPI/Card - rétrocompatibilité
+    else if (config.filter?.field && config.filter?.value !== undefined && config.filter?.value !== "") {
         baseData = baseData.filter(
             (row: Record<string, unknown>) =>
                 String(row[config.filter!.field]) === String(config.filter!.value)
         );
     }
-
-    // Fallback: support des filtres multiples (config.filters au pluriel) pour KPIGroup
-    if (!config.filter && Array.isArray(config.filters) && config.filters.length > 0) {
+    // Fallback: support des filtres multiples (config.filters au pluriel) pour KPIGroup - rétrocompatibilité
+    else if (!config.filter && Array.isArray(config.filters) && config.filters.length > 0) {
         baseData = config.filters.reduce((acc: Record<string, unknown>[], filterItem) => {
             if (!filterItem.field || filterItem.value === undefined || filterItem.value === "")
                 return acc;

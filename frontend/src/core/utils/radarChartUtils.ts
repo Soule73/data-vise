@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { RadarMetricConfig } from "@type/metric-bucket-types";
+import type { Filter } from "@type/visualization";
+import { applyAllFilters } from "./filterUtils";
 
 /**
  * Utilitaires spécialisés pour les graphiques radar
@@ -134,11 +136,12 @@ export function calculateRadarMetricValues(
 
     return values;
 }/**
- * Traite toutes les métriques radar et retourne les datasets
+ * Traite toutes les métriques radar et retourne les datasets avec filtres appliqués
  */
 export function processRadarMetrics(
     data: Record<string, any>[],
-    metrics: RadarMetricConfig[]
+    metrics: RadarMetricConfig[],
+    globalFilters?: Filter[]
 ): Array<{
     metric: RadarMetricConfig;
     values: number[];
@@ -147,11 +150,16 @@ export function processRadarMetrics(
     // Obtenir tous les labels (union des champs)
     const allLabels = getRadarLabels(metrics);
 
-    return metrics.map((metric, index) => ({
-        metric,
-        values: calculateRadarMetricValues(data, metric, allLabels),
-        index
-    }));
+    return metrics.map((metric, index) => {
+        // Appliquer les filtres globaux et les filtres spécifiques au dataset
+        const filteredData = applyAllFilters(data, globalFilters, metric.datasetFilters);
+
+        return {
+            metric,
+            values: calculateRadarMetricValues(filteredData, metric, allLabels),
+            index
+        };
+    });
 }
 
 /**

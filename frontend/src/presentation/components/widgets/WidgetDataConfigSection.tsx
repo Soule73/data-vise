@@ -13,6 +13,7 @@ import WidgetBubbleDataConfigSection from "@components/widgets/WidgetBubbleDataC
 import WidgetScatterDataConfigSection from "@components/widgets/WidgetScatterDataConfigSection";
 import WidgetRadarDataConfigSection from "@components/widgets/WidgetRadarDataConfigSection";
 import WidgetKPIGroupDataConfigSection from "@components/widgets/WidgetKPIGroupDataConfigSection";
+import GlobalFiltersConfig from "@components/widgets/GlobalFiltersConfig";
 import MultiBucketSection from "@components/widgets/MultiBucketSection";
 import { WIDGETS, WIDGET_DATA_CONFIG } from "@adapters/visualizations";
 import { useMultiBuckets } from "@hooks/useMultiBuckets";
@@ -49,43 +50,78 @@ export default function WidgetDataConfigSection({
 
   if (type === "bubble") {
     return (
-      <WidgetBubbleDataConfigSection
-        metrics={
-          Array.isArray(config.metrics)
-            ? (config.metrics as BubbleMetricConfig[])
-            : []
-        }
-        columns={columns}
-        handleConfigChange={handleConfigChange}
-      />
+      <div className="space-y-6">
+        {/* Filtres globaux */}
+        <GlobalFiltersConfig
+          filters={config.globalFilters || []}
+          columns={columns}
+          data={data}
+          onFiltersChange={(filters) => handleConfigChange('globalFilters', filters)}
+        />
+
+        {/* Configuration des datasets */}
+        <WidgetBubbleDataConfigSection
+          metrics={
+            Array.isArray(config.metrics)
+              ? (config.metrics as BubbleMetricConfig[])
+              : []
+          }
+          columns={columns}
+          data={data}
+          handleConfigChange={handleConfigChange}
+        />
+      </div>
     );
   }
   if (type === "scatter") {
     return (
-      <WidgetScatterDataConfigSection
-        metrics={
-          Array.isArray(config.metrics)
-            ? (config.metrics as BubbleMetricConfig[])
-            : []
-        }
-        columns={columns}
-        handleConfigChange={handleConfigChange}
-      />
+      <div className="space-y-6">
+        {/* Filtres globaux */}
+        <GlobalFiltersConfig
+          filters={config.globalFilters || []}
+          columns={columns}
+          data={data}
+          onFiltersChange={(filters) => handleConfigChange('globalFilters', filters)}
+        />
+
+        {/* Configuration des datasets */}
+        <WidgetScatterDataConfigSection
+          metrics={
+            Array.isArray(config.metrics)
+              ? (config.metrics as BubbleMetricConfig[])
+              : []
+          }
+          columns={columns}
+          data={data}
+          handleConfigChange={handleConfigChange}
+        />
+      </div>
     );
   }
   if (type === "radar") {
     return (
-      <WidgetRadarDataConfigSection
-        metrics={
-          Array.isArray(config.metrics)
-            ? (config.metrics as RadarMetricConfig[])
-            : []
-        }
-        columns={columns}
-        handleConfigChange={handleConfigChange}
-        configSchema={{ dataConfig }}
-        data={data}
-      />
+      <div className="space-y-6">
+        {/* Filtres globaux */}
+        <GlobalFiltersConfig
+          filters={config.globalFilters || []}
+          columns={columns}
+          data={data}
+          onFiltersChange={(filters) => handleConfigChange('globalFilters', filters)}
+        />
+
+        {/* Configuration des datasets */}
+        <WidgetRadarDataConfigSection
+          metrics={
+            Array.isArray(config.metrics)
+              ? (config.metrics as RadarMetricConfig[])
+              : []
+          }
+          columns={columns}
+          handleConfigChange={handleConfigChange}
+          configSchema={{ dataConfig }}
+          data={data}
+        />
+      </div>
     );
   }
   if (type === "kpi_group") {
@@ -107,63 +143,14 @@ export default function WidgetDataConfigSection({
   const showFilter = widgetDef?.enableFilter;
   return (
     <div className="space-y-6">
-      {/* Section filtre pour KPI */}
+      {/* Filtres globaux */}
       {showFilter && (
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Filtrer</h3>
-          <div className="space-y-3">
-            <SelectField
-              label="Champ"
-              value={config.filter?.field || ""}
-              onChange={(e) =>
-                handleConfigChange("filter", {
-                  ...config.filter,
-                  field: e.target.value,
-                  value: "",
-                })
-              }
-              options={[
-                { value: "", label: "-- Aucun --" },
-                ...columns.map((col) => ({ value: col, label: col })),
-              ]}
-              name="filter-field"
-              id="filter-field"
-            />
-            <SelectField
-              label="Valeur"
-              value={config.filter?.value || ""}
-              onChange={(e) =>
-                handleConfigChange("filter", {
-                  ...config.filter,
-                  value: e.target.value,
-                })
-              }
-              options={
-                config.filter?.field
-                  ? [
-                    { value: "", label: "-- Toutes --" },
-                    ...Array.from(
-                      new Set(
-                        (data || [])
-                          .map((row) =>
-                            config?.filter?.field !== undefined
-                              ? row[config.filter.field]
-                              : undefined
-                          )
-                          .filter(
-                            (v) => v !== undefined && v !== null && v !== ""
-                          )
-                      )
-                    ).map((v) => ({ value: v, label: String(v) })),
-                  ]
-                  : [{ value: "", label: "-- Choisir --" }]
-              }
-              name="filter-value"
-              id="filter-value"
-              disabled={!config.filter?.field}
-            />
-          </div>
-        </div>
+        <GlobalFiltersConfig
+          filters={config.globalFilters || []}
+          columns={columns}
+          data={data}
+          onFiltersChange={(filters) => handleConfigChange('globalFilters', filters)}
+        />
       )}
 
       {/* Métriques (metrics) */}

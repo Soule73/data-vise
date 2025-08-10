@@ -1,12 +1,14 @@
 import SelectField from "@components/SelectField";
 import InputField from "@components/forms/InputField";
 import DatasetSection from "@components/widgets/DatasetSection";
+import DatasetFiltersConfig from "@components/widgets/DatasetFiltersConfig";
 import type { BubbleMetricConfig } from "@type/metric-bucket-types";
 import type { WidgetBubbleDataConfigSectionProps } from "@type/widget-types";
 
 export default function WidgetBubbleDataConfigSection({
   metrics,
   columns,
+  data,
   handleConfigChange,
 }: WidgetBubbleDataConfigSectionProps) {
   const renderBubbleDatasetContent = (dataset: BubbleMetricConfig, idx: number, onUpdate: (updatedDataset: BubbleMetricConfig) => void) => (
@@ -62,6 +64,15 @@ export default function WidgetBubbleDataConfigSection({
         }}
         name={`bubble-label-${idx}`}
         id={`bubble-label-${idx}`}
+      />
+
+      {/* Section filtres spécifiques au dataset */}
+      <DatasetFiltersConfig
+        filters={dataset.datasetFilters || []}
+        columns={columns}
+        data={data}
+        onFiltersChange={(filters) => onUpdate({ ...dataset, datasetFilters: filters })}
+        datasetIndex={idx}
       />
     </div>
   );

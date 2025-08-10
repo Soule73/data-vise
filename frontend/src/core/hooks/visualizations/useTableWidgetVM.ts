@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import { useMultiBucketProcessor as useMultiBucketProcessorUtils } from "@utils/multiBucketProcessor";
+import { applyAllFilters } from "@utils/filterUtils";
 import {
   detectTableConfigType,
   processMultiBucketData,
@@ -12,8 +13,16 @@ import {
 } from "@utils/tableDataUtils";
 
 export function useTableWidgetLogic(data: any[], config: TableConfig) {
+  // Application des filtres globaux en premier
+  const filteredData = useMemo(() => {
+    if (config.globalFilters && config.globalFilters.length > 0) {
+      return applyAllFilters(data, config.globalFilters, []);
+    }
+    return data;
+  }, [data, config.globalFilters]);
+
   // Process data with multi-bucket system using the utils function
-  const processedData = useMultiBucketProcessorUtils(data, config);
+  const processedData = useMultiBucketProcessorUtils(filteredData, config);
 
   // Détection du type de configuration
   const configType = detectTableConfigType(config);
@@ -21,7 +30,7 @@ export function useTableWidgetLogic(data: any[], config: TableConfig) {
 
   // Traitement des données selon le type de configuration
   const { columns, displayData } = useMemo(() => {
-    const safeData = Array.isArray(data) ? data : [];
+    const safeData = Array.isArray(filteredData) ? filteredData : [];
 
     // PRIORITÉ 1: Système multi-buckets moderne
     if (hasMultiBuckets && processedData) {
@@ -40,7 +49,7 @@ export function useTableWidgetLogic(data: any[], config: TableConfig) {
 
     // PRIORITÉ 4: Données brutes (aucun groupement configuré)
     return processRawData(safeData);
-  }, [hasMetrics, hasLegacyBucket, hasMultiBuckets, config, data, processedData]);
+  }, [hasMetrics, hasLegacyBucket, hasMultiBuckets, config, filteredData, processedData]);
 
   // Génération du titre
   const tableTitle = useMemo(() =>

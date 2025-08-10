@@ -186,7 +186,8 @@ export abstract class WidgetConfigBase<
   buckets?: MultiBucketConfig[]; // Nouveaux buckets multiples
   widgetParams?: TParams;
   metricStyles?: TStyles;
-  filters?: TFilters;
+  filters?: TFilters; // Ancien système de filtres (rétrocompatibilité)
+  globalFilters?: Filter[]; // Nouveau système de filtres globaux
   constructor({
     metrics,
     bucket,
@@ -194,6 +195,7 @@ export abstract class WidgetConfigBase<
     widgetParams,
     metricStyles,
     filters,
+    globalFilters,
   }: {
     metrics: Metric[];
     bucket?: BucketConfig;
@@ -201,6 +203,7 @@ export abstract class WidgetConfigBase<
     widgetParams?: TParams;
     metricStyles?: TStyles;
     filters?: TFilters;
+    globalFilters?: Filter[];
   }) {
     this.metrics = metrics;
     this.bucket = bucket;
@@ -208,15 +211,29 @@ export abstract class WidgetConfigBase<
     this.widgetParams = widgetParams;
     this.metricStyles = metricStyles;
     this.filters = filters;
+    this.globalFilters = globalFilters;
   }
 }
 
 export class BarChartConfig extends WidgetConfigBase<BarChartParams> { }
 export class LineChartConfig extends WidgetConfigBase<LineChartParams> { }
 export class PieChartConfig extends WidgetConfigBase<PieChartParams> { }
-export class ScatterChartConfig extends WidgetConfigBase<ScatterChartParams> { }
-export class BubbleChartConfig extends WidgetConfigBase<BubbleChartParams> { }
-export class RadarChartConfig extends WidgetConfigBase<RadarChartParams> { }
+
+// Interfaces spécialisées pour les graphiques avec types de métriques spécifiques
+export interface ScatterChartConfig extends Omit<WidgetConfigBase<ScatterChartParams>, 'metrics'> {
+  metrics: ScatterMetricConfig[];
+  globalFilters?: Filter[];
+}
+
+export interface BubbleChartConfig extends Omit<WidgetConfigBase<BubbleChartParams>, 'metrics'> {
+  metrics: BubbleMetricConfig[];
+  globalFilters?: Filter[];
+}
+
+export interface RadarChartConfig extends Omit<WidgetConfigBase<RadarChartParams>, 'metrics'> {
+  metrics: RadarMetricConfig[];
+  globalFilters?: Filter[];
+}
 export class KPIWidgetConfig extends WidgetConfigBase<KPIWidgetParams> { }
 export class KPIGroupWidgetConfig extends WidgetConfigBase<KPIGroupWidgetParams> { }
 export class CardWidgetConfig extends WidgetConfigBase<CardWidgetParams> { }

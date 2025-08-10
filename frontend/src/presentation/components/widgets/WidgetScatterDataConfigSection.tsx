@@ -2,12 +2,14 @@ import type { ScatterMetricConfig } from "@type/metric-bucket-types";
 import SelectField from "@components/SelectField";
 import InputField from "@components/forms/InputField";
 import DatasetSection from "@components/widgets/DatasetSection";
+import DatasetFiltersConfig from "@components/widgets/DatasetFiltersConfig";
 import { useState } from "react";
 import type { WidgetScatterDataConfigSectionProps } from "@type/widget-types";
 
 export default function WidgetScatterDataConfigSection({
   metrics,
   columns,
+  data,
   handleConfigChange,
 }: WidgetScatterDataConfigSectionProps) {
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
@@ -54,6 +56,15 @@ export default function WidgetScatterDataConfigSection({
         }}
         name={`scatter-label-${idx}`}
         id={`scatter-label-${idx}`}
+      />
+
+      {/* Section filtres spécifiques au dataset */}
+      <DatasetFiltersConfig
+        filters={dataset.datasetFilters || []}
+        columns={columns}
+        data={data}
+        onFiltersChange={(filters) => onUpdate({ ...dataset, datasetFilters: filters })}
+        datasetIndex={idx}
       />
     </div>
   );

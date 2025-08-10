@@ -41,10 +41,10 @@ export function useBubbleChartLogic(
         [validMetrics]
     );
 
-    // Traitement des métriques bubble
+    // Traitement des métriques bubble avec filtres
     const processedMetrics = useMemo(() => {
-        return processBubbleMetrics(data, validMetrics as BubbleMetricConfig[]);
-    }, [data, validMetrics]);
+        return processBubbleMetrics(data, validMetrics as BubbleMetricConfig[], config.globalFilters);
+    }, [data, validMetrics, config.globalFilters]);
 
     // Calcul des échelles optimales
     const scales = useMemo(() => {

@@ -18,6 +18,7 @@ export interface TableConfig {
     columns?: any[];
     groupBy?: string;
     widgetParams?: any;
+    globalFilters?: any[]; // Support des filtres globaux
 }
 
 export interface TableDataResult {

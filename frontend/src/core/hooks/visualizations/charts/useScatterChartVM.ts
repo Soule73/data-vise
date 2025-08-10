@@ -41,10 +41,10 @@ export function useScatterChartLogic(
         [validMetrics]
     );
 
-    // Traitement des métriques scatter
+    // Traitement des métriques scatter avec filtres
     const processedMetrics = useMemo(() => {
-        return processScatterMetrics(data, validMetrics as ScatterMetricConfig[]);
-    }, [data, validMetrics]);
+        return processScatterMetrics(data, validMetrics as ScatterMetricConfig[], config.globalFilters);
+    }, [data, validMetrics, config.globalFilters]);
 
     // Calcul des échelles optimales
     const scales = useMemo(() => {

@@ -46,10 +46,10 @@ export function useRadarChartLogic(
         return getRadarLabels(validMetrics as RadarMetricConfig[]);
     }, [validMetrics]);
 
-    // Traitement des métriques radar
+    // Traitement des métriques radar avec filtres
     const processedMetrics = useMemo(() => {
-        return processRadarMetrics(data, validMetrics as RadarMetricConfig[]);
-    }, [data, validMetrics]);
+        return processRadarMetrics(data, validMetrics as RadarMetricConfig[], config.globalFilters);
+    }, [data, validMetrics, config.globalFilters]);
 
     // Création des datasets avec labels correctement formatés
     const datasets = useMemo(() => {

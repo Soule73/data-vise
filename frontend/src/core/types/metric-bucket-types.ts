@@ -71,6 +71,8 @@ export interface BucketUIState {
 export interface ScatterMetricConfig extends Metric {
   x: string;
   y: string;
+  // Filtres spécifiques à ce dataset
+  datasetFilters?: DatasetFilter[];
 }
 
 export interface BubbleMetricConfig extends ScatterMetricConfig {
@@ -81,6 +83,14 @@ export interface RadarMetricConfig extends Metric {
   fields: string[];
   groupBy?: string;
   groupByValue?: string;
+  // Filtres spécifiques à ce dataset
+  datasetFilters?: DatasetFilter[];
+}
+
+export interface DatasetFilter {
+  field: string;
+  value: string | number;
+  operator?: 'equals' | 'contains' | 'not_equals' | 'greater_than' | 'less_than';
 }
 
 export interface MetricUICollapseState {
