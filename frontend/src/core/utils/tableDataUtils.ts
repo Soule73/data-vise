@@ -189,7 +189,7 @@ export function processLegacyBucketData(
     // Formater les labels des buckets si ce sont des dates
     const bucketValues = rawDisplayData.map(row => row[config.bucket.field]);
     const formattedBucketValues = formatTableLabels(bucketValues);
-    
+
     const displayData = rawDisplayData.map((row, index) => ({
         ...row,
         [config.bucket.field]: formattedBucketValues[index]
@@ -266,7 +266,7 @@ function processGroupByData(
     // Formater les labels du groupKey si ce sont des dates
     const groupValues = rawData.map(row => row[groupKey]);
     const formattedGroupValues = formatTableLabels(groupValues);
-    
+
     return rawData.map((row, index) => ({
         ...row,
         [groupKey]: formattedGroupValues[index]
@@ -282,7 +282,7 @@ export function processRawData(data: any[]): TableDataResult {
     }
 
     const columns = createAutoColumns(data);
-    
+
     // Formater les valeurs des cellules (notamment les dates)
     const displayData = data.map(row => {
         const formattedRow: any = {};
@@ -291,7 +291,7 @@ export function processRawData(data: any[]): TableDataResult {
         });
         return formattedRow;
     });
-    
+
     return { columns, displayData };
 }
 

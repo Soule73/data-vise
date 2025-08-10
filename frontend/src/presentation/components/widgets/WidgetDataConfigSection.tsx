@@ -167,7 +167,7 @@ export default function WidgetDataConfigSection({
       )}
 
       {/* Métriques (metrics) */}
-      {dataConfig.metrics.label && (
+      {dataConfig.metrics.label && config.metrics && Array.isArray(config.metrics) && (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">{dataConfig.metrics.label}</h3>
           <div className="space-y-3">

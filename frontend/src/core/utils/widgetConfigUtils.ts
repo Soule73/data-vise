@@ -35,6 +35,12 @@ export function generateDefaultWidgetConfig(type: WidgetType, columns: string[])
             return configurePieWidget(baseConfig, columns);
         case "table":
             return configureTableWidget(baseConfig, columns);
+        case "kpi":
+            return configureKPIWidget(baseConfig, columns);
+        case "card":
+            return configureCardWidget(baseConfig, columns);
+        case "kpi_group":
+            return configureKPIGroupWidget(baseConfig, columns);
         default:
             return baseConfig;
     }
@@ -80,6 +86,52 @@ function configurePieWidget(baseConfig: any, columns: string[]): any {
 function configureTableWidget(baseConfig: any, columns: string[]): any {
     if (columns.length > 0 && !baseConfig.columns?.length) {
         baseConfig.columns = columns.slice(0, 5);
+    }
+    return baseConfig;
+}
+
+/**
+ * Configure un widget de type KPI
+ */
+function configureKPIWidget(baseConfig: any, columns: string[]): any {
+    // Un KPI a besoin d'une seule métrique
+    if (columns.length > 0 && !baseConfig.metrics?.length) {
+        baseConfig.metrics = [{
+            field: columns[0],
+            agg: "count",
+            label: `Count · ${columns[0]}`
+        }];
+    }
+    return baseConfig;
+}
+
+/**
+ * Configure un widget de type Card
+ */
+function configureCardWidget(baseConfig: any, columns: string[]): any {
+    // Une Card a besoin d'une seule métrique comme un KPI
+    if (columns.length > 0 && !baseConfig.metrics?.length) {
+        baseConfig.metrics = [{
+            field: columns[0],
+            agg: "count",
+            label: `Count · ${columns[0]}`
+        }];
+    }
+    return baseConfig;
+}
+
+/**
+ * Configure un widget de type KPI Group
+ */
+function configureKPIGroupWidget(baseConfig: any, columns: string[]): any {
+    // Un KPI Group peut avoir plusieurs métriques
+    if (columns.length > 0 && !baseConfig.metrics?.length) {
+        // Commencer par une seule métrique, l'utilisateur peut en ajouter d'autres
+        baseConfig.metrics = [{
+            field: columns[0],
+            agg: "count",
+            label: `Count · ${columns[0]}`
+        }];
     }
     return baseConfig;
 }
