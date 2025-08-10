@@ -2,63 +2,73 @@
 import { useMemo } from "react";
 import {
   aggregate,
-  // getLabels, getLegendPosition, getTitle, getTitleAlign
 } from "@utils/chartUtils";
-import { useMultiBucketProcessor } from "@hooks/common/useMultiBucketProcessor";
+import { useMultiBucketProcessor as useMultiBucketProcessorUtils } from "@utils/multiBucketProcessor";
 
 export function useTableWidgetLogic(data: any[], config: any) {
-  // Process data with multi-bucket system
-  const processedData = useMultiBucketProcessor(data, config);
+  // Process data with multi-bucket system using the utils function
+  const processedData = useMultiBucketProcessorUtils(data, config);
 
   const hasMetrics = Array.isArray(config.metrics) && config.metrics.length > 0;
-  const hasBucket = config.bucket && config.bucket.field;
   const hasMultiBuckets = Array.isArray(config.buckets) && config.buckets.length > 0;
+  const hasLegacyBucket = config.bucket && config.bucket.field; // Support legacy bucket
 
   const { columns, displayData } = useMemo(() => {
     const safeData = Array.isArray(data) ? data : [];
     let columns: { key: string; label: string }[] = [];
     let displayData: any[] = [];
 
-    // Support multi-bucket system
-    if (hasMultiBuckets && hasMetrics && processedData && processedData.length > 0) {
-      // Colonnes pour buckets
-      const bucketColumns = config.buckets.map((bucket: any) => ({
-        key: bucket.field,
-        label: bucket.label || bucket.field,
-      }));
+    // PRIORITÉ 1: Système multi-buckets moderne
+    if (hasMultiBuckets && processedData) {
+      const groupedData = processedData.groupedData || [];
+      const labels = processedData.labels || [];
+      
+      if (groupedData.length > 0 && labels.length > 0) {
+        // Créer les colonnes pour le(s) bucket(s)
+        const bucketColumns = config.buckets.map((bucket: any) => ({
+          key: bucket.field,
+          label: bucket.label || bucket.field,
+        }));
 
-      // Colonnes pour métriques
-      const metricColumns = config.metrics.map((m: any) => ({
-        key: m.field,
-        label: m.label || m.field,
-      }));
+        // Créer les colonnes pour les métriques si présentes
+        const metricColumns = hasMetrics ? config.metrics.map((m: any) => ({
+          key: m.field,
+          label: m.label || m.field,
+        })) : [];
 
-      columns = [...bucketColumns, ...metricColumns];
+        // Ajouter une colonne count si pas de métriques
+        const countColumn = !hasMetrics ? [{ key: '_doc_count', label: 'Nombre' }] : [];
 
-      displayData = processedData.map((item: any) => {
-        const row: any = {};
+        columns = [...bucketColumns, ...metricColumns, ...countColumn];
 
-        // Ajouter les valeurs de buckets
-        if (typeof item.key === 'object') {
-          Object.assign(row, item.key);
-        } else {
-          // Single bucket key
-          row[config.buckets[0].field] = item.key;
-        }
-
-        // Ajouter les valeurs de métriques
-        item.metrics.forEach((metric: any, index: number) => {
-          const metricConfig = config.metrics[index];
-          if (metricConfig) {
-            row[metricConfig.field] = metric.value;
+        // Créer les données d'affichage en utilisant les labels formatés
+        displayData = labels.map((label: string, index: number) => {
+          const row: any = {};
+          
+          // Ajouter la valeur du bucket principal avec le label formaté
+          const primaryBucketField = config.buckets[0].field;
+          row[primaryBucketField] = label;
+          
+          // Ajouter les valeurs de métriques depuis les données groupées si présentes
+          if (hasMetrics && config.metrics) {
+            const groupData = groupedData[index];
+            config.metrics.forEach((metric: any) => {
+              row[metric.field] = groupData?.[metric.field] ?? 0;
+            });
           }
-        });
+          
+          // Ajouter le count si pas de métriques
+          if (!hasMetrics) {
+            const groupData = groupedData[index];
+            row['_doc_count'] = groupData?._doc_count ?? 0;
+          }
 
-        return row;
-      });
+          return row;
+        });
+      }
     }
-    // Legacy support
-    else if (hasMetrics && hasBucket && config.bucket && config.metrics) {
+    // PRIORITÉ 2: Système legacy single bucket (rétro-compatibilité)
+    else if (hasLegacyBucket && hasMetrics && config.bucket && config.metrics) {
       const bucketLabel = config.bucket.label || config.bucket.field;
       columns = [
         { key: config.bucket.field, label: bucketLabel },
@@ -116,19 +126,37 @@ export function useTableWidgetLogic(data: any[], config: any) {
         displayData = safeData;
       }
     }
+    // PRIORITÉ 4: Données brutes (aucun groupement configuré)
+    else if (safeData.length > 0) {
+      // Générer les colonnes automatiquement depuis les données
+      const firstRow = safeData[0];
+      const keys = Object.keys(firstRow);
+      columns = keys.map(key => ({
+        key,
+        label: key.charAt(0).toUpperCase() + key.slice(1),
+      }));
+      displayData = safeData;
+    }
+    
     return { columns, displayData };
-  }, [hasMetrics, hasBucket, hasMultiBuckets, config.bucket, config.buckets, config.metrics, config.columns, config.groupBy, data, processedData]);
+  }, [hasMetrics, hasLegacyBucket, hasMultiBuckets, config.bucket, config.buckets, config.metrics, config.columns, config.groupBy, data, processedData]);
 
   // Détermination du titre à afficher
   let tableTitle = "Tableau";
   if (config.widgetParams && config.widgetParams.title) {
     tableTitle = config.widgetParams.title;
-  } else if (hasMultiBuckets && hasMetrics) {
+  } else if (hasMultiBuckets) {
+    // Priorité aux multi-buckets
     const bucketLabels = config.buckets
       .map((bucket: any) => bucket.label || bucket.field)
       .join(", ");
-    tableTitle = `Tableau groupé par ${bucketLabels}`;
-  } else if (hasBucket && hasMetrics) {
+    if (hasMetrics) {
+      tableTitle = `Tableau groupé par ${bucketLabels}`;
+    } else {
+      tableTitle = `Décompte par ${bucketLabels}`;
+    }
+  } else if (hasLegacyBucket && hasMetrics) {
+    // Fallback legacy
     const bucketLabel =
       config.bucket && config.bucket.label
         ? config.bucket.label
@@ -138,6 +166,10 @@ export function useTableWidgetLogic(data: any[], config: any) {
     tableTitle = `Tableau groupé par ${bucketLabel}`;
   } else if (config.groupBy) {
     tableTitle = `Tableau groupé par ${config.groupBy}`;
+  } else if (hasMetrics) {
+    tableTitle = `Tableau des métriques`;
+  } else {
+    tableTitle = `Tableau des données`;
   }
 
   return { columns, displayData, tableTitle };

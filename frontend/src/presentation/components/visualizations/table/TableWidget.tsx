@@ -19,13 +19,19 @@ export default function TableWidget({
     config
   );
 
-  if (
-    !data ||
-    !config.metrics ||
-    !config.bucket ||
-    !Array.isArray(config.metrics) ||
-    !config.bucket.field
-  ) {
+  // Validation moderne : priorité aux buckets multiples
+  const hasValidConfig = 
+    data && 
+    (
+      // Cas 1: Multi-buckets avec ou sans métriques
+      (Array.isArray(config.buckets) && config.buckets.length > 0) ||
+      // Cas 2: Legacy bucket avec métriques
+      (config.bucket && config.bucket.field && Array.isArray(config.metrics) && config.metrics.length > 0) ||
+      // Cas 3: Configuration colonne directe
+      (Array.isArray(config.columns) && config.columns.length > 0)
+    );
+
+  if (!hasValidConfig) {
     return <InvalideConfigWidget />;
   }
 
