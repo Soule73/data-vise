@@ -4,6 +4,7 @@ import NoDataWidget from "@components/widgets/NoDataWidget";
 import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
 import { TableCellsIcon } from "@heroicons/react/24/outline";
 import { useTableWidgetLogic } from "@hooks/visualizations/useTableWidgetVM";
+import { validateTableConfig } from "@utils/tableDataUtils";
 
 export default function TableWidget({
   data,
@@ -19,17 +20,8 @@ export default function TableWidget({
     config
   );
 
-  // Validation moderne : priorité aux buckets multiples
-  const hasValidConfig = 
-    data && 
-    (
-      // Cas 1: Multi-buckets avec ou sans métriques
-      (Array.isArray(config.buckets) && config.buckets.length > 0) ||
-      // Cas 2: Legacy bucket avec métriques
-      (config.bucket && config.bucket.field && Array.isArray(config.metrics) && config.metrics.length > 0) ||
-      // Cas 3: Configuration colonne directe
-      (Array.isArray(config.columns) && config.columns.length > 0)
-    );
+  // Validation moderne utilisant l'utilitaire
+  const hasValidConfig = validateTableConfig(config, data);
 
   if (!hasValidConfig) {
     return <InvalideConfigWidget />;
