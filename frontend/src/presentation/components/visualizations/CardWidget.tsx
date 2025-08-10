@@ -13,7 +13,7 @@ export default function CardWidget({
   config: CardWidgetConfig;
 }) {
   const {
-    value,
+    formattedValue,
     title,
     description,
     iconColor,
@@ -54,7 +54,7 @@ export default function CardWidget({
         className="text-3xl font-extrabold mt-1"
         style={{ color: valueColor }}
       >
-        {value}
+        {formattedValue}
       </span>
       {description && (
         <span className="text-xs mt-1" style={{ color: descriptionColor }}>

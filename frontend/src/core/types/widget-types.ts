@@ -300,6 +300,7 @@ export interface KPIWidgetVM {
   value: number;
   title: string;
   valueColor: string;
+  titleColor: string;
   showTrend: boolean;
   showValue: boolean;
   format: string;

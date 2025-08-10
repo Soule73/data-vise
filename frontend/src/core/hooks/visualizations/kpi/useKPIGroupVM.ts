@@ -44,13 +44,13 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
     () => (Array.isArray(config.metrics) ? config.metrics : []),
     [config.metrics]
   );
-  
+
   // Extraction des styles de métriques
   const metricStyles = useMemo<MetricStyleConfig[]>(
     () => (Array.isArray(config.metricStyles) ? config.metricStyles : []),
     [config.metricStyles]
   );
-  
+
   // Extraction des filtres
   const filters = useMemo<Filter[] | undefined>(
     () => config.filters,
@@ -69,14 +69,26 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
   // Configuration des paramètres pour chaque KPI individuel
   const widgetParamsList = useMemo<Array<Record<string, unknown>>>(
     () =>
-      metrics.map((metric, idx) => ({
-        ...config.widgetParams,
-        title: metric.label || metric.field || `KPI ${idx + 1}`,
-        description: "",
-        // Transmettre la config buckets à chaque KPI individuel
-        buckets: hasMultiBuckets ? bucketsConfig : undefined,
-      })),
-    [metrics, config.widgetParams, hasMultiBuckets, bucketsConfig]
+      metrics.map((metric, idx) => {
+        // Récupérer les styles pour ce métrique spécifique
+        const metricStyle = Array.isArray(metricStyles) ? metricStyles[idx] : undefined;
+        const baseParams = config.widgetParams as Record<string, unknown> || {};
+        
+        return {
+          // Hériter de tous les paramètres du groupe
+          ...baseParams,
+          // Surcharger le titre avec le nom de la métrique
+          title: metric.label || metric.field || `KPI ${idx + 1}`,
+          // Transmettre la couleur depuis metricStyles (priorité) ou baseParams (fallback)
+          valueColor: metricStyle?.valueColor || baseParams.valueColor || "#2563eb",
+          // Tous les autres paramètres KPI sont hérités du groupe :
+          // showTrend, showValue, format, decimals, currency, trendType, 
+          // showPercent, trendThreshold, titleColor
+          // Transmettre la config buckets à chaque KPI individuel
+          buckets: hasMultiBuckets ? bucketsConfig : undefined,
+        };
+      }),
+    [metrics, config.widgetParams, metricStyles, hasMultiBuckets, bucketsConfig]
   );
 
   return {

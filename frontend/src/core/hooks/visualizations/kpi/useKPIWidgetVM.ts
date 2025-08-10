@@ -27,7 +27,7 @@ export function useKPIWidgetVM(
 
   // Traitement des données avec le système multi-bucket
   const processedData = useMultiBucketProcessor(filteredData, config);
-  
+
   // Récupération de la première métrique
   const metric: Metric | undefined = config.metrics?.[0];
 
@@ -39,6 +39,7 @@ export function useKPIWidgetVM(
   // Extraction du titre et des paramètres
   const title = getKPITitle(config, metric, "KPI");
   const valueColor = getKPIValueColor(config as StylableConfig);
+  const titleColor = (config.widgetParams as Record<string, unknown>)?.titleColor as string || "#2563eb";
   const {
     showTrend,
     showValue,
@@ -69,6 +70,7 @@ export function useKPIWidgetVM(
     value,
     title,
     valueColor,
+    titleColor,
     showTrend,
     showValue,
     format,

@@ -8,6 +8,8 @@ import {
   calculateKPIValue,
   getCardColors,
   getKPITitle,
+  getKPIWidgetParams,
+  formatKPIValue,
   type FilterableConfig,
   type StylableConfig
 } from "@utils/kpiUtils";
@@ -16,7 +18,7 @@ export function useCardWidgetVM(
   data: Record<string, unknown>[],
   config: CardWidgetConfig
 ): {
-  value: number;
+  formattedValue: string;
   title: string;
   description: string;
   iconColor: string;
@@ -44,17 +46,23 @@ export function useCardWidgetVM(
   // Extraction des informations du widget
   const title = getKPITitle(config, metric, "Synthèse");
   const description = (typeof config.widgetParams?.description === 'string' ? config.widgetParams.description : undefined) || "";
-  
+
   // Extraction des couleurs avec l'utilitaire
   const { iconColor, valueColor, descriptionColor } = getCardColors(config as StylableConfig);
-  
-  // Extraction des paramètres d'affichage
+
+  // Extraction des paramètres d'affichage et de formatage
   const showIcon = config.widgetParams?.showIcon !== false;
   const iconName = (typeof config.widgetParams?.icon === 'string' ? config.widgetParams.icon : undefined) || "ChartBarIcon";
   const IconComponent = HeroIcons[iconName as keyof typeof HeroIcons] || HeroIcons.ChartBarIcon;
 
+  // Extraction des paramètres de formatage depuis widgetParams
+  const { format, decimals, currency } = getKPIWidgetParams(config as { widgetParams?: Record<string, unknown> });
+  
+  // Formatage de la valeur
+  const formattedValue = formatKPIValue(value, format, decimals, currency);
+
   return {
-    value,
+    formattedValue,
     title,
     description,
     iconColor,

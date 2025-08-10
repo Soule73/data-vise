@@ -390,13 +390,7 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     hideBucket: true,
     enableFilter: true,
     configSchema: {
-      metricStyles: {
-        valueColor: {
-          default: "#2563eb",
-          inputType: "color",
-          label: "Couleur de la valeur",
-        },
-      },
+      metricStyles: {},
       widgetParams: {
         title: { default: "", inputType: "text", label: "Titre du KPI" },
         valueColor: {
@@ -404,10 +398,60 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
           inputType: "color",
           label: "Couleur de la valeur",
         },
+        titleColor: {
+          default: "#2563eb",
+          inputType: "color",
+          label: "Couleur du titre",
+        },
         showTrend: {
           default: true,
           inputType: "checkbox",
           label: "Afficher la tendance",
+        },
+        showValue: {
+          default: true,
+          inputType: "checkbox",
+          label: "Afficher la valeur",
+        },
+        format: {
+          default: "number",
+          inputType: "select",
+          label: "Format d'affichage",
+          options: [
+            { value: "number", label: "Nombre" },
+            { value: "currency", label: "Devise" },
+            { value: "percent", label: "Pourcentage" },
+          ],
+        },
+        decimals: {
+          default: 2,
+          inputType: "number",
+          label: "Nombre de décimales",
+        },
+        currency: {
+          default: "€",
+          inputType: "text",
+          label: "Symbole de devise",
+        },
+        trendType: {
+          default: "arrow",
+          inputType: "select",
+          label: "Type de tendance",
+          options: [
+            { value: "arrow", label: "Flèche" },
+            { value: "icon", label: "Icône" },
+            { value: "text", label: "Texte" },
+          ],
+        },
+        showPercent: {
+          default: false,
+          inputType: "checkbox",
+          label: "Afficher pourcentage de tendance",
+        },
+        trendThreshold: {
+          default: 0,
+          inputType: "number",
+          label: "Seuil de tendance (%)",
         },
       },
     },
@@ -445,10 +489,61 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
           inputType: "number",
           label: "Colonnes",
         },
+        // Paramètres KPI partagés par tous les KPI du groupe
         showTrend: {
           default: true,
           inputType: "checkbox",
           label: "Afficher la tendance",
+        },
+        showValue: {
+          default: true,
+          inputType: "checkbox",
+          label: "Afficher la valeur",
+        },
+        format: {
+          default: "number",
+          inputType: "select",
+          label: "Format d'affichage",
+          options: [
+            { value: "number", label: "Nombre" },
+            { value: "currency", label: "Devise" },
+            { value: "percent", label: "Pourcentage" },
+          ],
+        },
+        decimals: {
+          default: 2,
+          inputType: "number",
+          label: "Nombre de décimales",
+        },
+        currency: {
+          default: "€",
+          inputType: "text",
+          label: "Symbole de devise",
+        },
+        trendType: {
+          default: "arrow",
+          inputType: "select",
+          label: "Type de tendance",
+          options: [
+            { value: "arrow", label: "Flèche" },
+            { value: "icon", label: "Icône" },
+            { value: "text", label: "Texte" },
+          ],
+        },
+        showPercent: {
+          default: false,
+          inputType: "checkbox",
+          label: "Afficher pourcentage de tendance",
+        },
+        trendThreshold: {
+          default: 0,
+          inputType: "number",
+          label: "Seuil de tendance (%)",
+        },
+        titleColor: {
+          default: "#2563eb",
+          inputType: "color",
+          label: "Couleur du titre",
         },
       },
     },
@@ -463,7 +558,10 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     hideBucket: true,
     enableFilter: true,
     configSchema: {
-      metricStyles: {
+      metricStyles: {},
+      widgetParams: {
+        title: { default: "", inputType: "text", label: "Titre de la carte" },
+        description: { default: "", inputType: "text", label: "Description" },
         iconColor: {
           default: "#6366f1",
           inputType: "color",
@@ -479,10 +577,6 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
           inputType: "color",
           label: "Couleur de la description",
         },
-      },
-      widgetParams: {
-        title: { default: "", inputType: "text", label: "Titre de la carte" },
-        description: { default: "", inputType: "text", label: "Description" },
         showIcon: {
           default: true,
           inputType: "checkbox",
@@ -496,6 +590,26 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
             value: k,
             label: k.replace(/Icon$/, ""),
           })),
+        },
+        format: {
+          default: "number",
+          inputType: "select",
+          label: "Format d'affichage",
+          options: [
+            { value: "number", label: "Nombre" },
+            { value: "currency", label: "Devise" },
+            { value: "percent", label: "Pourcentage" },
+          ],
+        },
+        decimals: {
+          default: 2,
+          inputType: "number",
+          label: "Nombre de décimales",
+        },
+        currency: {
+          default: "€",
+          inputType: "text",
+          label: "Symbole de devise",
         },
       },
     },

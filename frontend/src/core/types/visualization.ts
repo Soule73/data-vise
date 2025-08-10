@@ -87,6 +87,7 @@ export interface RadarChartParams extends BaseChartParams {
 export interface KPIWidgetParams {
   title?: string;
   valueColor?: string;
+  titleColor?: string;
   showTrend?: boolean;
   showValue?: boolean;
   format?: "number" | "currency" | "percent";
@@ -104,6 +105,14 @@ export interface KPIGroupWidgetParams {
   title?: string;
   columns?: number;
   showTrend?: boolean;
+  showValue?: boolean;
+  format?: "number" | "currency" | "percent";
+  currency?: string;
+  decimals?: number;
+  trendType?: "arrow" | "line";
+  showPercent?: boolean;
+  trendThreshold?: number;
+  titleColor?: string;
 }
 
 export interface CardWidgetParams {
