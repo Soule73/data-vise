@@ -175,19 +175,19 @@ export function generateDefaultMetricStyle(): Record<string, any> {
  * NE fait rien si le widget n'utilise pas de metricStyles (longueur = 0 dans l'adaptateur)
  */
 export function syncMetricStyles(
-    metrics: any[], 
-    metricStyles: any[] | undefined | null, 
+    metrics: any[],
+    metricStyles: any[] | undefined | null,
     widgetType: WidgetType
 ): any[] | undefined {
     // Vérifier d'abord si ce widget utilise des metricStyles
     const widgetDef = WIDGETS[widgetType];
     const metricStylesSchema = widgetDef?.configSchema?.metricStyles;
-    
+
     // Si metricStyles est vide dans l'adaptateur, retourner undefined pour ne pas créer de styles
     if (!metricStylesSchema || Object.keys(metricStylesSchema).length === 0) {
         return undefined;
     }
-    
+
     // S'assurer que metricStyles est un tableau
     const safeMetricStyles = Array.isArray(metricStyles) ? metricStyles : [];
     const newStyles = [...safeMetricStyles];

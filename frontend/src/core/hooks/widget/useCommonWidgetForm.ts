@@ -147,7 +147,7 @@ export function useCommonWidgetForm(
 
         prevMetricsRef.current = [...metrics];
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [config.metrics?.length, type]); // Ajout du type dans les dépendances
+    }, [config.metrics?.length, type]);
 
     // --- Handlers génériques SIMPLIFIÉS ---
     function handleConfigChange(field: string, value: unknown) {

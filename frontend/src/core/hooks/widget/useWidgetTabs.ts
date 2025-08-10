@@ -11,7 +11,7 @@ export function useWidgetTabs(config: any, widgetType?: WidgetType): TabConfig[]
         availableTabs.push({ key: "data", label: "Données" });
 
         const hasMetrics = config?.metrics && Array.isArray(config.metrics) && config.metrics.length > 0;
-        
+
         // Vérifier si le widget utilise des metricStyles dans l'adaptateur
         let hasMetricStyles = false;
         if (widgetType) {
