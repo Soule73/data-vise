@@ -368,14 +368,51 @@ export const WIDGETS: Record<WidgetType, WidgetDefinition> = {
     configSchema: {
       metricStyles: {
         ...COMMON_METRIC_STYLES,
-        opacity: { default: 0.7, inputType: "number", label: "Opacité (0-1)" },
-      },
-      widgetParams: {
-        ...COMMON_WIDGET_PARAMS,
+        borderColor: {
+          default: "#000000",
+          inputType: "color",
+          label: "Couleur de bordure",
+        },
         borderWidth: {
-          default: 1,
+          default: 2,
           inputType: "number",
           label: "Épaisseur bordure",
+        },
+        opacity: { default: 0.25, inputType: "number", label: "Opacité (0-1)" },
+        fill: {
+          default: true,
+          inputType: "checkbox",
+          label: "Remplir la zone",
+        },
+        pointStyle: {
+          default: "circle",
+          inputType: "select",
+          label: "Style des points",
+          options: [
+            { value: "circle", label: "Cercle" },
+            { value: "rect", label: "Rectangle" },
+            { value: "rectRounded", label: "Rectangle arrondi" },
+            { value: "rectRot", label: "Rectangle tourné" },
+            { value: "cross", label: "Croix" },
+            { value: "crossRot", label: "Croix tournée" },
+            { value: "star", label: "Étoile" },
+            { value: "line", label: "Ligne" },
+            { value: "dash", label: "Tiret" },
+          ],
+        },
+      },
+      widgetParams: {
+        // On retire xLabel, yLabel et showGrid du radar
+        ...Object.fromEntries(Object.entries(COMMON_WIDGET_PARAMS).filter(([k]) => k !== "xLabel" && k !== "yLabel" && k !== "showGrid")),
+        pointRadius: {
+          default: 4,
+          inputType: "number",
+          label: "Taille des points",
+        },
+        pointHoverRadius: {
+          default: 6,
+          inputType: "number",
+          label: "Taille des points au survol",
         },
       },
     },

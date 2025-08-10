@@ -1,5 +1,7 @@
 import ColorField from "@components/forms/ColorField";
 import InputField from "@components/forms/InputField";
+import SelectField from "@components/SelectField";
+import CheckboxField from "@components/forms/CheckboxField";
 import Button from "@components/forms/Button";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
@@ -69,6 +71,39 @@ export default function WidgetMetricStyleConfigSection({
                     )}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleMetricStyleChange(0, field, Number(e.target.value))
+                    }
+                    name={`metric-style-0-${field}`}
+                    id={`metric-style-0-${field}`}
+                  />
+                );
+              }
+              if (meta.inputType === "select" && meta.options) {
+                return (
+                  <SelectField
+                    key={field}
+                    label={label}
+                    value={String(
+                      safeMetricStyles?.[0]?.[field] ?? defaultValue
+                    )}
+                    options={meta.options}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleMetricStyleChange(0, field, e.target.value)
+                    }
+                    name={`metric-style-0-${field}`}
+                    id={`metric-style-0-${field}`}
+                  />
+                );
+              }
+              if (meta.inputType === "checkbox") {
+                return (
+                  <CheckboxField
+                    key={field}
+                    label={label}
+                    checked={Boolean(
+                      safeMetricStyles?.[0]?.[field] ?? defaultValue
+                    )}
+                    onChange={(checked) =>
+                      handleMetricStyleChange(0, field, checked)
                     }
                     name={`metric-style-0-${field}`}
                     id={`metric-style-0-${field}`}
@@ -204,6 +239,39 @@ export default function WidgetMetricStyleConfigSection({
                           field,
                           Number(e.target.value)
                         )
+                      }
+                      name={`metric-style-${idx}-${field}`}
+                      id={`metric-style-${idx}-${field}`}
+                    />
+                  );
+                }
+                if (meta.inputType === "select" && meta.options) {
+                  return (
+                    <SelectField
+                      key={field}
+                      label={label}
+                      value={String(
+                        safeMetricStyles[idx]?.[field] ?? defaultValue ?? ""
+                      )}
+                      options={meta.options}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        handleMetricStyleChange(idx, field, e.target.value)
+                      }
+                      name={`metric-style-${idx}-${field}`}
+                      id={`metric-style-${idx}-${field}`}
+                    />
+                  );
+                }
+                if (meta.inputType === "checkbox") {
+                  return (
+                    <CheckboxField
+                      key={field}
+                      label={label}
+                      checked={Boolean(
+                        safeMetricStyles[idx]?.[field] ?? defaultValue ?? false
+                      )}
+                      onChange={(checked) =>
+                        handleMetricStyleChange(idx, field, checked)
                       }
                       name={`metric-style-${idx}-${field}`}
                       id={`metric-style-${idx}-${field}`}

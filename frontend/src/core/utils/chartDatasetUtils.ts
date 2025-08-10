@@ -218,22 +218,31 @@ export function createRadarChartDataset(
     style: any
 ): any {
     const baseColor = getDatasetColor('radar', idx, style, style.colors);
-    return {
+
+    // Utiliser le label de la métrique ou générer un label par défaut
+    // Pour les métriques radar, on évite d'utiliser metric.field car elles utilisent fields[]
+    const label = metric.label || `Dataset ${idx + 1}`;
+
+    // Calculer l'opacité finale pour le background
+    const finalOpacity = style.opacity !== undefined ? style.opacity : 0.25;
+
+    const dataset = {
         type: 'radar' as const,
-        label: metric.label || `${metric.agg}(${metric.field})`,
+        label,
         data: values,
         backgroundColor: style.color ?
-            addTransparency(style.color, 0.25) :
-            addTransparency(baseColor, 0.25),
+            addTransparency(style.color, finalOpacity) :
+            addTransparency(baseColor, finalOpacity),
         borderColor: style.borderColor || baseColor,
         borderWidth: style.borderWidth ?? widgetParams.borderWidth ?? 2,
         pointStyle: style.pointStyle || widgetParams.pointStyle || 'circle',
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        fill: style.fill !== false,
+        pointRadius: style.pointRadius ?? widgetParams.pointRadius ?? 4,
+        pointHoverRadius: style.pointHoverRadius ?? widgetParams.pointHoverRadius ?? 6,
+        fill: style.fill !== undefined ? style.fill : true,
         tension: 0.1,
-        opacity: style.opacity || 0.7,
     };
+
+    return dataset;
 }
 
 /**

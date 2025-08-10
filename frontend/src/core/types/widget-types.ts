@@ -276,7 +276,8 @@ export interface WidgetBubbleDataConfigSectionProps {
 export interface MetricStyleFieldSchema {
   label?: string;
   default?: string | number | boolean | string[];
-  inputType?: "color" | "number" | "text" | "color-array";
+  inputType?: "color" | "number" | "text" | "color-array" | "select" | "checkbox";
+  options?: { value: string; label: string }[];
 }
 
 export interface WidgetKPIGroupDataConfigSectionProps

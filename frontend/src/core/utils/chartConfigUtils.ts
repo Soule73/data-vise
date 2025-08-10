@@ -233,6 +233,19 @@ function createBaseOptions(chartType: ChartType, params: any, labels: string[]):
                 borderWidth: params.borderWidth || 2,
             },
         };
+        // Configuration tooltip spécifique pour radar
+        baseOptions.plugins!.tooltip = {
+            callbacks: {
+                label: (context: TooltipItem<any>) => {
+                    // Pour radar, context.parsed est un objet {r: valeur}
+                    const value = context.parsed.r || context.parsed;
+                    const format = params.tooltipFormat || "{label}: {value}";
+                    return format
+                        .replace("{label}", context.dataset.label || "")
+                        .replace("{value}", value.toString());
+                },
+            },
+        };
     }
 
     // Options pour l'affichage des points (line, scatter, bubble, radar)
