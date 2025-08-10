@@ -85,6 +85,8 @@ export default function WidgetDataConfigSection({
         handleConfigChange={handleConfigChange}
         configSchema={{ dataConfig }}
         data={data}
+        config={config}
+        availableFields={columns}
       />
     );
   }
