@@ -864,8 +864,8 @@ export const WIDGET_DATA_CONFIG: Record<
   },
   radar: {
     metrics: COMMON_METRICS,
-    bucket: COMMON_BUCKET,
-    buckets: { ...COMMON_MULTI_BUCKETS, label: "Buckets" },
+    bucket: { ...COMMON_BUCKET, allow: false },
+    buckets: { ...COMMON_MULTI_BUCKETS, allow: false },
   },
   kpi: {
     metrics: { ...COMMON_METRICS, allowMultiple: false, label: "Métrique" },

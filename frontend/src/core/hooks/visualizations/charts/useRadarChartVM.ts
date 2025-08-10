@@ -2,7 +2,6 @@
 import { useMemo } from "react";
 import type { ChartOptions, ChartData } from "chart.js";
 import type { RadarChartConfig } from "@type/visualization";
-import { useMultiBucketProcessor } from "@utils/multiBucketProcessor";
 import { createRadarChartDataset } from "@utils/chartDatasetUtils";
 import { createBaseOptions } from "@utils/chartConfigUtils";
 import { mergeWidgetParams } from "@utils/widgetParamsUtils";
@@ -19,9 +18,6 @@ export function useRadarChartLogic(
     valueLabelsPlugin: any;
     validDatasets: any[];
 } {
-    // Traiter les données avec les buckets multiples
-    const processedData = useMultiBucketProcessor(data, config);
-    
     // Paramètres du widget
     const widgetParams = useMemo(() => mergeWidgetParams(config.widgetParams), [config.widgetParams]);
     
@@ -29,11 +25,10 @@ export function useRadarChartLogic(
     const validMetrics = useMemo(() => config.metrics || [], [config.metrics]);
     const metricStyles = useMemo(() => prepareMetricStyles(config.metricStyles), [config.metricStyles]);
 
-    // Pour le radar chart, nous devons traiter les données différemment
-    // Les labels sont les champs sélectionnés dans chaque dataset
+    // Pour le radar chart, les labels sont les champs sélectionnés dans les datasets
     const labels = useMemo(() => {
         if (!validMetrics.length) return [];
-        
+
         // Utiliser les champs du premier dataset comme axes du radar
         const firstMetric = validMetrics[0] as RadarMetricConfig;
         return firstMetric.fields || [];
@@ -41,13 +36,11 @@ export function useRadarChartLogic(
 
     // Créer les datasets pour chaque métrique radar
     const datasets = useMemo(() => {
-        const workingData = processedData.groupedData || data;
-        
         return (validMetrics as RadarMetricConfig[]).map((metric: RadarMetricConfig, idx: number) => {
-            // Filtrer les données selon groupBy si spécifié
-            let filteredData = workingData;
+            // Filtrer les données selon groupBy si spécifié dans le dataset
+            let filteredData = data;
             if (metric.groupBy && metric.groupByValue) {
-                filteredData = workingData.filter(row => 
+                filteredData = data.filter(row =>
                     String(row[metric.groupBy!]) === metric.groupByValue
                 );
             }
@@ -55,8 +48,8 @@ export function useRadarChartLogic(
             // Calculer les valeurs pour chaque champ (axe du radar)
             const values = (metric.fields || []).map(field => {
                 if (!filteredData.length) return 0;
-                
-                // Appliquer l'agrégation
+
+                // Appliquer l'agrégation sur le champ spécifique
                 switch (metric.agg) {
                     case 'sum':
                         return filteredData.reduce((sum, row) => sum + (Number(row[field]) || 0), 0);
@@ -78,12 +71,12 @@ export function useRadarChartLogic(
             const style = metricStyles[idx] || {};
             return createRadarChartDataset(metric, idx, values, labels, widgetParams, style);
         });
-    }, [validMetrics, data, processedData.groupedData, labels, widgetParams, metricStyles]);
+    }, [validMetrics, data, labels, widgetParams, metricStyles]);
 
     // Options du chart
     const options = useMemo(() => {
         const baseOptions = createBaseOptions("radar", widgetParams, labels);
-        
+
         // Options spécifiques au radar
         return {
             ...baseOptions,

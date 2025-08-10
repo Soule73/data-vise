@@ -1,7 +1,6 @@
 import SelectField from "@components/SelectField";
 import InputField from "@components/forms/InputField";
 import CheckboxField from "@components/forms/CheckboxField";
-import CommonMultiBucketSection from "@components/widgets/CommonMultiBucketSection";
 import DatasetSection from "@components/widgets/DatasetSection";
 import { useState } from "react";
 import type { WidgetRadarDataConfigSectionProps } from "@type/widget-types";
@@ -13,8 +12,6 @@ export default function WidgetRadarDataConfigSection({
   handleConfigChange,
   configSchema,
   data = [],
-  config,
-  availableFields,
 }: WidgetRadarDataConfigSectionProps) {
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
 
@@ -142,16 +139,6 @@ export default function WidgetRadarDataConfigSection({
 
   return (
     <div className="space-y-6">
-      {/* Section Multi-Buckets avec le composant générique */}
-      <CommonMultiBucketSection
-        config={config}
-        columns={columns}
-        availableFields={availableFields}
-        onConfigChange={handleConfigChange}
-        sectionLabel="Buckets"
-        allowMultiple={true}
-      />
-
       {/* Section Datasets avec le composant générique */}
       <DatasetSection
         title="Datasets (axes multiples)"
