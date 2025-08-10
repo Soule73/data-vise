@@ -14,7 +14,7 @@ export default function KPIGroupWidget({
   data: Record<string, any>[];
   config: KPIGroupWidgetConfig;
 }) {
-  const { metrics, metricStyles, filters, gridColumns, widgetParamsList } =
+  const { metrics, metricStyles, gridColumns, widgetParamsList } =
     useKPIGroupVM(config);
 
   if (
@@ -50,10 +50,11 @@ export default function KPIGroupWidget({
           data={data}
           config={{
             metrics: [metric],
-            metricStyles: metricStyles[idx] || {},
-            filters: filters && filters[idx] ? [filters[idx]] : undefined,
+            metricStyles: Array.isArray(metricStyles) ? metricStyles[idx] : metricStyles,
+            filters: config.filters, // Tous les KPI partagent les mêmes filtres
             widgetParams: widgetParamsList[idx],
             bucket: config.bucket,
+            buckets: config.buckets,
           }}
         />
       ))}
