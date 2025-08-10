@@ -160,6 +160,7 @@ export interface MetricStyle {
 
 export interface Filter {
   field: string; // Champ sur lequel appliquer le filtre
+  operator?: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than' | 'greater_equal' | 'less_equal' | 'starts_with' | 'ends_with'; // Opérateur de comparaison
   value: string | number | readonly string[] | undefined; // Valeur du filtre
 }
 

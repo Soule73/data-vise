@@ -90,7 +90,7 @@ export interface RadarMetricConfig extends Metric {
 export interface DatasetFilter {
   field: string;
   value: string | number;
-  operator?: 'equals' | 'contains' | 'not_equals' | 'greater_than' | 'less_than';
+  operator?: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than' | 'greater_equal' | 'less_equal' | 'starts_with' | 'ends_with';
 }
 
 export interface MetricUICollapseState {

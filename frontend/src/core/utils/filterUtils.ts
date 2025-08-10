@@ -7,7 +7,7 @@ import type { Filter } from "@type/visualization";
  */
 
 /**
- * Applique un filtre simple à un ensemble de données
+ * Applique un filtre simple à un ensemble de données avec opérateurs
  */
 export function applyFilter(
     data: Record<string, any>[],
@@ -17,6 +17,8 @@ export function applyFilter(
         return data;
     }
 
+    const operator = filter.operator || 'equals';
+
     return data.filter(row => {
         const fieldValue = row[filter.field];
 
@@ -24,11 +26,40 @@ export function applyFilter(
             return false;
         }
 
-        // Conversion en chaîne pour la comparaison
-        const fieldStr = String(fieldValue).toLowerCase();
-        const filterStr = String(filter.value).toLowerCase();
+        switch (operator) {
+            case 'equals':
+                return String(fieldValue) === String(filter.value);
 
-        return fieldStr.includes(filterStr);
+            case 'not_equals':
+                return String(fieldValue) !== String(filter.value);
+
+            case 'contains':
+                return String(fieldValue).toLowerCase().includes(String(filter.value).toLowerCase());
+
+            case 'not_contains':
+                return !String(fieldValue).toLowerCase().includes(String(filter.value).toLowerCase());
+
+            case 'greater_than':
+                return Number(fieldValue) > Number(filter.value);
+
+            case 'less_than':
+                return Number(fieldValue) < Number(filter.value);
+
+            case 'greater_equal':
+                return Number(fieldValue) >= Number(filter.value);
+
+            case 'less_equal':
+                return Number(fieldValue) <= Number(filter.value);
+
+            case 'starts_with':
+                return String(fieldValue).toLowerCase().startsWith(String(filter.value).toLowerCase());
+
+            case 'ends_with':
+                return String(fieldValue).toLowerCase().endsWith(String(filter.value).toLowerCase());
+
+            default:
+                return String(fieldValue) === String(filter.value);
+        }
     });
 }
 
@@ -62,11 +93,26 @@ export function applyDatasetFilter(
             case 'contains':
                 return String(fieldValue).toLowerCase().includes(String(filter.value).toLowerCase());
 
+            case 'not_contains':
+                return !String(fieldValue).toLowerCase().includes(String(filter.value).toLowerCase());
+
             case 'greater_than':
                 return Number(fieldValue) > Number(filter.value);
 
             case 'less_than':
                 return Number(fieldValue) < Number(filter.value);
+
+            case 'greater_equal':
+                return Number(fieldValue) >= Number(filter.value);
+
+            case 'less_equal':
+                return Number(fieldValue) <= Number(filter.value);
+
+            case 'starts_with':
+                return String(fieldValue).toLowerCase().startsWith(String(filter.value).toLowerCase());
+
+            case 'ends_with':
+                return String(fieldValue).toLowerCase().endsWith(String(filter.value).toLowerCase());
 
             default:
                 return String(fieldValue) === String(filter.value);
@@ -146,6 +192,11 @@ export function validateFilter(filter: Filter): {
         errors.push("La valeur du filtre doit être spécifiée");
     }
 
+    const validOperators = ['equals', 'not_equals', 'contains', 'not_contains', 'greater_than', 'less_than', 'greater_equal', 'less_equal', 'starts_with', 'ends_with'];
+    if (filter.operator && !validOperators.includes(filter.operator)) {
+        errors.push(`Opérateur invalide: ${filter.operator}`);
+    }
+
     return {
         isValid: errors.length === 0,
         errors
@@ -169,7 +220,7 @@ export function validateDatasetFilter(filter: DatasetFilter): {
         errors.push("La valeur du filtre doit être spécifiée");
     }
 
-    const validOperators = ['equals', 'contains', 'not_equals', 'greater_than', 'less_than'];
+    const validOperators = ['equals', 'not_equals', 'contains', 'not_contains', 'greater_than', 'less_than', 'greater_equal', 'less_equal', 'starts_with', 'ends_with'];
     if (filter.operator && !validOperators.includes(filter.operator)) {
         errors.push(`Opérateur invalide: ${filter.operator}`);
     }
