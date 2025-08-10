@@ -73,7 +73,7 @@ export function useKPIGroupVM(config: KPIGroupWidgetConfig): {
         // Récupérer les styles pour ce métrique spécifique
         const metricStyle = Array.isArray(metricStyles) ? metricStyles[idx] : undefined;
         const baseParams = config.widgetParams as Record<string, unknown> || {};
-        
+
         return {
           // Hériter de tous les paramètres du groupe
           ...baseParams,

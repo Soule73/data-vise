@@ -46,7 +46,7 @@ export default function WidgetFormLayout({
 }: WidgetFormLayoutProps) {
 
     // Utilisation du hook pour déterminer les onglets disponibles
-    const availableTabs = useWidgetTabs(config);
+    const availableTabs = useWidgetTabs(config, type);
 
     // Calcul optimisé des conditions pour l'affichage (mémorisées pour éviter re-calculs)
     const hasMetrics = config?.metrics && Array.isArray(config.metrics) && config.metrics.length > 0;

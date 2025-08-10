@@ -121,7 +121,7 @@ export function getCardColors(config: StylableConfig): {
     descriptionColor: string;
 } {
     const params = config.widgetParams || {};
-    
+
     const iconColor = (typeof params.iconColor === 'string' ? params.iconColor : undefined) || "#6366f1";
     const valueColor = (typeof params.valueColor === 'string' ? params.valueColor : undefined) || "#2563eb";
     const descriptionColor = (typeof params.descriptionColor === 'string' ? params.descriptionColor : undefined) || "#6b7280";

@@ -57,7 +57,7 @@ export function useCardWidgetVM(
 
   // Extraction des paramètres de formatage depuis widgetParams
   const { format, decimals, currency } = getKPIWidgetParams(config as { widgetParams?: Record<string, unknown> });
-  
+
   // Formatage de la valeur
   const formattedValue = formatKPIValue(value, format, decimals, currency);
 

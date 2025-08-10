@@ -138,14 +138,16 @@ export function useCommonWidgetForm(
         // Seulement si le nombre de métriques a changé (pas les labels)
         if (metrics.length !== prevMetricsRef.current.length) {
             const currentStyles = config.metricStyles || [];
-            const updatedStyles = syncMetricStyles(metrics, currentStyles);
+            const updatedStyles = syncMetricStyles(metrics, currentStyles, type);
 
-            setConfig((c: WidgetConfig) => ({ ...c, metricStyles: updatedStyles }));
+            if (updatedStyles !== undefined) {
+                setConfig((c: WidgetConfig) => ({ ...c, metricStyles: updatedStyles }));
+            }
         }
 
         prevMetricsRef.current = [...metrics];
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [config.metrics?.length]); // Dépendance simplifiée : seulement la longueur
+    }, [config.metrics?.length, type]); // Ajout du type dans les dépendances
 
     // --- Handlers génériques SIMPLIFIÉS ---
     function handleConfigChange(field: string, value: unknown) {

@@ -19,6 +19,10 @@ export function generateDefaultWidgetConfig(type: WidgetType, columns: string[])
 
         const result: any = {};
         for (const key of Object.keys(obj)) {
+            // Si c'est metricStyles et qu'il est vide, ne pas l'inclure
+            if (key === "metricStyles" && obj[key] && typeof obj[key] === "object" && Object.keys(obj[key]).length === 0) {
+                continue;
+            }
             result[key] = extractDefaults(obj[key]);
         }
         return result;
@@ -168,9 +172,22 @@ export function generateDefaultMetricStyle(): Record<string, any> {
 /**
  * Synchronise les styles des métriques avec la configuration (VERSION SIMPLIFIÉE)
  * Ajoute ou supprime des styles selon le nombre de métriques
+ * NE fait rien si le widget n'utilise pas de metricStyles (longueur = 0 dans l'adaptateur)
  */
-
-export function syncMetricStyles(metrics: any[], metricStyles: any[] | undefined | null): any[] {
+export function syncMetricStyles(
+    metrics: any[], 
+    metricStyles: any[] | undefined | null, 
+    widgetType: WidgetType
+): any[] | undefined {
+    // Vérifier d'abord si ce widget utilise des metricStyles
+    const widgetDef = WIDGETS[widgetType];
+    const metricStylesSchema = widgetDef?.configSchema?.metricStyles;
+    
+    // Si metricStyles est vide dans l'adaptateur, retourner undefined pour ne pas créer de styles
+    if (!metricStylesSchema || Object.keys(metricStylesSchema).length === 0) {
+        return undefined;
+    }
+    
     // S'assurer que metricStyles est un tableau
     const safeMetricStyles = Array.isArray(metricStyles) ? metricStyles : [];
     const newStyles = [...safeMetricStyles];
