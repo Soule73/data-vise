@@ -1,7 +1,6 @@
 import type { ScatterMetricConfig } from "@type/metric-bucket-types";
 import SelectField from "@components/SelectField";
 import InputField from "@components/forms/InputField";
-import CommonMultiBucketSection from "@components/widgets/CommonMultiBucketSection";
 import DatasetSection from "@components/widgets/DatasetSection";
 import { useState } from "react";
 import type { WidgetScatterDataConfigSectionProps } from "@type/widget-types";
@@ -10,8 +9,6 @@ export default function WidgetScatterDataConfigSection({
   metrics,
   columns,
   handleConfigChange,
-  config,
-  availableFields,
 }: WidgetScatterDataConfigSectionProps) {
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
 
@@ -77,16 +74,6 @@ export default function WidgetScatterDataConfigSection({
 
   return (
     <div className="space-y-6">
-      {/* Section Multi-Buckets avec le composant générique */}
-      <CommonMultiBucketSection
-        config={config}
-        columns={columns}
-        availableFields={availableFields}
-        onConfigChange={handleConfigChange}
-        sectionLabel="Buckets"
-        allowMultiple={true}
-      />
-
       {/* Section Datasets avec le composant générique */}
       <DatasetSection
         title="Datasets (x, y)"

@@ -159,25 +159,40 @@ export function createLineChartDataset(
  * Crée un dataset spécialisé pour scatter chart
  */
 export function createScatterChartDataset(
-    metric: Metric,
+    metric: any, // ScatterMetricConfig avec x, y et scatterData
     idx: number,
-    values: number[],
+    scatterData: Array<{ x: number; y: number }>,
     _labels: string[],
     widgetParams: any,
     style: any
 ): any {
+    const baseColor = getDatasetColor('scatter', idx, style, style.colors);
+    let backgroundColor = baseColor;
+
+    // Gérer l'opacité
+    if (style.opacity !== undefined && style.opacity !== null) {
+        if (typeof baseColor === 'string' && baseColor.startsWith('#')) {
+            // Convertir hex en rgba avec opacité
+            const r = parseInt(baseColor.slice(1, 3), 16);
+            const g = parseInt(baseColor.slice(3, 5), 16);
+            const b = parseInt(baseColor.slice(5, 7), 16);
+            backgroundColor = `rgba(${r}, ${g}, ${b}, ${style.opacity})`;
+        }
+    }
+
     return {
         type: 'scatter' as const,
-        label: metric.label || `${metric.agg}(${metric.field})`,
-        data: values,
-        backgroundColor: getDatasetColor('scatter', idx, style, style.colors),
-        borderColor: style.borderColor || getDatasetColor('scatter', idx, style),
-        borderWidth: widgetParams.borderWidth || (style.borderWidth ?? 1),
-        pointStyle: style.pointStyle || widgetParams.pointStyle || 'circle',
-        pointRadius: widgetParams.showPoints !== false ? 5 : 0,
-        pointHoverRadius: widgetParams.showPoints !== false ? 7 : 0,
+        label: metric.label,
+        data: scatterData,
+        backgroundColor,
+        borderColor: style.borderColor || baseColor,
+        borderWidth: style.borderWidth || 1,
+        pointStyle: style.pointStyle || 'circle',
+        pointRadius: widgetParams.showPoints !== false ? (style.pointRadius || 3) : 0,
+        pointHoverRadius: widgetParams.showPoints !== false ? (style.pointHoverRadius || 5) : 0,
         showLine: false,
-        opacity: style.opacity || 0.7,
+        hoverBackgroundColor: backgroundColor,
+        hoverBorderColor: style.borderColor || baseColor,
     };
 }
 
