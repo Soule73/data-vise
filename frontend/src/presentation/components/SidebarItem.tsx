@@ -1,4 +1,4 @@
-import type { SidebarItemProps } from '@type/navigation-types';
+import type { SidebarItemProps } from '@type/navigationTypes';
 import { NavLink } from 'react-router-dom';
 
 export default function SidebarItem({ to, children, icon }: SidebarItemProps) {

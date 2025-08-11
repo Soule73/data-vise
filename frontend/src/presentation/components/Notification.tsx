@@ -1,4 +1,4 @@
-import type { NotificationProps } from "@type/notification-types";
+import type { NotificationProps } from "@type/notificationTypes";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef } from "react";
 import Button from "@components/forms/Button";

@@ -1,20 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ChartOptions, ChartData } from "chart.js";
-import type { BarChartConfig } from "@type/visualization";
-import { useChartLogic } from "@hooks/visualizations/charts/useChartLogic";
-import { createBarChartDataset } from "@utils/chartDatasetUtils";
+import { useChartLogic } from "@hooks/visualizations/charts/useChartVM";
+import { createBarChartDataset } from "@utils/charts/chartDatasetUtils";
+import type { BarChartVM, BarChartWidgetProps } from "@type/widgetTypes";
 
-export function useBarChartLogic(
-    data: Record<string, any>[],
-    config: BarChartConfig
-): {
-    chartData: ChartData<"bar">;
-    options: ChartOptions<"bar">;
-    showNativeValues: boolean;
-    valueLabelsPlugin: any;
-} {
 
-    const result = useChartLogic({
+
+
+export function useBarChartLogic({
+    data,
+    config,
+}: BarChartWidgetProps): BarChartVM {
+    const result = useChartLogic<"bar">({
         chartType: "bar",
         data,
         config,

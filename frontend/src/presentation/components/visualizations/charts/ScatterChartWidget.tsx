@@ -1,4 +1,4 @@
-import { useScatterChartLogic } from "@hooks/visualizations/charts/optimized";
+import { useScatterChartLogic } from "@hooks/visualizations/charts";
 import {
   Chart as ChartJS,
   ScatterController,
@@ -12,7 +12,7 @@ import { Scatter } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
 import NoDataWidget from "@components/widgets/NoDataWidget";
-import type { ScatterChartWidgetProps } from "@type/widget-types";
+import type { ScatterChartWidgetProps } from "@type/widgetTypes";
 
 ChartJS.register(
   ScatterController,
@@ -26,11 +26,8 @@ ChartJS.register(
 export default function ScatterChartWidget({
   data,
   config,
-  // @ts-expect-error : Unused variable in edit mode
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  editMode,
 }: ScatterChartWidgetProps) {
-  const { chartData, options } = useScatterChartLogic(data, config);
+  const { chartData, options } = useScatterChartLogic({ data, config });
 
   if (
     !data ||

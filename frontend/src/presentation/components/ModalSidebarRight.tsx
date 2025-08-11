@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import type { ModalProps } from '@type/layout-types';
+import type { ModalProps } from '@type/layoutTypes';
 import Button from '@components/forms/Button';
 
 export default function ModalSidebarRight({

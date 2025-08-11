@@ -1,6 +1,6 @@
 import api from "@services/api";
-import { extractApiData } from "@utils/api-utils";
-import type { Widget } from "@type/widget-types";
+import { extractApiData } from "@utils/apiUtils";
+import type { Widget } from "@type/widgetTypes";
 import type { ApiResponse } from "@type/api";
 
 export async function fetchWidgets(): Promise<Widget[]> {

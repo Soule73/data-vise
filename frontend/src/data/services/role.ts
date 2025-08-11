@@ -1,7 +1,7 @@
 import api from '@services/api';
-import { extractApiData } from "@utils/api-utils";
+import { extractApiData } from "@utils/apiUtils";
 import type { ApiResponse } from "@type/api";
-import type { Role, Permission } from "@type/auth-types";
+import type { Role, Permission } from "@type/authTypes";
 
 export async function fetchRoles(): Promise<Role[]> {
   const res = await api.get<ApiResponse<Role[]>>('/auth/roles');

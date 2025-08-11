@@ -1,38 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
-import type { ChartOptions, ChartData } from "chart.js";
-import type { RadarChartConfig } from "@type/visualization";
-import { createRadarChartDataset } from "@utils/chartDatasetUtils";
-import { createBaseOptions, mergeOptions } from "@utils/chartConfigUtils";
-import { mergeWidgetParams } from "@utils/widgetParamsUtils";
-import { prepareMetricStyles } from "@utils/chartDatasetUtils";
-import { getCustomChartOptions } from "@utils/chartOptionsUtils";
-import type { RadarMetricConfig } from "@type/metric-bucket-types";
+import type { ChartData } from "chart.js";
+import { createRadarChartDataset } from "@utils/charts/chartDatasetUtils";
+import { createBaseOptions, mergeOptions } from "@utils/charts/chartConfigUtils";
+import { mergeWidgetParams } from "@utils/widgets/widgetParamsUtils";
+import { prepareMetricStyles } from "@utils/charts/chartDatasetUtils";
+import { getCustomChartOptions } from "@utils/charts/chartOptionsUtils";
+import type { RadarMetricConfig } from "@type/metricBucketTypes";
 import {
     getRadarLabels,
     processRadarMetrics,
     validateRadarConfiguration,
     generateRadarMetricLabel
-} from "@utils/radarChartUtils";
+} from "@utils/charts/radarChartUtils";
+import type { RadarChartVM, RadarChartWidgetProps } from "@type/widgetTypes";
 
-export function useRadarChartLogic(
-    data: Record<string, any>[],
-    config: RadarChartConfig
-): {
-    chartData: ChartData<"radar">;
-    options: ChartOptions<"radar">;
-    showNativeValues: boolean;
-    valueLabelsPlugin: any;
-    validDatasets: any[];
-    isValid: boolean;
-    validationErrors: string[];
-    validationWarnings: string[];
-} {
+export function useRadarChartLogic({
+    data,
+    config,
+}: RadarChartWidgetProps): RadarChartVM {
     // Paramètres du widget
     const widgetParams = useMemo(() => mergeWidgetParams(config.widgetParams), [config.widgetParams]);
 
     // Métriques et styles
     const validMetrics = useMemo(() => config.metrics || [], [config.metrics]);
+
     const metricStyles = useMemo(() => prepareMetricStyles(config.metricStyles), [config.metricStyles]);
 
     // Validation de la configuration

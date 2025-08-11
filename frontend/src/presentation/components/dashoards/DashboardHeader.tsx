@@ -2,7 +2,7 @@ import React from "react";
 import DashboardSharePopover from "@components/dashoards/DashboardSharePopover";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import Button from "@components/forms/Button";
-import type { DashboardHeaderProps } from "@type/dashboard-types";
+import type { DashboardHeaderProps } from "@type/dashboardTypes";
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   editMode,

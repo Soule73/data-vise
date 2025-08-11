@@ -9,8 +9,8 @@ import { useUserStore } from "@store/user";
 import { useSourcesQuery } from "@repositories/sources";
 import { useQueryClient } from "@tanstack/react-query";
 import { WIDGETS } from "@adapters/visualizations";
-import type { DataSource } from "@type/data-source";
-import type { Widget } from "@type/widget-types";
+import type { DataSource } from "@type/dataSource";
+import type { Widget } from "@type/widgetTypes";
 
 export function useWidgetListPage() {
   const queryClient = useQueryClient();

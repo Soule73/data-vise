@@ -1,12 +1,7 @@
-import BaseFilterConfig from "./BaseFilterConfig";
+import type { GlobalFiltersConfigProps } from "@type/widgetTypes";
+import BaseFilterConfig from "@components/widgets/BaseFilterConfig";
 import type { Filter } from "@type/visualization";
 
-interface GlobalFiltersConfigProps {
-    filters: Filter[];
-    columns: string[];
-    data?: Record<string, unknown>[]; // Données pour extraire les valeurs possibles
-    onFiltersChange: (filters: Filter[]) => void;
-}
 
 export default function GlobalFiltersConfig({
     filters = [],
@@ -14,7 +9,7 @@ export default function GlobalFiltersConfig({
     data = [],
     onFiltersChange,
 }: GlobalFiltersConfigProps) {
-    // Fonction pour créer un nouveau filtre global
+
     const createNewFilter = (columns: string[]): Filter => ({
         field: columns[0] || '',
         operator: 'equals',

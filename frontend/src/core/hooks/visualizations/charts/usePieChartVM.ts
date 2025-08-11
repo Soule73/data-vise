@@ -1,20 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ChartOptions, ChartData } from "chart.js";
-import type { PieChartConfig } from '@type/visualization';
-import { useChartLogic } from '@hooks/visualizations/charts/useChartLogic';
-import { createPieChartDataset } from '@utils/chartDatasetUtils';
+import { useChartLogic } from '@hooks/visualizations/charts/useChartVM';
+import { createPieChartDataset } from '@utils/charts/chartDatasetUtils';
+import type { PieChartVM, PieChartWidgetProps } from "@type/widgetTypes";
 
-export function usePieChartLogic(
-    data: Record<string, any>[],
-    config: PieChartConfig
-): {
-    chartData: ChartData<"pie">;
-    options: ChartOptions<"pie">;
-    showNativeValues: boolean;
-    valueLabelsPlugin: any;
-} {
+export function usePieChartLogic({
+    data,
+    config,
+}: PieChartWidgetProps): PieChartVM {
 
-    const result = useChartLogic({
+    const result = useChartLogic<"pie">({
         chartType: "pie",
         data,
         config,

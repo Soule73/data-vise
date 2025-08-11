@@ -1,7 +1,12 @@
 import { useEffect } from 'react';
-import type { UseWidgetAutoConfigProps } from '@type/widget-types';
-import { createDefaultWidgetConfig, optimizeWidgetConfig } from '@utils/widgetConfigDefaults';
-import { ensureMultiBuckets } from '@utils/bucketMigration';
+import type { UseWidgetAutoConfigProps } from '@type/widgetTypes';
+import type { MultiBucketConfig } from '@type/metricBucketTypes';
+import { createDefaultWidgetConfig, optimizeWidgetConfig } from '@utils/widgets/widgetConfigDefaults';
+
+// Fonction pour s'assurer que nous avons des buckets multiples
+function ensureMultiBuckets(config: { buckets?: MultiBucketConfig[] }): MultiBucketConfig[] {
+    return config.buckets || [];
+}
 
 
 /**
@@ -44,8 +49,6 @@ export function useWidgetAutoConfig({
 
         if (existingBuckets.length === 0 && optimizedConfig.buckets.length > 0) {
             onConfigChange('buckets', optimizedConfig.buckets);
-            // Maintenir la compatibilité
-            onConfigChange('bucket', optimizedConfig.bucket);
         }
 
     }, [widgetType, columns, data, autoInitialize, currentConfig, onConfigChange]);
@@ -72,12 +75,6 @@ export function useWidgetAutoConfig({
             if (suggestions) {
                 onConfigChange('metrics', suggestions.suggestedMetrics);
                 onConfigChange('buckets', suggestions.suggestedBuckets);
-                if (suggestions.suggestedBuckets.length > 0) {
-                    onConfigChange('bucket', {
-                        field: suggestions.suggestedBuckets[0].field,
-                        label: suggestions.suggestedBuckets[0].label
-                    });
-                }
             }
         }
     };

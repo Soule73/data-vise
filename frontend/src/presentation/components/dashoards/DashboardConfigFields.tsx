@@ -1,5 +1,5 @@
 import React from "react";
-import type { IntervalUnit } from "@type/dashboard-types";
+import type { IntervalUnit } from "@type/dashboardTypes";
 import {
   Popover,
   PopoverButton,

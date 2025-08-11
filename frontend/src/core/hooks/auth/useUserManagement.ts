@@ -12,7 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserStore } from "@store/user";
-import type { User, Role } from "@type/auth-types";
+import type { User, Role } from "@type/authTypes";
 import { userSchema } from "@validation/user";
 
 export function useUserManagement() {

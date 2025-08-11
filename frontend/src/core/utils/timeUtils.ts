@@ -1,4 +1,4 @@
-import type { IntervalUnit } from "@type/dashboard-types";
+import type { IntervalUnit } from "@type/dashboardTypes";
 
 /**
  * Convertit une valeur et une unité d'intervalle en millisecondes.

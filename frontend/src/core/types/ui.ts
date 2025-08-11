@@ -1,6 +1,6 @@
-import type { User } from "@type/auth-types";
+import type { User } from "@type/authTypes";
 import type { UseFormReturn } from "react-hook-form";
-import type { InputFieldProps } from "@type/form-types";
+import type { InputFieldProps } from "@type/formTypes";
 import type { TextareaHTMLAttributes } from "react";
 
 export type BadgeColor = "gray" | "indigo" | "green" | "yellow";

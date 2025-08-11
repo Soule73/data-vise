@@ -8,7 +8,7 @@ import { useNotificationStore } from "@store/notification";
 import { useNavigate } from "react-router-dom";
 import { useDashboardStore } from "@store/dashboard";
 import { useUserStore } from "@store/user";
-import type { Dashboard } from "@type/dashboard-types";
+import type { Dashboard } from "@type/dashboardTypes";
 
 export function useDashboardList() {
   const { data: dashboards = [], isLoading } = useDashboardsQuery();

@@ -7,7 +7,7 @@ import {
 } from "@headlessui/react";
 import { Button as HeadlessButton } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import type { ModalProps } from "@type/layout-types";
+import type { ModalProps } from "@type/layoutTypes";
 
 const sizeMap = {
   sm: "max-w-sm",

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getSlotStyleUtil } from "@utils/dashboardGridUtils";
-import type { UseDashboardGridProps } from "@type/dashboard-types";
+import { getSlotStyleUtil } from "@utils/dashboard/dashboardGridUtils";
+import type { UseDashboardGridProps } from "@type/dashboardTypes";
 
 export function useDashboardGrid({
   layout,

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import api from "@services/api";
-import type { CreateSourcePayload, DataSource, DetectParams, SourceFormState } from "@type/data-source";
+import type { CreateSourcePayload, DataSource, DetectParams, FetchSourceDataOptions, SourceFormState } from "@type/dataSource";
 import type { ApiError, ApiResponse } from "@type/api";
-import { extractApiData } from "@utils/api-utils";
+import { extractApiData } from "@utils/apiUtils";
 
 export async function getSources(): Promise<DataSource[]> {
   const res = await api.get<ApiResponse<DataSource[]>>("/sources");
@@ -105,15 +105,6 @@ export async function detectColumns(params: DetectParams | null): Promise<{
   }
 }
 
-export interface FetchSourceDataOptions {
-  from?: string;
-  to?: string;
-  page?: number;
-  pageSize?: number;
-  fields?: string[] | string;
-  forceRefresh?: boolean;
-  shareId?: string;
-}
 
 export async function fetchSourceData(
   {

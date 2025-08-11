@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import * as HeroIcons from "@heroicons/react/24/outline";
 import { useMultiBucketProcessor } from "@hooks/common/useMultiBucketProcessor";
-import type { CardWidgetConfig } from "@type/visualization";
-import type { Metric } from "@type/metric-bucket-types";
+import type { Metric } from "@type/metricBucketTypes";
 import {
   applyKPIFilters,
   calculateKPIValue,
@@ -10,23 +9,14 @@ import {
   getKPITitle,
   getKPIWidgetParams,
   formatKPIValue,
-  type FilterableConfig,
-  type StylableConfig
-} from "@utils/kpiUtils";
+} from "@utils/kpi/kpiUtils";
+import type { CardWidgetProps, CardWidgetVM, FilterableConfig, StylableConfig } from "@type/widgetTypes";
 
-export function useCardWidgetVM(
-  data: Record<string, unknown>[],
-  config: CardWidgetConfig
-): {
-  formattedValue: string;
-  title: string;
-  description: string;
-  iconColor: string;
-  valueColor: string;
-  descriptionColor: string;
-  showIcon: boolean;
-  IconComponent: React.ElementType;
-} {
+export function useCardWidgetVM({
+  data,
+  config,
+}: CardWidgetProps): CardWidgetVM {
+
   // Filtrage des données avec l'utilitaire
   const filteredData = useMemo(() => {
     return applyKPIFilters(data, config as FilterableConfig);
@@ -45,6 +35,7 @@ export function useCardWidgetVM(
 
   // Extraction des informations du widget
   const title = getKPITitle(config, metric, "Synthèse");
+
   const description = (typeof config.widgetParams?.description === 'string' ? config.widgetParams.description : undefined) || "";
 
   // Extraction des couleurs avec l'utilitaire
@@ -52,6 +43,7 @@ export function useCardWidgetVM(
 
   // Extraction des paramètres d'affichage et de formatage
   const showIcon = config.widgetParams?.showIcon !== false;
+
   const iconName = (typeof config.widgetParams?.icon === 'string' ? config.widgetParams.icon : undefined) || "ChartBarIcon";
   const IconComponent = HeroIcons[iconName as keyof typeof HeroIcons] || HeroIcons.ChartBarIcon;
 

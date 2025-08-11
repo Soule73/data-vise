@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { SourcesStore } from "@type/theme-types";
+import type { SourcesStore } from "@type/themeTypes";
 
 export const useSourcesStore = create<SourcesStore>((set) => ({
   sources: [],

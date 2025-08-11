@@ -4,7 +4,7 @@ import WidgetSaveTitleModal from "@components/widgets/WidgetSaveTitleModal";
 import WidgetMetricStyleConfigSection from "@components/widgets/WidgetMetricStyleConfigSection";
 import WidgetParamsConfigSection from "@components/widgets/WidgetParamsConfigSection";
 import { WIDGET_DATA_CONFIG } from "@adapters/visualizations";
-import type { WidgetFormLayoutProps, WidgetType } from "@type/widget-types";
+import type { WidgetFormLayoutProps, WidgetType } from "@type/widgetTypes";
 import { useWidgetTabs } from "@hooks/widget/useWidgetTabs";
 import Button from "@components/forms/Button";
 
@@ -45,18 +45,14 @@ export default function WidgetFormLayout({
     additionalHeaderContent
 }: WidgetFormLayoutProps) {
 
-    // Utilisation du hook pour déterminer les onglets disponibles
     const availableTabs = useWidgetTabs(config, type);
 
-    // Calcul optimisé des conditions pour l'affichage (mémorisées pour éviter re-calculs)
     const hasMetrics = config?.metrics && Array.isArray(config.metrics) && config.metrics.length > 0;
     const hasConfig = config && Object.keys(config).length > 0;
 
-    // Configuration optimisée du widget pour le preview
     const previewConfig = {
         ...config,
-        metrics: metricsWithLabels, // Utiliser directement metricsWithLabels du hook
-        bucket: config.bucket,
+        metrics: metricsWithLabels,
     };
 
     return (

@@ -3,7 +3,7 @@ import Modal from "@components/Modal";
 import SelectField from "@components/SelectField";
 import VisualizationTypeSelector from "@components/visualizations/VisualizationTypeSelector";
 import Button from "@components/forms/Button";
-import type { WidgetType, WidgetTypeSelectionModalProps } from "@type/widget-types";
+import type { WidgetType, WidgetTypeSelectionModalProps } from "@type/widgetTypes";
 
 
 

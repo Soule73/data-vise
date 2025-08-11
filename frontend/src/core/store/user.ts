@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { StateCreator } from "zustand";
-import type { Permission, User, UserStoreWithPerms } from "@type/auth-types";
+import type { Permission, User, UserStoreWithPerms } from "@type/authTypes";
 
 function getPermissionList(user: User | null): string[] {
   if (!user || !user.role || !user.role.permissions) return [];

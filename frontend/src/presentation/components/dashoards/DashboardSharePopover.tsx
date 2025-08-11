@@ -1,4 +1,4 @@
-import type { DashboardSharePopoverProps } from "@type/dashboard-types";
+import type { DashboardSharePopoverProps } from "@type/dashboardTypes";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import {
   ClipboardDocumentIcon,

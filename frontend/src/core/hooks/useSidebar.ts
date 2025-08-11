@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSidebarStore } from "@store/sidebar";
 import { useUserStore } from "@store/user";
-import type { SidebarGroup, SidebarGroupItem } from "@type/navigation-types";
+import type { SidebarGroup, SidebarGroupItem } from "@type/navigationTypes";
 
 export function useSidebar(sidebarGroups: SidebarGroup[]) {
   const user = useUserStore((s) => s.user);

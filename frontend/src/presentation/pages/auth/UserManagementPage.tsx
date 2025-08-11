@@ -3,7 +3,7 @@ import Table from "@components/Table";
 import Button from "@components/forms/Button";
 import { useEffect } from "react";
 import { useDashboardStore } from "@store/dashboard";
-import type { User } from "@type/auth-types";
+import type { User } from "@type/authTypes";
 import { ROUTES } from "@constants/routes";
 import UserModalForm from "@components/auth/UserModalForm";
 import UserDeleteModal from "@components/auth/UserDeleteModal";

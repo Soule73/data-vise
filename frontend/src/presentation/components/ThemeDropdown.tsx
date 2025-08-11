@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useThemeStore } from "@store/theme";
 import { useApplyThemeClass } from "@hooks/useTheme";
-import type { ThemeMode } from "@type/theme-types";
+import type { ThemeMode } from "@type/themeTypes";
 
 const themes = [
   {

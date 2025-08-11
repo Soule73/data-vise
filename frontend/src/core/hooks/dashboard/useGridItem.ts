@@ -1,7 +1,7 @@
 import { WIDGETS } from "@adapters/visualizations";
 import { useRef, useEffect, useMemo, useState } from "react";
-import type { DataSource } from "@type/data-source";
-import { getWidgetDataFields } from "@utils/widgetDataFields";
+import type { DataSource } from "@type/dataSource";
+import { getWidgetDataFields } from "@utils/widgets/widgetDataFields";
 import { useDataBySourceQuery } from "@repositories/sources";
 import {
   getWidgetComponent,
@@ -9,7 +9,7 @@ import {
   getGridItemStyleProps,
   useGridItemResizeObserver,
 } from "@utils/gridItemUtils";
-import type { UseGridItemProps } from "@type/dashboard-types";
+import type { UseGridItemProps } from "@type/dashboardTypes";
 
 export function useGridItem({
   widget,

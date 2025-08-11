@@ -6,7 +6,7 @@ import { usePermissionsQuery } from "@repositories/roles";
 import { useState, useMemo, useEffect } from "react";
 import { useDashboardStore } from "@store/dashboard";
 import { useQueryClient } from "@tanstack/react-query";
-import type { RoleCreateForm } from "@type/auth-types";
+import type { RoleCreateForm } from "@type/authTypes";
 
 export function useRoleCreate() {
   const navigate = useNavigate();

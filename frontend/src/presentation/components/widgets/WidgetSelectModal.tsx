@@ -1,7 +1,7 @@
 import ModalSidebarRight from "@components/ModalSidebarRight";
 import Button from "@components/forms/Button";
 import InputField from "@components/forms/InputField";
-import type { Widget, WidgetSelectModalProps } from "@type/widget-types";
+import type { Widget, WidgetSelectModalProps } from "@type/widgetTypes";
 import { WIDGETS } from "@adapters/visualizations";
 import { useState, useMemo } from "react";
 import { useWidgetsQuery } from "@repositories/widgets";

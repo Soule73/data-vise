@@ -2,60 +2,69 @@ import SelectField from "@components/SelectField";
 import InputField from "@components/forms/InputField";
 import DatasetSection from "@components/widgets/DatasetSection";
 import DatasetFiltersConfig from "@components/widgets/DatasetFiltersConfig";
-import type { BubbleMetricConfig } from "@type/metric-bucket-types";
-import type { WidgetBubbleDataConfigSectionProps } from "@type/widget-types";
+import type { BubbleMetricConfig } from "@type/metricBucketTypes";
+import type { WidgetBubbleDataConfigSectionProps } from "@type/widgetTypes";
 
+/**
+ * Configuration spécialisée pour les graphiques bubble
+ * Gère les champs X, Y, R et les filtres par dataset
+ */
 export default function WidgetBubbleDataConfigSection({
   metrics,
   columns,
   data,
   handleConfigChange,
 }: WidgetBubbleDataConfigSectionProps) {
+
+  const xOptions = Array.isArray(columns)
+    ? columns.map((col) => ({ value: col, label: col }))
+    : [];
+
+  const yOptions = Array.isArray(columns)
+    ? columns.map((col) => ({ value: col, label: col }))
+    : [];
+
+  const rOptions = Array.isArray(columns)
+    ? columns.map((col) => ({ value: col, label: col }))
+    : [];
+
   const renderBubbleDatasetContent = (dataset: BubbleMetricConfig, idx: number, onUpdate: (updatedDataset: BubbleMetricConfig) => void) => (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+    <div className="grid gap-2">
       <SelectField
+        textSize="sm"
         label="Champ X"
         value={dataset.x || ""}
         onChange={(e) => {
           onUpdate({ ...dataset, x: e.target.value });
         }}
-        options={
-          Array.isArray(columns)
-            ? columns.map((col) => ({ value: col, label: col }))
-            : []
-        }
+        options={xOptions}
         name={`bubble-x-${idx}`}
         id={`bubble-x-${idx}`}
       />
       <SelectField
+        textSize="sm"
         label="Champ Y"
         value={dataset.y || ""}
         onChange={(e) => {
           onUpdate({ ...dataset, y: e.target.value });
         }}
-        options={
-          Array.isArray(columns)
-            ? columns.map((col) => ({ value: col, label: col }))
-            : []
-        }
+        options={yOptions}
         name={`bubble-y-${idx}`}
         id={`bubble-y-${idx}`}
       />
       <SelectField
+        textSize="sm"
         label="Champ Rayon (r)"
         value={dataset.r || ""}
         onChange={(e) => {
           onUpdate({ ...dataset, r: e.target.value });
         }}
-        options={
-          Array.isArray(columns)
-            ? columns.map((col) => ({ value: col, label: col }))
-            : []
-        }
+        options={rOptions}
         name={`bubble-r-${idx}`}
         id={`bubble-r-${idx}`}
       />
       <InputField
+        textSize="sm"
         label="Label du dataset"
         value={dataset.label || ""}
         onChange={(e) => {
@@ -65,8 +74,6 @@ export default function WidgetBubbleDataConfigSection({
         name={`bubble-label-${idx}`}
         id={`bubble-label-${idx}`}
       />
-
-      {/* Section filtres spécifiques au dataset */}
       <DatasetFiltersConfig
         filters={dataset.datasetFilters || []}
         columns={columns}
@@ -88,7 +95,6 @@ export default function WidgetBubbleDataConfigSection({
 
   return (
     <div className="space-y-6">
-      {/* Section Datasets avec le composant générique */}
       <DatasetSection
         title="Datasets (x, y, r)"
         datasets={metrics}

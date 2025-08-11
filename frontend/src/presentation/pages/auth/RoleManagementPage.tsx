@@ -1,4 +1,4 @@
-import type { Role, Permission } from "@type/auth-types";
+import type { Role, Permission } from "@type/authTypes";
 import {
   PermissionGroup,
   RoleActions,

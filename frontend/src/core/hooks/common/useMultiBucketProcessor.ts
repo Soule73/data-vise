@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { processMultiBucketData } from "@utils/multiBucketProcessor";
-import type { ProcessedBucketItem, SupportedConfig } from "@type/metric-bucket-types";
+import { processMultiBucketData } from "@utils/bucketMetrics/multiBucketProcessor";
+import type { ProcessedBucketItem, SupportedConfig } from "@type/metricBucketTypes";
 
 
 /**

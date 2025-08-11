@@ -1,33 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
-import type { ChartOptions, ChartData } from "chart.js";
-import type { BubbleChartConfig } from "@type/visualization";
-import { createBubbleChartDataset } from "@utils/chartDatasetUtils";
-import { createBaseOptions, mergeOptions } from "@utils/chartConfigUtils";
-import { mergeWidgetParams } from "@utils/widgetParamsUtils";
-import { prepareMetricStyles } from "@utils/chartDatasetUtils";
-import { getCustomChartOptions } from "@utils/chartOptionsUtils";
-import type { BubbleMetricConfig } from "@type/metric-bucket-types";
+import type { ChartData, TooltipItem } from "chart.js";
+import { createBubbleChartDataset } from "@utils/charts/chartDatasetUtils";
+import { createBaseOptions, mergeOptions } from "@utils/charts/chartConfigUtils";
+import { mergeWidgetParams } from "@utils/widgets/widgetParamsUtils";
+import { prepareMetricStyles } from "@utils/charts/chartDatasetUtils";
+import { getCustomChartOptions } from "@utils/charts/chartOptionsUtils";
+import type { BubbleMetricConfig } from "@type/metricBucketTypes";
 import {
     processBubbleMetrics,
     validateBubbleConfiguration,
     generateBubbleMetricLabel,
     calculateBubbleScales
-} from "@utils/bubbleChartUtils";
+} from "@utils/charts/bubbleChartUtils";
+import type { BubbleChartVM, BubbleChartWidgetProps } from "@type/widgetTypes";
 
-export function useBubbleChartLogic(
-    data: Record<string, any>[],
-    config: BubbleChartConfig
-): {
-    chartData: ChartData<"bubble">;
-    options: ChartOptions<"bubble">;
-    showNativeValues: boolean;
-    valueLabelsPlugin: any;
-    validDatasets: any[];
-    isValid: boolean;
-    validationErrors: string[];
-    validationWarnings: string[];
-} {
+export function useBubbleChartLogic({
+    data,
+    config,
+}: BubbleChartWidgetProps): BubbleChartVM {
     // Paramètres du widget
     const widgetParams = useMemo(() => mergeWidgetParams(config.widgetParams), [config.widgetParams]);
 
@@ -105,8 +95,8 @@ export function useBubbleChartLogic(
                 tooltip: {
                     ...mergedOptions.plugins?.tooltip,
                     callbacks: {
-                        label: (context: any) => {
-                            const dataPoint = context.raw;
+                        label: (context: TooltipItem<"bubble">) => {
+                            const dataPoint = context.raw as { x: number; y: number; r: number };
                             const datasetLabel = context.dataset.label || '';
                             return `${datasetLabel}: (${dataPoint.x}, ${dataPoint.y}, ${dataPoint.r})`;
                         },

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useTableSearchStore } from "@store/tableSearch";
 import Pagination from "@components/Pagination";
 import TableSearch from "@components/TableSearch";
-import type { TableProps } from "@type/table-types";
+import type { TableProps } from "@type/tableTypes";
 
 export default function Table<T extends { [key: string]: any }>({
   columns,

@@ -9,7 +9,7 @@ import {
 import type {
   WidgetStyleConfigSectionProps,
   WidgetType,
-} from "@type/widget-types";
+} from "@type/widgetTypes";
 
 export default function WidgetStyleConfigSection({
   type,

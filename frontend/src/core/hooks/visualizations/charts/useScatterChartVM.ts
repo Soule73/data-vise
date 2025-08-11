@@ -1,38 +1,30 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
-import type { ChartOptions, ChartData } from "chart.js";
-import type { ScatterChartConfig } from "@type/visualization";
-import { createScatterChartDataset } from "@utils/chartDatasetUtils";
-import { createBaseOptions, mergeOptions } from "@utils/chartConfigUtils";
-import { mergeWidgetParams } from "@utils/widgetParamsUtils";
-import { prepareMetricStyles } from "@utils/chartDatasetUtils";
-import { getCustomChartOptions } from "@utils/chartOptionsUtils";
-import type { ScatterMetricConfig } from "@type/metric-bucket-types";
+import type { ChartData, TooltipItem } from "chart.js";
+import { createScatterChartDataset } from "@utils/charts/chartDatasetUtils";
+import { createBaseOptions, mergeOptions } from "@utils/charts/chartConfigUtils";
+import { mergeWidgetParams } from "@utils/widgets/widgetParamsUtils";
+import { prepareMetricStyles } from "@utils/charts/chartDatasetUtils";
+import { getCustomChartOptions } from "@utils/charts/chartOptionsUtils";
+import type { ScatterMetricConfig } from "@type/metricBucketTypes";
 import {
     processScatterMetrics,
     validateScatterConfiguration,
     generateScatterMetricLabel,
     calculateScatterScales
-} from "@utils/scatterChartUtils";
+} from "@utils/charts/scatterChartUtils";
+import type { ScatterChartVM, ScatterChartWidgetProps } from "@type/widgetTypes";
 
-export function useScatterChartLogic(
-    data: Record<string, any>[],
-    config: ScatterChartConfig
-): {
-    chartData: ChartData<"scatter">;
-    options: ChartOptions<"scatter">;
-    showNativeValues: boolean;
-    valueLabelsPlugin: any;
-    validDatasets: any[];
-    isValid: boolean;
-    validationErrors: string[];
-    validationWarnings: string[];
-} {
+export function useScatterChartLogic({
+    data,
+    config,
+}: ScatterChartWidgetProps): ScatterChartVM {
+
     // Paramètres du widget
     const widgetParams = useMemo(() => mergeWidgetParams(config.widgetParams), [config.widgetParams]);
 
     // Métriques et styles
     const validMetrics = useMemo(() => config.metrics || [], [config.metrics]);
+
     const metricStyles = useMemo(() => prepareMetricStyles(config.metricStyles), [config.metricStyles]);
 
     // Validation de la configuration
@@ -105,8 +97,8 @@ export function useScatterChartLogic(
                 tooltip: {
                     ...mergedOptions.plugins?.tooltip,
                     callbacks: {
-                        label: (context: any) => {
-                            const dataPoint = context.raw;
+                        label: (context: TooltipItem<"scatter">) => {
+                            const dataPoint = context.raw as { x: number; y: number };
                             const datasetLabel = context.dataset.label || '';
                             return `${datasetLabel}: (${dataPoint.x}, ${dataPoint.y})`;
                         },

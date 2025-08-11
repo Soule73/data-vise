@@ -11,7 +11,7 @@ import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { Radio, RadioGroup } from "@headlessui/react";
 import TextareaField from "@components/forms/TextareaField";
-import type { SourceFormProps } from "@type/data-source";
+import type { SourceFormProps } from "@type/dataSource";
 
 const SourceForm: React.FC<SourceFormProps> = ({
   form,

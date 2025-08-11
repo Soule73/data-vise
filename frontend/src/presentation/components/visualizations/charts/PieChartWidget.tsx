@@ -1,28 +1,26 @@
-import "@utils/chartjs-register";
-import { usePieChartLogic } from "@hooks/visualizations/charts/optimized";
+import "@utils/charts/chartjs-register";
+import { usePieChartLogic } from "@hooks/visualizations/charts";
 import { Pie } from "react-chartjs-2";
 import { ChartPieIcon } from "@heroicons/react/24/outline";
 import { InvalideConfigWidget } from "@components/widgets/InvalideConfigWidget";
 import NoDataWidget from "@components/widgets/NoDataWidget";
-import type { PieChartWidgetProps } from "@type/widget-types";
+import type { PieChartWidgetProps } from "@type/widgetTypes";
 
 
 export default function PieChartWidget({
   data,
   config,
-  // @ts-expect-error : Unused variable in edit mode
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  editMode,
 }: PieChartWidgetProps) {
   const { chartData, options, showNativeValues, valueLabelsPlugin } =
-    usePieChartLogic(data, config);
+    usePieChartLogic({ data, config });
 
   if (
     !data ||
     !config.metrics ||
-    !config.bucket ||
+    !config.buckets ||
     !Array.isArray(config.metrics) ||
-    !config.bucket.field
+    !config.buckets.length ||
+    !config.buckets[0]?.field
   ) {
     return <InvalideConfigWidget />;
   }

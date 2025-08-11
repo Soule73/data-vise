@@ -7,7 +7,7 @@ import {
   WIDGET_CONFIG_FIELDS,
 } from "@adapters/visualizations";
 import * as HeroIcons from "@heroicons/react/24/outline";
-import type { WidgetParamsConfigSectionProps } from "@type/widget-types";
+import type { WidgetParamsConfigSectionProps } from "@type/widgetTypes";
 
 export default function WidgetParamsConfigSection({
   type,

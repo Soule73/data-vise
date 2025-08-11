@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { DatasetFilter } from "@type/metric-bucket-types";
+import type { DatasetFilter } from "@type/metricBucketTypes";
 import type { Filter } from "@type/visualization";
 
 /**

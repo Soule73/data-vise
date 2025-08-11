@@ -4,7 +4,7 @@ import { WIDGETS } from "@adapters/visualizations";
 import type {
   VisualizationTypeSelectorProps,
   WidgetType,
-} from "@type/widget-types";
+} from "@type/widgetTypes";
 import { useState, type ReactNode } from "react";
 
 export default function VisualizationTypeSelector({
@@ -12,10 +12,11 @@ export default function VisualizationTypeSelector({
   setType,
 }: VisualizationTypeSelectorProps) {
   const [search, setSearch] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const filtered = Object.entries(WIDGETS).filter(([_, def]) =>
+
+  const filtered = Object.entries(WIDGETS).filter(([, def]) =>
     def.label.toLowerCase().includes(search.toLowerCase())
   );
+
   return (
     <>
       <div className="font-semibold mb-2">Type de visualisation</div>

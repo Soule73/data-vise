@@ -1,7 +1,7 @@
 import { useWidgetCreateForm } from "@hooks/widget/useWidgetCreateForm";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import type { WidgetType } from "@type/widget-types";
+import type { WidgetType } from "@type/widgetTypes";
 import WidgetFormLayout from "@components/widgets/WidgetFormLayout";
 
 export default function WidgetCreatePage() {

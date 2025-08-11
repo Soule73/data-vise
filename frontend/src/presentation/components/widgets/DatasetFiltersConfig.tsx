@@ -1,13 +1,8 @@
-import BaseFilterConfig from "./BaseFilterConfig";
-import type { DatasetFilter } from "@type/metric-bucket-types";
+import type { DatasetFiltersConfigProps } from "@type/widgetTypes";
+import BaseFilterConfig from "@components/widgets/BaseFilterConfig";
+import type { DatasetFilter } from "@type/metricBucketTypes";
 
-interface DatasetFiltersConfigProps {
-    filters: DatasetFilter[];
-    columns: string[];
-    data?: Record<string, unknown>[]; // Données pour extraire les valeurs possibles
-    onFiltersChange: (filters: DatasetFilter[]) => void;
-    datasetIndex: number;
-}
+
 
 export default function DatasetFiltersConfig({
     filters = [],

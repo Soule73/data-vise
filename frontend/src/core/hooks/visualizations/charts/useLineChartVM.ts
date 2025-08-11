@@ -1,20 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ChartOptions, ChartData } from "chart.js";
-import type { LineChartConfig } from "@type/visualization";
-import { useChartLogic } from "@hooks/visualizations/charts/useChartLogic";
-import { createLineChartDataset } from "@utils/chartDatasetUtils";
+import { useChartLogic } from "@hooks/visualizations/charts/useChartVM";
+import { createLineChartDataset } from "@utils/charts/chartDatasetUtils";
+import type { LineChartVM, LineChartWidgetProps } from "@type/widgetTypes";
 
-export function useLineChartLogic(
-    data: Record<string, any>[],
-    config: LineChartConfig
-): {
-    chartData: ChartData<"line">;
-    options: ChartOptions<"line">;
-    showNativeValues: boolean;
-    valueLabelsPlugin: any;
-} {
+export function useLineChartLogic({
+    data,
+    config,
+}: LineChartWidgetProps): LineChartVM {
 
-    const result = useChartLogic({
+    const result = useChartLogic<"line">({
         chartType: "line",
         data,
         config,

@@ -1,7 +1,7 @@
 import Button from "@components/forms/Button";
 import InputField from "@components/forms/InputField";
 import CheckboxField from "@components/forms/CheckboxField";
-import type { PermissionGroupProps, RoleActionsProps, RoleInfoProps } from "@type/auth-types";
+import type { PermissionGroupProps, RoleActionsProps, RoleInfoProps } from "@type/authTypes";
 
 
 

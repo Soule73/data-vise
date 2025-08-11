@@ -5,7 +5,7 @@ import Modal from "@components/Modal";
 import { useWidgetListPage } from "@hooks/widget/useWidgetListPage";
 import { DeleteWidgetModal } from "@components/widgets/DeleteWidgetModal";
 import Button from "@components/forms/Button";
-import type { Widget, WidgetType } from "@type/widget-types";
+import type { Widget, WidgetType } from "@type/widgetTypes";
 import { useMemo, useState } from "react";
 import { WIDGETS } from "@adapters/visualizations";
 import Badge from "@components/Badge";

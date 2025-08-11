@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Modal from "@components/Modal";
 import SelectField from "@components/SelectField";
 import Button from "@components/forms/Button";
-import type { ExportPDFModalProps } from "@type/dashboard-types";
+import type { ExportPDFModalProps } from "@type/dashboardTypes";
 
 const ExportPDFModal: React.FC<ExportPDFModalProps> = ({
   open,

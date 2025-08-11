@@ -1,6 +1,6 @@
 import Button from "@components/forms/Button";
 import Table from "@components/Table";
-import type { Dashboard } from "@type/dashboard-types";
+import type { Dashboard } from "@type/dashboardTypes";
 import Modal from "@components/Modal";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";

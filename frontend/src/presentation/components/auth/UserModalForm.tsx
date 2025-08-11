@@ -2,7 +2,7 @@ import Modal from "@components/Modal";
 import InputField from "@components/forms/InputField";
 import SelectField from "@components/SelectField";
 import Button from "@components/forms/Button";
-import type { User } from "@type/auth-types";
+import type { User } from "@type/authTypes";
 import React from "react";
 import type { UserModalFormProps } from "@type/ui";
 

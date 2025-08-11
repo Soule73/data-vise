@@ -1,4 +1,4 @@
-import type { SelectFieldProps } from "@type/form-types";
+import type { SelectFieldProps } from "@type/formTypes";
 import { forwardRef, useState, useMemo } from "react";
 import {
   Combobox,

@@ -1,4 +1,4 @@
-import type { WidgetConfigTabsProps } from "@type/widget-types";
+import type { WidgetConfigTabsProps } from "@type/widgetTypes";
 import React from "react";
 
 function TabButton({
@@ -28,14 +28,13 @@ const WidgetConfigTabs: React.FC<WidgetConfigTabsProps> = ({
   setTab,
   availableTabs
 }) => {
-  // Si aucun onglet spécifique n'est fourni, utiliser les onglets par défaut
+
   const tabs = availableTabs || [
     { key: "data", label: "Données" },
     { key: "metricsAxes", label: "Métriques & Axes" },
     { key: "params", label: "Paramètres widget" }
   ];
 
-  // Ne pas afficher les onglets s'il n'y en a qu'un seul
   if (tabs.length <= 1) {
     return null;
   }

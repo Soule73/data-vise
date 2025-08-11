@@ -1,4 +1,4 @@
-import type { AnimatedChartLogoProps } from "@type/theme-types";
+import type { AnimatedChartLogoProps } from "@type/themeTypes";
 import * as React from "react";
 
 export const AnimatedChartLogo: React.FC<AnimatedChartLogoProps> = ({

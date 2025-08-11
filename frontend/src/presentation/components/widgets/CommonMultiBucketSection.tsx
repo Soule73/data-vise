@@ -1,5 +1,5 @@
 import MultiBucketSection from "@components/widgets/MultiBucketSection";
-import type { CommonMultiBucketSectionProps } from "@type/metric-bucket-types";
+import type { CommonMultiBucketSectionProps } from "@type/metricBucketTypes";
 
 export default function CommonMultiBucketSection({
     config,

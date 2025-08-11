@@ -1,8 +1,11 @@
 import { useCallback, useMemo } from 'react';
-// import type { MultiBucketConfig, BucketConfig } from 'metric-bucket-types';
-import { ensureMultiBuckets, migrateLegacyBucket, migrateToLegacyBucket } from '@utils/bucketMigration';
-import { createDefaultBucket } from '@utils/bucketUtils';
-import type { MultiBucketConfig, UseMultiBucketsProps } from '@type/metric-bucket-types';
+import { createDefaultBucket } from '@utils/bucketMetrics/bucketUtils';
+import type { MultiBucketConfig, UseMultiBucketsProps } from '@type/metricBucketTypes';
+
+// Fonction pour s'assurer que nous avons des buckets multiples
+function ensureMultiBuckets(config: { buckets?: MultiBucketConfig[] }): MultiBucketConfig[] {
+    return config.buckets || [];
+}
 
 
 export function useMultiBuckets({
@@ -20,10 +23,6 @@ export function useMultiBuckets({
     const handleBucketsChange = useCallback((newBuckets: MultiBucketConfig[]) => {
         // Mettre à jour les buckets multiples
         onConfigChange('buckets', newBuckets);
-
-        // Maintenir la compatibilité avec l'ancien système
-        const legacyBucket = migrateToLegacyBucket(newBuckets);
-        onConfigChange('bucket', legacyBucket || { field: '' });
     }, [onConfigChange]);
 
     // Ajouter un nouveau bucket
@@ -64,14 +63,6 @@ export function useMultiBuckets({
         }
     }, [currentBuckets.length, columns, handleBucketsChange]);
 
-    // Migrer depuis l'ancien système si nécessaire
-    const migrateFromLegacy = useCallback(() => {
-        if (currentBuckets.length === 0 && config.bucket?.field) {
-            const migratedBucket = migrateLegacyBucket(config.bucket);
-            handleBucketsChange([migratedBucket]);
-        }
-    }, [currentBuckets.length, config.bucket, handleBucketsChange]);
-
     return {
         buckets: currentBuckets,
         handleBucketsChange,
@@ -80,7 +71,6 @@ export function useMultiBuckets({
         updateBucket,
         moveBucket,
         initializeIfEmpty,
-        migrateFromLegacy,
         canAddMore: allowMultiple || currentBuckets.length === 0,
         isEmpty: currentBuckets.length === 0,
     };

@@ -3,17 +3,13 @@ import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
 import NoDataWidget from "@components/widgets/NoDataWidget";
 import KPIWidget from "@components/visualizations/kpi/KPIWidget";
 import { useKPIGroupVM } from "@hooks/visualizations/kpi/useKPIGroupVM";
-import type { KPIGroupWidgetConfig } from "@type/visualization";
-import type { Metric } from "@type/metric-bucket-types";
+import type { Metric } from "@type/metricBucketTypes";
+import type { KPIGroupWidgetProps } from "@type/widgetTypes";
 
 export default function KPIGroupWidget({
   data,
   config,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>[];
-  config: KPIGroupWidgetConfig;
-}) {
+}: KPIGroupWidgetProps) {
   const { metrics, gridColumns, widgetParamsList } =
     useKPIGroupVM(config);
 
@@ -53,7 +49,6 @@ export default function KPIGroupWidget({
             metricStyles: {}, // Plus besoin des metricStyles, tout est dans widgetParams
             globalFilters: config.globalFilters, // Utiliser globalFilters au lieu de filters
             widgetParams: widgetParamsList[idx],
-            bucket: config.bucket,
             buckets: config.buckets,
           }}
         />

@@ -1,4 +1,4 @@
-import type { TableSearchProps } from "@type/table-types";
+import type { TableSearchProps } from "@type/tableTypes";
 import InputField from "@components/forms/InputField";
 
 export default function TableSearch({

@@ -1,7 +1,7 @@
 import api from "@services/api";
-import { extractApiData } from "@utils/api-utils";
+import { extractApiData } from "@utils/apiUtils";
 import type { ApiResponse } from "@type/api";
-import type { LoginRegisterResponse } from "@type/auth-types";
+import type { LoginRegisterResponse } from "@type/authTypes";
 
 export async function login(
   email: string,

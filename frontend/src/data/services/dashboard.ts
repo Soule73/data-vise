@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { DashboardLayoutItem } from "@type/dashboard-types";
-import type { Dashboard } from "@type/dashboard-types";
+import type { DashboardLayoutItem } from "@type/dashboardTypes";
+import type { Dashboard } from "@type/dashboardTypes";
 import type { ApiResponse } from "@type/api";
 import api from "@services/api";
-import { extractApiData } from "@utils/api-utils";
+import { extractApiData } from "@utils/apiUtils";
 
 export async function fetchDashboard(id?: string): Promise<Dashboard> {
   const res = await api.get<ApiResponse<Dashboard>>(`/dashboards/${id}`);

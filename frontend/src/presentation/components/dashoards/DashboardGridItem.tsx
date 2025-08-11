@@ -1,7 +1,7 @@
 import { EllipsisVerticalIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useGridItem } from "@hooks/dashboard/useGridItem";
-import type { DashboardGridItemProps } from "@type/dashboard-types";
+import type { DashboardGridItemProps } from "@type/dashboardTypes";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@constants/routes";
 

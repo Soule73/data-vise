@@ -8,7 +8,7 @@ import {
   fetchSharedDashboard,
   fetchSharedDashboardSources,
 } from "@services/dashboard";
-import type { Dashboard } from "@type/dashboard-types";
+import type { Dashboard } from "@type/dashboardTypes";
 import api from "@services/api";
 
 // Liste de tous les tableaux de bord

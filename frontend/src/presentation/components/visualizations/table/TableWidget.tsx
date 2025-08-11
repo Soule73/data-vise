@@ -1,23 +1,20 @@
 import Table from "@components/Table";
-import type { TableWidgetConfig } from "@type/visualization";
 import NoDataWidget from "@components/widgets/NoDataWidget";
 import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
 import { TableCellsIcon } from "@heroicons/react/24/outline";
 import { useTableWidgetLogic } from "@hooks/visualizations/useTableWidgetVM";
-import { validateTableConfig } from "@utils/tableDataUtils";
+import { validateTableConfig } from "@utils/kpi/tableDataUtils";
+import type { TableWidgetProps } from "@type/widgetTypes";
 
 export default function TableWidget({
   data,
   config,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>[];
-  config: TableWidgetConfig;
-  editMode?: boolean;
-}) {
+}: TableWidgetProps) {
   const { columns, displayData, tableTitle } = useTableWidgetLogic(
-    data,
-    config
+    {
+      data,
+      config
+    }
   );
 
   // Validation moderne utilisant l'utilitaire

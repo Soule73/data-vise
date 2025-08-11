@@ -2,20 +2,18 @@ import { Bubble } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
 import NoDataWidget from "@components/widgets/NoDataWidget";
-import { useBubbleChartLogic } from "@hooks/visualizations/charts/optimized";
-import type { BubbleChartWidgetProps } from "@type/widget-types";
+import { useBubbleChartLogic } from "@hooks/visualizations/charts";
+import type { BubbleChartWidgetProps } from "@type/widgetTypes";
 
 export default function BubbleChartWidget({
   data,
   config,
-  // @ts-expect-error : Unused variable in edit mode
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  editMode,
 }: BubbleChartWidgetProps) {
   const { chartData, options, validDatasets } = useBubbleChartLogic(
-    data,
-    config
-  );
+    {
+      data,
+      config
+    });
   if (
     !data ||
     !config.metrics ||

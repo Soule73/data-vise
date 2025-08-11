@@ -8,16 +8,12 @@ import {
 import { useKPIWidgetVM } from "@hooks/visualizations/kpi/useKPIWidgetVM";
 import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
 import NoDataWidget from "@components/widgets/NoDataWidget";
-import type { KPIWidgetConfig } from "@type/visualization";
+import type { KPIWidgetProps } from "@type/widgetTypes";
 
 export default function KPIWidget({
   data,
   config,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>[];
-  config: KPIWidgetConfig;
-}) {
+}: KPIWidgetProps) {
   const {
     value,
     title,
@@ -32,7 +28,7 @@ export default function KPIWidget({
     trendValue,
     trendPercent,
     getTrendColor,
-  } = useKPIWidgetVM(data, config);
+  } = useKPIWidgetVM({ data, config });
 
   if (
     !data ||

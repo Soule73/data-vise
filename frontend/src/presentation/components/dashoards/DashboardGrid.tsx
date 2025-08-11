@@ -1,5 +1,5 @@
 import { useDashboardGrid } from "@hooks/dashboard/useDashboardGrid";
-import type { DashboardGridProps } from "@type/dashboard-types";
+import type { DashboardGridProps } from "@type/dashboardTypes";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import DashboardGridItem from "@components/dashoards/DashboardGridItem";
 

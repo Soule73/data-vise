@@ -1,4 +1,4 @@
-import type { InputFieldProps } from "@type/form-types";
+import type { InputFieldProps } from "@type/formTypes";
 import { Field, Input, Label } from "@headlessui/react";
 import { forwardRef, useMemo } from "react";
 

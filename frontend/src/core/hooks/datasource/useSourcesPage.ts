@@ -9,7 +9,7 @@ import { useDashboardStore } from "@store/dashboard";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import type { DataSource } from "@type/data-source";
+import type { DataSource } from "@type/dataSource";
 import { ROUTES } from "@constants/routes";
 
 export function useSourcesPage() {

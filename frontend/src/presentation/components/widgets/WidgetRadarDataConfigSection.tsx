@@ -1,12 +1,14 @@
-import SelectField from "@components/SelectField";
 import InputField from "@components/forms/InputField";
 import CheckboxField from "@components/forms/CheckboxField";
 import DatasetSection from "@components/widgets/DatasetSection";
 import DatasetFiltersConfig from "@components/widgets/DatasetFiltersConfig";
-import { useState } from "react";
-import type { WidgetRadarDataConfigSectionProps } from "@type/widget-types";
-import type { RadarMetricConfig } from "@type/metric-bucket-types";
+import type { WidgetRadarDataConfigSectionProps } from "@type/widgetTypes";
+import type { RadarMetricConfig } from "@type/metricBucketTypes";
 
+/**
+ * Configuration spécialisée pour les graphiques radar
+ * Gère les champs/axes multiples et les filtres par dataset
+ */
 export default function WidgetRadarDataConfigSection({
   metrics,
   columns,
@@ -14,13 +16,6 @@ export default function WidgetRadarDataConfigSection({
   configSchema,
   data = [],
 }: WidgetRadarDataConfigSectionProps) {
-  const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
-
-  const toggleCollapse = (idx: number) =>
-    setCollapsed((prev) => ({ ...prev, [idx]: !prev[idx] }));
-
-  const groupByFields: string[] =
-    configSchema?.dataConfig?.groupByFields || columns;
 
   const axisFields: string[] = configSchema?.dataConfig?.axisFields || columns;
 
@@ -68,62 +63,7 @@ export default function WidgetRadarDataConfigSection({
           ))}
         </div>
       </div>
-      <SelectField
-        label="Grouper par (optionnel)"
-        value={dataset.groupBy || ""}
-        onChange={(e) => {
-          onUpdate({
-            ...dataset,
-            groupBy: e.target.value,
-            groupByValue: "",
-          });
-        }}
-        options={[
-          { value: "", label: "-- Aucun --" },
-          ...groupByFields.map((col: string) => ({
-            value: col,
-            label: col,
-          })),
-        ]}
-        name={`radar-groupby-${idx}`}
-        id={`radar-groupby-${idx}`}
-      />
-      {dataset.groupBy && (
-        <SelectField
-          label={`Valeur pour "${dataset.groupBy}"`}
-          value={dataset.groupByValue || ""}
-          onChange={(e) => {
-            onUpdate({
-              ...dataset,
-              groupByValue: e.target.value,
-            });
-          }}
-          options={[
-            { value: "", label: "-- Choisir --" },
-            ...Array.from(
-              new Set(
-                (data || [])
-                  .filter(
-                    (row: Record<string, unknown>) =>
-                      dataset.groupBy &&
-                      row[dataset.groupBy] !== undefined &&
-                      row[dataset.groupBy] !== null &&
-                      row[dataset.groupBy] !== ""
-                  )
-                  .map((row: Record<string, unknown>) =>
-                    dataset.groupBy
-                      ? String(row[dataset.groupBy])
-                      : ""
-                  )
-              )
-            ).map((val) => ({ value: val, label: String(val) })),
-          ]}
-          name={`radar-groupby-value-${idx}`}
-          id={`radar-groupby-value-${idx}`}
-        />
-      )}
 
-      {/* Section filtres spécifiques au dataset */}
       <DatasetFiltersConfig
         filters={dataset.datasetFilters || []}
         columns={columns}
@@ -149,16 +89,12 @@ export default function WidgetRadarDataConfigSection({
 
   return (
     <div className="space-y-6">
-      {/* Section Datasets avec le composant générique */}
       <DatasetSection
         title="Datasets (axes multiples)"
         datasets={metrics}
         onDatasetsChange={(newMetrics) => handleConfigChange("metrics", newMetrics)}
         createNewDataset={createNewDataset}
         renderDatasetContent={renderRadarDatasetContent}
-        collapsible={true}
-        collapsedState={collapsed}
-        onToggleCollapse={toggleCollapse}
         getDatasetLabel={getDatasetLabel}
       />
     </div>

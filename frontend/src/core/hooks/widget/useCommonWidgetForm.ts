@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSourcesQuery, useDataBySourceQuery } from "@repositories/sources";
-import type { DataSource } from "@type/data-source";
-import type { WidgetType, WidgetFormInitialValues, WidgetConfig, CommonWidgetFormState } from "@type/widget-types";
+import type { DataSource } from "@type/dataSource";
+import type { WidgetType, WidgetFormInitialValues, WidgetConfig, CommonWidgetFormState } from "@type/widgetTypes";
 import {
     WIDGETS,
     WIDGET_DATA_CONFIG,
 } from "@adapters/visualizations";
-import { generateDefaultWidgetConfig, syncMetricStyles } from "@utils/widgetConfigUtils";
+import { generateDefaultWidgetConfig, syncMetricStyles } from "@utils/widgets/widgetConfigUtils";
 import { createDragDropHandlers } from "@utils/dragDropUtils";
-import { reorderMetrics, updateMetricWithAutoLabel } from "@utils/metricUtils";
-import { extractColumnsFromData, generateSourceOptions, isWidgetPreviewReady } from "@utils/dataSourceUtils";
+import { reorderMetrics, updateMetricWithAutoLabel } from "@utils/bucketMetrics/metricUtils";
+import { extractColumnsFromData, generateSourceOptions, isWidgetPreviewReady } from "@utils/datasource/dataSourceUtils";
 
 export function useCommonWidgetForm(
     initialValues?: WidgetFormInitialValues
@@ -104,11 +104,18 @@ export function useCommonWidgetForm(
                 setConfig(newConfig);
             }
 
-            // Génération de bucket par défaut si autorisé et inexistant
-            if (widgetConfig.bucket.allow && (!config.bucket || !config.bucket.field)) {
+            // Génération de buckets par défaut si autorisé et inexistant
+            if (widgetConfig.buckets?.allow && (!config.buckets || config.buckets.length === 0)) {
                 setConfig((prevConfig: WidgetConfig) => ({
                     ...prevConfig,
-                    bucket: { field: columns[1] || columns[0] }
+                    buckets: [{
+                        field: columns[1] || columns[0],
+                        label: columns[1] || columns[0],
+                        type: 'terms',
+                        order: 'desc',
+                        size: 10,
+                        minDocCount: 1
+                    }]
                 }));
             }
         }

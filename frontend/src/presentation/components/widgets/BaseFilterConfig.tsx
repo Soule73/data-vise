@@ -1,45 +1,9 @@
 import SelectField from "@components/SelectField";
 import InputField from "@components/forms/InputField";
-import { TrashIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
-import type { Filter } from "@type/visualization";
-import type { DatasetFilter } from "@type/metric-bucket-types";
+import { TrashIcon } from "@heroicons/react/24/outline";
+import WidgetConfigSection from "@components/widgets/WidgetConfigSection";
+import { OPERATOR_OPTIONS, type BaseFilter, type BaseFilterConfigProps, type FilterType } from "@type/widgetTypes";
 
-// Interface commune pour les propriétés partagées
-interface BaseFilter {
-    field: string;
-    value: string | number | readonly string[] | undefined;
-    operator?: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than' | 'greater_equal' | 'less_equal' | 'starts_with' | 'ends_with';
-}
-
-// Type union pour supporter les deux types de filtres
-type FilterType = Filter | DatasetFilter;
-
-interface BaseFilterConfigProps<T extends FilterType & BaseFilter> {
-    filters: T[];
-    columns: string[];
-    data?: Record<string, unknown>[];
-    onFiltersChange: (filters: T[]) => void;
-    title: string;
-    description: string;
-    createNewFilter: (columns: string[]) => T;
-    // Props optionnelles pour customisation
-    prefix?: string; // Préfixe pour les IDs et noms des champs
-    className?: string;
-}
-
-// Options pour les opérateurs (communes aux deux types)
-const OPERATOR_OPTIONS = [
-    { value: "equals", label: "Égal à" },
-    { value: "not_equals", label: "Différent de" },
-    { value: "contains", label: "Contient" },
-    { value: "not_contains", label: "Ne contient pas" },
-    { value: "greater_than", label: "Supérieur à" },
-    { value: "less_than", label: "Inférieur à" },
-    { value: "greater_equal", label: "Supérieur ou égal" },
-    { value: "less_equal", label: "Inférieur ou égal" },
-    { value: "starts_with", label: "Commence par" },
-    { value: "ends_with", label: "Finit par" },
-];
 
 export default function BaseFilterConfig<T extends FilterType & BaseFilter>({
     filters = [],
@@ -50,7 +14,6 @@ export default function BaseFilterConfig<T extends FilterType & BaseFilter>({
     description,
     createNewFilter,
     prefix = "filter",
-    className = "",
 }: BaseFilterConfigProps<T>) {
     const handleAddFilter = () => {
         const newFilter = createNewFilter(columns);
@@ -95,21 +58,12 @@ export default function BaseFilterConfig<T extends FilterType & BaseFilter>({
     };
 
     return (
-        <div className={className}>
-            <div className="flex justify-between items-center mb-3">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                    {title}
-                </h3>
-                <button
-                    type="button"
-                    onClick={handleAddFilter}
-                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
-                >
-                    <PlusCircleIcon className="w-4 h-4" />
-                    Ajouter un filtre
-                </button>
-            </div>
-
+        <WidgetConfigSection
+            title={title}
+            addButtonText="Ajouter un filtre"
+            onAdd={handleAddFilter}
+            canAdd={true}
+        >
             {filters.length === 0 ? (
                 <p className="text-sm text-gray-500 dark:text-gray-400 italic">
                     {description}
@@ -187,6 +141,6 @@ export default function BaseFilterConfig<T extends FilterType & BaseFilter>({
                     ))}
                 </div>
             )}
-        </div>
+        </WidgetConfigSection>
     );
 }

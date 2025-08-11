@@ -8,12 +8,11 @@ import {
   WIDGETS,
   WIDGET_CONFIG_FIELDS,
 } from "@adapters/visualizations";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
-import { useMetricUICollapseStore } from "@store/metricUI";
 import type {
   MetricStyleFieldSchema,
   WidgetMetricStyleConfigSectionProps,
-} from "@type/widget-types";
+} from "@type/widgetTypes";
+import CollapsibleSection from "@components/widgets/CollapsibleSection";
 
 export default function WidgetMetricStyleConfigSection({
   type,
@@ -33,8 +32,6 @@ export default function WidgetMetricStyleConfigSection({
     string | number | boolean
   >[];
   const safeMetrics = (metrics ?? []) as { label?: string }[];
-  const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
-  const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
 
   if (type === "card") {
     return (
@@ -121,168 +118,147 @@ export default function WidgetMetricStyleConfigSection({
   return (
     <div className="space-y-4">
       {safeMetrics.map((metric, idx) => (
-        <div key={idx} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-          <div
-            className="flex items-center justify-start cursor-pointer mb-3"
-            onClick={() => toggleCollapse(idx)}
-          >
-            <button
-              type="button"
-              className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors mr-2"
-              tabIndex={-1}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleCollapse(idx);
-              }}
-              aria-label={collapsedMetrics[idx] ? "Déplier" : "Replier"}
-            >
-              {collapsedMetrics[idx] ? (
-                <ChevronDownIcon className="w-4 h-4" />
-              ) : (
-                <ChevronUpIcon className="w-4 h-4" />
-              )}
-            </button>
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white">{metric.label}</h4>
-          </div>
-          {!collapsedMetrics[idx] && (
-            <div className="grid grid-cols-1 gap-4">
-              {Object.entries(metricStyleSchema).map(([field, metaRaw]) => {
-                const meta = (metaRaw as MetricStyleFieldSchema) || WIDGET_CONFIG_FIELDS[field] || {};
-                const label = meta.label || field;
-                const defaultValue = meta.default;
+        <CollapsibleSection
+          key={idx}
+          title={metric.label || `Métrique ${idx + 1}`}
+          hideSettings={true}
+        >
+          <div className="grid grid-cols-1 gap-4">
+            {Object.entries(metricStyleSchema).map(([field, metaRaw]) => {
+              const meta = (metaRaw as MetricStyleFieldSchema) || WIDGET_CONFIG_FIELDS[field] || {};
+              const label = meta.label || field;
+              const defaultValue = meta.default;
 
-                // Support pour color-array (utilisé dans pie chart)
-                if (meta.inputType === "color-array" || field === "colors") {
-                  const colorArray = (safeMetricStyles[idx]?.[field] || defaultValue || ["#2563eb"]) as string[];
-                  return (
-                    <div key={field} className="flex flex-col gap-2">
-                      <label className="text-sm font-medium text-gray-900 dark:text-white">
-                        {label}
-                      </label>
-                      <div className="flex flex-wrap items-end gap-2">
-                        {colorArray.map((color: string, colorIdx: number) => (
-                          <div key={colorIdx} className="flex items-center gap-1">
-                            <ColorField
-                              value={color || "#2563eb"}
-                              onChange={(val) => {
-                                const newArray = [...colorArray];
-                                newArray[colorIdx] = val;
-                                handleMetricStyleChange(idx, field, newArray);
-                              }}
-                              name={`metric-style-${idx}-${field}-${colorIdx}`}
-                              id={`metric-style-${idx}-${field}-${colorIdx}`}
-                            />
-                            <button
-                              type="button"
-                              className="text-xs text-red-500 hover:underline"
-                              onClick={() => {
-                                const newArray = [...colorArray];
-                                newArray.splice(colorIdx, 1);
-                                handleMetricStyleChange(idx, field, newArray.length > 0 ? newArray : ["#2563eb"]);
-                              }}
-                              title="Supprimer cette couleur"
-                            >
-                              <XMarkIcon className="w-5 h-5 inline-block" />
-                            </button>
-                          </div>
-                        ))}
-                        <Button
-                          variant="outline"
-                          type="button"
-                          className="w-max text-xs h-max text-indigo-600 border border-indigo-300 rounded px-2 py-1 hover:bg-indigo-50"
-                          onClick={() => {
-                            const newArray = [...colorArray, "#2563eb"];
-                            handleMetricStyleChange(idx, field, newArray);
-                          }}
-                        >
-                          + Couleur
-                        </Button>
-                      </div>
+              if (meta.inputType === "color-array" || field === "colors") {
+                const colorArray = (safeMetricStyles[idx]?.[field] || defaultValue || ["#2563eb"]) as string[];
+                return (
+                  <div key={field} className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-900 dark:text-white">
+                      {label}
+                    </label>
+                    <div className="flex flex-wrap items-end gap-2">
+                      {colorArray.map((color: string, colorIdx: number) => (
+                        <div key={colorIdx} className="flex items-center gap-1">
+                          <ColorField
+                            value={color || "#2563eb"}
+                            onChange={(val) => {
+                              const newArray = [...colorArray];
+                              newArray[colorIdx] = val;
+                              handleMetricStyleChange(idx, field, newArray);
+                            }}
+                            name={`metric-style-${idx}-${field}-${colorIdx}`}
+                            id={`metric-style-${idx}-${field}-${colorIdx}`}
+                          />
+                          <button
+                            type="button"
+                            className="text-xs text-red-500 hover:underline"
+                            onClick={() => {
+                              const newArray = [...colorArray];
+                              newArray.splice(colorIdx, 1);
+                              handleMetricStyleChange(idx, field, newArray.length > 0 ? newArray : ["#2563eb"]);
+                            }}
+                            title="Supprimer cette couleur"
+                          >
+                            <XMarkIcon className="w-5 h-5 inline-block" />
+                          </button>
+                        </div>
+                      ))}
+                      <Button
+                        variant="outline"
+                        type="button"
+                        className="w-max text-xs h-max text-indigo-600 border border-indigo-300 rounded px-2 py-1 hover:bg-indigo-50"
+                        onClick={() => {
+                          const newArray = [...colorArray, "#2563eb"];
+                          handleMetricStyleChange(idx, field, newArray);
+                        }}
+                      >
+                        + Couleur
+                      </Button>
                     </div>
-                  );
-                }
+                  </div>
+                );
+              }
 
-                if (
-                  meta.inputType === "color" ||
-                  field === "color" ||
-                  field === "borderColor"
-                ) {
-                  return (
-                    <ColorField
-                      key={field}
-                      label={label}
-                      value={String(
-                        safeMetricStyles[idx]?.[field] ??
-                        defaultValue ??
-                        (field === "borderColor" ? "#000000" : "#2563eb")
-                      )}
-                      onChange={(val) =>
-                        handleMetricStyleChange(idx, field, val)
-                      }
-                      name={`metric-style-${idx}-${field}`}
-                      id={`metric-style-${idx}-${field}`}
-                    />
-                  );
-                }
-                if (meta.inputType === "number") {
-                  return (
-                    <InputField
-                      key={field}
-                      label={label}
-                      type="number"
-                      value={String(
-                        safeMetricStyles[idx]?.[field] ?? defaultValue ?? ""
-                      )}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        handleMetricStyleChange(
-                          idx,
-                          field,
-                          Number(e.target.value)
-                        )
-                      }
-                      name={`metric-style-${idx}-${field}`}
-                      id={`metric-style-${idx}-${field}`}
-                    />
-                  );
-                }
-                if (meta.inputType === "select" && meta.options) {
-                  return (
-                    <SelectField
-                      key={field}
-                      label={label}
-                      value={String(
-                        safeMetricStyles[idx]?.[field] ?? defaultValue ?? ""
-                      )}
-                      options={meta.options}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        handleMetricStyleChange(idx, field, e.target.value)
-                      }
-                      name={`metric-style-${idx}-${field}`}
-                      id={`metric-style-${idx}-${field}`}
-                    />
-                  );
-                }
-                if (meta.inputType === "checkbox") {
-                  return (
-                    <CheckboxField
-                      key={field}
-                      label={label}
-                      checked={Boolean(
-                        safeMetricStyles[idx]?.[field] ?? defaultValue ?? false
-                      )}
-                      onChange={(checked) =>
-                        handleMetricStyleChange(idx, field, checked)
-                      }
-                      name={`metric-style-${idx}-${field}`}
-                      id={`metric-style-${idx}-${field}`}
-                    />
-                  );
-                }
-                return null;
-              })}
-            </div>
-          )}
-        </div>
+              if (
+                meta.inputType === "color" ||
+                field === "color" ||
+                field === "borderColor"
+              ) {
+                return (
+                  <ColorField
+                    key={field}
+                    label={label}
+                    value={String(
+                      safeMetricStyles[idx]?.[field] ??
+                      defaultValue ??
+                      (field === "borderColor" ? "#000000" : "#2563eb")
+                    )}
+                    onChange={(val) =>
+                      handleMetricStyleChange(idx, field, val)
+                    }
+                    name={`metric-style-${idx}-${field}`}
+                    id={`metric-style-${idx}-${field}`}
+                  />
+                );
+              }
+              if (meta.inputType === "number") {
+                return (
+                  <InputField
+                    key={field}
+                    label={label}
+                    type="number"
+                    value={String(
+                      safeMetricStyles[idx]?.[field] ?? defaultValue ?? ""
+                    )}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleMetricStyleChange(
+                        idx,
+                        field,
+                        Number(e.target.value)
+                      )
+                    }
+                    name={`metric-style-${idx}-${field}`}
+                    id={`metric-style-${idx}-${field}`}
+                  />
+                );
+              }
+              if (meta.inputType === "select" && meta.options) {
+                return (
+                  <SelectField
+                    key={field}
+                    label={label}
+                    value={String(
+                      safeMetricStyles[idx]?.[field] ?? defaultValue ?? ""
+                    )}
+                    options={meta.options}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleMetricStyleChange(idx, field, e.target.value)
+                    }
+                    name={`metric-style-${idx}-${field}`}
+                    id={`metric-style-${idx}-${field}`}
+                  />
+                );
+              }
+              if (meta.inputType === "checkbox") {
+                return (
+                  <CheckboxField
+                    key={field}
+                    label={label}
+                    checked={Boolean(
+                      safeMetricStyles[idx]?.[field] ?? defaultValue ?? false
+                    )}
+                    onChange={(checked) =>
+                      handleMetricStyleChange(idx, field, checked)
+                    }
+                    name={`metric-style-${idx}-${field}`}
+                    id={`metric-style-${idx}-${field}`}
+                  />
+                );
+              }
+              return null;
+            })}
+          </div>
+        </CollapsibleSection>
       ))}
     </div>
   );

@@ -1,7 +1,7 @@
 import type { TabConfig } from "@type/ui";
 import { useMemo } from "react";
 import { WIDGETS } from "@adapters/visualizations";
-import type { WidgetType } from "@type/widget-types";
+import type { WidgetType } from "@type/widgetTypes";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useWidgetTabs(config: any, widgetType?: WidgetType): TabConfig[] {

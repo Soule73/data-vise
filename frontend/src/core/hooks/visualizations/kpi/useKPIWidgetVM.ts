@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { useMultiBucketProcessor } from "@hooks/common/useMultiBucketProcessor";
-import type { KPIWidgetConfig } from "@type/visualization";
-import type { Metric } from "@type/metric-bucket-types";
-import type { KPIWidgetVM } from "@type/widget-types";
+import type { Metric } from "@type/metricBucketTypes";
+import type { FilterableConfig, KPIWidgetProps, KPIWidgetVM, StylableConfig } from "@type/widgetTypes";
 import {
   applyKPIFilters,
   calculateKPIValue,
@@ -12,14 +11,13 @@ import {
   getKPITitle,
   getKPIValueColor,
   getKPIWidgetParams,
-  type FilterableConfig,
-  type StylableConfig
-} from "@utils/kpiUtils";
+} from "@utils/kpi/kpiUtils";
 
-export function useKPIWidgetVM(
-  data: Record<string, unknown>[],
-  config: KPIWidgetConfig
-): KPIWidgetVM {
+export function useKPIWidgetVM({
+  data,
+  config,
+}: KPIWidgetProps): KPIWidgetVM {
+
   // Filtrage des données avec l'utilitaire
   const filteredData = useMemo(() => {
     return applyKPIFilters(data, config as FilterableConfig);
@@ -38,8 +36,11 @@ export function useKPIWidgetVM(
 
   // Extraction du titre et des paramètres
   const title = getKPITitle(config, metric, "KPI");
+
   const valueColor = getKPIValueColor(config as StylableConfig);
+
   const titleColor = (config.widgetParams as Record<string, unknown>)?.titleColor as string || "#2563eb";
+
   const {
     showTrend,
     showValue,

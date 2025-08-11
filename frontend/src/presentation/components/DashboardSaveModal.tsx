@@ -2,7 +2,7 @@ import Button from "@components/forms/Button";
 import Modal from "@components/Modal";
 import InputField from "@components/forms/InputField";
 import CheckboxField from "@components/forms/CheckboxField";
-import type { SaveModalProps } from "@type/dashboard-types";
+import type { SaveModalProps } from "@type/dashboardTypes";
 
 export function DashboardSaveModal(props: SaveModalProps) {
   const {

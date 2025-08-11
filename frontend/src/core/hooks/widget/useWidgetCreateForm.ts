@@ -5,7 +5,7 @@ import { useCreateWidgetMutation } from "@repositories/widgets";
 import { useNotificationStore } from "@store/notification";
 import { useDashboardStore } from "@store/dashboard";
 import { ROUTES } from "@constants/routes";
-import type { WidgetFormInitialValues } from "@type/widget-types";
+import type { WidgetFormInitialValues } from "@type/widgetTypes";
 import { useCommonWidgetForm } from "@hooks/widget/useCommonWidgetForm";
 
 export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {

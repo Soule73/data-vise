@@ -4,9 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useDashboardStore } from "@store/dashboard";
 import { useNotificationStore } from "@store/notification";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import type { DashboardLayoutItem } from "@type/dashboard-types";
+import type { DashboardLayoutItem } from "@type/dashboardTypes";
 import { useSourcesQuery } from "@repositories/sources";
-import type { IntervalUnit } from "@type/dashboard-types";
+import type { IntervalUnit } from "@type/dashboardTypes";
 import { useUserStore } from "@store/user";
 import { ROUTES } from "@constants/routes";
 import { useDashboardIdQuery } from "@repositories/dashboards";
@@ -21,13 +21,13 @@ import {
   getDashboardBreadcrumb,
   initDashboardTimeConfig,
   getDashboardPDFFileName,
-} from "@utils/dashboardUtils";
+} from "@utils/dashboard/dashboardUtils";
 import {
   enableDashboardShare,
   disableDashboardShare,
 } from "@services/dashboard";
-import { exportDashboardToPDF } from "@utils/dashboardExportUtils";
-import type { Widget } from "@type/widget-types";
+import { exportDashboardToPDF } from "@utils/dashboard/dashboardExportUtils";
+import type { Widget } from "@type/widgetTypes";
 
 export function useDashboard(onSaveCallback?: (success: boolean) => void) {
 

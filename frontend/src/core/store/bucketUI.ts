@@ -1,19 +1,19 @@
-import { create } from 'zustand';
-import type { BucketUIState } from '@type/metric-bucket-types';
+// import { create } from 'zustand';
+// import type { BucketUIState } from '@type/metricBucketTypes';
 
-export const useBucketUIStore = create<BucketUIState>((set) => ({
-    collapsedBuckets: {},
+// export const useBucketUIStore = create<BucketUIState>((set) => ({
+//     collapsedBuckets: {},
 
-    toggleBucketCollapse: (idx: string | number) =>
-        set((state) => ({
-            collapsedBuckets: {
-                ...state.collapsedBuckets,
-                [idx]: !state.collapsedBuckets[idx],
-            },
-        })),
+//     toggleBucketCollapse: (idx: string | number) =>
+//         set((state) => ({
+//             collapsedBuckets: {
+//                 ...state.collapsedBuckets,
+//                 [idx]: !state.collapsedBuckets[idx],
+//             },
+//         })),
 
-    setBucketCollapsed: (collapsed: Record<string | number, boolean>) =>
-        set({ collapsedBuckets: collapsed }),
+//     setBucketCollapsed: (collapsed: Record<string | number, boolean>) =>
+//         set({ collapsedBuckets: collapsed }),
 
-    resetBuckets: () => set({ collapsedBuckets: {} }),
-}));
+//     resetBuckets: () => set({ collapsedBuckets: {} }),
+// }));

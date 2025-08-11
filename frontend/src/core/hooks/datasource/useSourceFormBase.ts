@@ -7,8 +7,8 @@ import {
   mapDetectedColumns,
   autoDetectTimestampField,
   buildDetectParams,
-} from "@utils/dataSourceFormUtils";
-import type { DetectParams, SourceFormState } from "@type/data-source";
+} from "@utils/datasource/dataSourceFormUtils";
+import type { DetectParams, SourceFormState } from "@type/dataSource";
 
 
 export function useSourceFormBase(initial?: Partial<SourceFormState>) {

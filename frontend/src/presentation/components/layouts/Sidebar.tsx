@@ -14,7 +14,7 @@ import { Transition } from "@headlessui/react";
 import type {
   SidebarGroup,
   SidebarGroupItem,
-} from "@type/navigation-types";
+} from "@type/navigationTypes";
 
 const sidebarGroups: SidebarGroup[] = [
   {

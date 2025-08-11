@@ -1,11 +1,10 @@
 import type {
   BubbleMetricConfig,
-  BucketConfig,
   Metric,
   RadarMetricConfig,
   ScatterMetricConfig,
   MultiBucketConfig,
-} from "@type/metric-bucket-types";
+} from "@type/metricBucketTypes";
 
 // --- Base params communs à la plupart des visualisations ---
 export interface BaseChartParams {
@@ -183,7 +182,6 @@ export abstract class WidgetConfigBase<
     | ScatterMetricConfig[]
     | BubbleMetricConfig[]
     | RadarMetricConfig[];
-  bucket?: BucketConfig; // Bucket legacy pour compatibilité
   buckets?: MultiBucketConfig[]; // Nouveaux buckets multiples
   widgetParams?: TParams;
   metricStyles?: TStyles;
@@ -191,7 +189,6 @@ export abstract class WidgetConfigBase<
   globalFilters?: Filter[]; // Nouveau système de filtres globaux
   constructor({
     metrics,
-    bucket,
     buckets,
     widgetParams,
     metricStyles,
@@ -199,7 +196,6 @@ export abstract class WidgetConfigBase<
     globalFilters,
   }: {
     metrics: Metric[];
-    bucket?: BucketConfig;
     buckets?: MultiBucketConfig[];
     widgetParams?: TParams;
     metricStyles?: TStyles;
@@ -207,7 +203,7 @@ export abstract class WidgetConfigBase<
     globalFilters?: Filter[];
   }) {
     this.metrics = metrics;
-    this.bucket = bucket;
+    this.buckets = buckets;
     this.buckets = buckets;
     this.widgetParams = widgetParams;
     this.metricStyles = metricStyles;
@@ -217,7 +213,9 @@ export abstract class WidgetConfigBase<
 }
 
 export class BarChartConfig extends WidgetConfigBase<BarChartParams> { }
+
 export class LineChartConfig extends WidgetConfigBase<LineChartParams> { }
+
 export class PieChartConfig extends WidgetConfigBase<PieChartParams> { }
 
 // Interfaces spécialisées pour les graphiques avec types de métriques spécifiques
@@ -250,7 +248,6 @@ export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
   maxHeight?: string | number;
   constructor(params: {
     metrics: Metric[];
-    bucket?: BucketConfig;
     buckets?: MultiBucketConfig[];
     columns?: { key: string; label: string }[];
     pageSize?: number;
@@ -277,3 +274,4 @@ export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
     this.maxHeight = params.maxHeight;
   }
 }
+

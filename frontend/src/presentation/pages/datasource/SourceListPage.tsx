@@ -5,7 +5,7 @@ import { useSourcesPage } from "@hooks/datasource/useSourcesPage";
 import { ROUTES } from "@constants/routes";
 import { Link } from "react-router-dom";
 import { DeleteSourceForm } from "@components/source/DeleteSourceForm";
-import type { DataSource } from "@type/data-source";
+import type { DataSource } from "@type/dataSource";
 import Badge from "@components/Badge";
 import { DocumentTextIcon, TableCellsIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
