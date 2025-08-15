@@ -1,12 +1,14 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { plugin as markdown } from 'vite-plugin-markdown'
 import path from 'path';
 
 export default defineConfig({
   plugins: [
     tailwindcss(),
     react(),
+    markdown()
   ],
   resolve: {
     alias: {
@@ -24,7 +26,7 @@ export default defineConfig({
       '@repositories': path.resolve(__dirname, './src/data/repositories'),
       '@adapters': path.resolve(__dirname, './src/data/adapters'),
       '@validation': path.resolve(__dirname, './src/core/validation'),
-
+      '@data': path.resolve(__dirname, './src/data'),
     }
   }
 })

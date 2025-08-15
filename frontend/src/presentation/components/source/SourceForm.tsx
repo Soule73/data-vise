@@ -336,7 +336,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
                   <>
                     <InputField
                       label="Token Bearer"
-                      value={values.authConfig.token}
+                      value={values?.authConfig?.token}
                       onChange={(e) =>
                         setFormField("authConfig.token", e.target.value)
                       }
@@ -350,7 +350,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
                   <>
                     <InputField
                       label="Clé API"
-                      value={values.authConfig.apiKey}
+                      value={values?.authConfig?.apiKey}
                       onChange={(e) =>
                         setFormField("authConfig.apiKey", e.target.value)
                       }
@@ -360,7 +360,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
                     )}
                     <InputField
                       label="Nom du header (optionnel)"
-                      value={values.authConfig.headerName}
+                      value={values?.authConfig?.headerName}
                       onChange={(e) =>
                         setFormField("authConfig.headerName", e.target.value)
                       }
@@ -372,7 +372,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
                   <>
                     <InputField
                       label="Nom d'utilisateur"
-                      value={values.authConfig.username}
+                      value={values?.authConfig?.username}
                       onChange={(e) =>
                         setFormField("authConfig.username", e.target.value)
                       }
@@ -383,7 +383,7 @@ const SourceForm: React.FC<SourceFormProps> = ({
                     <InputField
                       label="Mot de passe"
                       type="password"
-                      value={values.authConfig.password}
+                      value={values?.authConfig?.password}
                       onChange={(e) =>
                         setFormField("authConfig.password", e.target.value)
                       }
@@ -535,18 +535,18 @@ const SourceForm: React.FC<SourceFormProps> = ({
                 {values.authType === "bearer" && (
                   <div>
                     <span className="font-semibold dark:text-gray-300">Token :</span>{" "}
-                    {values.authConfig.token ? "•••••" : "non renseigné"}
+                    {values?.authConfig?.token ? "•••••" : "non renseigné"}
                   </div>
                 )}
                 {values.authType === "apiKey" && (
                   <>
                     <div>
                       <span className="font-semibold dark:text-gray-300">Clé API :</span>{" "}
-                      {values.authConfig.apiKey ? "•••••" : "non renseigné"}
+                      {values?.authConfig?.apiKey ? "•••••" : "non renseigné"}
                     </div>
                     <div>
                       <span className="font-semibold dark:text-gray-300">Header :</span>{" "}
-                      {values.authConfig.headerName || "x-api-key"}
+                      {values?.authConfig?.headerName || "x-api-key"}
                     </div>
                   </>
                 )}
@@ -554,11 +554,11 @@ const SourceForm: React.FC<SourceFormProps> = ({
                   <>
                     <div>
                       <span className="font-semibold dark:text-gray-300">Utilisateur :</span>{" "}
-                      {values.authConfig.username || "non renseigné"}
+                      {values?.authConfig?.username || "non renseigné"}
                     </div>
                     <div>
                       <span className="font-semibold dark:text-gray-300">Mot de passe :</span>{" "}
-                      {values.authConfig.password ? "•••••" : "non renseigné"}
+                      {values?.authConfig?.password ? "•••••" : "non renseigné"}
                     </div>
                   </>
                 )}

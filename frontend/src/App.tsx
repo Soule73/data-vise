@@ -19,6 +19,8 @@ import WidgetEditPage from "@pages/widget/WidgetEditPage";
 import AppLoader from "@components/layouts/AppLoader";
 import DashboardSharePage from "@pages/dashboard/DashboardSharePage";
 import ErrorPage from "@components/layouts/ErrorPage";
+import LandingPage from "@pages/LandingPage";
+import DocumentationPage from "@pages/DocumentationPage";
 
 function RequireAuth({
   children,
@@ -78,6 +80,10 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path={ROUTES.home} element={<LandingPage />} />
+        <Route path={ROUTES.docs} element={<DocumentationPage />} />
+        <Route path={ROUTES.docsSection} element={<DocumentationPage />} />
+        <Route path={ROUTES.docsPage} element={<DocumentationPage />} />
         <Route path={ROUTES.login} element={<Login />} />
         <Route path={ROUTES.register} element={<Register />} />
         <Route
@@ -173,7 +179,7 @@ const App: React.FC = () => {
           }
         />
         <Route path={ROUTES.dashboardShare} element={<DashboardSharePage />} />
-        <Route path="/" element={<Navigate to={ROUTES.dashboard} replace />} />
+        {/* <Route path="/" element={<Navigate to={ROUTES.dashboard} replace />} /> */}
         <Route path="*" element={<Navigate to={ROUTES.dashboard} replace />} />
       </Routes>
     </BrowserRouter>

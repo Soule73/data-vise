@@ -263,7 +263,7 @@ export default function DashboardConfigFields({
         {icon}
         {label}
       </PopoverButton>
-      <PopoverPanel className="z-50 mt-2 rounded-xl bg-white dark:bg-gray-900 p-4 shadow-xl border border-gray-200 dark:border-gray-700">
+      <PopoverPanel className="absolute top-full left-0 z-[150] mt-2 w-max min-w-80 rounded-xl bg-white dark:bg-gray-900 p-4 shadow-xl border border-gray-200 dark:border-gray-700">
         {panel}
       </PopoverPanel>
     </Popover>

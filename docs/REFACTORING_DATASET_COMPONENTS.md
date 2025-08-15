@@ -81,7 +81,6 @@ interface CommonMultiBucketSectionProps {
 
 **Améliorations:**
 - Gestion des axes multiples via checkboxes isolée
-- Support du groupBy avec options dynamiques
 - Réduction significative de la complexité
 - Réutilisation des patterns de collapse
 
@@ -127,7 +126,7 @@ DatasetSection<T>
     └── renderDatasetContent(dataset, index, onUpdate)
         ├── BubbleDatasetContent (x, y, r)
         ├── ScatterDatasetContent (x, y)
-        └── RadarDatasetContent (fields[], groupBy)
+        └── RadarDatasetContent (fields[])
 
 CommonMultiBucketSection
 ├── MultiBucketSection Wrapper

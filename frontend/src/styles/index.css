@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./landing.css";
 @custom-variant dark (&:where(.dark, .dark *));
 
 body {
@@ -118,4 +119,46 @@ textarea:focus {
 
 .space-y-3>*+* {
   margin-top: 0.75rem;
+}
+
+/* Dashboard Widget Resize Handles */
+.resize-handle-widget {
+  position: relative;
+}
+
+.resize-handle-widget::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(-45deg, transparent 0%, transparent 30%, rgba(99, 102, 241, 0.4) 30%, rgba(99, 102, 241, 0.4) 40%, transparent 40%, transparent 60%, rgba(99, 102, 241, 0.4) 60%, rgba(99, 102, 241, 0.4) 70%, transparent 70%);
+  cursor: nw-resize;
+  pointer-events: auto;
+  z-index: 10;
+  border-bottom-right-radius: inherit;
+}
+
+.resize-handle-widget:hover::after {
+  background: linear-gradient(-45deg, transparent 0%, transparent 30%, rgba(99, 102, 241, 0.6) 30%, rgba(99, 102, 241, 0.6) 40%, transparent 40%, transparent 60%, rgba(99, 102, 241, 0.6) 60%, rgba(99, 102, 241, 0.6) 70%, transparent 70%);
+}
+
+/* Améliore le curseur sur les zones de resize */
+.resize-handle-widget .resize-zone {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  cursor: nw-resize;
+  z-index: 15;
+}
+
+/* Disable drag on resize zone */
+.resize-handle-widget .resize-zone {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
 }

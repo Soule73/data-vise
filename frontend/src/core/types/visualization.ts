@@ -21,7 +21,7 @@ export interface BarChartParams extends BaseChartParams {
   stacked?: boolean;
   labelFormat?: string;
   showValues?: boolean;
-  horizontal?: boolean; // indexAxis: 'y'
+  horizontal?: boolean;
   tooltipFormat?: string;
   labelColor?: string;
   labelFontSize?: number;
@@ -157,18 +157,17 @@ export interface MetricStyle {
   borderColor?: string; // Couleur de bordure par métrique
 }
 
+export type FilterOperator = 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than' | 'greater_equal' | 'less_equal' | 'starts_with' | 'ends_with';
+
 export interface Filter {
   field: string; // Champ sur lequel appliquer le filtre
-  operator?: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than' | 'greater_equal' | 'less_equal' | 'starts_with' | 'ends_with'; // Opérateur de comparaison
-  value: string | number | readonly string[] | undefined; // Valeur du filtre
+  operator?: FilterOperator;
+  value: string | number | readonly string[] | undefined;
 }
 
-export interface FilterConfig {
-  filters: Filter[]; // Liste des filtres à appliquer
-}
 
 export interface MetricStyleConfig {
-  [key: string]: MetricStyle; // Clé de la métrique et ses styles
+  [key: string]: MetricStyle;
 }
 
 // Classe de base pour la configuration d'un widget
@@ -182,17 +181,15 @@ export abstract class WidgetConfigBase<
     | ScatterMetricConfig[]
     | BubbleMetricConfig[]
     | RadarMetricConfig[];
-  buckets?: MultiBucketConfig[]; // Nouveaux buckets multiples
+  buckets?: MultiBucketConfig[];
   widgetParams?: TParams;
   metricStyles?: TStyles;
-  filters?: TFilters; // Ancien système de filtres (rétrocompatibilité)
-  globalFilters?: Filter[]; // Nouveau système de filtres globaux
+  globalFilters?: Filter[];
   constructor({
     metrics,
     buckets,
     widgetParams,
     metricStyles,
-    filters,
     globalFilters,
   }: {
     metrics: Metric[];
@@ -207,7 +204,6 @@ export abstract class WidgetConfigBase<
     this.buckets = buckets;
     this.widgetParams = widgetParams;
     this.metricStyles = metricStyles;
-    this.filters = filters;
     this.globalFilters = globalFilters;
   }
 }
@@ -239,7 +235,6 @@ export class CardWidgetConfig extends WidgetConfigBase<CardWidgetParams> { }
 export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
   columns?: { key: string; label: string }[];
   pageSize?: number;
-  groupBy?: string;
   width?: string | number;
   height?: string | number;
   minWidth?: string | number;
@@ -251,7 +246,6 @@ export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
     buckets?: MultiBucketConfig[];
     columns?: { key: string; label: string }[];
     pageSize?: number;
-    groupBy?: string;
     width?: string | number;
     height?: string | number;
     minWidth?: string | number;
@@ -265,8 +259,6 @@ export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
     super(params);
     this.columns = params.columns;
     this.pageSize = params.pageSize;
-    this.groupBy = params.groupBy;
-    this.width = params.width;
     this.height = params.height;
     this.minWidth = params.minWidth;
     this.minHeight = params.minHeight;

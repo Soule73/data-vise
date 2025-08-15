@@ -46,8 +46,7 @@ export default function KPIGroupWidget({
           data={data}
           config={{
             metrics: [metric],
-            metricStyles: {}, // Plus besoin des metricStyles, tout est dans widgetParams
-            globalFilters: config.globalFilters, // Utiliser globalFilters au lieu de filters
+            globalFilters: config.globalFilters,
             widgetParams: widgetParamsList[idx],
             buckets: config.buckets,
           }}

@@ -29,7 +29,6 @@ export type ChartType = "bar" | "line" | "pie" | "scatter" | "bubble" | "radar";
 
 export interface GroupFieldConfig {
   xField?: string;
-  groupBy?: string;
   nameField?: string;
   valueField?: string;
   dataConfig?: {
@@ -725,8 +724,6 @@ export interface BaseChartConfig {
  * Interface pour les configurations de widget avec filtre
  */
 export interface FilterableConfig {
-  filter?: { field: string; value: string };
-  filters?: Array<{ field: string; value: string | number | readonly string[] | undefined }>;
   globalFilters?: Filter[];
 }
 
@@ -750,9 +747,8 @@ export interface TableConfig {
   metrics?: any[];
   buckets?: any[];
   columns?: any[];
-  groupBy?: string;
   widgetParams?: any;
-  globalFilters?: any[]; // Support des filtres globaux
+  globalFilters?: any[];
 }
 
 export interface TableDataResult {
@@ -802,7 +798,7 @@ export const OPERATOR_OPTIONS = [
 export interface DatasetFiltersConfigProps {
   filters: DatasetFilter[];
   columns: string[];
-  data?: Record<string, unknown>[]; // Données pour extraire les valeurs possibles
+  data?: Record<string, any>[];
   onFiltersChange: (filters: DatasetFilter[]) => void;
   datasetIndex: number;
 }
@@ -810,6 +806,6 @@ export interface DatasetFiltersConfigProps {
 export interface GlobalFiltersConfigProps {
   filters: Filter[];
   columns: string[];
-  data?: Record<string, unknown>[]; // Données pour extraire les valeurs possibles
+  data?: Record<string, any>[];
   onFiltersChange: (filters: Filter[]) => void;
 }

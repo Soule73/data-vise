@@ -78,9 +78,9 @@ export interface DashboardGridItemProps {
   draggedIdx: number | null;
   isMobile?: boolean;
   isLoading?: boolean;
-  handleDragStart: (idx: number) => void;
-  handleDragOver: (idx: number) => void;
-  handleDrop: (idx: number) => void;
+  handleDragStart: (idx: number, e?: React.DragEvent) => void;
+  handleDragOver: (idx: number, e?: React.DragEvent) => void;
+  handleDrop: (idx: number, e?: React.DragEvent) => void;
   handleDragEnd: () => void;
   onSwapLayout?: (newLayout: DashboardLayoutItem[]) => void;
   autoRefreshIntervalValue?: number;
@@ -167,9 +167,9 @@ export interface UseGridItemProps {
   onSwapLayout?: (newLayout: DashboardLayoutItem[]) => void;
   hoveredIdx?: number | null;
   draggedIdx?: number | null;
-  handleDragStart?: (idx: number) => void;
-  handleDragOver?: (idx: number) => void;
-  handleDrop?: (idx: number) => void;
+  handleDragStart?: (idx: number, e?: React.DragEvent) => void;
+  handleDragOver?: (idx: number, e?: React.DragEvent) => void;
+  handleDrop?: (idx: number, e?: React.DragEvent) => void;
   handleDragEnd?: () => void;
   isMobile?: boolean;
   item?: DashboardLayoutItem;

@@ -128,80 +128,6 @@ export function processMultiBucketData(
     return { columns, displayData };
 }
 
-/**
- * Traite les données avec colonnes personnalisées
- */
-export function processCustomColumnsData(
-    data: any[],
-    config: TableConfig
-): TableDataResult {
-    if (!config.columns) {
-        return { columns: [], displayData: [] };
-    }
-
-    const columns = config.columns.map((col: any) => ({
-        key: col.key,
-        label: col.label || col.key,
-    }));
-
-    let displayData: any[] = [];
-
-    if (config.groupBy && typeof config.groupBy === "string") {
-        // Grouper par un champ spécifique
-        displayData = processGroupByData(data, config.groupBy, columns);
-    } else {
-        // Données brutes
-        displayData = data;
-    }
-
-    return { columns, displayData };
-}
-
-/**
- * Traite les données avec groupBy
- */
-function processGroupByData(
-    data: any[],
-    groupKey: string,
-    columns: TableColumn[]
-): any[] {
-    const groups: Record<string, any[]> = {};
-
-    data.forEach((row: any) => {
-        const key = String(row[groupKey]);
-        if (!groups[key]) groups[key] = [];
-        groups[key].push(row);
-    });
-
-    const rawData = Object.entries(groups).map(([groupVal, rows]) => {
-        const summary: any = { [groupKey]: groupVal, count: rows.length };
-
-        columns.forEach((col: any) => {
-            if (col.key !== groupKey) {
-                const nums = rows
-                    .map((r: any) => Number(r[col.key]))
-                    .filter((v: number) => !isNaN(v));
-
-                if (nums.length === rows.length && nums.length > 0) {
-                    summary[col.key] = nums.reduce((a: number, b: number) => a + b, 0);
-                } else {
-                    summary[col.key] = rows[0][col.key] ?? "";
-                }
-            }
-        });
-
-        return summary;
-    });
-
-    // Formater les labels du groupKey si ce sont des dates
-    const groupValues = rawData.map(row => row[groupKey]);
-    const formattedGroupValues = formatTableLabels(groupValues);
-
-    return rawData.map((row, index) => ({
-        ...row,
-        [groupKey]: formattedGroupValues[index]
-    }));
-}
 
 /**
  * Traite les données brutes (sans configuration spécifique)
@@ -247,11 +173,6 @@ export function generateTableTitle(config: TableConfig, configType: ReturnType<t
         } else {
             return `Décompte par ${bucketLabels}`;
         }
-    }
-
-    // Group by
-    if (config.groupBy) {
-        return `Tableau groupé par ${config.groupBy}`;
     }
 
     // Cas génériques

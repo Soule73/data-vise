@@ -14,8 +14,9 @@ import {
   fetchUploadedFile,
   getSourceById,
 } from "@services/datasource";
-import type { DetectParams, SourceFormState } from "@type/dataSource";
+
 import type { ApiError } from "@type/api";
+import type { DetectParams, SourceFormState } from "@type/dataSource";
 
 export function useSourcesQuery({ queryClient }: { queryClient: QueryClient }) {
   const query = useQuery({

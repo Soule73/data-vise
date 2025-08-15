@@ -4,7 +4,6 @@ import { applyAllFilters } from "@utils/filterUtils";
 import {
   detectTableConfigType,
   processMultiBucketData,
-  processCustomColumnsData,
   processRawData,
   generateTableTitle,
 } from "@utils/kpi/tableDataUtils";
@@ -23,7 +22,7 @@ export function useTableWidgetLogic({
     return data;
   }, [data, config.globalFilters]);
 
-  // Process data with multi-bucket system using the utils function
+
   const processedData = useMultiBucketProcessorUtils(filteredData, config);
 
   // Détection du type de configuration
@@ -31,7 +30,6 @@ export function useTableWidgetLogic({
 
   const { hasMetrics, hasMultiBuckets } = configType;
 
-  // Traitement des données selon le type de configuration
   const { columns, displayData } = useMemo(() => {
 
     const safeData = Array.isArray(filteredData) ? filteredData : [];
@@ -40,12 +38,6 @@ export function useTableWidgetLogic({
       return processMultiBucketData(processedData, config, hasMetrics);
     }
 
-    // PRIORITÉ 2: Configuration colonnes personnalisées
-    if (Array.isArray(config.columns) && config.columns.length > 0) {
-      return processCustomColumnsData(safeData, config);
-    }
-
-    // PRIORITÉ 3: Données brutes (aucun groupement configuré)
     return processRawData(safeData);
 
   }, [hasMetrics, hasMultiBuckets, config, filteredData, processedData]);

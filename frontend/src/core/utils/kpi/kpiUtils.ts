@@ -18,24 +18,6 @@ export function applyKPIFilters(
     if (config.globalFilters && config.globalFilters.length > 0) {
         baseData = applyAllFilters(baseData, config.globalFilters, []);
     }
-    // Appliquer le filtre unique (config.filter au singulier) pour KPI/Card - rétrocompatibilité
-    else if (config.filter?.field && config.filter?.value !== undefined && config.filter?.value !== "") {
-        baseData = baseData.filter(
-            (row: Record<string, unknown>) =>
-                String(row[config.filter!.field]) === String(config.filter!.value)
-        );
-    }
-    // Fallback: support des filtres multiples (config.filters au pluriel) pour KPIGroup - rétrocompatibilité
-    else if (!config.filter && Array.isArray(config.filters) && config.filters.length > 0) {
-        baseData = config.filters.reduce((acc: Record<string, unknown>[], filterItem) => {
-            if (!filterItem.field || filterItem.value === undefined || filterItem.value === "")
-                return acc;
-            return acc.filter(
-                (row: Record<string, unknown>) =>
-                    String(row[filterItem.field]) === String(filterItem.value)
-            );
-        }, baseData);
-    }
 
     return baseData;
 }

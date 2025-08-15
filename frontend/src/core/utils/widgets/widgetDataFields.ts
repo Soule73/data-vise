@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// import type { WidgetType } from "@type/widget-types";
 import type { Filter } from "@type/visualization";
 import type {
   Metric,
   ScatterMetricConfig,
   BubbleMetricConfig,
   RadarMetricConfig,
+  MultiBucketConfig,
 } from "@type/metricBucketTypes";
-import type { ColumnFieldConfig, GroupFieldConfig } from "@type/widgetTypes";
 
-// Extraction de tous les champs utilisés par les métriques, y compris x, y, r pour scatter/bubble
+// Extraction de tous les champs utilisés par les métriques, incluant les champs spécialisés
 function extractAllMetricFields(
   metrics?:
     | Metric[]
@@ -26,62 +25,59 @@ function extractAllMetricFields(
         | BubbleMetricConfig
         | RadarMetricConfig
     ) => {
-      const scatterFields: string[] = [];
-      // Scatter/Bubble : x, y, r
+      const metricFields: string[] = [];
+
+      // Scatter/Bubble : champs x, y, r
       if (typeof (m as ScatterMetricConfig).x === "string")
-        scatterFields.push((m as ScatterMetricConfig).x);
+        metricFields.push((m as ScatterMetricConfig).x);
       if (typeof (m as ScatterMetricConfig).y === "string")
-        scatterFields.push((m as ScatterMetricConfig).y);
+        metricFields.push((m as ScatterMetricConfig).y);
       if (typeof (m as BubbleMetricConfig).r === "string")
-        scatterFields.push((m as BubbleMetricConfig).r);
-      // Radar : fields (array)
+        metricFields.push((m as BubbleMetricConfig).r);
+
+      // Radar : champs fields (array)
       if (Array.isArray((m as RadarMetricConfig).fields))
-        scatterFields.push(
+        metricFields.push(
           ...((m as RadarMetricConfig).fields as string[]).filter(Boolean)
         );
-      // Standard metric : field
+
+      // Métrique standard : field
       if (typeof (m as Metric).field === "string")
-        scatterFields.push((m as Metric).field);
-      // Récursif pour sous-métriques
-      if (
-        typeof m === "object" &&
-        m !== null &&
-        "metrics" in m &&
-        Array.isArray((m as any).metrics)
-      ) {
-        scatterFields.push(...extractAllMetricFields((m as any).metrics));
+        metricFields.push((m as Metric).field);
+
+      // Filtres dataset pour métriques spécialisées
+      if (Array.isArray((m as any).datasetFilters)) {
+        metricFields.push(
+          ...extractDatasetFilterFields((m as any).datasetFilters)
+        );
       }
-      return scatterFields;
+
+      return metricFields;
     }
   );
 }
 
-// Extraction de tous les champs de groupement (bucket, groupBy, xField, nameField, valueField...)
+// Extraction des champs des filtres dataset
+function extractDatasetFilterFields(datasetFilters: any[] = []): string[] {
+  if (!Array.isArray(datasetFilters)) return [];
+  return datasetFilters
+    .map((filter: any) => filter.field || null)
+    .filter((field: string | null): field is string => !!field);
+}
 
-function extractAllGroupFields(config: GroupFieldConfig): string[] {
-  const groupFields: string[] = [];
-  if (config.xField) groupFields.push(config.xField);
-  if (config.groupBy) groupFields.push(config.groupBy);
-  if (config.nameField) groupFields.push(config.nameField);
-  if (config.valueField) groupFields.push(config.valueField);
-  // DataConfig (radar, etc.)
-  if (config.dataConfig) {
-    if (Array.isArray(config.dataConfig.groupByFields)) {
-      groupFields.push(...config.dataConfig.groupByFields);
-    }
-    if (Array.isArray(config.dataConfig.axisFields)) {
-      groupFields.push(...config.dataConfig.axisFields);
-    }
-  }
-  return groupFields.filter(Boolean);
+// Extraction des champs des buckets multiples
+function extractBucketFields(buckets: MultiBucketConfig[] = []): string[] {
+  if (!Array.isArray(buckets)) return [];
+  return buckets
+    .map((bucket: MultiBucketConfig) => bucket.field || null)
+    .filter((field: string | null): field is string => !!field);
 }
 
 // Extraction de tous les champs de colonnes (table)
-
-function extractAllColumnFields(config: ColumnFieldConfig): string[] {
+function extractAllColumnFields(config: { columns?: Array<string | { key: string; label: string }> }): string[] {
   if (Array.isArray(config.columns)) {
     return config.columns
-      .map((c) => (typeof c === "string" ? c : c.key))
+      .map((c: string | { key: string; label: string }) => (typeof c === "string" ? c : c.key))
       .filter(Boolean);
   }
   return [];
@@ -104,33 +100,36 @@ export function getWidgetDataFields(
     | RadarMetricConfig[];
     columns?: Array<string | { key: string; label: string }>;
     filters?: Filter[];
+    globalFilters?: Filter[];
+    buckets?: MultiBucketConfig[];
     [key: string]: any;
   },
-  // type?: WidgetType
 ): string[] {
   if (!config) return [];
-  let fields: string[] = [];
 
-  // 1. Champs de groupement (bucket, groupBy, xField, nameField, valueField, dataConfig...)
-  const groupFields = extractAllGroupFields(config as GroupFieldConfig);
+  // 1. Colonnes explicites (table)
+  const columnFields = extractAllColumnFields(config);
 
-  // 2. Colonnes explicites (table)
-  const columnFields = extractAllColumnFields(config as ColumnFieldConfig);
-
-  // 3. Champs de métriques (récursif, gère tous les cas)
+  // 2. Champs de métriques (incluant champs spécialisés et datasetFilters)
   const metricFields = extractAllMetricFields(config.metrics);
 
-  // 4. Champs de filtres (field uniquement, tous les filtres)
+  // 3. Champs de filtres locaux
   const filterFields = extractAllFilterFields(config.filters);
 
-  // 5. Agrégation finale
-  fields = [
-    ...groupFields,
+  // 4. Champs de filtres globaux
+  const globalFilterFields = extractAllFilterFields(config.globalFilters);
+
+  // 5. Champs des buckets multiples
+  const bucketFields = extractBucketFields(config.buckets);
+
+  // 6. Agrégation finale avec déduplication
+  const allFields = [
     ...columnFields,
     ...metricFields,
     ...filterFields,
+    ...globalFilterFields,
+    ...bucketFields,
   ].filter(Boolean);
 
-  // Déduplique les champs
-  return Array.from(new Set(fields));
+  return Array.from(new Set(allFields));
 }
