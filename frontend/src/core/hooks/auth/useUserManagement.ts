@@ -1,18 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   useCreateUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
-} from "@/data/repositories/auth";
+} from "@repositories/auth";
 import { useState, useMemo } from "react";
-import { useNotificationStore } from "@/core/store/notification";
-import { rolesQuery } from "@/data/repositories/roles";
-import { usersQuery } from "@/data/repositories/users";
+import { useNotificationStore } from "@store/notification";
+import { useRolesQuery } from "@repositories/roles";
+import { useUsersQuery } from "@repositories/users";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUserStore } from "@/core/store/user";
-import type { User, Role } from "@/core/types/auth-types";
-import { userSchema } from "@/core/validation/user";
+import { useUserStore } from "@store/user";
+import type { User, Role } from "@type/authTypes";
+import { userSchema } from "@validation/user";
 
 export function useUserManagement() {
   const showNotification = useNotificationStore((s) => s.showNotification);
@@ -24,8 +25,8 @@ export function useUserManagement() {
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const queryClient = useQueryClient();
 
-  const { data: users, isLoading } = usersQuery();
-  const { roles } = rolesQuery();
+  const { data: users, isLoading } = useUsersQuery();
+  const { roles } = useRolesQuery();
 
   const createMutation = useCreateUserMutation({
     queryClient,

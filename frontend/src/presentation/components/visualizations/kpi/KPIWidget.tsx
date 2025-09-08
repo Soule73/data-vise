@@ -5,18 +5,31 @@ import {
   ChevronDownIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
-import { useKPIWidgetVM } from "@/core/hooks/visualizations/useKPIWidgetVM";
-import InvalideConfigWidget from "../charts/InvalideConfigWidget";
-import NoDataWidget from "../charts/NoDataWidget";
-import type { KPIWidgetConfig } from "@/core/types/visualization";
+import { useKPIWidgetVM } from "@hooks/visualizations/kpi/useKPIWidgetVM";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import type { KPIWidgetProps } from "@type/widgetTypes";
 
 export default function KPIWidget({
   data,
   config,
-}: {
-  data: Record<string, any>[];
-  config: KPIWidgetConfig;
-}) {
+}: KPIWidgetProps) {
+  const {
+    value,
+    title,
+    valueColor,
+    titleColor,
+    showTrend,
+    showValue,
+    formatValue,
+    trendType,
+    showPercent,
+    trend,
+    trendValue,
+    trendPercent,
+    getTrendColor,
+  } = useKPIWidgetVM({ data, config });
+
   if (
     !data ||
     !config.metrics ||
@@ -35,20 +48,6 @@ export default function KPIWidget({
     );
   }
 
-  const {
-    value,
-    title,
-    valueColor,
-    showTrend,
-    showValue,
-    formatValue,
-    trendType,
-    showPercent,
-    trend,
-    trendValue,
-    trendPercent,
-    getTrendColor,
-  } = useKPIWidgetVM(data, config);
 
   function TrendIcon({ direction }: { direction: "up" | "down" }) {
     if (trendType === "caret") {
@@ -67,7 +66,10 @@ export default function KPIWidget({
 
   return (
     <div className="flex flex-col items-center justify-center h-full max-h-full bg-white dark:bg-gray-900 w-full max-w-full rounded-lg">
-      <span className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+      <span
+        className="text-xs text-gray-500 dark:text-gray-400 mb-1"
+        style={{ color: titleColor }}
+      >
         {title}
       </span>
       {showValue && (

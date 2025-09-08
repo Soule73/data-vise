@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import type { AuthRequest } from "../middleware/auth";
-import dashboardService from "@/services/dashboardService";
-import { handleServiceResult, toApiError } from "@/utils/api";
+import type { AuthRequest } from "@middleware/auth";
+import dashboardService from "@services/dashboardService";
+import { handleServiceResult, toApiError } from "@utils/api";
 
 /**
  * Contrôleur pour gérer les opérations liées aux dashboards.
@@ -31,7 +31,6 @@ const dashboardController = {
       userId,
       ownerId: userId,
       visibility: req.body.visibility ?? "private",
-      autoRefreshInterval: req.body.autoRefreshInterval ?? 60000,
       autoRefreshIntervalValue: req.body.autoRefreshIntervalValue,
       autoRefreshIntervalUnit: req.body.autoRefreshIntervalUnit,
       timeRange,
@@ -77,7 +76,6 @@ const dashboardController = {
       ...req.body,
       userId,
       visibility: req.body.visibility ?? "private",
-      autoRefreshInterval: req.body.autoRefreshInterval ?? 60000,
       autoRefreshIntervalValue: req.body.autoRefreshIntervalValue,
       autoRefreshIntervalUnit: req.body.autoRefreshIntervalUnit,
       timeRange,

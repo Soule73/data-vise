@@ -1,17 +1,17 @@
-import Dashboard from "../models/Dashboard";
-import Widget from "../models/Widget";
+import Dashboard from "@models/Dashboard";
+import Widget from "@models/Widget";
 import type {
   IDashboard,
   DashboardCreatePayload,
   DashboardUpdatePayload,
-} from "@/types/dashboardType";
-import type { IWidget } from "@/types/widgetType";
-import type { ApiResponse } from "@/types/api";
-import { cleanTimeRange } from "@/utils/dataSourceUtils";
-import { randomUUID } from "crypto";
-import DataSource from "@/models/DataSource";
-import { IDataSource } from "@/types/sourceType";
-import { toApiData, toApiError } from "@/utils/api";
+} from "@type/dashboardType";
+// import type { IWidget } from "@type/widgetType";
+import type { ApiResponse } from "@type/api";
+import { cleanTimeRange } from "@utils/dataSourceUtils";
+import DataSource from "@models/DataSource";
+import { IDataSource } from "@type/sourceType";
+import { toApiData, toApiError } from "@utils/api";
+import { generateUUID } from "@utils/uuidGenerator";
 
 /**
  * Service pour gérer les opérations liées aux dashboards.
@@ -36,7 +36,6 @@ const dashboardService = {
       ...data,
       userId,
       visibility: data.visibility ?? "private",
-      autoRefreshInterval: data.autoRefreshInterval ?? 60000,
       autoRefreshIntervalValue: data.autoRefreshIntervalValue,
       autoRefreshIntervalUnit: data.autoRefreshIntervalUnit,
       timeRange,
@@ -95,7 +94,6 @@ const dashboardService = {
       {
         ...data,
         visibility: data.visibility ?? "private",
-        autoRefreshInterval: data.autoRefreshInterval ?? 60000,
         autoRefreshIntervalValue: data.autoRefreshIntervalValue,
         autoRefreshIntervalUnit: data.autoRefreshIntervalUnit,
         timeRange,
@@ -146,7 +144,7 @@ const dashboardService = {
   async enableShare(
     dashboardId: string
   ): Promise<ApiResponse<{ shareId: string }>> {
-    const shareId = randomUUID();
+    const shareId = generateUUID(true, 8, true, "share-");
 
     const updated = await Dashboard.findByIdAndUpdate(
       dashboardId,

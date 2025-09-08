@@ -1,11 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRegisterMutation } from "@/data/repositories/auth";
-import { registerSchema, type RegisterForm } from "@/core/validation/register";
-import { useUserStore } from "@/core/store/user";
+import { useRegisterMutation } from "@repositories/auth";
+import { registerSchema, type RegisterForm } from "@validation/register";
+import { useUserStore } from "@store/user";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
+import { ROUTES } from "@constants/routes";
+import type { ApiError } from "@type/api";
 
 export function useRegisterForm() {
   const setUser = useUserStore((s) => s.setUser);
@@ -17,12 +18,12 @@ export function useRegisterForm() {
     onSuccess: (res) => {
       setUser(res.user, res.token);
       setGlobalError("");
-      // Redirige l'utilisateur après inscription
+
       navigate(ROUTES.dashboard, { replace: true });
     },
-    onError: (e: any) => {
-      if (e.response?.data?.errors) {
-        Object.entries(e.response.data.errors).forEach(([field, message]) => {
+    onError: (e: ApiError) => {
+      if (e?.errors) {
+        Object.entries(e?.errors).forEach(([field, message]) => {
           form.setError(field as keyof RegisterForm, {
             type: "manual",
             message: message as string,
@@ -31,7 +32,7 @@ export function useRegisterForm() {
         setGlobalError("");
       } else {
         setGlobalError(
-          e.response?.data?.message || "Erreur lors de la création du compte"
+          e?.message || "Erreur lors de la création du compte"
         );
       }
     },

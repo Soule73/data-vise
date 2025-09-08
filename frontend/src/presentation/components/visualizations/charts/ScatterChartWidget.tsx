@@ -1,4 +1,4 @@
-import { useScatterChartLogic } from "@/core/hooks/visualizations/useScatterChartVM";
+import { useScatterChartLogic } from "@hooks/visualizations/charts";
 import {
   Chart as ChartJS,
   ScatterController,
@@ -10,9 +10,9 @@ import {
 } from "chart.js";
 import { Scatter } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
-import InvalideConfigWidget from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import type { ScatterChartConfig } from "@/core/types/visualization";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import type { ScatterChartWidgetProps } from "@type/widgetTypes";
 
 ChartJS.register(
   ScatterController,
@@ -26,13 +26,9 @@ ChartJS.register(
 export default function ScatterChartWidget({
   data,
   config,
-  //@ts-ignore
-  editMode,
-}: {
-  data: Record<string, any>[];
-  config: ScatterChartConfig;
-  editMode?: boolean;
-}) {
+}: ScatterChartWidgetProps) {
+  const { chartData, options } = useScatterChartLogic({ data, config });
+
   if (
     !data ||
     !config.metrics ||
@@ -50,7 +46,7 @@ export default function ScatterChartWidget({
       />
     );
   }
-  const { chartData, options } = useScatterChartLogic(data, config);
+
   return (
     <div className="shadow bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
       <Scatter

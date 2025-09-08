@@ -1,25 +1,26 @@
-import { useTableWidgetLogic } from "@/core/hooks/visualizations/useTableWidgetVM";
-import Table from "@/presentation/components/Table";
-import type { TableWidgetConfig } from "@/core/types/visualization";
-import NoDataWidget from "../charts/NoDataWidget";
-import InvalideConfigWidget from "../charts/InvalideConfigWidget";
+import Table from "@components/Table";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
 import { TableCellsIcon } from "@heroicons/react/24/outline";
+import { useTableWidgetLogic } from "@hooks/visualizations/useTableWidgetVM";
+import { validateTableConfig } from "@utils/kpi/tableDataUtils";
+import type { TableWidgetProps } from "@type/widgetTypes";
 
 export default function TableWidget({
   data,
   config,
-}: {
-  data: Record<string, any>[];
-  config: TableWidgetConfig;
-  editMode?: boolean;
-}) {
-  if (
-    !data ||
-    !config.metrics ||
-    !config.bucket ||
-    !Array.isArray(config.metrics) ||
-    !config.bucket.field
-  ) {
+}: TableWidgetProps) {
+  const { columns, displayData, tableTitle } = useTableWidgetLogic(
+    {
+      data,
+      config
+    }
+  );
+
+  // Validation moderne utilisant l'utilitaire
+  const hasValidConfig = validateTableConfig(config, data);
+
+  if (!hasValidConfig) {
     return <InvalideConfigWidget />;
   }
 
@@ -32,10 +33,6 @@ export default function TableWidget({
       />
     );
   }
-  const { columns, displayData, tableTitle } = useTableWidgetLogic(
-    data,
-    config
-  );
 
   return (
     <div className="bg-white shadow dark:bg-gray-900 rounded w-full max-w-full h-full p-2">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getSlotStyleUtil } from "@/core/utils/dashboardGridUtils";
-import type { UseDashboardGridProps } from "@/core/types/dashboard-types";
+import { getSlotStyleUtil } from "@utils/dashboard/dashboardGridUtils";
+import type { UseDashboardGridProps } from "@type/dashboardTypes";
 
 export function useDashboardGrid({
   layout,
@@ -30,26 +30,57 @@ export function useDashboardGrid({
   }, []);
 
   // --- Drag & drop handlers ---
-  const handleDragStart = (idx: number) => setDraggedIdx(idx);
-  const handleDragOver = (idx: number) => setHoveredIdx(idx);
-  const handleDragEnd = () => setDraggedIdx(null);
-  const handleDrop = (slotIdx: number) => {
+  const handleDragStart = (idx: number, e?: React.DragEvent) => {
+    setDraggedIdx(idx);
+    if (e) {
+      // Paramètres de base pour le drag & drop
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', idx.toString());
+    } else {
+      console.warn('Missing drag event');
+    }
+  };
+
+  const handleDragOver = (idx: number, e?: React.DragEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+    setHoveredIdx(idx);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIdx(null);
+    setHoveredIdx(null);
+  };
+
+  const handleDrop = (slotIdx: number, e?: React.DragEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+
     if (draggedIdx === null || draggedIdx === slotIdx) {
       setDraggedIdx(null);
       setHoveredIdx(null);
       return;
     }
-    if (draggedIdx === -1 || slotIdx === -1) {
+
+    if (draggedIdx === -1 || slotIdx === -1 || draggedIdx >= layout.length || slotIdx >= layout.length) {
       setDraggedIdx(null);
       setHoveredIdx(null);
       return;
     }
+
     // Swap en préservant toutes les propriétés, y compris widget
     const newLayout = layout.map((item) => ({ ...item }));
     const temp = { ...newLayout[draggedIdx] };
     newLayout[draggedIdx] = { ...newLayout[slotIdx] };
     newLayout[slotIdx] = temp;
-    onSwapLayout && onSwapLayout(newLayout);
+
+    if (onSwapLayout) {
+      onSwapLayout(newLayout);
+    }
+
     setDraggedIdx(null);
     setHoveredIdx(null);
   };
@@ -59,7 +90,7 @@ export function useDashboardGrid({
     const newLayout = layout
       .filter((_, lidx) => lidx !== idx)
       .map((item) => ({ ...item }));
-    onSwapLayout && onSwapLayout(newLayout);
+    if (onSwapLayout) onSwapLayout(newLayout);
   };
 
   // --- Alerte navigation/fermeture si édition non sauvegardée ---

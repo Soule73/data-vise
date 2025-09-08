@@ -1,5 +1,5 @@
-import { ROUTES } from "@/core/constants/routes";
-import { useUserStore } from "@/core/store/user";
+import { ROUTES } from "@constants/routes";
+import { useUserStore } from "@store/user";
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";

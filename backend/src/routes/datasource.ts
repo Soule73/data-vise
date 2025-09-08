@@ -1,66 +1,10 @@
-import express, { Request, Response, NextFunction } from "express";
-import { requirePermission } from "../middleware/requirePermission";
-import { requireAuth } from "../middleware/auth";
-import dataSourceController from "../controllers/dataSourceController";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
+import { Router } from "express";
+import { requirePermission } from "@middleware/requirePermission";
+import { requireAuth } from "@middleware/auth";
+import dataSourceController from "@controllers/dataSourceController";
+import uploadFileService from "@services/upload_file_service";
 
-/**
- * Crée le répertoire de stockage pour les fichiers uploadés s'il n'existe pas.
- * Le répertoire est créé dans le répertoire courant du processus.
- *
- * @type {string}
- * @description Ce répertoire est utilisé pour stocker les fichiers uploadés via l'API.
- * Il est important de s'assurer que ce répertoire existe avant de tenter d'y stocker des fichiers.
- *
- * Si le répertoire n'existe pas, il est créé avec les permissions par défaut.
- */
-const uploadsDir: string = path.resolve(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-/**
- * Configuration de multer pour le stockage des fichiers uploadés.
- * Utilise le système de fichiers pour stocker les fichiers dans le répertoire spécifié.
- * Le nom du fichier est généré de manière unique en utilisant un timestamp et un nombre aléatoire.
- *
- * @type {multer.StorageEngine}
- *
- */
-const storage: multer.StorageEngine = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname) || ".csv";
-    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-    cb(null, uniqueName);
-  },
-});
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-});
-
-const router = express.Router();
-
-/** * Endpoint pour lister toutes les sources de données.
- * L'utilisateur doit être authentifié et avoir
- *
- * la permission "datasource:canView".
- *
- * ROUTE GET /sources
- *
- */
-router.get(
-  "/",
-  requireAuth,
-  requirePermission("datasource:canView"),
-  dataSourceController.list
-);
+const router = Router();
 
 /**
  * Endpoint pour créer une nouvelle source.
@@ -77,8 +21,23 @@ router.post(
   "/",
   requireAuth,
   requirePermission("datasource:canCreate"),
-  upload.single("file"),
+  uploadFileService,
   dataSourceController.create
+);
+
+/** * Endpoint pour lister toutes les sources de données.
+ * L'utilisateur doit être authentifié et avoir
+ *
+ * la permission "datasource:canView".
+ *
+ * ROUTE GET /sources
+ *
+ */
+router.get(
+  "/",
+  requireAuth,
+  requirePermission("datasource:canView"),
+  dataSourceController.list
 );
 
 /**
@@ -127,6 +86,8 @@ router.put(
  * ROUTE DELETE sources/:id
  *
  */
+
+
 router.delete(
   "/:id",
   requireAuth,
@@ -150,17 +111,13 @@ router.post(
   "/detect-columns",
   requireAuth,
   requirePermission("datasource:canView"),
-  upload.single("file"),
+  uploadFileService,
   dataSourceController.detectColumns
 );
 
-/**
- * Endpoint pour récupérer un fichier JSON de test.
- */
-router.get("/demo/ventes", dataSourceController.demoVentes);
 
 /**
- * Récupère les données d'une source avec filtrage temporel.
+ * Récupère les données d'une source.
  * L'utilisateur doit être authentifié et avoir
  * la permission "datasource:canView".
  * Ce point d'entrée accepte un paramètre `shareId` dans la requête.
@@ -184,5 +141,11 @@ router.get(
   requirePermission("datasource:canView"),
   dataSourceController.fetchData
 );
+
+
+/**
+ * Endpoint pour récupérer un fichier JSON de test.
+ */
+router.get("/demo/ventes", dataSourceController.demoVentes);
 
 export default router;

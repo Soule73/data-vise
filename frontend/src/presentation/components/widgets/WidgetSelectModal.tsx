@@ -1,17 +1,17 @@
-import ModalSidebarRight from "@/presentation/components/ModalSidebarRight";
-import Button from "@/presentation/components/forms/Button";
-import InputField from "@/presentation/components/forms/InputField";
-import type {Widget, WidgetSelectModalProps } from "@/core/types/widget-types";
-import { WIDGETS } from "@/data/adapters/visualizations";
+import ModalSidebarRight from "@components/ModalSidebarRight";
+import Button from "@components/forms/Button";
+import InputField from "@components/forms/InputField";
+import type { Widget, WidgetSelectModalProps } from "@type/widgetTypes";
+import { WIDGETS } from "@adapters/visualizations";
 import { useState, useMemo } from "react";
-import { widgetsQuery } from "@/data/repositories/widgets";
+import { useWidgetsQuery } from "@repositories/widgets";
 
 export default function WidgetSelectModal({
   open,
   onClose,
   onSelect,
 }: WidgetSelectModalProps) {
-  const { data: widgets = [], isLoading } = widgetsQuery();
+  const { data: widgets = [], isLoading } = useWidgetsQuery();
   const [search, setSearch] = useState("");
   const filteredWidgets = useMemo(() => {
     const s = search.trim().toLowerCase();

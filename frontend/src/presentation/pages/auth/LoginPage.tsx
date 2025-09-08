@@ -1,8 +1,8 @@
-import AuthLayout from "@/presentation/components/layouts/AuthLayout";
-import InputField from "@/presentation/components/forms/InputField";
-import { useLoginForm } from "@/core/hooks/auth/useLoginForm";
-import Button from "@/presentation/components/forms/Button";
-import logoDataVise from "../../../core/assets/logo-datavise.svg";
+import AuthLayout from "@components/layouts/AuthLayout";
+import InputField from "@components/forms/InputField";
+import { useLoginForm } from "@hooks/auth/useLoginForm";
+import Button from "@components/forms/Button";
+import logoDataVise from "@assets/logo-datavise.svg";
 
 export default function Login() {
   const {
@@ -16,19 +16,9 @@ export default function Login() {
 
   return (
     <AuthLayout
-      title="Connexion à votre compte"
+      title="Conecter vous à Data-Vise"
       logoUrl={logoDataVise}
-      // bottomText={
-      //   <>
-      //     Pas encore de compte ?{" "}
-      //     <a
-      //       href="/register"
-      //       className="font-semibold text-indigo-600 hover:text-indigo-500"
-      //     >
-      //       Créer un compte
-      //     </a>
-      //   </>
-      // }
+
     >
       {globalError && (
         <div
@@ -45,12 +35,14 @@ export default function Login() {
           type="email"
           {...register("email")}
           error={errors.email?.message}
+          className="!py-4"
         />
         <InputField
           placeholder="Mot de passe"
           type="password"
           {...register("password")}
           error={errors.password?.message}
+          className="!py-4"
         />
         <Button
           type="submit"
@@ -59,6 +51,7 @@ export default function Login() {
           variant="solid"
           loading={loading}
           disabled={loading}
+
         >
           Se connecter
         </Button>

@@ -1,7 +1,9 @@
-import dataSourceService from "@/services/dataSourceService";
+import dataSourceService from "@services/dataSourceService";
 import { Request, Response, NextFunction } from "express";
 import fs from "fs";
-import { handleServiceResult } from "@/utils/api";
+import { handleServiceResult } from "@utils/api";
+import DataSource from "@models/DataSource";
+import path from "path";
 
 /**
  * Contrôleur pour gérer les opérations liées aux sources de données.
@@ -38,7 +40,8 @@ const dataSourceController = {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response> {
+  ): Promise<Response | void> {
+
     const userId = (req as any).user?.id;
 
     const file = (req as any).file as Express.Multer.File | undefined;
@@ -57,6 +60,7 @@ const dataSourceController = {
     });
 
     return handleServiceResult(res, result, 201);
+
   },
 
   /**
@@ -87,10 +91,48 @@ const dataSourceController = {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response> {
-    const result = await dataSourceService.update(req.params.id, req.body);
+  ): Promise<Response | void> {
+    try {
+      const {
+        name,
+        type,
+        endpoint,
+        filePath,
+        config,
+        httpMethod,
+        authType,
+        authConfig,
+        timestampField,
+        esIndex,
+        esQuery,
+      } = req.body;
 
-    return handleServiceResult(res, result);
+      const updatePayload: any = {
+        name,
+        type,
+        endpoint,
+        filePath,
+        config,
+        timestampField,
+        httpMethod,
+        authType,
+        authConfig,
+        esIndex,
+        esQuery,
+      };
+      const updated = await DataSource.findByIdAndUpdate(
+        req.params.id,
+        updatePayload,
+        { new: true }
+      );
+      if (!updated) {
+        return res.status(404).json({ error: "Source non trouvée" });
+      }
+      return res.json({ data: updated });
+    } catch (err) {
+      next(err);
+      return;
+    }
   },
 
   /**
@@ -129,6 +171,8 @@ const dataSourceController = {
       httpMethod,
       authType,
       authConfig,
+      esIndex,
+      esQuery,
     } = req.body;
 
     const file = (req as any).file as Express.Multer.File | undefined;
@@ -147,10 +191,12 @@ const dataSourceController = {
       httpMethod,
       authType,
       authConfig,
+      esIndex,
+      esQuery,
     });
 
     if (file) {
-      fs.unlink(file.path, () => {});
+      fs.unlink(file.path, () => { });
     }
 
     return handleServiceResult(res, result);
@@ -191,7 +237,7 @@ const dataSourceController = {
    */
   async demoVentes(req: Request, res: Response): Promise<void> {
     res.sendFile(
-      require("path").resolve(__dirname, "../data/ventes-exemple.json")
+      path.resolve(__dirname, "../data/ventes-exemple.json")
     );
   },
 };

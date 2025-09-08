@@ -1,11 +1,10 @@
 import { EllipsisVerticalIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { useGridItem } from "@/core/hooks/dashboard/useGridItem";
-import type { DashboardGridItemProps } from "@/core/types/dashboard-types";
+import { useGridItem } from "@hooks/dashboard/useGridItem";
+import type { DashboardGridItemProps } from "@type/dashboardTypes";
 import { Link } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
+import { ROUTES } from "@constants/routes";
 
-// Overlay de rafraîchissement (spinner)
 function RefreshOverlay() {
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-white/20 dark:bg-gray-900/20 z-30 pointer-events-none">
@@ -15,7 +14,7 @@ function RefreshOverlay() {
 }
 
 export default function DashboardGridItem(props: DashboardGridItemProps) {
-  // --- Déstructuration des props ---
+
   const {
     idx,
     hydratedLayout,
@@ -34,14 +33,13 @@ export default function DashboardGridItem(props: DashboardGridItemProps) {
     onSwapLayout,
     timeRangeFrom,
     timeRangeTo,
-    refreshMs,
     forceRefreshKey,
     page,
     pageSize,
-    shareId, // Ajout du shareId
+    shareId,
+    refreshMs,
   } = props;
 
-  // --- Hook logique centralisé ---
   const {
     widgetData,
     isRefreshing,
@@ -67,15 +65,14 @@ export default function DashboardGridItem(props: DashboardGridItemProps) {
     item,
     timeRangeFrom,
     timeRangeTo,
-    refreshMs,
     forceRefreshKey,
     page,
     pageSize,
-    shareId, // Propagation du shareId au hook
+    shareId,
+    refreshMs
   });
   const widgetRef = handleResize();
 
-  // --- Rendu ---
   return (
     <div
       ref={editMode ? widgetRef : undefined}
@@ -84,7 +81,6 @@ export default function DashboardGridItem(props: DashboardGridItemProps) {
       style={styleProps.style}
       {...dragProps}
     >
-      {/* Menu contextuel d'édition (supprimer) */}
       {editMode && onRemove && (
         <Menu as="div" className="absolute top-2 right-2 z-50 text-left">
           <MenuButton className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none">
@@ -114,7 +110,7 @@ export default function DashboardGridItem(props: DashboardGridItemProps) {
           </MenuItems>
         </Menu>
       )}
-      {/* Affichage du widget ou des messages d'état */}
+
       {WidgetComponent && (
         <>
           <WidgetComponent

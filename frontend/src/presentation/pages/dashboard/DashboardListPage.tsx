@@ -1,11 +1,11 @@
-import Button from "@/presentation/components/forms/Button";
-import Table from "@/presentation/components/Table";
-import type { Dashboard } from "@/core/types/dashboard-types";
-import Modal from "@/presentation/components/Modal";
+import Button from "@components/forms/Button";
+import Table from "@components/Table";
+import type { Dashboard } from "@type/dashboardTypes";
+import Modal from "@components/Modal";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
-import { useDashboardList } from "@/core/hooks/dashboard/useDashboardList";
+import { ROUTES } from "@constants/routes";
+import { useDashboardList } from "@hooks/dashboard/useDashboardList";
 
 export default function DashboardListPage() {
   const {

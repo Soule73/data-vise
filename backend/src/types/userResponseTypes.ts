@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import { IRole } from "./authType";
 
 export interface LeanRole {
   _id: Types.ObjectId | string;

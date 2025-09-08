@@ -1,7 +1,7 @@
-import DashboardGridItem from "./DashboardGridItem";
-import { useDashboardGrid } from "@/core/hooks/dashboard/useDashboardGrid";
-import type { DashboardGridProps } from "@/core/types/dashboard-types";
+import { useDashboardGrid } from "@hooks/dashboard/useDashboardGrid";
+import type { DashboardGridProps } from "@type/dashboardTypes";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import DashboardGridItem from "@components/dashoards/DashboardGridItem";
 
 // Slot d'ajout de widget
 function AddWidgetSlot({
@@ -14,12 +14,14 @@ function AddWidgetSlot({
   return (
     <div
       key="add-slot"
-      className="relative min-h-[160px] w-full max-w-full border-2 border-dashed rounded-lg flex items-center justify-center text-gray-400 hover:border-indigo-400 hover:text-indigo-600 cursor-pointer select-none overflow-x-auto"
+      className="relative min-h-[160px] w-full max-w-full border-2 border-dashed rounded-lg flex items-center justify-center text-gray-400 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 cursor-pointer select-none overflow-x-auto transition-all duration-200 group"
       style={{ ...getSlotStyle(), minHeight: 300 }}
       onClick={onClick}
     >
-      <PlusIcon className="w-6 h-6 text-gray-400" />
-      <span className="ml-2">Ajouter un widget</span>
+      <div className="flex flex-col items-center gap-2">
+        <PlusIcon className="w-8 h-8 text-gray-400 group-hover:text-indigo-500 transition-colors" />
+        <span className="text-sm font-medium group-hover:text-indigo-600">Ajouter un widget</span>
+      </div>
     </div>
   );
 }
@@ -33,13 +35,13 @@ export default function DashboardGrid({
   handleAddWidget,
   timeRangeFrom,
   timeRangeTo,
-  refreshMs,
   forceRefreshKey,
   page,
   pageSize,
-  shareId, // Propagation du shareId
+  shareId,
+  refreshMs
 }: DashboardGridProps) {
-  // --- Hook logique centralisé ---
+
   const {
     draggedIdx,
     hoveredIdx,
@@ -58,16 +60,14 @@ export default function DashboardGrid({
     onSwapLayout,
   });
 
-  // --- Rendu ---
   return (
     <div
-      className={`dashboard-grid w-full flex flex-wrap min-w-full gap-2 ${
-        editMode &&
-        "border-2 border-dashed border-gray-300 dark:border-gray-700"
-      }`}
+      className={`dashboard-grid w-full flex flex-wrap min-w-full gap-2 ${editMode &&
+        "border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50"
+        }`}
     >
       {slots.map((item, idx) => {
-        // Slot d'ajout de widget
+
         if (idx === slots.length - 1) {
           if (!editMode) return null;
           return (
@@ -78,8 +78,11 @@ export default function DashboardGrid({
             />
           );
         }
+
         const widget = item?.widget;
+
         if (!widget) return null;
+
         return (
           <DashboardGridItem
             key={widget.widgetId || idx}
@@ -100,11 +103,11 @@ export default function DashboardGrid({
             onSwapLayout={onSwapLayout}
             timeRangeFrom={timeRangeFrom}
             timeRangeTo={timeRangeTo}
-            refreshMs={refreshMs}
             forceRefreshKey={forceRefreshKey}
             page={page}
             pageSize={pageSize}
-            shareId={shareId} // Propagation du shareId à chaque item
+            shareId={shareId}
+            refreshMs={refreshMs}
           />
         );
       })}

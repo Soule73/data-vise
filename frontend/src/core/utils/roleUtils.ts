@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Regroupe les permissions par modèle (avant le ':').
  */

@@ -1,4 +1,4 @@
-import type { DashboardSharePopoverProps } from "@/core/types/dashboard-types";
+import type { DashboardSharePopoverProps } from "@type/dashboardTypes";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import {
   ClipboardDocumentIcon,
@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import React from "react";
 import { Link } from "react-router-dom";
-import Button from "../forms/Button";
+import Button from "@components/forms/Button";
 
 const DashboardSharePopover: React.FC<DashboardSharePopoverProps> = ({
   isShareEnabled,
@@ -24,7 +24,6 @@ const DashboardSharePopover: React.FC<DashboardSharePopoverProps> = ({
   return (
     <Popover className="relative">
       <PopoverButton
-        // className="flex cursor-pointer items-center gap-1 px-2 py-1 rounded bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
         title="Partager le dashboard publiquement"
       >
         <Button

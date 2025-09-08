@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { DashboardStore } from "../types/dashboard-types";
+import type { DashboardStore } from "@type/dashboardTypes";
 
 export const useDashboardStore = create<DashboardStore>((set) => ({
   editMode: false,

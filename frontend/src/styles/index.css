@@ -1,0 +1,164 @@
+@import "tailwindcss";
+@import "./landing.css";
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  @apply bg-gray-100 text-gray-900 font-sans antialiased dark:bg-gray-900;
+}
+
+/* Modern UI Styles for Data-Vise */
+
+/* Custom scrollbar styles */
+.config-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203 213 225) transparent;
+
+}
+
+.config-scrollbar::-webkit-scrollbar {
+  @apply w-[1px]
+}
+
+.config-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent
+}
+
+.config-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-none
+}
+
+.config-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400
+}
+
+/* Dark mode scrollbar */
+.dark .config-scrollbar {
+  scrollbar-color: rgb(71 85 105) transparent;
+
+}
+
+.dark .config-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+.dark .config-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-600;
+}
+
+/* Focus states with simple rings */
+.focus-ring:focus {
+  @apply outline-0 bg-blue-500;
+}
+
+/* Simple card styles */
+.card-simple {
+  @apply bg-white border border-gray-200 rounded-lg shadow;
+}
+
+.dark .card-simple {
+  @apply bg-gray-900 border-gray-700;
+}
+
+/* Button hover states - simple */
+.btn-simple {
+  @apply transition-colors duration-150;
+}
+
+/* Form field states */
+.form-field-simple {
+  @apply transition-colors duration-150;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.form-field-simple:focus {
+  @apply border-blue-500;
+  box-shadow: 0 0 0 1px rgb(59 130 246);
+}
+
+.dark .form-field-simple:focus {
+  @apply border-blue-400;
+  box-shadow: 0 0 0 1px rgb(96 165 250);
+}
+
+/* Minimal animations - only for necessary feedback */
+.fade-in {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Remove default focus outlines and replace with simple borders */
+* {
+  outline: none;
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+}
+
+/* Simple spacing utilities */
+.space-y-6>*+* {
+  margin-top: 1.5rem;
+}
+
+.space-y-4>*+* {
+  margin-top: 1rem;
+}
+
+.space-y-3>*+* {
+  margin-top: 0.75rem;
+}
+
+/* Dashboard Widget Resize Handles */
+.resize-handle-widget {
+  position: relative;
+}
+
+.resize-handle-widget::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(-45deg, transparent 0%, transparent 30%, rgba(99, 102, 241, 0.4) 30%, rgba(99, 102, 241, 0.4) 40%, transparent 40%, transparent 60%, rgba(99, 102, 241, 0.4) 60%, rgba(99, 102, 241, 0.4) 70%, transparent 70%);
+  cursor: nw-resize;
+  pointer-events: auto;
+  z-index: 10;
+  border-bottom-right-radius: inherit;
+}
+
+.resize-handle-widget:hover::after {
+  background: linear-gradient(-45deg, transparent 0%, transparent 30%, rgba(99, 102, 241, 0.6) 30%, rgba(99, 102, 241, 0.6) 40%, transparent 40%, transparent 60%, rgba(99, 102, 241, 0.6) 60%, rgba(99, 102, 241, 0.6) 70%, transparent 70%);
+}
+
+/* Améliore le curseur sur les zones de resize */
+.resize-handle-widget .resize-zone {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  cursor: nw-resize;
+  z-index: 15;
+}
+
+/* Disable drag on resize zone */
+.resize-handle-widget .resize-zone {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+}

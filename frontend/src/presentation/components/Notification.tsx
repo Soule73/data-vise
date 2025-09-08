@@ -1,6 +1,7 @@
-import type { NotificationProps } from "@/core/types/notification-types";
+import type { NotificationProps } from "@type/notificationTypes";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef } from "react";
+import Button from "@components/forms/Button";
 
 export type NotificationType =
   | "success"
@@ -49,7 +50,7 @@ export default function Notification({
       if (barRef.current) {
         barRef.current.style.width = "100%";
         barRef.current.style.transition = "none";
-        // Force reflow
+
         void barRef.current.offsetWidth;
         barRef.current.style.transition = `width ${duration}ms linear`;
         barRef.current.style.width = "0%";
@@ -76,13 +77,13 @@ export default function Notification({
           <div className="font-semibold text-base text-gray-900 dark:text-gray-100">
             {title}
           </div>
-          <button
-            className="ml-2 text-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
+          <Button
+            className="ml-2 text-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none w-max"
             onClick={onClose}
             aria-label="Fermer la notification"
           >
             <XMarkIcon className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
         {description && (
           <div className="mt-1 text-sm text-gray-700 dark:text-gray-300">

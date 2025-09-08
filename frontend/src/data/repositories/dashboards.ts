@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { QueryClient, useQuery } from "@tanstack/react-query";
 import {
   fetchDashboard,
@@ -6,12 +7,12 @@ import {
   createDashboard as apiCreateDashboard,
   fetchSharedDashboard,
   fetchSharedDashboardSources,
-} from "@/data/services/dashboard";
-import type { Dashboard } from "@/core/types/dashboard-types";
-import api from "@/data/services/api";
+} from "@services/dashboard";
+import type { Dashboard } from "@type/dashboardTypes";
+import api from "@services/api";
 
 // Liste de tous les tableaux de bord
-export function dashboardsQuery() {
+export function useDashboardsQuery() {
   return useQuery<Dashboard[]>({
     queryKey: ["dashboards"],
     queryFn: fetchDashboards,
@@ -23,7 +24,7 @@ export function dashboardsQuery() {
 }
 
 // Récupération d'un tableau de bord spécifique par son ID
-export function dashboardIdQuery(
+export function useDashboardIdQuery(
   dashboardId?: string,
   enabled: boolean = true
 ) {
@@ -91,17 +92,12 @@ export async function updateDashboardQuery({
 }
 
 // Récupération d'un dashboard partagé par son shareId (public)
-export function sharedDashboardQuery(shareId?: string) {
+export function useSharedDashboardQuery(shareId?: string) {
   return useQuery<Dashboard | undefined>({
     queryKey: ["shared-dashboard", shareId],
     queryFn: async () => {
       if (!shareId) return undefined;
-      try {
-        return await fetchSharedDashboard(shareId);
-      } catch (e: any) {
-        // if (e?.response?.status === 404) return undefined;
-        throw e;
-      }
+      return await fetchSharedDashboard(shareId);
     },
     enabled: !!shareId,
     retry: (failureCount, error: any) => {
@@ -117,7 +113,7 @@ export function sharedDashboardQuery(shareId?: string) {
 }
 
 // Récupération des sources d'un dashboard partagé par son shareId (public)
-export function sharedDashboardSourcesQuery(shareId?: string) {
+export function useSharedDashboardSourcesQuery(shareId?: string) {
   return useQuery<any[]>({
     queryKey: ["shared-dashboard-sources", shareId],
     queryFn: async () => {

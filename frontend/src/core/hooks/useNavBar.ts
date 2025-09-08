@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useDashboardStore } from "../store/dashboard";
-import { useSidebarStore } from "../store/sidebar";
+import { useDashboardStore } from "@store/dashboard";
+import { useSidebarStore } from "@store/sidebar";
 
 export default function useNavBar() {
   // Affiche le bouton menu sur toutes les tailles d'écran

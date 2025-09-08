@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCreateWidgetMutation } from "@/data/repositories/widgets";
-import { useNotificationStore } from "@/core/store/notification";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { ROUTES } from "@/core/constants/routes";
-import type { WidgetFormInitialValues } from "@/core/types/widget-types";
-import { useWidgetForm } from "./useWidgetForm";
-import { v4 as uuidv4 } from "uuid";
+import { useCreateWidgetMutation } from "@repositories/widgets";
+import { useNotificationStore } from "@store/notification";
+import { useDashboardStore } from "@store/dashboard";
+import { ROUTES } from "@constants/routes";
+import type { WidgetFormInitialValues } from "@type/widgetTypes";
+import { useCommonWidgetForm } from "@hooks/widget/useCommonWidgetForm";
 
 export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
   const navigate = useNavigate();
@@ -15,8 +14,8 @@ export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
   const showNotification = useNotificationStore((s) => s.showNotification);
   const setBreadcrumb = useDashboardStore((s) => s.setBreadcrumb);
 
-  // Centralise toute la logique de formulaire dans le hook partagé
-  const form = useWidgetForm(initialValues);
+  // Utilise le hook centralisé pour toute la logique de formulaire
+  const form = useCommonWidgetForm(initialValues);
 
   // Mutation de création
   const createMutation = useCreateWidgetMutation({
@@ -49,13 +48,7 @@ export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
       { url: ROUTES.widgets, label: "Visualisations" },
       { url: ROUTES.createWidget, label: form.widgetTitle || "Créer" },
     ]);
-    // eslint-disable-next-line
   }, [form.widgetTitle, setBreadcrumb]);
-
-  // Génère un widgetId unique au format UUID
-  function generateWidgetId() {
-    return uuidv4();
-  }
 
   // Handler de création (validation + mutation)
   function handleCreate() {
@@ -66,10 +59,9 @@ export function useWidgetCreateForm(initialValues?: WidgetFormInitialValues) {
     form.setTitle(form.widgetTitle);
     form.setShowSaveModal(false);
     const payload = {
-      widgetId: generateWidgetId(),
       title: form.widgetTitle.trim(),
       type: form.type,
-      dataSourceId: form.sourceId, // correspondance backend
+      dataSourceId: form.sourceId,
       config: form.config,
       visibility: form.visibility,
     };

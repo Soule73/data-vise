@@ -1,16 +1,16 @@
 import {
   useDeleteSourceMutation,
-  sourcesQuery,
+  useSourcesQuery,
   getUploadedFile,
-} from "@/data/repositories/sources";
-import { useNotificationStore } from "@/core/store/notification";
-import { useUserStore } from "@/core/store/user";
-import { useDashboardStore } from "@/core/store/dashboard";
+} from "@/data/repositories/datasources";
+import { useNotificationStore } from "@store/notification";
+import { useUserStore } from "@store/user";
+import { useDashboardStore } from "@store/dashboard";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import type { DataSource } from "@/core/types/data-source";
-import { ROUTES } from "@/core/constants/routes";
+import type { DataSource } from "@type/dataSource";
+import { ROUTES } from "@constants/routes";
 
 export function useSourcesPage() {
   const queryClient = useQueryClient();
@@ -19,7 +19,7 @@ export function useSourcesPage() {
     isLoading,
     refetch,
     refetchSources,
-  } = sourcesQuery({ queryClient });
+  } = useSourcesQuery({ queryClient });
   const sources: DataSource[] = sourcesRaw || [];
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
@@ -95,6 +95,7 @@ export function useSourcesPage() {
       setSelectedSource(null);
       handleDeleteSuccess();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (e: any) => {
       setModalOpen(false);
       setSelectedSource(null);

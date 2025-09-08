@@ -1,4 +1,4 @@
-import type { CollapsibleProps } from "@/core/types/dashboard-types";
+import type { CollapsibleProps } from "@type/dashboardTypes";
 import {
   Disclosure,
   DisclosureButton,

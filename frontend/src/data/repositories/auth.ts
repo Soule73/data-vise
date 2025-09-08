@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { QueryClient, useMutation } from "@tanstack/react-query";
 import {
   login as loginService,
   register as registerService,
-} from "@/data/services/auth";
-import { createUser, updateUser, deleteUser } from "@/data/services/user";
-import type { LoginForm } from "@/core/validation/login";
-import type { RegisterForm } from "@/core/validation/register";
+} from "@services/auth";
+import { createUser, updateUser, deleteUser } from "@services/user";
+import type { LoginForm } from "@validation/login";
+import type { RegisterForm } from "@validation/register";
 
 export function useLoginMutation({
   onSuccess,

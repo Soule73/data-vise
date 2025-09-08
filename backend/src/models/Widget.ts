@@ -1,4 +1,4 @@
-import { IWidget, WidgetHistoryItem } from "@/types/widgetType";
+import { IWidget, WidgetHistoryItem } from "@type/widgetType";
 import mongoose, { Schema } from "mongoose";
 
 const WidgetHistoryItemSchema = new Schema<WidgetHistoryItem>(

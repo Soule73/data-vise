@@ -1,10 +1,10 @@
 import { Bars3Icon, HomeIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import ThemeDropdown from "../ThemeDropdown";
-import UserDropdown from "../UserDropdown";
+import ThemeDropdown from "@components/ThemeDropdown";
+import UserDropdown from "@components/UserDropdown";
 import { Link } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
-import logoDataVise from "../../../core/assets/logo-datavise.svg";
-import useNavBar from "@/core/hooks/useNavBar";
+import { ROUTES } from "@constants/routes";
+import logoDataVise from "@assets/logo-datavise.svg";
+import useNavBar from "@hooks/useNavBar";
 
 export default function Navbar({
   hideUserInfo = false,
@@ -37,9 +37,8 @@ export default function Navbar({
         <img
           src={logoDataVise}
           alt="Logo DataVise"
-          className={`h-10 w-auto  ${
-            hideSidebar ? "border-r" : "border-x"
-          } px-2 border-gray-300 dark:border-gray-700`}
+          className={`h-10 w-auto  ${hideSidebar ? "border-r" : "border-x"
+            } px-2 border-gray-300 dark:border-gray-700`}
           style={{ minWidth: 40 }}
         />
         <Breadcrumb breadcrumb={breadcrumb} hideSidebar={hideSidebar} />

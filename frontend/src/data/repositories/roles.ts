@@ -1,9 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
-import type { Permission, Role } from "../../core/types/auth-types";
-import { fetchRoles, updateRole, deleteRole, createRole, fetchPermissions } from "@/data/services/role";
+import type { Permission, Role } from "@type/authTypes";
+import {
+  fetchRoles,
+  updateRole,
+  deleteRole,
+  createRole,
+  fetchPermissions,
+} from "@services/role";
 
-export function rolesQuery() {
-  const { data = [], isLoading, error } = useQuery<Role[]>({
+export function useRolesQuery() {
+  const {
+    data = [],
+    isLoading,
+    error,
+  } = useQuery<Role[]>({
     queryKey: ["roles"],
     queryFn: fetchRoles,
     staleTime: 1000 * 60 * 60 * 24, // 24h
@@ -14,7 +25,7 @@ export function rolesQuery() {
   return { roles: data, isLoading, error };
 }
 
-export function permissionsQuery() {
+export function usePermissionsQuery() {
   return useQuery<Permission[]>({
     queryKey: ["permissions"],
     queryFn: fetchPermissions,
@@ -25,11 +36,10 @@ export function permissionsQuery() {
   });
 }
 
-
 export function useUpdateRoleMutation({
   onSuccess,
   onError,
-  queryClient
+  queryClient,
 }: {
   onSuccess?: () => void;
   onError?: (e: unknown) => void;
@@ -49,7 +59,7 @@ export function useUpdateRoleMutation({
 export function useDeleteRoleMutation({
   onSuccess,
   onError,
-  queryClient
+  queryClient,
 }: {
   onSuccess?: () => void;
   onError?: (e: unknown) => void;
@@ -68,13 +78,12 @@ export function useDeleteRoleMutation({
 export function useCreateRoleMutation({
   onSuccess,
   onError,
-  queryClient
+  queryClient,
 }: {
   queryClient: QueryClient;
   onSuccess?: () => void;
   onError?: (e: unknown) => void;
-}
-) {
+}) {
   return useMutation({
     mutationFn: async (payload: any) => createRole(payload),
     onSuccess: () => {

@@ -1,12 +1,12 @@
-import Button from "@/presentation/components/forms/Button";
-import Table from "@/presentation/components/Table";
-import Modal from "@/presentation/components/Modal";
-import { useSourcesPage } from "@/core/hooks/datasource/useSourcesPage";
-import { ROUTES } from "@/core/constants/routes";
+import Button from "@components/forms/Button";
+import Table from "@components/Table";
+import Modal from "@components/Modal";
+import { useSourcesPage } from "@hooks/datasource/useSourcesPage";
+import { ROUTES } from "@constants/routes";
 import { Link } from "react-router-dom";
-import { DeleteSourceForm } from "@/presentation/components/source/DeleteSourceForm";
-import type { DataSource } from "@/core/types/data-source";
-import Badge from "@/presentation/components/Badge";
+import { DeleteSourceForm } from "@components/source/DeleteSourceForm";
+import type { DataSource } from "@type/dataSource";
+import Badge from "@components/Badge";
 import { DocumentTextIcon, TableCellsIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
 
@@ -32,7 +32,6 @@ export default function SourcesPage() {
         key: "icon",
         label: " ",
         render: (row: DataSource) => {
-          // Affiche une icône différente selon le type de source (CSV ou JSON)
           if (row.type === "csv") {
             return (
               <span className="flex items-center justify-center w-8 h-8">
@@ -40,13 +39,14 @@ export default function SourcesPage() {
               </span>
             );
           }
-          if (row.type === "json") {
+          if (row.type === "json" || row.type === "elasticsearch") {
             return (
               <span className="flex items-center justify-center w-8 h-8">
                 <DocumentTextIcon className="w-6 h-6 text-indigo-500" />
               </span>
             );
           }
+
           return <span className="w-8 h-8" />;
         },
       },

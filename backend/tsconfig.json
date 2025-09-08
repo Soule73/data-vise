@@ -12,6 +12,33 @@
         "paths": {
             "@/*": [
                 "*"
+            ],
+            "@routes/*": [
+                "routes/*"
+            ],
+            "@middleware/*": [
+                "middleware/*"
+            ],
+            "@utils/*": [
+                "utils/*"
+            ],
+            "@controllers/*": [
+                "controllers/*"
+            ],
+            "@data/*": [
+                "data/*"
+            ],
+            "@models/*": [
+                "models/*"
+            ],
+            "@services/*": [
+                "services/*"
+            ],
+            "@validation/*": [
+                "validation/*"
+            ],
+            "@type/*": [
+                "types/*"
             ]
         }
     },

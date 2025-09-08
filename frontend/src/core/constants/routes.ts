@@ -1,4 +1,5 @@
 export const ROUTES = {
+  home: "/",
   login: "/login",
   register: "/register",
   dashboard: "/dashboard",
@@ -17,4 +18,7 @@ export const ROUTES = {
   createRole: "/roles/create",
   dashboardShare: "/dashboard/share/:shareId",
   editSource: "/sources/edit/:id",
+  docs: "/docs",
+  docsSection: "/docs/:section",
+  docsPage: "/docs/:section/:page",
 };

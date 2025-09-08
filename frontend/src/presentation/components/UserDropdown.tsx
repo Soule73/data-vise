@@ -3,9 +3,9 @@ import {
   ChevronDownIcon,
   ArrowRightEndOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { useUserStore } from "@/core/store/user";
+import { useUserStore } from "@store/user";
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
+import { ROUTES } from "@constants/routes";
 
 export default function UserDropdown() {
   const user = useUserStore((s) => s.user);

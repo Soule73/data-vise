@@ -1,37 +1,37 @@
-import type { ButtonProps } from "@/core/types/form-types";
+import type { ButtonProps } from "@type/formTypes";
 import { Button as HeadlessButton } from "@headlessui/react";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
 const sizeClasses = {
-  sm: "px-2 py-1 text-sm",
-  md: "px-3 py-1.5 text-base",
-  lg: "px-4 py-2 text-lg",
+  sm: "px-3 py-1.5 text-sm",
+  md: "px-4 py-2 text-sm",
+  lg: "px-6 py-3 text-base",
 };
 
 const colorClasses = {
   indigo: {
     solid:
-      "bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600",
+      "bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
     outline:
-      "border border-indigo-600 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-indigo-700/20 dark:text-indigo-200 hover:dark:bg-indigo-700",
+      "border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
   },
   red: {
     solid:
-      "bg-red-600 text-white hover:bg-red-500 focus-visible:outline-red-600",
+      "bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2",
     outline:
-      "border border-red-600 text-red-600 bg-white hover:bg-red-50 dark:bg-red-700/20 dark:text-red-200 hover:dark:bg-red-700",
+      "border border-red-300 text-red-700 bg-white hover:bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-600 dark:hover:bg-red-900/20 focus:ring-2 focus:ring-red-500 focus:ring-offset-2",
   },
   green: {
     solid:
-      "bg-green-600 text-white hover:bg-green-500 focus-visible:outline-green-600",
+      "bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
     outline:
-      "border border-green-600 text-green-600 bg-white hover:bg-green-50 dark:bg-green-700/20 dark:text-green-200 hover:dark:bg-green-700",
+      "border border-green-300 text-green-700 bg-white hover:bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-600 dark:hover:bg-green-900/20 focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
   },
   gray: {
     solid:
-      "bg-gray-600 text-white hover:bg-gray-500 focus-visible:outline-gray-600",
+      "bg-gray-600 text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2",
     outline:
-      "border border-gray-300 text-gray-600 bg-white hover:bg-gray-50 dark:bg-gray-700/20 dark:text-gray-200 hover:dark:bg-gray-700",
+      "border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2",
   },
 };
 
@@ -40,7 +40,7 @@ export default function Button({
   size = "md",
   color = "indigo",
   variant = "solid",
-  type,
+  type = "button",
   loading = false,
   className = "",
   ...props
@@ -52,7 +52,7 @@ export default function Button({
     <HeadlessButton
       type={type}
       className={[
-        `flex w-full disabled:opacity-30 justify-center items-center rounded-md font-semibold focus-visible:outline-2 cursor-pointer focus-visible:outline-offset-2 ${sizeClass} ${colorClass} transition-colors duration-300 disabled:cursor-not-allowed`,
+        `flex w-full disabled:opacity-50 justify-center items-center rounded-md font-medium transition-colors ${sizeClass} ${colorClass} disabled:cursor-not-allowed cursor-pointer`,
         className,
       ]
         .filter(Boolean)
@@ -61,7 +61,7 @@ export default function Button({
       {...props}
     >
       {loading && (
-        <ArrowPathIcon className="animate-spin mr-2 h-5 w-5 text-white" />
+        <ArrowPathIcon className="animate-spin mr-2 h-4 w-4" />
       )}
       {children}
     </HeadlessButton>

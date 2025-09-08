@@ -1,15 +1,15 @@
-import { WIDGETS } from "@/data/adapters/visualizations";
+import { WIDGETS } from "@adapters/visualizations";
 import { useRef, useEffect, useMemo, useState } from "react";
-import type { DataSource } from "../../types/data-source";
-import { getWidgetDataFields } from "@/core/utils/widgetDataFields";
-import { dataBySourceQuery } from "@/data/repositories/sources";
+import type { DataSource } from "@type/dataSource";
+import { getWidgetDataFields } from "@utils/widgets/widgetDataFields";
+import { useDataBySourceQuery } from "@/data/repositories/datasources";
 import {
   getWidgetComponent,
   getDataError,
   getGridItemStyleProps,
   useGridItemResizeObserver,
-} from "@/core/utils/gridItemUtils";
-import type { UseGridItemProps } from "../../types/dashboard-types";
+} from "@utils/gridItemUtils";
+import type { UseGridItemProps } from "@type/dashboardTypes";
 
 export function useGridItem({
   widget,
@@ -32,20 +32,18 @@ export function useGridItem({
   forceRefreshKey,
   page,
   pageSize,
-  shareId, // Ajout du shareId
+  shareId,
 }: UseGridItemProps) {
   // --- Gestion du resize natif ---
+  const widgetRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  useGridItemResizeObserver({
+    widgetRef,
+    editMode,
+    hydratedLayout,
+    idx,
+    onSwapLayout,
+  });
   function handleResize() {
-    const widgetRef = useRef<HTMLDivElement>(
-      null
-    ) as React.RefObject<HTMLDivElement>;
-    useGridItemResizeObserver({
-      widgetRef,
-      editMode,
-      hydratedLayout,
-      idx,
-      onSwapLayout,
-    });
     return widgetRef;
   }
 
@@ -53,18 +51,55 @@ export function useGridItem({
   const dragProps = useMemo(() => {
     // Désactive le drag & drop en mobile
     if (!editMode || isMobile) return {};
+
     return {
       draggable: true,
-      onDragStart: () => handleDragStart && handleDragStart(idx),
+      onDragStart: (e: React.DragEvent) => {
+        // Vérifie si le drag commence depuis la zone de resize
+        const target = e.target as HTMLElement;
+        const rect = target.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const resizeZoneSize = 20;
+        const isInResizeZone =
+          x >= rect.width - resizeZoneSize &&
+          y >= rect.height - resizeZoneSize;
+
+        if (isInResizeZone) {
+          e.preventDefault();
+          return;
+        }
+
+        // Passe l'index pour le drag
+        if (handleDragStart) {
+          console.log('Starting drag for widget index:', idx);
+          handleDragStart(idx, e);
+        } else {
+          console.warn('handleDragStart is not available');
+        }
+      },
       onDragOver: (e: React.DragEvent) => {
         e.preventDefault();
-        handleDragOver && handleDragOver(idx);
+        if (handleDragOver) handleDragOver(idx, e);
       },
       onDrop: (e: React.DragEvent) => {
         e.preventDefault();
-        handleDrop && handleDrop(idx);
+        if (handleDrop) handleDrop(idx, e);
       },
-      onDragEnd: () => handleDragEnd && handleDragEnd(),
+      onDragEnd: () => {
+        if (handleDragEnd) handleDragEnd();
+      },
+      onDragEnter: (e: React.DragEvent) => {
+        e.preventDefault();
+      },
+      onDragLeave: (e: React.DragEvent) => {
+        // Évite le flickering lors du hover sur les enfants
+        if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+        if (hoveredIdx === idx) {
+          // Reset hover state quand on quitte le widget
+        }
+      },
     };
   }, [
     editMode,
@@ -74,6 +109,7 @@ export function useGridItem({
     handleDragOver,
     handleDrop,
     handleDragEnd,
+    hoveredIdx,
   ]);
 
   // --- Style props ---
@@ -96,10 +132,14 @@ export function useGridItem({
   );
 
   // --- Colonnes nécessaires à la visualisation ---
-  const config = widget?.config || {};
+  const config = useMemo(() => widget?.config || {}, [widget?.config]);
   const fields = useMemo(
-    () => getWidgetDataFields(config, widget?.type),
-    [widget?.type, config]
+    () => getWidgetDataFields(config,
+      //  widget?.type
+    ),
+    [
+      // widget?.type, 
+      config]
   );
 
   // --- Données du widget (hook data + refresh) ---
@@ -107,7 +147,7 @@ export function useGridItem({
     data: widgetData,
     loading,
     error,
-  } = dataBySourceQuery(
+  } = useDataBySourceQuery(
     source?._id,
     {
       from: timeRangeFrom || undefined,
@@ -115,7 +155,7 @@ export function useGridItem({
       fields,
       page,
       pageSize,
-      shareId, // Passage du shareId à dataBySourceQuery
+      shareId,
     },
     undefined,
     refreshMs,
@@ -123,6 +163,7 @@ export function useGridItem({
   );
 
   // --- Mémorisation des dernières données valides ---
+  //  eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [lastValidData, setLastValidData] = useState<any>(undefined);
   useEffect(() => {
     if (widgetData && Array.isArray(widgetData) && widgetData.length > 0) {
@@ -133,13 +174,10 @@ export function useGridItem({
   const isRefreshing = loading && !!lastValidData;
 
   // --- Détermination du composant de visualisation ---
-  // const widgetDef = widget
-  //   ? WIDGETS[widget.type as keyof typeof WIDGETS]
-  //   : null;
   const WidgetComponent = getWidgetComponent(widget, WIDGETS);
 
   // --- Gestion des erreurs de données ---
-  let dataError = getDataError({ source, error, loading, widgetData });
+  const dataError = getDataError({ source, error, loading, widgetData });
 
   // --- Retour du hook ---
   return {

@@ -1,7 +1,6 @@
 import { Response, NextFunction } from "express";
-import User from "../models/User";
-import type { AuthRequest } from "./auth";
-import { PopulatedRole } from "@/types/authType";
+import User from "@models/User";
+import { AuthRequest, PopulatedRole } from "@type/authType";
 
 /**
  * Middleware générique pour vérifier qu'un utilisateur a la permission demandée.
@@ -24,7 +23,7 @@ export function requirePermission(
       req.method === "PUT" &&
       req.params.id &&
       String(req.params.id) ===
-        String((user as { _id?: string; id: string })._id ?? user.id)
+      String((user as { _id?: string; id: string })._id ?? user.id)
     ) {
       return next();
     }
@@ -46,29 +45,29 @@ export function requirePermission(
 
     const perms = Array.isArray(role.permissions)
       ? role.permissions.map((p) => {
-          if (typeof p === "string") {
-            return p;
-          }
+        if (typeof p === "string") {
+          return p;
+        }
 
-          if (
-            typeof p === "object" &&
-            p &&
-            "name" in p &&
-            typeof (p as { name: unknown }).name === "string"
-          ) {
-            return (p as { name: string }).name;
-          }
+        if (
+          typeof p === "object" &&
+          p &&
+          "name" in p &&
+          typeof (p as { name: unknown }).name === "string"
+        ) {
+          return (p as { name: string }).name;
+        }
 
-          if (
-            typeof p === "object" &&
-            p &&
-            typeof (p as object).toString === "function"
-          ) {
-            return (p as object).toString();
-          }
+        if (
+          typeof p === "object" &&
+          p &&
+          typeof (p as object).toString === "function"
+        ) {
+          return (p as object).toString();
+        }
 
-          return "";
-        })
+        return "";
+      })
       : [];
 
     if (perms.includes(permissionName)) {

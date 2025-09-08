@@ -1,17 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import { useCreateRoleMutation } from "@/data/repositories/roles";
-import { useNotificationStore } from "@/core/store/notification";
-import { ROUTES } from "@/core/constants/routes";
-import { permissionsQuery } from "@/data/repositories/roles";
+import { useCreateRoleMutation } from "@repositories/roles";
+import { useNotificationStore } from "@store/notification";
+import { ROUTES } from "@constants/routes";
+import { usePermissionsQuery } from "@repositories/roles";
 import { useState, useMemo, useEffect } from "react";
-import { useDashboardStore } from "../../store/dashboard";
+import { useDashboardStore } from "@store/dashboard";
 import { useQueryClient } from "@tanstack/react-query";
-import type { RoleCreateForm } from "@/core/types/auth-types";
+import type { RoleCreateForm } from "@type/authTypes";
 
 export function useRoleCreate() {
   const navigate = useNavigate();
   const showNotification = useNotificationStore((s) => s.showNotification);
-  const { data: permissions } = permissionsQuery();
+  const { data: permissions } = usePermissionsQuery();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<RoleCreateForm>({
     name: "",

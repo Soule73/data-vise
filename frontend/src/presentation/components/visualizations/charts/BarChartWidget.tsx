@@ -1,4 +1,4 @@
-import { useBarChartLogic } from "@/core/hooks/visualizations/useBarChartVM";
+import { useBarChartLogic } from "@hooks/visualizations/charts";
 import {
   Chart as ChartJS,
   BarElement,
@@ -10,9 +10,9 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
-import InvalideConfigWidget from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import type { BarChartConfig } from "@/core/types/visualization";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import type { BarChartWidgetProps } from "@type/widgetTypes";
+import NoDataWidget from "@components/widgets/NoDataWidget";
 
 ChartJS.register(
   BarElement,
@@ -23,22 +23,20 @@ ChartJS.register(
   Legend
 );
 
+
 export default function BarChartWidget({
   data,
   config,
-  //@ts-ignore
-  editMode,
-}: {
-  data: Record<string, any>[];
-  config: BarChartConfig;
-  editMode?: boolean;
-}) {
+}: BarChartWidgetProps) {
+  const { chartData, options } = useBarChartLogic({ data, config });
+
   if (
     !data ||
     !config.metrics ||
-    !config.bucket ||
+    !config.buckets ||
     !Array.isArray(config.metrics) ||
-    !config.bucket.field
+    !config.buckets.length ||
+    !config.buckets[0]?.field
   ) {
     return <InvalideConfigWidget />;
   }
@@ -52,7 +50,6 @@ export default function BarChartWidget({
       />
     );
   }
-  const { chartData, options } = useBarChartLogic(data, config);
 
   return (
     <div className="shadow bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">

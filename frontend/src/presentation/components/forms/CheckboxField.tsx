@@ -1,4 +1,4 @@
-import type { CheckboxFieldProps } from "@/core/types/form-types";
+import type { CheckboxFieldProps } from "@type/formTypes";
 import { Checkbox } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/16/solid";
 import React from "react";
@@ -30,10 +30,10 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
       </Checkbox>
       {
         label && (
-      
-      <span className="select-none text-sm font-medium text-gray-900 dark:text-gray-300 ml-2">
-        {label}
-      </span>
+
+          <span className="select-none text-sm font-medium text-gray-900 dark:text-gray-300 ml-2">
+            {label}
+          </span>
 
         )
       }

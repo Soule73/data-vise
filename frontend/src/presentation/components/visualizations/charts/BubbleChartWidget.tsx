@@ -1,24 +1,19 @@
 import { Bubble } from "react-chartjs-2";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
-import InvalideConfigWidget from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import { useBubbleChartLogic } from "@/core/hooks/visualizations/useBubbleChartVM";
-import type { BubbleChartConfig } from "@/core/types/visualization";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import { useBubbleChartLogic } from "@hooks/visualizations/charts";
+import type { BubbleChartWidgetProps } from "@type/widgetTypes";
 
 export default function BubbleChartWidget({
   data,
   config,
-  //@ts-ignore
-  editMode,
-}: {
-  data: Record<string, any>[];
-  config: BubbleChartConfig;
-  editMode?: boolean;
-}) {
+}: BubbleChartWidgetProps) {
   const { chartData, options, validDatasets } = useBubbleChartLogic(
-    data,
-    config
-  );
+    {
+      data,
+      config
+    });
   if (
     !data ||
     !config.metrics ||

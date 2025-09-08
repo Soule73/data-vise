@@ -1,16 +1,12 @@
-import SelectField from "@/presentation/components/SelectField";
-import InputField from "@/presentation/components/forms/InputField";
-import Button from "@/presentation/components/forms/Button";
-import {
-  XMarkIcon,
-  ChevronUpIcon,
-  ChevronDownIcon,
-  PlusCircleIcon,
-} from "@heroicons/react/24/solid";
-import { useMetricUICollapseStore } from "@/core/store/metricUI";
-import type { WidgetKPIGroupDataConfigSectionProps } from "@/core/types/widget-types";
-import type { MetricConfig } from "@/core/types/metric-bucket-types";
-import type { KPIGroupWidgetConfig } from "@/core/types/visualization";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import SelectField from "@components/SelectField";
+import InputField from "@components/forms/InputField";
+import type { WidgetKPIGroupDataConfigSectionProps } from "@type/widgetTypes";
+import type { Metric } from "@type/metricBucketTypes";
+import type { KPIGroupWidgetConfig } from "@type/visualization";
+import GlobalFiltersConfig from "@components/widgets/GlobalFiltersConfig";
+import CollapsibleSection from "@components/widgets/CollapsibleSection";
+import WidgetConfigSection from "@components/widgets/WidgetConfigSection";
 
 export default function WidgetKPIGroupDataConfigSection({
   dataConfig,
@@ -23,35 +19,10 @@ export default function WidgetKPIGroupDataConfigSection({
   handleMetricAggOrFieldChange,
   data = [],
 }: WidgetKPIGroupDataConfigSectionProps) {
-  const collapsedMetrics = useMetricUICollapseStore((s) => s.collapsedMetrics);
-  const toggleCollapse = useMetricUICollapseStore((s) => s.toggleCollapse);
 
   const kpiConfig = config as KPIGroupWidgetConfig;
+
   const kpiDataConfig = dataConfig as { metrics: any };
-  const filters = (kpiConfig.filters ?? []) as {
-    field: string;
-    value: string;
-  }[];
-
-  // --- Handlers extraits ---
-  const handleFilterFieldChange = (idx: number, value: string) => {
-    const newFilters = [...filters];
-    newFilters[idx] = {
-      ...(newFilters[idx] || {}),
-      field: value,
-      value: "",
-    };
-    handleConfigChange("filters", newFilters);
-  };
-
-  const handleFilterValueChange = (idx: number, value: string) => {
-    const newFilters = [...filters];
-    newFilters[idx] = {
-      ...(newFilters[idx] || {}),
-      value,
-    };
-    handleConfigChange("filters", newFilters);
-  };
 
   const handleMetricMoveUp = (idx: number) => {
     if (idx === 0) return;
@@ -75,7 +46,7 @@ export default function WidgetKPIGroupDataConfigSection({
 
   const handleMetricDelete = (idx: number) => {
     const newMetrics = kpiConfig.metrics.filter(
-      (_: any, i: number) => i !== idx
+      (_: Metric, i: number) => i !== idx
     );
     handleConfigChange("metrics", newMetrics);
   };
@@ -117,235 +88,104 @@ export default function WidgetKPIGroupDataConfigSection({
     ]);
   };
 
-  // --- Logique options et disabled extraites ---
-  const getFilterFieldOptions = (idx: number) => [
-    { value: "", label: "-- Aucun --" },
-    ...columns.map((col) => ({ value: String(col), label: col })),
-    ...Array.from(
-      new Set(
-        (data || [])
-          .map((row) => row[filters[idx]?.field ?? ""])
-          .filter((val) => val !== undefined && val !== null && val !== "")
-      )
-    ).map((val) => ({ value: String(val), label: String(val) })),
-  ];
+  const getAggLabel = (metric: Metric) =>
 
-  const getFilterValueOptions = (idx: number) =>
-    filters[idx]?.field
-      ? [
-          { value: "", label: "-- Toutes --" },
-          ...Array.from(
-            new Set(
-              (data || [])
-                .map(
-                  (row: Record<string, unknown>) =>
-                    row[filters[idx]?.field ?? ""]
-                )
-                .filter((v) => v !== undefined && v !== null && v !== "")
-            )
-          ).map((v) => ({ value: String(v), label: String(v) })),
-        ]
-      : [{ value: "", label: "-- Choisir --" }];
+    kpiDataConfig.metrics?.allowedAggs.find((a: Metric) => a.label === metric.agg)?.label || metric.agg || "";
 
-  const isFilterValueDisabled = (idx: number) => !filters[idx]?.field;
+  const getFieldLabel = (metric: Metric) => metric.field || "";
 
-  // --- Logique d'affichage des labels extraite ---
-  const getAggLabel = (metric: MetricConfig) =>
-    kpiDataConfig.metrics?.allowedAggs.find((a: any) => a.value === metric.agg)
-      ?.label ||
-    metric.agg ||
-    "";
-
-  const getFieldLabel = (metric: MetricConfig) => metric.field || "";
-
-  const getHeaderLabel = (metric: MetricConfig) => {
+  const getHeaderLabel = (metric: Metric) => {
     const aggLabel = getAggLabel(metric);
     const fieldLabel = getFieldLabel(metric);
     return `${aggLabel}${fieldLabel ? " · " + fieldLabel : ""}`;
   };
 
-  // --- Rendu ---
+  const aggsOptions = Array.isArray(kpiDataConfig.metrics?.allowedAggs)
+    ? kpiDataConfig.metrics.allowedAggs
+    : [];
+
+  const fieldOptions =
+    Array.isArray(columns)
+      ? columns.map((col) => ({ value: col, label: col }))
+      : []
+    ;
+
   return (
-    <div className="space-y-4">
-      {/* Filtres par KPI (centralisé dans config.filters) */}
-      {Array.isArray(kpiConfig.metrics) &&
-        kpiConfig.metrics.map((metric: MetricConfig, idx: number) => (
-          <div
-            key={idx}
-            className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow mb-2"
-          >
-            <div className="font-semibold mb-1">
-              Filtrer KPI {metric.label || metric.field || idx + 1}
-            </div>
-            <div className="flex flex-col gap-2">
-              <SelectField
-                label="Champ"
-                value={filters[idx]?.field || ""}
-                onChange={(e) => handleFilterFieldChange(idx, e.target.value)}
-                options={
-                  Array.isArray(getFilterFieldOptions(idx))
-                    ? getFilterFieldOptions(idx)
-                    : []
-                }
-                name={`filter-field-${idx}`}
-                id={`filter-field-${idx}`}
-              />
-              <SelectField
-                label="Valeur"
-                value={filters[idx]?.value || ""}
-                onChange={(e) => handleFilterValueChange(idx, e.target.value)}
-                options={
-                  Array.isArray(getFilterValueOptions(idx))
-                    ? getFilterValueOptions(idx)
-                    : []
-                }
-                name={`filter-value-${idx}`}
-                id={`filter-value-${idx}`}
-                disabled={isFilterValueDisabled(idx)}
-              />
-            </div>
-          </div>
-        ))}
-      {/* Métriques (metrics) */}
-      {kpiDataConfig.metrics?.label && (
-        <div className="font-semibold mb-1">{kpiDataConfig.metrics.label}</div>
-      )}
-      {Array.isArray(kpiConfig.metrics) && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
-          <div className="space-y-1 divide-y divide-gray-300 dark:divide-gray-700 ">
-            {kpiConfig.metrics.map((metric: MetricConfig, idx: number) => {
+    <div className="space-y-6">
+      <GlobalFiltersConfig
+        filters={kpiConfig.globalFilters || []}
+        columns={columns}
+        data={data}
+        onFiltersChange={(filters) => handleConfigChange('globalFilters', filters)}
+      />
+      <WidgetConfigSection
+        title={kpiDataConfig.metrics.label}
+        canAdd={kpiDataConfig.metrics?.allowMultiple}
+        onAdd={() => handleAddMetric()}
+      >
+
+        {Array.isArray(kpiConfig.metrics) && (
+          <div className="space-y-3">
+            {kpiConfig.metrics.map((metric: Metric, idx: number) => {
               const headerLabel = getHeaderLabel(metric);
               const isOnlyMetric = kpiConfig.metrics.length === 1;
               return (
-                <div
+                <CollapsibleSection
                   key={idx}
-                  className="px-2 pb-2 flex flex-col relative group"
+                  title={headerLabel}
+                  canMoveDown={idx < kpiConfig.metrics.length - 1}
+                  canMoveUp={idx > 0}
+                  onDelete={() => handleMetricDelete(idx)}
+                  hideSettings={kpiDataConfig.metrics?.allowMultiple && isOnlyMetric}
                   draggable={
                     kpiDataConfig.metrics?.allowMultiple && !isOnlyMetric
                   }
                   onDragStart={() => handleDragStart && handleDragStart(idx)}
                   onDragOver={(e) => handleDragOver && handleDragOver(idx, e)}
                   onDrop={() => handleDrop && handleDrop(idx)}
+
+                  onMoveDown={() => handleMetricMoveDown(idx)}
+                  onMoveUp={() => handleMetricMoveUp(idx)}
+
                 >
-                  <div
-                    className="flex items-center justify-between cursor-pointer"
-                    onClick={() => toggleCollapse(idx)}
-                  >
-                    <span className="font-medium text-sm text-gray-700 dark:text-gray-300">
-                      <ChevronDownIcon className="w-4 h-4 mr-1 inline-block" />
-                      {headerLabel}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {kpiDataConfig.metrics?.allowMultiple &&
-                        !isOnlyMetric && (
-                          <>
-                            <button
-                              className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
-                                idx === 0 ? "opacity-50 cursor-not-allowed" : ""
-                              }`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleMetricMoveUp(idx);
-                              }}
-                              disabled={idx === 0}
-                              aria-disabled={idx === 0}
-                              title="Monter"
-                            >
-                              <ChevronUpIcon className="w-4 h-4" />
-                            </button>
-                            <button
-                              className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded ${
-                                idx === kpiConfig.metrics.length - 1
-                                  ? "opacity-50 cursor-not-allowed"
-                                  : ""
-                              }`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleMetricMoveDown(idx);
-                              }}
-                              disabled={idx === kpiConfig.metrics.length - 1}
-                              aria-disabled={
-                                idx === kpiConfig.metrics.length - 1
-                              }
-                              title="Descendre"
-                            >
-                              <ChevronDownIcon className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
-                      {!isOnlyMetric && (
-                        <button
-                          className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleMetricDelete(idx);
-                          }}
-                          title="Supprimer"
-                        >
-                          <XMarkIcon className="w-5 h-5 text-red-500" />
-                        </button>
-                      )}
-                    </div>
+                  <div className="flex flex-col gap-2 mt-2">
+                    <SelectField
+                      label="Agrégation"
+                      value={metric.agg}
+                      onChange={(e) =>
+                        handleMetricAggChange(idx, e.target.value)
+                      }
+                      options={aggsOptions}
+                      name={`metric-agg-${idx}`}
+                      id={`metric-agg-${idx}`}
+                    />
+                    <SelectField
+                      label="Champ"
+                      value={metric.field}
+                      onChange={(e) =>
+                        handleMetricFieldChange(idx, e.target.value)
+                      }
+                      options={fieldOptions}
+                      name={`metric-field-${idx}`}
+                      id={`metric-field-${idx}`}
+                    />
+                    <InputField
+                      label="Label"
+                      value={metric.label || ""}
+                      onChange={(e) => {
+                        const target = e.target as HTMLInputElement;
+                        handleMetricLabelChange(idx, target.value);
+                      }}
+                      name={`metric-label-${idx}`}
+                      id={`metric-label-${idx}`}
+                    />
                   </div>
-                  {!collapsedMetrics[idx] && (
-                    <div className="flex flex-col gap-2 mt-2">
-                      <SelectField
-                        label="Agrégation"
-                        value={metric.agg}
-                        onChange={(e) =>
-                          handleMetricAggChange(idx, e.target.value)
-                        }
-                        options={
-                          Array.isArray(kpiDataConfig.metrics?.allowedAggs)
-                            ? kpiDataConfig.metrics.allowedAggs
-                            : []
-                        }
-                        name={`metric-agg-${idx}`}
-                        id={`metric-agg-${idx}`}
-                      />
-                      <SelectField
-                        label="Champ"
-                        value={metric.field}
-                        onChange={(e) =>
-                          handleMetricFieldChange(idx, e.target.value)
-                        }
-                        options={
-                          Array.isArray(columns)
-                            ? columns.map((col) => ({ value: col, label: col }))
-                            : []
-                        }
-                        name={`metric-field-${idx}`}
-                        id={`metric-field-${idx}`}
-                      />
-                      <InputField
-                        label="Label"
-                        value={metric.label}
-                        onChange={(e) =>
-                          handleMetricLabelChange(idx, e.target.value)
-                        }
-                        name={`metric-label-${idx}`}
-                        id={`metric-label-${idx}`}
-                      />
-                    </div>
-                  )}
-                </div>
+                </CollapsibleSection>
               );
             })}
           </div>
-          {kpiDataConfig.metrics?.allowMultiple && (
-            <Button
-              color="indigo"
-              className="mt-2 w-max mx-auto !bg-gray-300 dark:!bg-gray-700 hover:!bg-gray-200 dark:hover:!bg-gray-600 !border-none"
-              variant="outline"
-              onClick={handleAddMetric}
-              disabled={!kpiDataConfig.metrics.allowMultiple}
-            >
-              <PlusCircleIcon className="w-5 h-5 mr-1" />
-              Ajouter
-            </Button>
-          )}
-        </div>
-      )}
+        )}
+      </WidgetConfigSection>
     </div>
   );
 }

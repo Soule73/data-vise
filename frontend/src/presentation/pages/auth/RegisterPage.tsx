@@ -1,8 +1,8 @@
-import AuthLayout from "@/presentation/components/layouts/AuthLayout";
-import InputField from "@/presentation/components/forms/InputField";
-import Button from "@/presentation/components/forms/Button";
-import { useRegisterForm } from "@/core/hooks/auth/useRegisterForm";
-import logoDataVise from "../../../core/assets/logo-datavise.svg";
+import AuthLayout from "@components/layouts/AuthLayout";
+import InputField from "@components/forms/InputField";
+import Button from "@components/forms/Button";
+import { useRegisterForm } from "@hooks/auth/useRegisterForm";
+import logoDataVise from "@assets/logo-datavise.svg";
 
 export default function Register() {
   const {

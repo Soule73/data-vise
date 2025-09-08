@@ -1,18 +1,18 @@
 import { ChartBarIcon } from "@heroicons/react/24/outline";
-import InvalideConfigWidget from "../charts/InvalideConfigWidget";
-import NoDataWidget from "../charts/NoDataWidget";
-import KPIWidget from "./KPIWidget";
-import { useKPIGroupVM } from "@/core/hooks/visualizations/useKPIGroupVM";
-import type { KPIGroupWidgetConfig } from "@/core/types/visualization";
-import type { MetricConfig } from "@/core/types/metric-bucket-types";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import KPIWidget from "@components/visualizations/kpi/KPIWidget";
+import { useKPIGroupVM } from "@hooks/visualizations/kpi/useKPIGroupVM";
+import type { Metric } from "@type/metricBucketTypes";
+import type { KPIGroupWidgetProps } from "@type/widgetTypes";
 
 export default function KPIGroupWidget({
   data,
   config,
-}: {
-  data: Record<string, any>[];
-  config: KPIGroupWidgetConfig;
-}) {
+}: KPIGroupWidgetProps) {
+  const { metrics, gridColumns, widgetParamsList } =
+    useKPIGroupVM(config);
+
   if (
     !data ||
     !config.metrics ||
@@ -21,6 +21,7 @@ export default function KPIGroupWidget({
   ) {
     return <InvalideConfigWidget />;
   }
+
   if (data.length === 0) {
     return (
       <NoDataWidget
@@ -31,8 +32,6 @@ export default function KPIGroupWidget({
     );
   }
 
-  const { metrics, metricStyles, filters, gridColumns, widgetParamsList } =
-    useKPIGroupVM(config);
 
   return (
     <div
@@ -41,16 +40,15 @@ export default function KPIGroupWidget({
         gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
       }}
     >
-      {metrics.map((metric: MetricConfig, idx: number) => (
+      {metrics.map((metric: Metric, idx: number) => (
         <KPIWidget
           key={idx}
           data={data}
           config={{
             metrics: [metric],
-            metricStyles: metricStyles[idx] || {},
-            filters: filters && filters[idx] ? [filters[idx]] : undefined,
+            globalFilters: config.globalFilters,
             widgetParams: widgetParamsList[idx],
-            bucket: config.bucket,
+            buckets: config.buckets,
           }}
         />
       ))}

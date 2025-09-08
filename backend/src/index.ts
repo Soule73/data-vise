@@ -2,21 +2,19 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import authRoutes from "@/routes/auth";
-import dataSourceRoutes from "@/routes/datasource";
-import widgetRoutes from "@/routes/widget";
-import dashboardRoutes from "@/routes/dashboard";
-import uploadsRoutes from "@/routes/uploads";
+import authRoutes from "@routes/auth";
+import dataSourceRoutes from "@routes/datasource";
+import widgetRoutes from "@routes/widget";
+import dashboardRoutes from "@routes/dashboard";
+import uploadsRoutes from "@routes/uploads";
 import type { Request, Response, NextFunction } from "express";
-import { initPermissionsAndRoles } from "./data/initPermissions";
+import { initPermissionsAndRoles } from "@data/initPermissions";
 
 dotenv.config();
 
 const PORT = process.env.PORT;
 
 const allowOrigin = process.env.CORS_ORIGIN;
-
-console.log("CORS Origin:", allowOrigin);
 
 const appDomain = process.env.APP_DOMAIN;
 
@@ -51,7 +49,6 @@ mongoose
     connectTimeoutMS: 10000,
   })
   .then(async () => {
-    console.log("Connecté à MongoDB");
 
     await initPermissionsAndRoles();
 

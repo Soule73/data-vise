@@ -1,27 +1,26 @@
-import "@/core/chartjs-register";
-import { usePieChartLogic } from "@/core/hooks/visualizations/usePieChartVM";
+import "@utils/charts/chartjs-register";
+import { usePieChartLogic } from "@hooks/visualizations/charts";
 import { Pie } from "react-chartjs-2";
 import { ChartPieIcon } from "@heroicons/react/24/outline";
-import { InvalideConfigWidget } from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import type { PieChartConfig } from "@/core/types/visualization";
+import { InvalideConfigWidget } from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import type { PieChartWidgetProps } from "@type/widgetTypes";
+
 
 export default function PieChartWidget({
   data,
   config,
-  //@ts-ignore
-  editMode,
-}: {
-  data: Record<string, any>[];
-  config: PieChartConfig;
-  editMode?: boolean;
-}) {
+}: PieChartWidgetProps) {
+  const { chartData, options, showNativeValues, valueLabelsPlugin } =
+    usePieChartLogic({ data, config });
+
   if (
     !data ||
     !config.metrics ||
-    !config.bucket ||
+    !config.buckets ||
     !Array.isArray(config.metrics) ||
-    !config.bucket.field
+    !config.buckets.length ||
+    !config.buckets[0]?.field
   ) {
     return <InvalideConfigWidget />;
   }
@@ -35,8 +34,6 @@ export default function PieChartWidget({
       />
     );
   }
-  const { chartData, options, showNativeValues, valueLabelsPlugin } =
-    usePieChartLogic(data, config);
 
   return (
     <div className="shadow bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">

@@ -1,8 +1,8 @@
-import Sidebar from "@/presentation/components/layouts/Sidebar";
-import Navbar from "@/presentation/components/layouts/Navbar";
-import Notification from "@/presentation/components/Notification";
-import { useNotificationStore } from "@/core/store/notification";
-import type { BaseLayoutProps } from "@/core/types/layout-types";
+import Sidebar from "@components/layouts/Sidebar";
+import Navbar from "@components/layouts/Navbar";
+import Notification from "@components/Notification";
+import { useNotificationStore } from "@store/notification";
+import type { BaseLayoutProps } from "@type/layoutTypes";
 
 export default function BaseLayout({ children, hideSidebar = false, hideNavbar = false, hideUserInfo = false }: BaseLayoutProps) {
   const notif = useNotificationStore((s) => s.notification);
@@ -16,9 +16,9 @@ export default function BaseLayout({ children, hideSidebar = false, hideNavbar =
         title={notif.title}
         description={notif.description}
       />
-      {!hideNavbar && <Navbar 
-      hideSidebar={hideSidebar}
-      hideUserInfo={hideUserInfo} />}
+      {!hideNavbar && <Navbar
+        hideSidebar={hideSidebar}
+        hideUserInfo={hideUserInfo} />}
       {!hideSidebar && <Sidebar />}
       <main className="py-4 px-2 md:px-6 relative z-0">{children}</main>
     </div>

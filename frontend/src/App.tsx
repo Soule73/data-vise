@@ -1,26 +1,26 @@
-// src/App.tsx
-
 import React, { useEffect, useState, type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "@/presentation/pages/auth/LoginPage";
-import Register from "@/presentation/pages/auth/RegisterPage";
-import SourcesPage from "@/presentation/pages/datasource/SourceListPage";
-import AddSourcePage from "@/presentation/pages/datasource/AddSourcePage";
-import EditSourcePage from "@/presentation/pages/datasource/EditSourcePage";
-import BaseLayout from "@/presentation/components/layouts/BaseLayout";
-import { useUserStore } from "@/core/store/user";
-import { ROUTES } from "@/core/constants/routes";
-import WidgetListPage from "@/presentation/pages/widget/WidgetListPage";
-import WidgetCreatePage from "@/presentation/pages/widget/WidgetCreatePage";
-import RoleManagementPage from "@/presentation/pages/auth/RoleManagementPage";
-import RoleCreatePage from "@/presentation/pages/auth/RoleCreatePage";
-import UserManagementPage from "@/presentation/pages/auth/UserManagementPage";
-import DashboardPage from "@/presentation/pages/dashboard/DashboardPage";
-import DashboardListPage from "@/presentation/pages/dashboard/DashboardListPage";
-import WidgetEditPage from "@/presentation/pages/widget/WidgetEditPage";
-import AppLoader from "@/presentation/components/layouts/AppLoader";
-import DashboardSharePage from "@/presentation/pages/dashboard/DashboardSharePage";
-import ErrorPage from "./presentation/components/layouts/ErrorPage";
+import Login from "@pages/auth/LoginPage";
+import Register from "@pages/auth/RegisterPage";
+import SourcesPage from "@pages/datasource/SourceListPage";
+import AddSourcePage from "@pages/datasource/AddSourcePage";
+import EditSourcePage from "@pages/datasource/EditSourcePage";
+import BaseLayout from "@components/layouts/BaseLayout";
+import { useUserStore } from "@store/user";
+import { ROUTES } from "@constants/routes";
+import WidgetListPage from "@pages/widget/WidgetListPage";
+import WidgetCreatePage from "@pages/widget/WidgetCreatePage";
+import RoleManagementPage from "@pages/auth/RoleManagementPage";
+import RoleCreatePage from "@pages/auth/RoleCreatePage";
+import UserManagementPage from "@pages/auth/UserManagementPage";
+import DashboardPage from "@pages/dashboard/DashboardPage";
+import DashboardListPage from "@pages/dashboard/DashboardListPage";
+import WidgetEditPage from "@pages/widget/WidgetEditPage";
+import AppLoader from "@components/layouts/AppLoader";
+import DashboardSharePage from "@pages/dashboard/DashboardSharePage";
+import ErrorPage from "@components/layouts/ErrorPage";
+import LandingPage from "@pages/LandingPage";
+import DocumentationPage from "@pages/DocumentationPage";
 
 function RequireAuth({
   children,
@@ -49,10 +49,8 @@ const App: React.FC = () => {
   const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
-    // Affiche le loader au moins 3 secondes
     const timer = setTimeout(() => {
       setShowLoader(false);
-      // Vérifie via le store si l'utilisateur est bien connecté
       const currentUser = useUserStore.getState().user;
       const isDashboardShare = /^\/dashboard\/share\//.test(
         window.location.pathname
@@ -63,16 +61,14 @@ const App: React.FC = () => {
         window.location.pathname !== ROUTES.register &&
         !isDashboardShare
       ) {
-        console.log(
-          "Utilisateur non connecté, redirection vers la page de connexion"
-        );
+
         window.location.replace(ROUTES.login);
+
       }
-    }, 3000);
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Le loader ne s'affiche que sur les pages RequireAuth
   if (
     (user === undefined || user === null || showLoader) &&
     window.location.pathname !== ROUTES.login &&
@@ -84,6 +80,10 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path={ROUTES.home} element={<LandingPage />} />
+        <Route path={ROUTES.docs} element={<DocumentationPage />} />
+        <Route path={ROUTES.docsSection} element={<DocumentationPage />} />
+        <Route path={ROUTES.docsPage} element={<DocumentationPage />} />
         <Route path={ROUTES.login} element={<Login />} />
         <Route path={ROUTES.register} element={<Register />} />
         <Route
@@ -179,7 +179,7 @@ const App: React.FC = () => {
           }
         />
         <Route path={ROUTES.dashboardShare} element={<DashboardSharePage />} />
-        <Route path="/" element={<Navigate to={ROUTES.dashboard} replace />} />
+        {/* <Route path="/" element={<Navigate to={ROUTES.dashboard} replace />} /> */}
         <Route path="*" element={<Navigate to={ROUTES.dashboard} replace />} />
       </Routes>
     </BrowserRouter>

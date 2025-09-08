@@ -1,10 +1,10 @@
 import type {
   BubbleMetricConfig,
-  BucketConfig,
-  MetricConfig,
+  Metric,
   RadarMetricConfig,
   ScatterMetricConfig,
-} from "./metric-bucket-types";
+  MultiBucketConfig,
+} from "@type/metricBucketTypes";
 
 // --- Base params communs à la plupart des visualisations ---
 export interface BaseChartParams {
@@ -21,7 +21,7 @@ export interface BarChartParams extends BaseChartParams {
   stacked?: boolean;
   labelFormat?: string;
   showValues?: boolean;
-  horizontal?: boolean; // indexAxis: 'y'
+  horizontal?: boolean;
   tooltipFormat?: string;
   labelColor?: string;
   labelFontSize?: number;
@@ -86,6 +86,7 @@ export interface RadarChartParams extends BaseChartParams {
 export interface KPIWidgetParams {
   title?: string;
   valueColor?: string;
+  titleColor?: string;
   showTrend?: boolean;
   showValue?: boolean;
   format?: "number" | "currency" | "percent";
@@ -103,6 +104,14 @@ export interface KPIGroupWidgetParams {
   title?: string;
   columns?: number;
   showTrend?: boolean;
+  showValue?: boolean;
+  format?: "number" | "currency" | "percent";
+  currency?: string;
+  decimals?: number;
+  trendType?: "arrow" | "line";
+  showPercent?: boolean;
+  trendThreshold?: number;
+  titleColor?: string;
 }
 
 export interface CardWidgetParams {
@@ -148,17 +157,17 @@ export interface MetricStyle {
   borderColor?: string; // Couleur de bordure par métrique
 }
 
+export type FilterOperator = 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than' | 'greater_equal' | 'less_equal' | 'starts_with' | 'ends_with';
+
 export interface Filter {
   field: string; // Champ sur lequel appliquer le filtre
-  value: string | number | readonly string[] | undefined; // Valeur du filtre
+  operator?: FilterOperator;
+  value: string | number | readonly string[] | undefined;
 }
 
-export interface FilterConfig {
-  filters: Filter[]; // Liste des filtres à appliquer
-}
 
 export interface MetricStyleConfig {
-  [key: string]: MetricStyle; // Clé de la métrique et ses styles
+  [key: string]: MetricStyle;
 }
 
 // Classe de base pour la configuration d'un widget
@@ -168,48 +177,64 @@ export abstract class WidgetConfigBase<
   TFilters = Filter[]
 > {
   metrics:
-    | MetricConfig[]
+    | Metric[]
     | ScatterMetricConfig[]
     | BubbleMetricConfig[]
     | RadarMetricConfig[];
-  bucket: BucketConfig;
+  buckets?: MultiBucketConfig[];
   widgetParams?: TParams;
   metricStyles?: TStyles;
-  filters?: TFilters;
+  globalFilters?: Filter[];
   constructor({
     metrics,
-    bucket,
+    buckets,
     widgetParams,
     metricStyles,
-    filters,
+    globalFilters,
   }: {
-    metrics: MetricConfig[];
-    bucket: BucketConfig;
+    metrics: Metric[];
+    buckets?: MultiBucketConfig[];
     widgetParams?: TParams;
     metricStyles?: TStyles;
     filters?: TFilters;
+    globalFilters?: Filter[];
   }) {
     this.metrics = metrics;
-    this.bucket = bucket;
+    this.buckets = buckets;
+    this.buckets = buckets;
     this.widgetParams = widgetParams;
     this.metricStyles = metricStyles;
-    this.filters = filters;
+    this.globalFilters = globalFilters;
   }
 }
 
-export class BarChartConfig extends WidgetConfigBase<BarChartParams> {}
-export class LineChartConfig extends WidgetConfigBase<LineChartParams> {}
-export class PieChartConfig extends WidgetConfigBase<PieChartParams> {}
-export class ScatterChartConfig extends WidgetConfigBase<ScatterChartParams> {}
-export class BubbleChartConfig extends WidgetConfigBase<BubbleChartParams> {}
-export class RadarChartConfig extends WidgetConfigBase<RadarChartParams> {}
-export class KPIWidgetConfig extends WidgetConfigBase<KPIWidgetParams> {}
-export class KPIGroupWidgetConfig extends WidgetConfigBase<KPIGroupWidgetParams> {}
-export class CardWidgetConfig extends WidgetConfigBase<CardWidgetParams> {}
+export class BarChartConfig extends WidgetConfigBase<BarChartParams> { }
+
+export class LineChartConfig extends WidgetConfigBase<LineChartParams> { }
+
+export class PieChartConfig extends WidgetConfigBase<PieChartParams> { }
+
+// Interfaces spécialisées pour les graphiques avec types de métriques spécifiques
+export interface ScatterChartConfig extends Omit<WidgetConfigBase<ScatterChartParams>, 'metrics'> {
+  metrics: ScatterMetricConfig[];
+  globalFilters?: Filter[];
+}
+
+export interface BubbleChartConfig extends Omit<WidgetConfigBase<BubbleChartParams>, 'metrics'> {
+  metrics: BubbleMetricConfig[];
+  globalFilters?: Filter[];
+}
+
+export interface RadarChartConfig extends Omit<WidgetConfigBase<RadarChartParams>, 'metrics'> {
+  metrics: RadarMetricConfig[];
+  globalFilters?: Filter[];
+}
+export class KPIWidgetConfig extends WidgetConfigBase<KPIWidgetParams> { }
+export class KPIGroupWidgetConfig extends WidgetConfigBase<KPIGroupWidgetParams> { }
+export class CardWidgetConfig extends WidgetConfigBase<CardWidgetParams> { }
 export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
   columns?: { key: string; label: string }[];
   pageSize?: number;
-  groupBy?: string;
   width?: string | number;
   height?: string | number;
   minWidth?: string | number;
@@ -217,11 +242,10 @@ export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
   maxWidth?: string | number;
   maxHeight?: string | number;
   constructor(params: {
-    metrics: MetricConfig[];
-    bucket: BucketConfig;
+    metrics: Metric[];
+    buckets?: MultiBucketConfig[];
     columns?: { key: string; label: string }[];
     pageSize?: number;
-    groupBy?: string;
     width?: string | number;
     height?: string | number;
     minWidth?: string | number;
@@ -235,8 +259,6 @@ export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
     super(params);
     this.columns = params.columns;
     this.pageSize = params.pageSize;
-    this.groupBy = params.groupBy;
-    this.width = params.width;
     this.height = params.height;
     this.minWidth = params.minWidth;
     this.minHeight = params.minHeight;
@@ -244,3 +266,4 @@ export class TableWidgetConfig extends WidgetConfigBase<TableWidgetParams> {
     this.maxHeight = params.maxHeight;
   }
 }
+

@@ -1,18 +1,26 @@
-import { Link } from "react-router-dom";
-import { ROUTES } from "@/core/constants/routes";
-import Table from "@/presentation/components/Table";
-import Modal from "@/presentation/components/Modal";
-import { useWidgetListPage } from "@/core/hooks/widget/useWidgetListPage";
-import { DeleteWidgetModal } from "@/presentation/components/widget/DeleteWidgetModal";
-import Button from "@/presentation/components/forms/Button";
-import type { Widget } from "@/core/types/widget-types";
-import { useMemo } from "react";
-import { WIDGETS } from "@/data/adapters/visualizations";
-import Badge from "@/presentation/components/Badge";
+import { useNavigate, Link } from "react-router-dom";
+import { ROUTES } from "@constants/routes";
+import Table from "@components/Table";
+import Modal from "@components/Modal";
+import { useWidgetListPage } from "@hooks/widget/useWidgetListPage";
+import { DeleteWidgetModal } from "@components/widgets/DeleteWidgetModal";
+import Button from "@components/forms/Button";
+import type { Widget, WidgetType } from "@type/widgetTypes";
+import { useMemo, useState } from "react";
+import { WIDGETS } from "@adapters/visualizations";
+import Badge from "@components/Badge";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
+import WidgetTypeSelectionModal from "@components/widgets/WidgetTypeSelectionModal";
+import { useSourcesQuery } from "@/data/repositories/datasources";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function WidgetListPage() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { data: sources = [] } = useSourcesQuery({ queryClient });
+
   const {
     tableData,
     isLoading,
@@ -28,13 +36,17 @@ export default function WidgetListPage() {
     hasPermission,
   } = useWidgetListPage();
 
-  // Définition des colonnes avec useMemo pour éviter le recalcul à chaque rendu
-  // Correction : la Table filtre les colonnes sans label, donc il faut mettre un label non vide pour la colonne icône
+  const handleCreateWidget = (sourceId: string, type: WidgetType) => {
+    setShowCreateModal(false);
+    // Naviguer vers la page de création avec les paramètres
+    navigate(`${ROUTES.createWidget}?sourceId=${sourceId}&type=${type}`);
+  };
+
   const columns = useMemo(
     () => [
       {
         key: "icon",
-        label: " ", // espace pour que la colonne soit considérée comme valide
+        label: " ",
         render: (row: Widget) => {
           const widgetDef = WIDGETS[row.type as keyof typeof WIDGETS];
           const Icon = widgetDef?.icon;
@@ -74,12 +86,13 @@ export default function WidgetListPage() {
       <div className="flex items-center justify-end mb-3">
         <div className="flex items-center gap-2">
           {hasPermission("widget:canCreate") && (
-            <Link
-              to={ROUTES.createWidget}
-              className=" w-max text-indigo-500 underline hover:text-indigo-600 font-medium"
+            <Button
+              color="indigo"
+              onClick={() => setShowCreateModal(true)}
+              className="w-max"
             >
               Ajouter une visualisation
-            </Link>
+            </Button>
           )}
         </div>
       </div>
@@ -175,6 +188,13 @@ export default function WidgetListPage() {
         }
         loading={deleteMutation.isPending}
         widget={selectedWidget}
+      />
+
+      <WidgetTypeSelectionModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onConfirm={handleCreateWidget}
+        sources={sources}
       />
     </div>
   );

@@ -1,7 +1,7 @@
-import widgetService from "@/services/widgetService";
+import widgetService from "@services/widgetService";
 import { Request, Response, NextFunction } from "express";
-import { handleServiceResult } from "@/utils/api";
-import { AuthRequest } from "@/types/authType";
+import { handleServiceResult } from "@utils/api";
+import { AuthRequest } from "@type/authType";
 
 /**
  * Contrôleur pour gérer les opérations liées aux widgets.

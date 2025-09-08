@@ -1,8 +1,9 @@
-import type { DashboardLayoutItem } from "@/core/types/dashboard-types";
-import type { Dashboard } from "@/core/types/dashboard-types";
-import type { ApiResponse } from "@/core/types/api";
-import api from "./api";
-import { extractApiData } from "../../core/utils/api-utils";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { DashboardLayoutItem } from "@type/dashboardTypes";
+import type { Dashboard } from "@type/dashboardTypes";
+import type { ApiResponse } from "@type/api";
+import api from "@services/api";
+import { extractApiData } from "@utils/apiUtils";
 
 export async function fetchDashboard(id?: string): Promise<Dashboard> {
   const res = await api.get<ApiResponse<Dashboard>>(`/dashboards/${id}`);
@@ -14,7 +15,6 @@ export async function saveDashboardLayout(
   layout: DashboardLayoutItem[],
   title?: string,
   config?: {
-    autoRefreshInterval?: number;
     autoRefreshIntervalValue?: number;
     autoRefreshIntervalUnit?: string;
     timeRange?: any;

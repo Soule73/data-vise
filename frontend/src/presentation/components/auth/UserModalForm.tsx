@@ -1,25 +1,10 @@
-import Modal from "@/presentation/components/Modal";
-import InputField from "@/presentation/components/forms/InputField";
-import SelectField from "@/presentation/components/SelectField";
-import Button from "@/presentation/components/forms/Button";
-import type { User } from "@/core/types/auth-types";
-import type { UseFormReturn } from "react-hook-form";
+import Modal from "@components/Modal";
+import InputField from "@components/forms/InputField";
+import SelectField from "@components/SelectField";
+import Button from "@components/forms/Button";
+import type { User } from "@type/authTypes";
 import React from "react";
-
-interface UserModalFormProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: () => void;
-  loading: boolean;
-  editingUser: boolean;
-  form: User;
-  setForm: React.Dispatch<React.SetStateAction<User>>;
-  formHook: UseFormReturn<any>;
-  showPassword: boolean;
-  generatePassword: () => void;
-  rolesList: { value: string; label: string }[];
-  getErrorMsg: (err: unknown) => string | undefined;
-}
+import type { UserModalFormProps } from "@type/ui";
 
 export default function UserModalForm({
   open,
@@ -46,7 +31,6 @@ export default function UserModalForm({
     formHook.setValue(e.target.name, value);
   }
 
-  // Cast pour permettre password optionnel
   const formWithPassword = form as User & { password?: string };
 
   return (

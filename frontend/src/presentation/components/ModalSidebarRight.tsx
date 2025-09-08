@@ -1,7 +1,8 @@
 import { Fragment } from 'react';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import type { ModalProps } from '@/core/types/layout-types';
+import type { ModalProps } from '@type/layoutTypes';
+import Button from '@components/forms/Button';
 
 export default function ModalSidebarRight({
     open,
@@ -11,9 +12,9 @@ export default function ModalSidebarRight({
     footer,
     hideCloseButton = false,
     className = '',
-    size = 'md', // Optionnel, pour largeur personnalisable
+    size = 'md',
 }: ModalProps) {
-    // Largeur du panneau latéral
+
     const widthMap = {
         sm: 'w-80',
         md: 'w-[28rem]',
@@ -50,14 +51,14 @@ export default function ModalSidebarRight({
                                 <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
                                     {!hideCloseButton && (
-                                        <button
+                                        <Button
                                             type="button"
-                                            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                                            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm !w-8 !h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white "
                                             onClick={onClose}
                                             aria-label="Fermer le panneau"
                                         >
                                             <XMarkIcon className="w-5 h-5" aria-hidden="true" />
-                                        </button>
+                                        </Button>
                                     )}
                                 </div>
                             )}

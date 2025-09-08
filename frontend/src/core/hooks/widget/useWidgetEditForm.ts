@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useNotificationStore } from "@/core/store/notification";
-import { useDashboardStore } from "@/core/store/dashboard";
-import { ROUTES } from "@/core/constants/routes";
-import { fetchWidgetById, updateWidget } from "@/data/services/widget";
-import type { DataSource } from "@/core/types/data-source";
-import type { WidgetType,Widget } from "@/core/types/widget-types";
-import { dataBySourceQuery, sourcesQuery } from "@/data/repositories/sources";
+import { useNotificationStore } from "@store/notification";
+import { useDashboardStore } from "@store/dashboard";
+import { ROUTES } from "@constants/routes";
+import { fetchWidgetById, updateWidget } from "@services/widget";
+import type { DataSource } from "@type/dataSource";
+import type { WidgetType, Widget } from "@type/widgetTypes";
+import { useDataBySourceQuery, useSourcesQuery } from "@/data/repositories/datasources";
 import { useQueryClient } from "@tanstack/react-query";
-import { useWidgetForm } from "./useWidgetForm";
+import { useCommonWidgetForm } from "@hooks/widget/useCommonWidgetForm";
 
 export function useWidgetEditForm() {
   const queryClient = useQueryClient();
@@ -27,9 +27,9 @@ export function useWidgetEditForm() {
   const [formReady, setFormReady] = useState(false);
 
   // Liste Data source
-  const { data: sources = [] } = sourcesQuery({ queryClient });
+  const { data: sources = [] } = useSourcesQuery({ queryClient });
   // Charge les données de la source via id
-  const { data: realSourceData } = dataBySourceQuery(source?._id ?? "");
+  const { data: realSourceData } = useDataBySourceQuery(source?._id ?? "");
 
   // Initialise les colonnes à partir des données de la source (comme en création)
   useEffect(() => {
@@ -73,7 +73,7 @@ export function useWidgetEditForm() {
         } else {
           setSource(null);
         }
-      } catch (e) {
+      } catch {
         setError("Impossible de charger le widget");
       } finally {
         setLoading(false);
@@ -84,45 +84,31 @@ export function useWidgetEditForm() {
 
   // Préparer les valeurs initiales pour le hook formulaire dès que tout est chargé
   useEffect(() => {
-    if (widget && source && columns.length > 0) {
+    if (widget && source && columns.length > 0 && realSourceData) {
       setFormReady(true);
     }
-  }, [widget, source, columns]);
+  }, [widget, source, columns, realSourceData]);
 
-  // Utilisation du hook formulaire avec initialValues (comme en création)
-  const form = useWidgetForm(
-    formReady
-      ? {
-          type: (widget?.type as WidgetType) || "bar",
-          config: config,
-          title: widgetTitle,
-          sourceId: widget?.dataSourceId,
-          columns: columns,
-          dataPreview: Array.isArray(realSourceData)
-            ? (realSourceData as Record<string, unknown>[])
-            : [],
-          visibility: visibility,
-          disableAutoConfig: true,
-        }
-      : undefined
-  );
+  // Préparer les valeurs initiales une fois que tout est prêt (useMemo pour éviter la re-création)
+  const initialValues = useMemo(() => {
+    if (!formReady) return undefined;
 
-  // Synchronise le formulaire avec les données chargées (widget, config, etc.)
-  useEffect(() => {
-    if (formReady) {
-      form.setType((widget?.type as WidgetType) || "bar");
-      form.setConfig(config || {});
-      form.setTitle(widgetTitle || "");
-      form.setSourceId(widget?.dataSourceId || "");
-      form.setColumns(columns || []);
-      form.setVisibility(visibility || "private");
-      form.setWidgetTitle(widgetTitle || "");
-      // Pour la preview
-      if (realSourceData) {
-        form.setDataPreview(realSourceData);
-      }
-    }
-  }, [formReady, widget, config, widgetTitle, columns, visibility, realSourceData]);
+    return {
+      type: (widget?.type as WidgetType) || "bar",
+      config: config,
+      title: widgetTitle,
+      sourceId: widget?.dataSourceId,
+      columns: columns,
+      dataPreview: Array.isArray(realSourceData)
+        ? (realSourceData as Record<string, unknown>[])
+        : [],
+      visibility: visibility,
+      disableAutoConfig: true, // IMPORTANT: empêche l'auto-génération
+    };
+  }, [formReady, widget?.type, widget?.dataSourceId, config, widgetTitle, columns, realSourceData, visibility]);
+
+  // Utilisation du hook centralisé avec initialValues
+  const form = useCommonWidgetForm(initialValues);
 
   // Gestion de la sauvegarde spécifique à l'édition
   async function handleSave() {

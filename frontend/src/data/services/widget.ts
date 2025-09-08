@@ -1,9 +1,7 @@
-import api from "./api";
-import { extractApiData } from "../../core/utils/api-utils";
-import type { Widget } from "@/core/types/widget-types";
-import type { ApiResponse } from "@/core/types/api";
-
-// Les fonctions extractApiError et extractApiData seront déplacées dans un utilitaire commun.
+import api from "@services/api";
+import { extractApiData } from "@utils/apiUtils";
+import type { Widget } from "@type/widgetTypes";
+import type { ApiResponse } from "@type/api";
 
 export async function fetchWidgets(): Promise<Widget[]> {
   const response = await api.get<ApiResponse<Widget[]>>("/widgets");

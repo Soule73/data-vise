@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { IWidget } from "./widgetType";
+import { IWidget } from "@type/widgetType";
 
 export interface DashboardLayoutItem {
   widgetId: string;
@@ -33,7 +33,6 @@ export interface IDashboard extends mongoose.Document {
 export interface DashboardBasePayload {
   title?: string;
   layout?: DashboardLayoutItem[];
-  autoRefreshInterval?: number;
   autoRefreshIntervalValue?: number;
   autoRefreshIntervalUnit?: string;
   timeRange?: unknown;

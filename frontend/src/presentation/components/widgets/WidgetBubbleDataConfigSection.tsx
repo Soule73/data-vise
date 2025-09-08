@@ -1,131 +1,107 @@
-import SelectField from "@/presentation/components/SelectField";
-import InputField from "@/presentation/components/forms/InputField";
-import Button from "@/presentation/components/forms/Button";
-import { XMarkIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
-import type { BubbleMetricConfig } from "@/core/types/metric-bucket-types";
-import type { WidgetBubbleDataConfigSectionProps } from "@/core/types/widget-types";
+import SelectField from "@components/SelectField";
+import InputField from "@components/forms/InputField";
+import DatasetSection from "@components/widgets/DatasetSection";
+import DatasetFiltersConfig from "@components/widgets/DatasetFiltersConfig";
+import type { BubbleMetricConfig } from "@type/metricBucketTypes";
+import type { WidgetBubbleDataConfigSectionProps } from "@type/widgetTypes";
 
+/**
+ * Configuration spécialisée pour les graphiques bubble
+ * Gère les champs X, Y, R et les filtres par dataset
+ */
 export default function WidgetBubbleDataConfigSection({
   metrics,
   columns,
+  data,
   handleConfigChange,
 }: WidgetBubbleDataConfigSectionProps) {
+
+  const xOptions = Array.isArray(columns)
+    ? columns.map((col) => ({ value: col, label: col }))
+    : [];
+
+  const yOptions = Array.isArray(columns)
+    ? columns.map((col) => ({ value: col, label: col }))
+    : [];
+
+  const rOptions = Array.isArray(columns)
+    ? columns.map((col) => ({ value: col, label: col }))
+    : [];
+
+  const renderBubbleDatasetContent = (dataset: BubbleMetricConfig, idx: number, onUpdate: (updatedDataset: BubbleMetricConfig) => void) => (
+    <div className="grid gap-2">
+      <SelectField
+        textSize="sm"
+        label="Champ X"
+        value={dataset.x || ""}
+        onChange={(e) => {
+          onUpdate({ ...dataset, x: e.target.value });
+        }}
+        options={xOptions}
+        name={`bubble-x-${idx}`}
+        id={`bubble-x-${idx}`}
+      />
+      <SelectField
+        textSize="sm"
+        label="Champ Y"
+        value={dataset.y || ""}
+        onChange={(e) => {
+          onUpdate({ ...dataset, y: e.target.value });
+        }}
+        options={yOptions}
+        name={`bubble-y-${idx}`}
+        id={`bubble-y-${idx}`}
+      />
+      <SelectField
+        textSize="sm"
+        label="Champ Rayon (r)"
+        value={dataset.r || ""}
+        onChange={(e) => {
+          onUpdate({ ...dataset, r: e.target.value });
+        }}
+        options={rOptions}
+        name={`bubble-r-${idx}`}
+        id={`bubble-r-${idx}`}
+      />
+      <InputField
+        textSize="sm"
+        label="Label du dataset"
+        value={dataset.label || ""}
+        onChange={(e) => {
+          const target = e.target as HTMLInputElement;
+          onUpdate({ ...dataset, label: target.value });
+        }}
+        name={`bubble-label-${idx}`}
+        id={`bubble-label-${idx}`}
+      />
+      <DatasetFiltersConfig
+        filters={dataset.datasetFilters || []}
+        columns={columns}
+        data={data}
+        onFiltersChange={(filters) => onUpdate({ ...dataset, datasetFilters: filters })}
+        datasetIndex={idx}
+      />
+    </div>
+  );
+
+  const createNewDataset = () => ({
+    agg: "none",
+    field: "",
+    x: columns[0] || "",
+    y: columns[1] || "",
+    r: columns[2] || "",
+    label: "",
+  });
+
   return (
-    <div className="space-y-4">
-      <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 shadow">
-        <div className="font-semibold mb-1">Datasets (x, y, r)</div>
-        <div className="space-y-2">
-          {metrics.map((dataset: BubbleMetricConfig, idx: number) => (
-            <div
-              key={idx}
-              className="flex flex-col gap-2 border-b pb-2 mb-2 relative group bg-white/60 dark:bg-gray-900/60 rounded p-2"
-            >
-              <div className="flex gap-2 items-center">
-                <span className="font-medium text-sm text-gray-700 dark:text-gray-300">
-                  Dataset {idx + 1}
-                </span>
-                {metrics.length > 1 && (
-                  <button
-                    className="ml-auto p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded"
-                    onClick={() => {
-                      const newMetrics = metrics.filter(
-                        (_: BubbleMetricConfig, i: number) => i !== idx
-                      );
-                      handleConfigChange("metrics", newMetrics);
-                    }}
-                    title="Supprimer ce dataset"
-                  >
-                    <XMarkIcon className="w-5 h-5 text-red-500" />
-                  </button>
-                )}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-                <SelectField
-                  label="Champ X"
-                  value={dataset.x || ""}
-                  onChange={(e) => {
-                    const newMetrics = [...metrics];
-                    newMetrics[idx] = { ...dataset, x: e.target.value };
-                    handleConfigChange("metrics", newMetrics);
-                  }}
-                  options={
-                    Array.isArray(columns)
-                      ? columns.map((col) => ({ value: col, label: col }))
-                      : []
-                  }
-                  name={`bubble-x-${idx}`}
-                  id={`bubble-x-${idx}`}
-                />
-                <SelectField
-                  label="Champ Y"
-                  value={dataset.y || ""}
-                  onChange={(e) => {
-                    const newMetrics = [...metrics];
-                    newMetrics[idx] = { ...dataset, y: e.target.value };
-                    handleConfigChange("metrics", newMetrics);
-                  }}
-                  options={
-                    Array.isArray(columns)
-                      ? columns.map((col) => ({ value: col, label: col }))
-                      : []
-                  }
-                  name={`bubble-y-${idx}`}
-                  id={`bubble-y-${idx}`}
-                />
-                <SelectField
-                  label="Champ Rayon (r)"
-                  value={dataset.r || ""}
-                  onChange={(e) => {
-                    const newMetrics = [...metrics];
-                    newMetrics[idx] = { ...dataset, r: e.target.value };
-                    handleConfigChange("metrics", newMetrics);
-                  }}
-                  options={
-                    Array.isArray(columns)
-                      ? columns.map((col) => ({ value: col, label: col }))
-                      : []
-                  }
-                  name={`bubble-r-${idx}`}
-                  id={`bubble-r-${idx}`}
-                />
-                <InputField
-                  label="Label du dataset"
-                  value={dataset.label || ""}
-                  onChange={(e) => {
-                    const target = e.target as HTMLInputElement;
-                    const newMetrics = [...metrics];
-                    newMetrics[idx] = { ...dataset, label: target.value };
-                    handleConfigChange("metrics", newMetrics);
-                  }}
-                  name={`bubble-label-${idx}`}
-                  id={`bubble-label-${idx}`}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        <Button
-          color="indigo"
-          className="mt-2 w-max mx-auto !bg-gray-300 dark:!bg-gray-700 hover:!bg-gray-200 dark:hover:!bg-gray-600 !border-none"
-          variant="outline"
-          onClick={() => {
-            handleConfigChange("metrics", [
-              ...metrics,
-              {
-                agg: "none",
-                field: "",
-                x: columns[0] || "",
-                y: columns[1] || "",
-                r: columns[2] || "",
-                label: "",
-              },
-            ]);
-          }}
-        >
-          <PlusCircleIcon className="w-5 h-5 mr-1" />
-          Ajouter un dataset
-        </Button>
-      </div>
+    <div className="space-y-6">
+      <DatasetSection
+        title="Datasets (x, y, r)"
+        datasets={metrics}
+        onDatasetsChange={(newMetrics) => handleConfigChange("metrics", newMetrics)}
+        createNewDataset={createNewDataset}
+        renderDatasetContent={renderBubbleDatasetContent}
+      />
     </div>
   );
 }

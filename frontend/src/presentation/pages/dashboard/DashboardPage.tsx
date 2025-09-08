@@ -1,19 +1,19 @@
-import DashboardGrid from "@/presentation/components/dashoards/DashboardGrid";
-import WidgetSelectModal from "@/presentation/components/widgets/WidgetSelectModal";
-import { useDashboard } from "@/core/hooks/dashboard/useDashboard";
-import DashboardHeader from "../../components/dashoards/DashboardHeader";
-import { EmptyDashboard } from "@/presentation/components/dashoards/EmptyDashboard";
-import { DashboardSaveModal } from "./DashboardSaveModal";
-import ExportPDFModal from "@/presentation/components/ExportPDFModal";
+import DashboardGrid from "@components/dashoards/DashboardGrid";
+import WidgetSelectModal from "@components/widgets/WidgetSelectModal";
+import { useDashboard } from "@hooks/dashboard/useDashboard";
+import DashboardHeader from "@components/dashoards/DashboardHeader";
+import { EmptyDashboard } from "@components/dashoards/EmptyDashboard";
+import { DashboardSaveModal } from "@components/DashboardSaveModal";
+import ExportPDFModal from "@components/ExportPDFModal";
+import DashboardConfigFields from "@components/dashoards/DashboardConfigFields";
 
 export default function DashboardPage() {
-  // --- Hooks et stores ---
   const {
     sources,
     saving,
     selectOpen,
     setSelectOpen,
-    layout,
+    layout = [],
     editMode,
     setEditMode,
     hasUnsavedChanges,
@@ -62,16 +62,30 @@ export default function DashboardPage() {
     setExportPDFModalOpen,
   } = useDashboard();
 
-  // --- Rendu ---
+  const canUpdate = hasPermission("dashboard:canUpdate");
+  const isEditing = editMode || isCreate;
+  const isEmpty = layout.length === 0;
+
+  const gridProps = {
+    layout,
+    sources: sources ?? [],
+    handleAddWidget: openAddWidgetModal,
+    timeRangeFrom: effectiveFrom,
+    timeRangeTo: effectiveTo,
+    refreshMs,
+    forceRefreshKey,
+    hasUnsavedChanges,
+  };
+  const swapHandler = isEditing ? handleSwapLayout : undefined;
+
   return (
     <>
-      {/* Sélecteur de widget */}
       <WidgetSelectModal
         open={selectOpen}
         onClose={() => setSelectOpen(false)}
         onSelect={handleAddWidget}
       />
-      {/* Modal de sauvegarde */}
+
       <DashboardSaveModal
         saving={saving}
         saveModalOpen={saveModalOpen}
@@ -84,7 +98,7 @@ export default function DashboardPage() {
         visibility={visibility}
         setVisibility={setVisibility}
       />
-      {/* Header dashboard */}
+
       <DashboardHeader
         editMode={editMode}
         isCreate={isCreate}
@@ -94,20 +108,6 @@ export default function DashboardPage() {
         handleCancelEdit={handleCancelEdit}
         setEditMode={setEditMode}
         saving={saving}
-        handleSaveConfig={handleSaveConfig}
-        autoRefreshIntervalValue={autoRefreshIntervalValue}
-        autoRefreshIntervalUnit={autoRefreshIntervalUnit}
-        timeRangeFrom={timeRangeFrom}
-        timeRangeTo={timeRangeTo}
-        relativeValue={relativeValue}
-        relativeUnit={relativeUnit}
-        timeRangeMode={timeRangeMode}
-        handleChangeAutoRefresh={handleChangeAutoRefresh}
-        handleChangeTimeRangeAbsolute={handleChangeTimeRangeAbsolute}
-        handleChangeTimeRangeRelative={handleChangeTimeRangeRelative}
-        handleChangeTimeRangeMode={handleChangeTimeRangeMode}
-        savingConfig={saving}
-        onForceRefresh={() => setForceRefreshKey((k) => k + 1)}
         shareLoading={shareLoading}
         shareError={shareError}
         shareLink={shareLink}
@@ -117,45 +117,40 @@ export default function DashboardPage() {
         handleDisableShare={handleDisableShare}
         handleCopyShareLink={handleCopyShareLink}
         handleExportPDF={() => setExportPDFModalOpen(true)}
-      />
-      {/* Modal d'export PDF */}
+      >
+        {canUpdate && (
+          <DashboardConfigFields
+            autoRefreshIntervalValue={autoRefreshIntervalValue}
+            autoRefreshIntervalUnit={autoRefreshIntervalUnit}
+            timeRangeFrom={timeRangeFrom}
+            timeRangeTo={timeRangeTo}
+            relativeValue={relativeValue}
+            relativeUnit={relativeUnit}
+            timeRangeMode={timeRangeMode}
+            handleChangeAutoRefresh={handleChangeAutoRefresh}
+            handleChangeTimeRangeAbsolute={handleChangeTimeRangeAbsolute}
+            handleChangeTimeRangeRelative={handleChangeTimeRangeRelative}
+            handleChangeTimeRangeMode={handleChangeTimeRangeMode}
+            onSave={handleSaveConfig}
+            saving={saving}
+            onForceRefresh={() => setForceRefreshKey((k) => k + 1)}
+          />
+        )}
+      </DashboardHeader>
+
       <ExportPDFModal
         open={exportPDFModalOpen}
         onClose={() => setExportPDFModalOpen(false)}
         onExport={handleExportPDF}
       />
-      {/* Grille ou placeholder */}
-      {isCreate ? (
-        layout.length === 0 ? (
-          <EmptyDashboard />
-        ) : (
-          <DashboardGrid
-            layout={layout ?? []}
-            onSwapLayout={handleSwapLayout}
-            sources={sources ?? []}
-            editMode={true}
-            hasUnsavedChanges={hasUnsavedChanges}
-            handleAddWidget={openAddWidgetModal}
-            timeRangeFrom={effectiveFrom}
-            timeRangeTo={effectiveTo}
-            refreshMs={refreshMs}
-            forceRefreshKey={forceRefreshKey}
-          />
-        )
-      ) : layout.length === 0 ? (
+
+      {isEmpty ? (
         <EmptyDashboard />
       ) : (
         <DashboardGrid
-          layout={layout}
-          onSwapLayout={editMode ? handleSwapLayout : undefined}
-          sources={sources ?? []}
-          editMode={editMode}
-          hasUnsavedChanges={hasUnsavedChanges}
-          handleAddWidget={openAddWidgetModal}
-          timeRangeFrom={effectiveFrom}
-          timeRangeTo={effectiveTo}
-          refreshMs={refreshMs}
-          forceRefreshKey={forceRefreshKey}
+          {...gridProps}
+          editMode={isEditing}
+          onSwapLayout={swapHandler}
         />
       )}
     </>

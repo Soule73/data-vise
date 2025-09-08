@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import Modal from "./Modal";
-import SelectField from "./SelectField";
-import Button from "./forms/Button";
-import type { ExportPDFModalProps } from "@/core/types/dashboard-types";
+import Modal from "@components/Modal";
+import SelectField from "@components/SelectField";
+import Button from "@components/forms/Button";
+import type { ExportPDFModalProps } from "@type/dashboardTypes";
 
 const ExportPDFModal: React.FC<ExportPDFModalProps> = ({
   open,
@@ -26,7 +26,8 @@ const ExportPDFModal: React.FC<ExportPDFModalProps> = ({
             id="pdf-orientation"
             label="Orientation"
             value={orientation}
-            onChange={(e: any) => setOrientation(e.target.value)}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onChange={(e: React.ChangeEvent<any>) => setOrientation(e.target.value as "portrait" | "landscape")}
             options={[
               { value: "landscape", label: "Paysage" },
               { value: "portrait", label: "Portrait" },

@@ -1,12 +1,12 @@
-import { useUserManagement } from "@/core/hooks/auth/useUserManagement";
-import Table from "@/presentation/components/Table";
-import Button from "@/presentation/components/forms/Button";
+import { useUserManagement } from "@hooks/auth/useUserManagement";
+import Table from "@components/Table";
+import Button from "@components/forms/Button";
 import { useEffect } from "react";
-import { useDashboardStore } from "@/core/store/dashboard";
-import type { User } from "@/core/types/auth-types";
-import { ROUTES } from "@/core/constants/routes";
-import UserModalForm from "@/presentation/components/auth/UserModalForm";
-import UserDeleteModal from "@/presentation/components/auth/UserDeleteModal";
+import { useDashboardStore } from "@store/dashboard";
+import type { User } from "@type/authTypes";
+import { ROUTES } from "@constants/routes";
+import UserModalForm from "@components/auth/UserModalForm";
+import UserDeleteModal from "@components/auth/UserDeleteModal";
 
 function getErrorMsg(err: unknown) {
   if (!err) return undefined;
@@ -46,8 +46,6 @@ export default function UserManagementPage() {
     hasPermission,
     rolesList,
   } = useUserManagement();
-
-  // Synchronise le form local et react-hook-form
 
   return (
     <div className="max-w-5xl mx-auto py-4 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 shadow-sm">

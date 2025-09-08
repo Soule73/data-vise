@@ -1,8 +1,8 @@
-import Modal from "@/presentation/components/Modal";
-import InputField from "@/presentation/components/forms/InputField";
-import Button from "@/presentation/components/forms/Button";
-import type { WidgetSaveTitleModalProps } from "@/core/types/widget-types";
-import CheckboxField from "../forms/CheckboxField";
+import Modal from "@components/Modal";
+import InputField from "@components/forms/InputField";
+import Button from "@components/forms/Button";
+import type { WidgetSaveTitleModalProps } from "@type/widgetTypes";
+import CheckboxField from "@components/forms/CheckboxField";
 
 export default function WidgetSaveTitleModal({
   open,

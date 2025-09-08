@@ -1,11 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { useUserStore } from "@/core/store/user";
-import { useLoginMutation } from "@/data/repositories/auth";
-import { loginSchema, type LoginForm } from "@/core/validation/login";
+import { useUserStore } from "@store/user";
+import { useLoginMutation } from "@repositories/auth";
+import { loginSchema, type LoginForm } from "@validation/login";
 import { useState } from "react";
-import { ROUTES } from "../../constants/routes";
+import { ROUTES } from "@constants/routes";
+import type { ApiError } from "@type/api";
 
 export function useLoginForm() {
   const setUser = useUserStore((s) => s.setUser);
@@ -19,9 +20,9 @@ export function useLoginForm() {
       setGlobalError("");
       navigate(ROUTES.dashboard);
     },
-    onError: (e: any) => {
-      if (e.response?.data?.errors) {
-        Object.entries(e.response.data.errors).forEach(([field, message]) => {
+    onError: (e: ApiError) => {
+      if (e?.errors) {
+        Object.entries(e.errors).forEach(([field, message]) => {
           form.setError(field as keyof LoginForm, {
             type: "manual",
             message: message as string,
@@ -29,7 +30,7 @@ export function useLoginForm() {
         });
         setGlobalError("");
       } else {
-        setGlobalError(e.response?.data?.message || "Erreur de connexion");
+        setGlobalError(e.message || "Erreur de connexion");
       }
     },
   });

@@ -1,4 +1,4 @@
-import { useLineChartLogic } from "@/core/hooks/visualizations/useLineChartVM";
+import { useLineChartLogic } from "@hooks/visualizations/charts";
 import { PresentationChartLineIcon } from "@heroicons/react/24/outline";
 import {
   Chart as ChartJS,
@@ -12,9 +12,9 @@ import {
   Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import InvalideConfigWidget from "./InvalideConfigWidget";
-import NoDataWidget from "./NoDataWidget";
-import type { LineChartConfig } from "@/core/types/visualization";
+import InvalideConfigWidget from "@components/widgets/InvalideConfigWidget";
+import NoDataWidget from "@components/widgets/NoDataWidget";
+import type { LineChartWidgetProps } from "@type/widgetTypes";
 
 ChartJS.register(
   LineElement,
@@ -30,19 +30,17 @@ ChartJS.register(
 export default function LineChartWidget({
   data,
   config,
-  //@ts-ignore
-  editMode,
-}: {
-  data: Record<string, any>[];
-  config: LineChartConfig;
-  editMode?: boolean;
-}) {
+}: LineChartWidgetProps) {
+  const { chartData, options, showNativeValues, valueLabelsPlugin } =
+    useLineChartLogic({ data, config });
+
   if (
     !data ||
     !config.metrics ||
-    !config.bucket ||
+    !config.buckets ||
     !Array.isArray(config.metrics) ||
-    !config.bucket.field
+    !config.buckets.length ||
+    !config.buckets[0]?.field
   ) {
     return <InvalideConfigWidget />;
   }
@@ -56,8 +54,7 @@ export default function LineChartWidget({
       />
     );
   }
-  const { chartData, options, showNativeValues, valueLabelsPlugin } =
-    useLineChartLogic(data, config);
+
   return (
     <div className=" bg-white dark:bg-gray-900 rounded w-full max-w-full h-full flex items-center justify-center overflow-hidden">
       <Line
