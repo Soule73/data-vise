@@ -15,6 +15,30 @@
     ],
     "routes": [
         {
+            "src": "/api/health",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/auth/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/sources/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/widgets/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/dashboards/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/uploads/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
             "src": "/api/(.*)",
             "dest": "/backend/src/index.ts"
         },
