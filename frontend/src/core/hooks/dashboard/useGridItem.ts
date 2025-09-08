@@ -2,7 +2,7 @@ import { WIDGETS } from "@adapters/visualizations";
 import { useRef, useEffect, useMemo, useState } from "react";
 import type { DataSource } from "@type/dataSource";
 import { getWidgetDataFields } from "@utils/widgets/widgetDataFields";
-import { useDataBySourceQuery } from "@repositories/sources";
+import { useDataBySourceQuery } from "@/data/repositories/datasources";
 import {
   getWidgetComponent,
   getDataError,

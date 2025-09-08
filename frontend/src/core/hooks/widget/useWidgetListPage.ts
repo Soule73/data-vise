@@ -6,7 +6,7 @@ import {
   useDeleteWidgetMutation,
 } from "@repositories/widgets";
 import { useUserStore } from "@store/user";
-import { useSourcesQuery } from "@repositories/sources";
+import { useSourcesQuery } from "@/data/repositories/datasources";
 import { useQueryClient } from "@tanstack/react-query";
 import { WIDGETS } from "@adapters/visualizations";
 import type { DataSource } from "@type/dataSource";

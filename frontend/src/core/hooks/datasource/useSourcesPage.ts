@@ -2,7 +2,7 @@ import {
   useDeleteSourceMutation,
   useSourcesQuery,
   getUploadedFile,
-} from "@repositories/sources";
+} from "@/data/repositories/datasources";
 import { useNotificationStore } from "@store/notification";
 import { useUserStore } from "@store/user";
 import { useDashboardStore } from "@store/dashboard";

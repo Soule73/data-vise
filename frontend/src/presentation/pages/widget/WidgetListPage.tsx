@@ -12,7 +12,7 @@ import Badge from "@components/Badge";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
 import WidgetTypeSelectionModal from "@components/widgets/WidgetTypeSelectionModal";
-import { useSourcesQuery } from "@repositories/sources";
+import { useSourcesQuery } from "@/data/repositories/datasources";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function WidgetListPage() {

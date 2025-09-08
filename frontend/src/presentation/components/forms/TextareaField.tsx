@@ -22,7 +22,7 @@ const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
             id={id}
             rows={props.minRows || props.rows}
             className={[
-              "block w-full rounded-md bg-white dark:bg-gray-800 px-3 py-1.5 text-base text-gray-900 dark:text-gray-100 outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 transition-colors duration-300 font-mono",
+              "w-full rounded-md bg-white dark:bg-gray-900 px-3 py-2  text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors",
               className,
             ]
               .filter(Boolean)

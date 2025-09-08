@@ -82,8 +82,7 @@ export interface SourceFormProps {
   setShowModal: (b: boolean) => void;
   globalError: string;
   handleNext: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSubmit: (data: Record<string, any>) => void;
+  onSubmit: (data: SourceFormState) => void;
   isEdit?: boolean;
   filePath?: string | null;
   setFilePath?: (v: string | null) => void;

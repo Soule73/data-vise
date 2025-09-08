@@ -5,7 +5,7 @@ import { useDashboardStore } from "@store/dashboard";
 import { useNotificationStore } from "@store/notification";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import type { DashboardLayoutItem } from "@type/dashboardTypes";
-import { useSourcesQuery } from "@repositories/sources";
+import { useSourcesQuery } from "@/data/repositories/datasources";
 import type { IntervalUnit } from "@type/dashboardTypes";
 import { useUserStore } from "@store/user";
 import { ROUTES } from "@constants/routes";

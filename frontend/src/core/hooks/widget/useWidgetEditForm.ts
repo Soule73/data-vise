@@ -6,7 +6,7 @@ import { ROUTES } from "@constants/routes";
 import { fetchWidgetById, updateWidget } from "@services/widget";
 import type { DataSource } from "@type/dataSource";
 import type { WidgetType, Widget } from "@type/widgetTypes";
-import { useDataBySourceQuery, useSourcesQuery } from "@repositories/sources";
+import { useDataBySourceQuery, useSourcesQuery } from "@/data/repositories/datasources";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCommonWidgetForm } from "@hooks/widget/useCommonWidgetForm";
 

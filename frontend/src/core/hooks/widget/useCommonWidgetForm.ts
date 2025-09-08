@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSourcesQuery, useDataBySourceQuery } from "@repositories/sources";
+import { useSourcesQuery, useDataBySourceQuery } from "@/data/repositories/datasources";
 import type { DataSource } from "@type/dataSource";
 import type { WidgetType, WidgetFormInitialValues, WidgetConfig, CommonWidgetFormState } from "@type/widgetTypes";
 import {

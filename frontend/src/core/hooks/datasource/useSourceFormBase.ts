@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { dataSourceSchema } from "@validation/datasource";
 import { ZodError } from "zod";
-import { useDetectColumnsQuery } from "@repositories/sources";
+import { useDetectColumnsQuery } from "@/data/repositories/datasources";
 import {
   mapDetectedColumns,
   autoDetectTimestampField,

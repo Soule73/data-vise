@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@constants/routes";
 import { useNotificationStore } from "@store/notification";
-import { useCreateSourceMutation } from "@repositories/sources";
+import { useCreateSourceMutation } from "@/data/repositories/datasources";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSourceFormBase } from "@hooks/datasource/useSourceFormBase";
 import type { ApiError } from "@type/api";

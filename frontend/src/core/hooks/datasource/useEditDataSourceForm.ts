@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   useUpdateSourceMutation,
   useSourceByIdQuery,
-} from "@repositories/sources";
+} from "@/data/repositories/datasources";
 import { useNotificationStore } from "@store/notification";
 import { useDashboardStore } from "@store/dashboard";
 import { ROUTES } from "@constants/routes";
