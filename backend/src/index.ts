@@ -42,21 +42,23 @@ app.get("/", (req, res) => {
   res.json({ message: "API Data-Vise opérationnelle" });
 });
 
+// Initialisation MongoDB et permissions pour la production
 mongoose
   .connect(process.env.MONGO_URI || "", {
     serverSelectionTimeoutMS: 5000,
-
     connectTimeoutMS: 10000,
   })
   .then(async () => {
-
     await initPermissionsAndRoles();
 
-    app.listen(PORT, () => {
-      if (appDebug) {
-        console.log(`Serveur backend démarré sur ${appDomain}:${PORT}`);
-      }
-    });
+    // En développement local uniquement
+    if (process.env.NODE_ENV === 'development' && PORT) {
+      app.listen(PORT, () => {
+        if (appDebug) {
+          console.log(`Serveur backend démarré sur ${appDomain}:${PORT}`);
+        }
+      });
+    }
   })
   .catch((err) => {
     if (appDebug) {
@@ -83,3 +85,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     status,
   });
 });
+
+// Export pour Vercel (production sans port)
+export default app;

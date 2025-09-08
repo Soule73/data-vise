@@ -1,1 +1,36 @@
 node_modules/
+
+# Fichiers d'environnement - CRITIQUES pour la sécurité
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+frontend/.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Builds
+build/
+dist/
+.next/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads et données temporaires
+uploads/
+temp/
+*.tmp

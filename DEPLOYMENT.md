@@ -7,13 +7,15 @@
 Allez dans les paramètres de votre projet Vercel et ajoutez ces variables d'environnement :
 
 ```
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/database
-JWT_SECRET=your-super-secret-jwt-key
-CORS_ORIGIN=https://your-domain.vercel.app
-APP_DOMAIN=https://your-domain.vercel.app
+MONGO_URI=mongodb+srv://[USERNAME]:[PASSWORD]@[CLUSTER].mongodb.net/[DATABASE]
+JWT_SECRET=[VOTRE_CLE_JWT_SECRETE]
+CORS_ORIGIN=https://[VOTRE-DOMAINE].vercel.app
+APP_DOMAIN=https://[VOTRE-DOMAINE].vercel.app
 APP_DEBUG=false
-ELASTICSEARCH_URL=your-elasticsearch-url (si utilisé)
+ELASTICSEARCH_URL=[VOTRE_URL_ELASTICSEARCH]
 ```
+
+⚠️ **Important** : Remplacez les valeurs entre crochets par vos vraies valeurs sécurisées.
 
 ### 2. Base de données MongoDB
 
