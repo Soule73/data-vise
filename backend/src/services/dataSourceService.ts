@@ -54,7 +54,7 @@ const dataSourceService = {
       })
     );
 
-    return createApiSuccess(sourcesWithUsage);
+    return toApiData(sourcesWithUsage);
   },
 
 
@@ -80,7 +80,7 @@ const dataSourceService = {
       parseResult.data,
     );
 
-    return createApiSuccess(source);
+    return toApiData(source);
   },
 
 
@@ -102,7 +102,7 @@ const dataSourceService = {
 
     const count = await Widget.countDocuments({ dataSourceId: source._id });
 
-    return createApiSuccess({ ...source.toObject(), isUsed: count > 0 });
+    return toApiData({ ...source.toObject(), isUsed: count > 0 });
   },
 
 
@@ -167,7 +167,7 @@ const dataSourceService = {
       await fs.unlink(oldFilePath);
     }
 
-    return createApiSuccess(source);
+    return toApiData(source);
   },
 
 
@@ -202,7 +202,7 @@ const dataSourceService = {
       } catch (e) { }
     }
 
-    return createApiSuccess({ message: "Source supprimée." });
+    return toApiData({ message: "Source supprimée." });
   },
 
 
