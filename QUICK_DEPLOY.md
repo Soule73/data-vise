@@ -42,12 +42,14 @@
 
 5. **Configurer les variables d'environnement**
    ```
-   MONGO_URI = mongodb+srv://user:password@cluster.mongodb.net/database
-   JWT_SECRET = your-secret-key-here
-   CORS_ORIGIN = https://your-app.vercel.app
-   APP_DOMAIN = https://your-app.vercel.app
+   MONGO_URI = mongodb+srv://[USERNAME]:[PASSWORD]@[CLUSTER].mongodb.net/[DATABASE]
+   JWT_SECRET = [VOTRE_CLE_JWT_SECRETE]
+   CORS_ORIGIN = https://[VOTRE-APP].vercel.app
+   APP_DOMAIN = https://[VOTRE-APP].vercel.app
    APP_DEBUG = false
    ```
+
+   ⚠️ **Sécurité** : Remplacez les valeurs entre crochets par vos vraies valeurs.
 
 6. **Déployer**
    - Méthode automatique : Chaque push déclenchera un déploiement

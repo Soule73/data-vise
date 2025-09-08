@@ -1,17 +1,53 @@
 {
-    "buildCommand": "cd frontend && npm run build",
-    "outputDirectory": "frontend/dist",
+    "version": 2,
+    "builds": [
+        {
+            "src": "frontend/package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "dist"
+            }
+        },
+        {
+            "src": "backend/src/index.ts",
+            "use": "@vercel/node"
+        }
+    ],
     "routes": [
         {
             "src": "/api/health",
-            "dest": "/api/health.ts"
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/auth/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/sources/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/widgets/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/dashboards/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/uploads/(.*)",
+            "dest": "/backend/src/index.ts"
+        },
+        {
+            "src": "/api/(.*)",
+            "dest": "/backend/src/index.ts"
         },
         {
             "handle": "filesystem"
         },
         {
             "src": "/(.*)",
-            "dest": "/index.html"
+            "dest": "/frontend/dist/index.html"
         }
     ]
 }
