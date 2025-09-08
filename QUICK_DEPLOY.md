@@ -17,20 +17,30 @@
 
 ### 3. Déploiement via GitHub (Recommandé)
 
-1. **Pusher le code sur GitHub**
+1. **Générer les fichiers de verrouillage (si nécessaire)**
+   ```bash
+   .\generate-lockfiles.ps1  # Windows
+   ./generate-lockfiles.sh   # Linux/Mac
+   ```
+
+2. **Pusher le code sur GitHub**
    ```bash
    git add .
    git commit -m "Configuration déploiement Vercel"
    git push origin main
    ```
 
-2. **Connecter à Vercel**
+3. **Configurer les secrets GitHub** (pour déploiement automatique)
+   - Suivez le guide dans `GITHUB_SECRETS.md`
+   - Ajoutez `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+
+4. **Connecter à Vercel**
    - Allez sur [vercel.com](https://vercel.com)
    - Cliquez "New Project"
    - Importez votre repository GitHub
    - Vercel détectera automatiquement le `vercel.json`
 
-3. **Configurer les variables d'environnement**
+5. **Configurer les variables d'environnement**
    ```
    MONGO_URI = mongodb+srv://user:password@cluster.mongodb.net/database
    JWT_SECRET = your-secret-key-here
@@ -39,8 +49,9 @@
    APP_DEBUG = false
    ```
 
-4. **Déployer**
-   - Cliquez "Deploy"
+6. **Déployer**
+   - Méthode automatique : Chaque push déclenchera un déploiement
+   - Méthode manuelle : Cliquez "Deploy" sur Vercel
    - Attendez le déploiement (2-3 minutes)
 
 ### 4. Déploiement via CLI
@@ -98,16 +109,23 @@ vercel --prod
 ## 📱 Scripts utiles
 
 ```bash
-# Build local
+# Générer les package-lock.json si manquants
+.\generate-lockfiles.ps1  # Windows
+./generate-lockfiles.sh   # Linux/Mac
+
+# Build local pour tester
 npm run build --prefix frontend
 npm run build --prefix backend
 
-# Déploiement rapide
+# Déploiement manuel via CLI
 .\deploy.ps1  # Windows
 ./deploy.sh   # Linux/Mac
 
 # Voir les logs Vercel
 vercel logs
+
+# Voir les logs GitHub Actions
+# Allez dans l'onglet "Actions" de votre repository
 ```
 
 ## 🔒 Sécurité

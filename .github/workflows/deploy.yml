@@ -2,48 +2,91 @@ name: Deploy to Vercel
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main]
+
+env:
+  NODE_VERSION: '22'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: 📥 Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
+    - name: 📦 Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
-        cache: 'npm'
+        node-version: ${{ env.NODE_VERSION }}
 
-    - name: Install frontend dependencies
+    - name: 🗃️ Cache frontend dependencies
+      uses: actions/cache@v3
+      with:
+        path: frontend/node_modules
+        key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package*.json') }}
+        restore-keys: |
+          ${{ runner.os }}-frontend-
+
+    - name: 🗃️ Cache backend dependencies
+      uses: actions/cache@v3
+      with:
+        path: backend/node_modules
+        key: ${{ runner.os }}-backend-${{ hashFiles('backend/package*.json') }}
+        restore-keys: |
+          ${{ runner.os }}-backend-
+
+    - name: 📦 Install frontend dependencies
       run: |
         cd frontend
-        npm ci
+        if [ -f package-lock.json ]; then
+          echo "📋 Using npm ci for frontend"
+          npm ci
+        else
+          echo "📦 Using npm install for frontend"
+          npm install
+        fi
 
-    - name: Install backend dependencies
+    - name: 📦 Install backend dependencies
       run: |
         cd backend
-        npm ci
+        if [ -f package-lock.json ]; then
+          echo "📋 Using npm ci for backend"
+          npm ci
+        else
+          echo "📦 Using npm install for backend"
+          npm install
+        fi
 
-    - name: Build frontend
+    - name: 🏗️ Build frontend
       run: |
         cd frontend
+        echo "🏗️ Building frontend..."
         npm run build
+        echo "✅ Frontend build completed"
 
-    - name: Build backend
+    - name: 🏗️ Build backend
       run: |
         cd backend
+        echo "🏗️ Building backend..."
         npm run build
+        echo "✅ Backend build completed"
 
-    - name: Deploy to Vercel
+    - name: 🚀 Deploy to Vercel
+      if: github.event_name == 'push'
       uses: amondnet/vercel-action@v25
       with:
         vercel-token: ${{ secrets.VERCEL_TOKEN }}
         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
         vercel-args: '--prod'
+
+    - name: 📊 Deployment Summary
+      if: github.event_name == 'push'
+      run: |
+        echo "🎉 Deployment completed successfully!"
+        echo "📱 Frontend: Built and deployed"
+        echo "🔧 Backend API: Built and deployed"
+        echo "🌐 Check your Vercel dashboard for the deployment URL"
