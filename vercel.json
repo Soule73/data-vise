@@ -9,23 +9,18 @@
             }
         },
         {
-            "src": "backend/api/index.ts",
-            "use": "@vercel/node",
-            "config": {
-                "maxLambdaSize": "50mb",
-                "maxDuration": 30,
-                "memory": 1024
-            }
+            "src": "api/index.ts",
+            "use": "@vercel/node"
         }
     ],
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "/backend/api/index.ts"
+            "destination": "/api/index.ts"
         },
         {
             "source": "/(.*)",
-            "destination": "/frontend/dist/index.html"
+            "destination": "/index.html"
         }
     ],
     "redirects": [],
