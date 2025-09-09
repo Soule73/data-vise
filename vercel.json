@@ -1,19 +1,13 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "frontend/package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "distDir": "dist"
-            }
-        },
-        {
-            "src": "api/index.vercel.js",
-            "use": "@vercel/node"
+    "buildCommand": "cd backend && npm ci && npm run build && cd ../frontend && npm ci && npm run build",
+    "outputDirectory": "frontend/dist",
+    "installCommand": "npm install",
+    "functions": {
+        "api/**/*.js": {
+            "runtime": "nodejs22.x"
         }
-    ],
-    "installCommand": "cd backend && npm ci && npm run build && cd ../frontend && npm ci",
+    },
     "rewrites": [
         {
             "source": "/api/(.*)",
