@@ -39,24 +39,55 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  res.json({ message: "API Data-Vise opérationnelle" });
+  res.json({
+    message: "API Data-Vise opérationnelle",
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV,
+    routes: ["/api/auth", "/api/sources", "/api/widgets", "/api/dashboards", "/api/uploads"]
+  });
 });
 
+app.get("/api", (req, res) => {
+  res.json({
+    message: "API Data-Vise /api endpoint",
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV,
+    availableRoutes: [
+      "GET /api/auth/me",
+      "POST /api/auth/login",
+      "GET /api/sources",
+      "GET /api/widgets",
+      "GET /api/dashboards"
+    ]
+  });
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage()
+  });
+});
+
+// Initialisation MongoDB et permissions pour la production
 mongoose
   .connect(process.env.MONGO_URI || "", {
     serverSelectionTimeoutMS: 5000,
-
     connectTimeoutMS: 10000,
   })
   .then(async () => {
-
     await initPermissionsAndRoles();
 
-    app.listen(PORT, () => {
-      if (appDebug) {
-        console.log(`Serveur backend démarré sur ${appDomain}:${PORT}`);
-      }
-    });
+    // En développement local uniquement
+    if (process.env.NODE_ENV === 'development' && PORT) {
+      app.listen(PORT, () => {
+        if (appDebug) {
+          console.log(`Serveur backend démarré sur ${appDomain}:${PORT}`);
+        }
+      });
+    }
   })
   .catch((err) => {
     if (appDebug) {
@@ -83,3 +114,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     status,
   });
 });
+
+// Export pour Vercel (production sans port)
+export default app;

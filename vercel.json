@@ -22,6 +22,9 @@
             "dest": "/backend/api/index.ts"
         },
         {
+            "handle": "filesystem"
+        },
+        {
             "src": "/docs/(.*)",
             "dest": "/frontend/dist/docs/$1"
         },
