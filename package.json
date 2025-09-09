@@ -1,16 +1,16 @@
 {
-  "name": "data-vise-app",
-  "version": "1.0.0",
-  "description": "Data Vise - MERN Stack Application",
-  "scripts": {
-    "build": "echo 'Building...'",
-    "install:all": "cd backend && npm ci && cd ../frontend && npm ci"
-  },
-  "engines": {
-    "node": "22.x"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Soule73/data-vise.git"
-  }
+    "name": "data-vise-app",
+    "version": "1.0.0",
+    "description": "Data Vise - MERN Stack Application",
+    "scripts": {
+        "build": "echo 'Building...'",
+        "install:all": "cd backend && npm ci && cd ../frontend && npm ci"
+    },
+    "engines": {
+        "node": "22.x"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Soule73/data-vise.git"
+    }
 }
