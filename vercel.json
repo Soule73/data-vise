@@ -18,25 +18,14 @@
             }
         }
     ],
-    "routes": [
+    "rewrites": [
         {
-            "src": "/api/(.*)",
-            "dest": "/backend/api/index.ts"
+            "source": "/api/(.*)",
+            "destination": "/backend/api/index.ts"
         },
         {
-            "handle": "filesystem"
-        },
-        {
-            "src": "/docs/(.*)",
-            "dest": "/frontend/dist/docs/$1"
-        },
-        {
-            "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))",
-            "dest": "/frontend/dist/$1"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/frontend/dist/index.html"
+            "source": "/docs/(.*)",
+            "destination": "/frontend/dist/docs/$1"
         }
     ],
     "headers": [
@@ -57,5 +46,7 @@
                 }
             ]
         }
-    ]
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
 }
