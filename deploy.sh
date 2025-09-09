@@ -1,45 +1,66 @@
 #!/bin/bash
 
-# Script de déploiement pour Data Vise sur Vercel
+# Script de déploiement automatisé pour Data Vise
+# Usage: ./deploy.sh [preview|production]
 
-echo "🚀 Déploiement de Data Vise sur Vercel"
+set -e
 
-# Vérifier si Vercel CLI est installé
+echo "🚀 Déploiement Data Vise sur Vercel"
+echo "=================================="
+
+# Vérification des pré-requis
 if ! command -v vercel &> /dev/null; then
-    echo "❌ Vercel CLI n'est pas installé. Installation..."
-    npm install -g vercel
+    echo "❌ Vercel CLI non installé. Installation..."
+    npm i -g vercel
 fi
 
-# Build du frontend
-echo "📦 Build du frontend..."
-cd frontend
-npm run build
-if [ $? -ne 0 ]; then
-    echo "❌ Erreur lors du build du frontend"
+if ! command -v node &> /dev/null; then
+    echo "❌ Node.js requis"
     exit 1
 fi
-cd ..
 
-# Build du backend
-echo "📦 Build du backend..."
-cd backend
-npm run build
-if [ $? -ne 0 ]; then
-    echo "❌ Erreur lors du build du backend"
+# Mode de déploiement
+MODE=${1:-preview}
+echo "📦 Mode: $MODE"
+
+# Nettoyage des builds précédents
+echo "🧹 Nettoyage..."
+rm -rf frontend/dist/
+rm -rf backend/dist/
+
+# Installation des dépendances
+echo "📦 Installation des dépendances..."
+cd backend && npm ci --only=production
+cd ../frontend && npm ci
+
+# Vérification de la configuration
+echo "🔍 Vérification de la configuration..."
+if [ ! -f "../vercel.json" ]; then
+    echo "❌ vercel.json manquant"
     exit 1
 fi
+
+# Build local pour vérification
+echo "🔨 Build de vérification..."
+npm run build
+
 cd ..
 
-# Vérifier les variables d'environnement
-echo "🔍 Vérification des variables d'environnement..."
-if [ ! -f ".env" ]; then
-    echo "⚠️  Fichier .env manquant. Copiez .env.example vers .env et configurez vos variables"
-    echo "Ou configurez-les directement sur Vercel Dashboard"
+# Déploiement
+echo "🚀 Déploiement en cours..."
+if [ "$MODE" = "production" ]; then
+    vercel --prod --yes
+else
+    vercel --yes
 fi
 
-# Déploiement sur Vercel
-echo "🚀 Déploiement sur Vercel..."
-vercel --prod
+echo "✅ Déploiement terminé !"
+echo "🌐 Vérifiez votre application sur l'URL fournie par Vercel"
 
-echo "✅ Déploiement terminé!"
-echo "📱 Vérifiez votre application sur le domaine fourni par Vercel"
+# Instructions post-déploiement
+echo ""
+echo "📋 Instructions post-déploiement:"
+echo "1. Configurez les variables d'environnement dans Vercel Dashboard"
+echo "2. Vérifiez la connexion à MongoDB"
+echo "3. Testez les endpoints API"
+echo "4. Vérifiez le fonctionnement du frontend"

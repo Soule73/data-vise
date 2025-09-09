@@ -1,45 +1,66 @@
-# Script de déploiement PowerShell pour Data Vise sur Vercel
+# Script de déploiement PowerShell pour Data Vise
+# Usage: .\deploy.ps1 [-Mode "preview"|"production"]
 
-Write-Host "🚀 Déploiement de Data Vise sur Vercel" -ForegroundColor Green
+param(
+    [string]$Mode = "preview"
+)
 
-# Vérifier si Vercel CLI est installé
-try {
-    vercel --version | Out-Null
-} catch {
-    Write-Host "❌ Vercel CLI n'est pas installé. Installation..." -ForegroundColor Red
-    npm install -g vercel
+Write-Host "🚀 Déploiement Data Vise sur Vercel" -ForegroundColor Green
+Write-Host "==================================" -ForegroundColor Green
+
+# Vérification des pré-requis
+if (!(Get-Command "vercel" -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ Vercel CLI non installé. Installation..." -ForegroundColor Red
+    npm i -g vercel
 }
 
-# Build du frontend
-Write-Host "📦 Build du frontend..." -ForegroundColor Blue
-Set-Location frontend
-npm run build
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Erreur lors du build du frontend" -ForegroundColor Red
+if (!(Get-Command "node" -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ Node.js requis" -ForegroundColor Red
     exit 1
 }
-Set-Location ..
 
-# Build du backend
-Write-Host "📦 Build du backend..." -ForegroundColor Blue
-Set-Location backend
-npm run build
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Erreur lors du build du backend" -ForegroundColor Red
+Write-Host "📦 Mode: $Mode" -ForegroundColor Blue
+
+# Nettoyage des builds précédents
+Write-Host "🧹 Nettoyage..." -ForegroundColor Yellow
+if (Test-Path "frontend/dist") { Remove-Item -Recurse -Force "frontend/dist" }
+if (Test-Path "backend/dist") { Remove-Item -Recurse -Force "backend/dist" }
+
+# Installation des dépendances
+Write-Host "📦 Installation des dépendances..." -ForegroundColor Yellow
+Set-Location "backend"
+npm ci --only=production
+Set-Location "../frontend"
+npm ci
+
+# Vérification de la configuration
+Write-Host "🔍 Vérification de la configuration..." -ForegroundColor Yellow
+if (!(Test-Path "../vercel.json")) {
+    Write-Host "❌ vercel.json manquant" -ForegroundColor Red
     exit 1
 }
-Set-Location ..
 
-# Vérifier les variables d'environnement
-Write-Host "🔍 Vérification des variables d'environnement..." -ForegroundColor Blue
-if (!(Test-Path ".env")) {
-    Write-Host "⚠️  Fichier .env manquant. Copiez .env.example vers .env et configurez vos variables" -ForegroundColor Yellow
-    Write-Host "Ou configurez-les directement sur Vercel Dashboard" -ForegroundColor Yellow
+# Build local pour vérification
+Write-Host "🔨 Build de vérification..." -ForegroundColor Yellow
+npm run build
+
+Set-Location ".."
+
+# Déploiement
+Write-Host "🚀 Déploiement en cours..." -ForegroundColor Green
+if ($Mode -eq "production") {
+    vercel --prod --yes
+} else {
+    vercel --yes
 }
 
-# Déploiement sur Vercel
-Write-Host "🚀 Déploiement sur Vercel..." -ForegroundColor Green
-vercel --prod
+Write-Host "✅ Déploiement terminé !" -ForegroundColor Green
+Write-Host "🌐 Vérifiez votre application sur l'URL fournie par Vercel" -ForegroundColor Blue
 
-Write-Host "✅ Déploiement terminé!" -ForegroundColor Green
-Write-Host "📱 Vérifiez votre application sur le domaine fourni par Vercel" -ForegroundColor Cyan
+# Instructions post-déploiement
+Write-Host ""
+Write-Host "📋 Instructions post-déploiement:" -ForegroundColor Cyan
+Write-Host "1. Configurez les variables d'environnement dans Vercel Dashboard" -ForegroundColor White
+Write-Host "2. Vérifiez la connexion à MongoDB" -ForegroundColor White
+Write-Host "3. Testez les endpoints API" -ForegroundColor White
+Write-Host "4. Vérifiez le fonctionnement du frontend" -ForegroundColor White

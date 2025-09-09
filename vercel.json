@@ -9,45 +9,57 @@
             }
         },
         {
-            "src": "backend/src/index.ts",
-            "use": "@vercel/node"
+            "src": "backend/api/index.ts",
+            "use": "@vercel/node",
+            "config": {
+                "maxLambdaSize": "50mb"
+            }
         }
     ],
     "routes": [
         {
-            "src": "/api/health",
-            "dest": "/backend/src/index.ts"
-        },
-        {
-            "src": "/api/auth/(.*)",
-            "dest": "/backend/src/index.ts"
-        },
-        {
-            "src": "/api/sources/(.*)",
-            "dest": "/backend/src/index.ts"
-        },
-        {
-            "src": "/api/widgets/(.*)",
-            "dest": "/backend/src/index.ts"
-        },
-        {
-            "src": "/api/dashboards/(.*)",
-            "dest": "/backend/src/index.ts"
-        },
-        {
-            "src": "/api/uploads/(.*)",
-            "dest": "/backend/src/index.ts"
-        },
-        {
             "src": "/api/(.*)",
-            "dest": "/backend/src/index.ts"
+            "dest": "/backend/api/index.ts"
         },
         {
             "handle": "filesystem"
         },
         {
+            "src": "/docs/(.*)",
+            "dest": "/frontend/dist/docs/$1"
+        },
+        {
+            "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))",
+            "dest": "/frontend/dist/$1"
+        },
+        {
             "src": "/(.*)",
             "dest": "/frontend/dist/index.html"
+        }
+    ],
+    "functions": {
+        "backend/api/index.ts": {
+            "maxDuration": 30,
+            "memory": 1024
+        }
+    },
+    "headers": [
+        {
+            "source": "/api/(.*)",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "*"
+                },
+                {
+                    "key": "Access-Control-Allow-Methods",
+                    "value": "GET, POST, PUT, DELETE, OPTIONS"
+                },
+                {
+                    "key": "Access-Control-Allow-Headers",
+                    "value": "Content-Type, Authorization"
+                }
+            ]
         }
     ]
 }
