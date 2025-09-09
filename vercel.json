@@ -2,10 +2,10 @@
     "version": 2,
     "builds": [
         {
-            "src": "package.json",
+            "src": "frontend/package.json",
             "use": "@vercel/static-build",
             "config": {
-                "distDir": "frontend/dist"
+                "distDir": "dist"
             }
         },
         {
@@ -13,6 +13,7 @@
             "use": "@vercel/node"
         }
     ],
+    "installCommand": "cd backend && npm install && npm run build",
     "rewrites": [
         {
             "source": "/api/(.*)",
