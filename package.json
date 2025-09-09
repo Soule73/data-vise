@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Data Vise - MERN Stack Application",
     "scripts": {
-        "build": "echo 'Building...'",
+        "build": "cd backend && npm ci && npm run build && cd ../frontend && npm ci && npm run build",
         "install:all": "cd backend && npm ci && cd ../frontend && npm ci"
     },
     "engines": {
