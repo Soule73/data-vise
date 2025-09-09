@@ -10,6 +10,11 @@ export default defineConfig({
     react(),
     markdown()
   ],
+  base: "/",
+  build: {
+    outDir: "dist",
+    emptyOutDir: true
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
