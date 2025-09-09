@@ -40,8 +40,13 @@ try {
         errors.push('❌ Configuration Vercel: builds manquants');
     }
 
-    if (!vercelConfig.routes || vercelConfig.routes.length < 2) {
-        errors.push('❌ Configuration Vercel: routes manquantes');
+    // Vérifier soit routes (ancienne syntaxe) soit rewrites (nouvelle syntaxe)
+    if (!vercelConfig.routes && !vercelConfig.rewrites) {
+        errors.push('❌ Configuration Vercel: routes ou rewrites manquantes');
+    } else if (vercelConfig.routes && vercelConfig.routes.length < 2) {
+        errors.push('❌ Configuration Vercel: routes insuffisantes');
+    } else if (vercelConfig.rewrites && vercelConfig.rewrites.length < 1) {
+        errors.push('❌ Configuration Vercel: rewrites insuffisantes');
     }
 
     console.log('✅ Configuration Vercel valide');
