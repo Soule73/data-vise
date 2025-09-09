@@ -24,10 +24,11 @@
             "destination": "/backend/api/index.ts"
         },
         {
-            "source": "/docs/(.*)",
-            "destination": "/frontend/dist/docs/$1"
+            "source": "/(.*)",
+            "destination": "/frontend/dist/index.html"
         }
     ],
+    "redirects": [],
     "headers": [
         {
             "source": "/api/(.*)",
