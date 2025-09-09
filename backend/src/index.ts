@@ -45,18 +45,19 @@ app.get("/", (req, res) => {
 mongoose
   .connect(process.env.MONGO_URI || "", {
     serverSelectionTimeoutMS: 5000,
-
     connectTimeoutMS: 10000,
   })
   .then(async () => {
-
     await initPermissionsAndRoles();
 
-    app.listen(PORT, () => {
-      if (appDebug) {
-        console.log(`Serveur backend démarré sur ${appDomain}:${PORT}`);
-      }
-    });
+    // Only start server in development mode
+    if (process.env.NODE_ENV !== 'production') {
+      app.listen(PORT, () => {
+        if (appDebug) {
+          console.log(`Serveur backend démarré sur ${appDomain}:${PORT}`);
+        }
+      });
+    }
   })
   .catch((err) => {
     if (appDebug) {
@@ -83,3 +84,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     status,
   });
 });
+
+// Export the Express app for serverless function handler
+export default app;

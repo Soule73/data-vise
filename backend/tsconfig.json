@@ -3,47 +3,47 @@
         "target": "ES2020",
         "module": "commonjs",
         "outDir": "./dist",
-        "rootDir": "./src",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "baseUrl": "./src",
+        "baseUrl": ".",
         "paths": {
             "@/*": [
-                "*"
+                "src/*"
             ],
             "@routes/*": [
-                "routes/*"
+                "src/routes/*"
             ],
             "@middleware/*": [
-                "middleware/*"
+                "src/middleware/*"
             ],
             "@utils/*": [
-                "utils/*"
+                "src/utils/*"
             ],
             "@controllers/*": [
-                "controllers/*"
+                "src/controllers/*"
             ],
             "@data/*": [
-                "data/*"
+                "src/data/*"
             ],
             "@models/*": [
-                "models/*"
+                "src/models/*"
             ],
             "@services/*": [
-                "services/*"
+                "src/services/*"
             ],
             "@validation/*": [
-                "validation/*"
+                "src/validation/*"
             ],
             "@type/*": [
-                "types/*"
+                "src/types/*"
             ]
         }
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "api/**/*"
     ],
     "exclude": [
         "node_modules"
